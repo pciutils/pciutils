@@ -1,3 +1,7 @@
+Thu Oct 14 10:40:12 1999  Dave Jones    <dave@powertweak.com>
+
+	* pci.ids: Added lots of subsystem definitions.
+
 Sat Oct  9 14:32:28 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* setpci.man: Better example.
