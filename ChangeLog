@@ -1,5 +1,13 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lib/proc.c (proc_setup): Increased path name length limit to 1024.
+	Thanks for Redhat and Mandrake for inspiration.
+
+	* lib/configure: Recognize ppc and ppc64, both have 64-bit addresses.
+	Grabbed from Redhat (Fedora) patches.
+
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
 	Merged bug fixes from Debian patches:
 
 	* lspci.c (show_verbose): "Cache Line Size" should be capitalized.

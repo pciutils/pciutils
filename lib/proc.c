@@ -178,7 +178,7 @@ proc_setup(struct pci_dev *d, int rw)
 
   if (a->cached_dev != d || a->fd_rw < rw)
     {
-      char buf[256];
+      char buf[1024];
       if (a->fd >= 0)
 	close(a->fd);
       if (snprintf(buf, sizeof(buf), "%s/%02x/%02x.%d", a->method_params[PCI_ACCESS_PROC_BUS_PCI],
