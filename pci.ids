@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.14 1998/11/04 17:40:24 ralf Exp $
+#	$Id: pci.ids,v 1.15 1998/11/11 09:19:36 jes Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -501,6 +501,7 @@
 	0002  Smart 16/4 BM Mk2 PCI Ringnode
 	1001  Collage 155 Server
 10b7  3Com Corporation
+	0001  3c985 1000BaseSX
 	3390  Token Link Velocity
 	5900  3c590 10BaseT [Vortex]
 	5950  3c595 100BaseTX [Vortex]
@@ -1216,6 +1217,7 @@
 12ac  Measurex Corporation
 12ad  Multidata GmbH
 12ae  Alteon Networks Inc.
+	0001  AceNIC Gigabit Ethernet
 12af  TDK USA Corp
 12b0  Jorge Scientific Corp
 12b1  GammaLink
