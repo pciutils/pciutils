@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.33 2000/01/20 21:15:41 mj Exp $
+ *	$Id: lspci.c,v 1.34 2000/01/20 21:23:14 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -101,7 +101,7 @@ scan_device(struct pci_dev *p)
   if (how_much < 128 && (d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
     {
       /* For cardbus bridges, we need to fetch 64 bytes more to get the full standard header... */
-      if (!pci_read_block(p, 0, d->config+64, 64))
+      if (!pci_read_block(p, 64, d->config+64, 64))
 	die("Unable to read cardbus bridge extension data.");
       how_much = 128;
     }
