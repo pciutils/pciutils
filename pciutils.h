@@ -1,5 +1,5 @@
 /*
- *	$Id: pciutils.h,v 1.10 1998/11/22 08:56:02 mj Exp $
+ *	$Id: pciutils.h,v 1.11 1999/01/19 21:24:42 mj Exp $
  *
  *	Linux PCI Utilities -- Declarations
  *
@@ -16,7 +16,7 @@
 #include "pci.h"
 #endif
 
-#define PCIUTILS_VERSION "1.09"
+#define PCIUTILS_VERSION "1.10"
 
 #define PROC_BUS_PCI "/proc/bus/pci"
 #define ETC_PCI_IDS "/usr/share/pci.ids"
