@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.52 2000/02/29 21:23:45 ralf Exp $
+#	$Id: pci.ids,v 1.53 2000/03/09 08:19:20 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -258,6 +258,8 @@
 	0026  DECchip 21154
 	0045  DECchip 21553
 	0046  DECchip 21554
+		9005 1364  Dell PowerEdge RAID Controller 2
+		9005 1365  Dell PowerEdge RAID Controller 2
 1012  Micronics Computers Inc
 1013  Cirrus Logic
 	0038  GD 7548
@@ -411,20 +413,35 @@
 	1489  M1489
 	1511  M1511
 	1513  M1513
-	1531  M1531
-	1533  M1533
+	1531  M1531 Northbridge [Aladdin IV/IV+]
+	1533  M1533 PCI-to-ISA Bridge
+	1535  M1535 PCI Bridge + Super I/O + FIR
+	1541  M1541 Northbridge [Aladdin V]
+	1542  M1542 Northbridge [Aladdin V]
+	1543  M1543 PCI-to-ISA Bridge + Super I/O + FIR
+	1561  M1561 Northbridge [Aladdin 7]
+	1621  M1621 Northbridge [Aladdin-Pro II]
+	1631  M1631 Northbridge+3D Graphics [Aladdin TNT2]
+	1641  M1641 Northbridge [Aladdin-Pro IV]
 	3141  M3141
 	3143  M3143
 	3145  M3145
 	3147  M3147
 	3149  M3149
 	3151  M3151
+	3307  M3307 MPEG-I Video Controller
+	3309  M3309 MPEG-II Video w/ Software Audio Decoder
+	3321  M3321 MPEG-II Audio/Video Decoder
 	5217  M5217H
 	5219  M5219
 	5225  M5225
 	5229  M5229
 	5235  M5235
+	5251  M5251 P1394 OHCI Controller
 1028  Dell Computer Corporation
+	0001  PowerEdge Expandable RAID Controller 2/Si
+	0002  PowerEdge Expandable RAID Controller 3/Di
+	0003  PowerEdge Expandable RAID Controller 3/Si
 1029  Siemens Nixdorf IS
 102a  LSI Logic
 	0000  HYDRA
@@ -834,6 +851,7 @@
 	1022  ISP1022
 	1080  ISP1080
 	1240  ISP1240
+	1280  ISP1280
 	2020  ISP2020A
 	2100  ISP2100
 	2200  ISP2200
@@ -1051,8 +1069,23 @@
 	1077  VScom 400 4 port serial adaptor
 	9036  9036
 	9050  PCI <-> IOBus Bridge
-		d84d 4055  EX-4055 4 port serial adapter
-		d84d 4065  EX-4065 8 port serial adapter
+		d84d 4006  EX-4006 1P
+		d84d 4008  EX-4008 1P EPP/ECP
+		d84d 4014  EX-4014 2P
+		d84d 4018  EX-4018 3P EPP/ECP
+		d84d 4025  EX-4025 1S(16C550) RS-232
+		d84d 4027  EX-4027 1S(16C650) RS-232
+		d84d 4028  EX-4028 1S(16C850) RS-232
+		d84d 4036  EX-4036 2S(16C650) RS-232
+		d84d 4037  EX-4037 2S(16C650) RS-232
+		d84d 4038  EX-4038 2S(16C850) RS-232
+		d84d 4052  EX-4052 1S(16C550) RS-422/485
+		d84d 4053  EX-4053 2S(16C550) RS-422/485
+		d84d 4055  EX-4055 4S(16C550) RS-232
+		d84d 4058  EX-4055 4S(16C650) RS-232
+		d84d 4065  EX-4065 8S(16C550) RS-232
+		d84d 4068  EX-4068 8S(16C650) RS-232
+		d84d 4078  EX-4078 2S(16C552) RS-232+1P
 	9060  9060
 	906d  9060SD
 		125c 0640  Aries 16000P
@@ -1215,9 +1248,10 @@
 	10dc  ATT2C15-3 FPGA
 10dd  Evans & Sutherland
 10de  nVidia Corporation
-	0008  NV1 EDGE 3D
-	0009  NV1 EDGE 3D
-	0020  Riva TNT 128
+	0008  EDGE 3D [NV1]
+	0009  EDGE 3D [NV1]
+	0010  Mutara V08 [NV2]
+	0020  Riva TnT 128 [NV04]
 		1043 0200  V3400 TNT
 		1092 0550  Viper V550
 		1092 0552  Viper V550
@@ -1232,7 +1266,7 @@
 		1092 4904  Viper V550 
 		1092 4914  Viper V550 
 		1092 8225  Viper V550
-	0028  Riva TNT2
+	0028  Riva TnT2 [NV5]
 		1043 0200  AGP-V3800 SGRAM
 		1092 4804  Viper V770
 		1092 4a00  Viper V770
@@ -1241,16 +1275,20 @@
 		1092 7a02  Viper V770 Ultra
 		1102 1020  3D Blaster RIVA TNT2
 		14af 5810  Maxi Gamer Xentor
-	0029  Riva TNT2 Ultra
+	0029  Riva TnT2 Ultra [NV5]
 		1043 0200  AGP-V3800 Deluxe
 		1102 1021  3D Blaster RIVA TNT2 Ultra
 		14af 5820  Maxi Gamer Xentor 32
-	002c  Vanta
+	002a  Riva TnT2 [NV5]
+	002b  Riva TnT2 [NV5]
+	002c  Vanta [NV6]
 		1043 0200  AGP-V3800 Combat SDRAM
 		1092 6820  Viper V730
 		14af 5008  Maxi Gamer Phoenix 2
-	002d  Riva TNT2 Model 64
+	002d  Vanta [NV6]
 		1043 0200  AGP-V3800M
+	002e  Vanta [NV6]
+	002f  Vanta [NV6]
 	00a0  Riva TNT2
 		14af 5810  Maxi Gamer Xentor
 10df  Emulex Corporation
@@ -1330,6 +1368,10 @@
 10ed  Ascii Corporation
 	7310  V7310
 10ee  Xilinx, Inc.
+	3fc0  RME Digi96
+	3fc1  RME Digi96/8
+	3fc2  RME Digi96/8 Pro
+	3fc3  RME Digi96/8 Pad
 10ef  Racore Computer Products, Inc.
 	8154  M815x Token Ring Adapter
 10f0  Peritek Corporation
@@ -1515,7 +1557,7 @@
 	0000  155P-MF1 (FPGA)
 	0002  155P-MF1 (ASIC)
 	0003  ENI-25P ATM Adapter
-	0005  ENI-25P ATM Adapter
+	0005  Speedstream 30xx ATM Adapter
 111b  Teledyne Electronic Systems
 111c  Tricord Systems Inc.
 	0001  Powerbis Bridge
@@ -2209,6 +2251,7 @@
 	1968  ES1968 Maestro 2
 	1969  ES1969 Solo-1 Audiodrive
 	1978  ES1978 Maestro 2E
+	1988  ES1988 Allegro-1
 	2808  ES336H Fax Modem (Later Model)
 	2898  ES2898 Modem
 125e  Specialvideo Engineering SRL
@@ -2249,6 +2292,7 @@
 1277  Comstream
 1278  Transtech Parallel Systems Ltd.
 1279  Transmeta Corporation
+	0295  Virtual Northbridge
 127a  Rockwell International
 	1002  HCF 56k V90 FaxModem
 	1003  HCF 56k V90 FaxModem
@@ -2706,6 +2750,7 @@
 13c0  Microgate Corporation
 	0010  SyncLink WAN Adapter
 13c1  3ware Inc
+	1000  3ware ATA-RAID
 13c2  Technotrend Systemtechnik GmbH
 13c3  Janz Computer AG
 13c4  Phase Metrics
@@ -2871,6 +2916,7 @@
 145d  Gallant Computer Inc
 145e  Aashima Technology B.V.
 145f  Baldor Electric Company
+	0001  NextMove PCI
 1460  DYNARC INC
 1461  Avermedia Technologies Inc
 1462  Micro-star International Co Ltd
@@ -2955,6 +3001,7 @@
 14b1  Nextcom K.K.
 14b2  ENNOVATE Networks Inc
 14b3  XPEED Inc
+	0000  DSL NIC
 14b4  PHILIPS Business Electronics B.V.
 14b5  Creamware GmBH
 14b6  Quantum Data Corp.
@@ -2997,6 +3044,7 @@
 14d9  Alpha Processor Inc
 14da  National Aerospace Laboratories
 14db  AFAVLAB Technology Inc
+	2120  TK9902
 14dc  Amplicon Liveline Ltd
 	0000  PCI230
 	0001  PCI242
@@ -3460,6 +3508,7 @@
 	71a0  440GX - 82443GX Host bridge
 	71a1  440GX - 82443GX AGP bridge
 	71a2  440GX - 82443GX Host bridge (AGP disabled)
+	7601  82372FB PIIX4 IDE
 	7602  82372FB [PCI-to-USB UHCI]
 	7800  i740
 		1092 0100  Stealth II G460
