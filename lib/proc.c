@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.2 1999/04/18 19:08:12 mj Exp $
+ *	$Id: proc.c,v 1.3 1999/06/17 17:51:11 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -32,7 +32,7 @@
 
 #if defined(__GLIBC__) && !(defined(__powerpc__) && __GLIBC__ == 2 && __GLIBC_MINOR__ == 0)
 #ifndef SYS_pread
-#define SYS_pread __NR_pread
+#define SYS_pread 180
 #endif
 static int
 pread(unsigned int fd, void *buf, size_t size, loff_t where)
@@ -41,7 +41,7 @@ pread(unsigned int fd, void *buf, size_t size, loff_t where)
 }
 
 #ifndef SYS_pwrite
-#define SYS_pwrite __NR_pwrite
+#define SYS_pwrite 181
 #endif
 static int
 pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
