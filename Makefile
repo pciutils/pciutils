@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 1998/04/19 11:02:25 mj Exp $
+# $Id: Makefile,v 1.9 1998/11/22 08:56:00 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -7,8 +7,8 @@ KERN_H=$(shell if [ ! -f pci.h ] ; then echo '-DKERNEL_PCI_H' ; fi)
 OPT=-O2 -fomit-frame-pointer
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wno-unused -Werror -DARCH_$(ARCH) $(KERN_H)
 
-PREFIX=/
-MANPREFIX=/usr
+ROOT=/
+PREFIX=/usr
 
 all: lspci setpci
 
@@ -25,9 +25,11 @@ clean:
 	rm -f lspci setpci pci.h
 
 install: all
-	install -o root -g root -m 755 -s lspci setpci $(PREFIX)/sbin
-	install -o root -g root -m 644 pci.ids $(PREFIX)/etc
-	install -o root -g root -m 644 lspci.8 setpci.8 $(MANPREFIX)/man/man8
+	install -o root -g root -m 755 -s lspci setpci $(ROOT)/sbin
+	install -o root -g root -m 644 pci.ids $(PREFIX)/share
+	install -o root -g root -m 644 lspci.8 setpci.8 $(PREFIX)/man/man8
+	# Remove relics from old versions
+	rm -f $(ROOT)/etc/pci.ids
 
 dist: clean
 	cp /usr/src/linux/include/linux/pci.h .

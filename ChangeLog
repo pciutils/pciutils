@@ -1,3 +1,9 @@
+Sun Nov 22 10:49:56 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile, pciutils.h: Moved pci.ids to /usr/share.
+
+	* Released as version 1.09.
+
 Wed Nov 18 15:47:05 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_htype1): Fixed displaying of prefetchable memory behind
