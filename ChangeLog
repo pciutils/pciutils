@@ -1,3 +1,17 @@
+2000-05-20  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 2.1.8.
+
+	* pci.ids: ID updates.
+
+	* lspci.c (show_verbose): Min/max latency is now printed in nanoseconds.
+
+2000-05-04  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_verbose): If the header type doesn't match device
+	class, just print a warning and still use the header type, assuming
+	bogus class info.
+
 2000-05-01  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_pm): Updated according to PCI PM specs 1.1.

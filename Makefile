@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.33 2000/04/21 11:58:00 mj Exp $
+# $Id: Makefile,v 1.34 2000/05/20 14:42:35 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2000 Martin Mares <mj@suse.cz>
 
@@ -6,10 +6,10 @@ OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
 
-VERSION=2.1.7
-SUFFIX=
+VERSION=2.1.8
+#SUFFIX=-pre2
 #SUFFIX=-alpha
-DATE=2000-04-21
+DATE=2000-05-20
 
 INSTALL=install
 DIRINSTALL=install -d
@@ -77,7 +77,7 @@ release:
 	mv pciutils.spec.new pciutils.spec
 	mv README.new README
 
-REL=pciutils-$(VERSION)
+REL=pciutils-$(VERSION)$(SUFFIX)
 
 dist: clean
 	mkdir dist
