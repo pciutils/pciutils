@@ -1,5 +1,7 @@
 2002-03-26  Martin Mares  <mj@ucw.cz>
 
+	* README: Rewritten.
+
 	* Makefile: When the currently installed pci.ids file is newer than
 	the version to be installed, don't overwrite it. Suggested by
 	Jean Delvare <khali@linux-fr.org>.
