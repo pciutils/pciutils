@@ -1,10 +1,10 @@
 #
 #	List of PCI ID's
 #
-#	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
+#	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.15 1998/11/11 09:19:36 jes Exp $
+#	$Id: pci.ids,v 1.16 1999/01/23 20:25:35 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -208,7 +208,11 @@
 	051a  MGA 1064SG [Mystique]
 	051b  MGA 2164W [Millennium II]
 	051f  MGA 2164W AGP [Millennium II AGP]
+	0520  MGA G200 PCI
+	0521  MGA G200 AGP
 	0d10  MGA Ultima/Impression
+	1000  MGA G100 [multi monitor]
+	1001  MGA G100 AGP
 102c  Chips and Technologies
 	00b8  64310
 	00d8  65545
@@ -309,6 +313,7 @@
 	0107  OTI107
 104f  Co-time Computer Ltd
 1050  Winbond Electronics Corp
+	0840  89C840
 	0940  89C940
 1051  Anigma, Inc.
 1053  Young Micro Systems
@@ -370,6 +375,8 @@
 106b  Apple Computer Inc.
 	0001  Bandit PowerPC host bridge
 	0002  Grand Central I/O
+	0003  Control Video
+	0004  PlanB Video-In
 	000e  Hydra Mac I/O
 106c  Hyundai Electronics America
 106d  Sequent Computer Systems
@@ -539,7 +546,7 @@
 	3151  M3151
 	3307  M3307
 	5215  M4803
-	5217  m5217h
+	5217  M5217h
 	5219  M5219
 	5229  M5229
 	5235  m5225
@@ -658,6 +665,8 @@
 	9100  320 P
 	9500  360P
 1102  Creative Labs
+	0002  SB Live!
+	7002  SB Live! Daughterboard
 1103  Triones Technologies, Inc.
 1104  RasterOps Corp.
 1105  Sigma Designs, Inc.
@@ -670,15 +679,17 @@
 	0586  VT82C586 ISA [Apollo VP]
 	0595  VT82C595 [Apollo VP2]
 	0597  VT82C597 [Apollo VP3]
+	0598  VT82C598 [Apollo MVP3]
 	0926  VT82C926 [Amazon]
 	1000  82C570MV
 	1106  82C570MV
-	1571  VT 82C416MV
+	1571  VT82C416MV
 	1595  VT82C595/97 [Apollo VP2/97]
 	3038  VT82C586B USB
 	3040  VT82C586B ACPI
 	6100  VT85C100A [Rhine II]
 	8597  VT82C597 [Apollo VP3 AGP]
+	8598  VT82C598 [Apollo MVP3 AGP]
 1107  Stratus Computers
 1108  Proteon, Inc.
 	0100  p1690plus_AA
@@ -1185,7 +1196,13 @@
 128b  Transwitch Corporation
 128c  Retix Corporation
 128d  G2 Networks, Inc.
-128e  Samho Multi Tech Ltd.
+# ??? 128e  Samho Multi Tech Ltd.
+128e  Hoontech Corporation
+	0008  ST128 WSS/SB
+	0009  ST128 SAM9407
+	000a  ST128 Game Port
+	000b  ST128 MPU Port
+	000c  ST128 Ctrl Port
 128f  Tateno Dennou, Inc.
 1290  Sord Computer Corporation
 1291  NCS Computer Italia
@@ -1699,14 +1716,19 @@
 	7111  82371AB PIIX4 IDE
 	7112  82371AB PIIX4 USB
 	7113  82371AB PIIX4 ACPI
-	7180  440LX - 82443LX PAC Host
-	7181  440LX - 82443LX PAC AGP
-	7190  440BX - 82443BX Host
-	7191  440BX - 82443BX AGP
-	7192  440BX - 82443BX (AGP disabled)
+	7180  440LX - 82443LX Host bridge
+	7181  440LX - 82443LX AGP bridge
+	7190  440BX/ZX - 82443BX/ZX Host bridge
+	7191  440BX/ZX - 82443BX/ZX AGP bridge
+	7192  440BX/ZX - 82443BX/ZX Host bridge (AGP disabled)
+	71a0  440GX - 82443GX Host bridge
+	71a1  440GX - 82443GX AGP bridge
+	71a2  440GX - 82443GX Host bridge (AGP disabled)
 	7800  i740
-	84c4  82450KX [Orion]
-	84c5  82450GX [Orion]
+	84c4  450KX/GX [Orion] - 82454KX/GX PCI bridge
+	84c5  450KX/GX [Orion] - 82453KX/GX Memory controller
+	84ca  450NX - 82451NX Memory & I/O Controller
+	84cb  450NX - 82454NX PCI Expander Bridge
 8800  Trigem Computer Inc.
 8888  Silicon Magic
 8e0e  Computone Corporation

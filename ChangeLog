@@ -1,3 +1,7 @@
+Sat Jan 23 21:30:54 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Added few devices.
+
 Fri Jan 22 19:29:31 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Version string is now defined in top-level Makefile, exported
