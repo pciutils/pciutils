@@ -159,7 +159,9 @@ sub CopyFile($$$$) {
 sub GenPackage($) {
 	my ($s) = @_;
 	$s->{"PKG"} = $s->{"PACKAGE"} . "-" . $s->{"VERSION"};
-	my $dir = $s->{"DISTDIR"} . "/" . $s->{"PKG"};
+	my $dd = $s->{"DISTDIR"};
+	my $pkg = $s->{"PKG"};
+	my $dir = "$dd/$pkg";
 	print "Generating $dir\n";
 
 	FILES: foreach my $f (`find . -type f`) {
@@ -185,17 +187,16 @@ sub GenPackage($) {
 		`cd $dir && make distclean >&2`; die if $?;
 	}
 
-	my $arch = "$dir.tar.gz";
-	print "Creating $arch\n";
+	print "Creating $dd/$pkg.tar.gz\n";
 	my $tarvv = $verbose ? "vv" : "";
-	`tar cz${tarvv}f $arch $dir >&2`; die if $?;
-	push @{$s->{"distfiles"}}, $arch;
+	`cd $dd && tar cz${tarvv}f $pkg.tar.gz $pkg >&2`; die if $?;
+	push @{$s->{"distfiles"}}, "$dd/$pkg.tar.gz";
 
 	my $adir = $s->{"archivedir"};
-	my $afile = $adir . "/" . $s->{"PKG"} . ".tar.gz";
-	print "Archiving $arch in $afile\n";
+	my $afile = "$adir/$pkg.tar.gz";
+	print "Archiving to $afile\n";
 	-d $adir or `mkdir -p $adir`;
-	`cp $arch $afile`; die if $?;
+	`cp $dd/$pkg.tar.gz $afile`; die if $?;
 
 	return $dir;
 }
