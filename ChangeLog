@@ -1,3 +1,9 @@
+Wed Sep  9 12:03:24 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_bases): Better displaying of unassigned and
+	disabled bases. Thanks to Gabriel Paubert <paubert@iram.es>
+	for an idea.
+
 Wed Sep  2 10:58:01 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* setpci.c (pread): Recognize glibc 1.99 numbered as 2.0 on the PPC.

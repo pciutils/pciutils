@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.14 1998/07/17 08:57:14 mj Exp $
+ *	$Id: lspci.c,v 1.15 1998/09/09 07:38:54 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -269,46 +269,65 @@ show_bases(struct device *d, int cnt)
       if (buscentric_view)
 	pos = flg;
       else
-	pos = d->kernel_base_addr[i];
-      if (!pos || pos == 0xffffffff)
+	{
+	  pos = d->kernel_base_addr[i];
+	  if (!pos)
+	    continue;
+	}
+      if (pos == 0xffffffff)
 	continue;
+      if (verbose > 1)
+	printf("\tRegion %d: ", i);
+      else
+	putchar('\t');
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
 	{
-	  if (cmd & PCI_COMMAND_IO)
-	    {
-	      if (verbose > 1)
-		printf("\tRegion %d: ", i);
-	      else
-		putchar('\t');
-	      printf("I/O ports at %04lx\n", pos & PCI_BASE_ADDRESS_IO_MASK);
-	    }
+	  unsigned long a = pos & PCI_BASE_ADDRESS_IO_MASK;
+	  printf("I/O ports at ");
+	  if (a)
+	    printf("%04lx", a);
+	  else
+	    printf("<unassigned>");
+	  if (!(cmd & PCI_COMMAND_IO))
+	    printf(" [disabled]");
 	}
-      else if (cmd & PCI_COMMAND_MEMORY)
+      else
 	{
 	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
-	  if (verbose > 1)
-	    printf("\tRegion %d: ", i);
-	  else
-	    putchar('\t');
+	  unsigned long a = pos & PCI_BASE_ADDRESS_MEM_MASK;
+	  int x64 = 0;
 	  printf("Memory at ");
 	  if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
 	    {
 	      if (i < cnt - 1)
 		{
+		  u32 z;
 		  i++;
-		  if (!buscentric_view)
-		    printf("%08x", get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i));
+		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+		  if (buscentric_view)
+		    printf("%08x", z);
+		  if (z)
+		    x64 = 1;
 		}
 	      else
-		printf("????????");
+		{
+		  printf("????????");
+		  x64 = 1;
+		}
 	    }
-	  printf("%08lx (%s, %sprefetchable)\n",
-		 pos & PCI_BASE_ADDRESS_MEM_MASK,
+	  if (x64 || a)
+	    printf("%08lx", a);
+	  else
+	    printf("<unassigned>");
+	  printf(" (%s, %sprefetchable)",
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
-		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M 32-bit" : "???",
+		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
 		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
+	  if (!(cmd & PCI_COMMAND_MEMORY))
+	    printf(" [disabled]");
 	}
+      putchar('\n');
     }
 }
 
