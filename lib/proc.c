@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.9 2002/03/30 15:39:25 mj Exp $
+ *	$Id: proc.c,v 1.10 2002/12/26 20:24:08 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -160,6 +160,7 @@ proc_scan(struct pci_access *a)
       d->func = PCI_FUNC(dfn & 0xff);
       d->vendor_id = vend >> 16U;
       d->device_id = vend & 0xffff;
+      d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE);
       known = PCI_FILL_IDENT;
       if (!a->buscentric)
 	{
