@@ -1,5 +1,7 @@
 2004-07-05  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test7.
+
 	* lspci.c (config_fetch): Wanted to merge Matthew's bug fix, but
 	ended up with rewriting the fetching mechanism to be fully dynamic,
 	but avoid reading config space registers not explicitly requested.
