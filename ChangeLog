@@ -1,3 +1,8 @@
+Wed Nov  3 10:24:38 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_terse): If prog-if is zero, but it's present in the
+	ID list, show it.
+
 Sat Oct 30 11:06:35 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as version 2.1.

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.30 1999/10/09 13:26:02 mj Exp $
+ *	$Id: lspci.c,v 1.31 1999/11/03 09:30:11 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -240,15 +240,20 @@ show_terse(struct device *d)
 			 p->vendor_id, p->device_id, 0, 0));
   if (c = get_conf_byte(d, PCI_REVISION_ID))
     printf(" (rev %02x)", c);
-  if (verbose && (c = get_conf_byte(d, PCI_CLASS_PROG)))
+  if (verbose)
     {
-      char *x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
-				PCI_LOOKUP_PROGIF,
-				get_conf_word(d, PCI_CLASS_DEVICE), c, 0, 0);
-      printf(" (prog-if %02x", c);
-      if (x)
-	printf(" [%s]", x);
-      putchar(')');
+      char *x;
+      c = get_conf_byte(d, PCI_CLASS_PROG);
+      x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
+			  PCI_LOOKUP_PROGIF,
+			  get_conf_word(d, PCI_CLASS_DEVICE), c, 0, 0);
+      if (c || x)
+	{
+	  printf(" (prog-if %02x", c);
+	  if (x)
+	    printf(" [%s]", x);
+	  putchar(')');
+	}
     }
   putchar('\n');
 }
