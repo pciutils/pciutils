@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.2 1998/04/19 11:02:29 mj Exp $
+ *	$Id: setpci.c,v 1.3 1998/06/08 07:57:54 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -8,14 +8,20 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <asm/unistd.h>
 #include <asm/byteorder.h>
+
+#include <asm/unistd.h>
+#ifdef __GLIBC__
+#include <syscall-list.h>
+#endif
 
 #include "pciutils.h"
 
@@ -59,8 +65,22 @@ xmalloc(unsigned int howmuch)
  * As libc doesn't support pread/pwrite yet, we have to call them directly
  * or use lseek/read/write instead.
  */
+#ifdef __GLIBC__
+static int
+pread(unsigned int fd, void *buf, size_t size, loff_t where)
+{
+  return syscall(SYS_pread, fd, buf, size, where);
+}
+
+static int
+pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
+{
+  return syscall(SYS_pwrite, fd, buf, size, where);
+}
+#else
 static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
 static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
+#endif
 
 static void
 scan_devices(void)
@@ -333,6 +353,11 @@ main(int argc, char **argv)
   struct pci_filter filter;
   struct device **selected_devices = NULL;
 
+  if (argc == 2 && !strcmp(argv[1], "--version"))
+    {
+      puts("setpci version " PCIUTILS_VERSION);
+      return 0;
+    }
   argc--;
   argv++;
   while (argc && argv[0][0] == '-')
