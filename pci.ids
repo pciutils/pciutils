@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.19 1999/02/28 20:23:08 mj Exp $
+#	$Id: pci.ids,v 1.20 1999/03/10 04:19:07 cort Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -146,6 +146,7 @@
 	001d  82G2675
 	0020  MCA
 	0022  IBM27-82351
+	002d  Python
 	002e  ServeRAID controller
 	0036  Miami
 	003e  TR_Wake
