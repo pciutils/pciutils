@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 2000/04/17 15:59:16 mj Exp $
+# $Id: Makefile,v 1.33 2000/04/21 11:58:00 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2000 Martin Mares <mj@suse.cz>
 
@@ -6,17 +6,27 @@ OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
 
-VERSION=2.1.6
+VERSION=2.1.7
 SUFFIX=
 #SUFFIX=-alpha
-DATE=2000-04-17
+DATE=2000-04-21
 
+INSTALL=install
+DIRINSTALL=install -d
 ifeq ($(shell uname),FreeBSD)
 ROOT=/usr/local
 PREFIX=/usr/local
 else
+ifeq ($(shell uname),AIX)
+ROOT=/usr/local
+PREFIX=/usr/local
+CFLAGS=-g
+INSTALL=installbsd
+DIRINSTALL=mkdir -p
+else
 ROOT=/
 PREFIX=/usr
+endif
 endif
 MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
 
@@ -41,16 +51,16 @@ common.o: common.c pciutils.h lib/libpci.a
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)$(SUFFIX)/"
 
 clean:
-	rm -f `find . -name "*~" -or -name "*.[oa]" -or -name "\#*\#" -or -name TAGS -or -name core`
+	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
 	rm -f lspci setpci lib/config.* *.8
 	rm -rf dist
 
 install: all
 	# -c is ignored on Linux, but required on FreeBSD
-	install -d -m 755 $(ROOT)/sbin $(PREFIX)/share $(MANDIR)/man8
-	install -c -m 755 -s lspci setpci $(ROOT)/sbin
-	install -c -m 644 pci.ids $(PREFIX)/share
-	install -c -m 644 lspci.8 setpci.8 $(MANDIR)/man8
+	$(DIRINSTALL) -m 755 $(ROOT)/sbin $(PREFIX)/share $(MANDIR)/man8
+	$(INSTALL) -c -m 755 -s lspci setpci $(ROOT)/sbin
+	$(INSTALL) -c -m 644 pci.ids $(PREFIX)/share
+	$(INSTALL) -c -m 644 lspci.8 setpci.8 $(MANDIR)/man8
 	# Remove relics from old versions
 	rm -f $(ROOT)/etc/pci.ids
 

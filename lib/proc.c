@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.7 2000/01/20 21:14:44 mj Exp $
+ *	$Id: proc.c,v 1.8 2000/04/21 11:58:00 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -48,8 +48,8 @@ static int pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
 #include <asm/unistd.h>
 static _syscall5(int, pread, unsigned int, fd, void *, buf, size_t, size, u32, where_lo, u32, where_hi);
 static _syscall5(int, pwrite, unsigned int, fd, void *, buf, size_t, size, u32, where_lo, u32, where_hi);
-static int do_read(struct pci_dev *d __attribute__((unused)), int fd, void *buf, size_t size, int where) { return pread(fd, buf, size, where, 0); }
-static int do_write(struct pci_dev *d __attribute__((unused)), int fd, void *buf, size_t size, int where) { return pwrite(fd, buf, size, where, 0); }
+static int do_read(struct pci_dev *d UNUSED, int fd, void *buf, size_t size, int where) { return pread(fd, buf, size, where, 0); }
+static int do_write(struct pci_dev *d UNUSED, int fd, void *buf, size_t size, int where) { return pwrite(fd, buf, size, where, 0); }
 #define HAVE_DO_READ
 
 #else

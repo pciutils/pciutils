@@ -1,23 +1,39 @@
 #!/bin/sh
 
-echo -n "Configuring libpci for your system..."
+echo_n() {
+	if [ -n "$BASH" ]
+	then
+		echo -n "$*"
+	else
+		echo "$*\c"
+	fi
+}
+
+echo_n "Configuring libpci for your system..."
 prefix=${1:-/usr}
 version=${2:-0.0}
 sys=`uname -s`
 rel=`uname -r`
-cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/'`
-echo "$sys/$cpu $rel"
+if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
+then
+	rel=`/usr/bin/oslevel`
+	proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
+	cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
+else
+	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/'`
+fi
+echo " $sys/$cpu $rel"
 
 c=config.h
 echo >$c "#define ARCH_`echo $cpu | tr 'a-z' 'A-Z'`"
-echo >$c "#define OS_`echo $sys | tr 'a-z' 'A-Z'`"
+echo >>$c "#define OS_`echo $sys | tr 'a-z' 'A-Z'`"
 
-echo -n "Looking for access methods..."
+echo_n "Looking for access methods..."
 
 case $sys in
 	Linux)
 		case $rel in
-			2.[1-9]*|[3-9]*)	echo -n " proc"
+			2.[1-9]*|[3-9]*)	echo_n " proc"
 						echo >>$c '#define HAVE_PM_LINUX_PROC'
 						echo >>$c '#define HAVE_LINUX_BYTEORDER_H'
 						echo >>$c '#define PATH_PROC_BUS_PCI "/proc/bus/pci"'
@@ -25,31 +41,36 @@ case $sys in
 						;;
 		esac
 		case $cpu in
-				i386)		echo -n " i386-ports"
+				i386)		echo_n " i386-ports"
 						echo >>$c '#define HAVE_PM_INTEL_CONF'
 						ok=1
 						;;
 				alpha|ia64)	echo >>$c '#define HAVE_64BIT_ADDRESS'
-#						echo -n " syscalls"
+#						echo_n " syscalls"
 #						echo >>$c '#define HAVE_PM_SYSCALLS'
 #						ok=1
 						;;
 				sparc|sparc64)	echo >>$c '#define HAVE_64BIT_ADDRESS'
 						echo >>$c '#define HAVE_LONG_ADDRESS'
-#						echo -n " syscalls"
+#						echo_n " syscalls"
 #						echo >>$c '#define HAVE_PM_SYSCALLS'
 #						ok=1
 						;;
 		esac
 		;;
 	FreeBSD)
-		echo -n " fbsd-device"
+		echo_n " fbsd-device"
 		echo >>$c '#define HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PATH_FBSD_DEVICE "/dev/pci"'
 		ok=1
 		;;
+	AIX)
+		echo_n " aix-device"
+		echo >>$c '#define HAVE_PM_AIX_DEVICE'
+		ok=1
+		;;
         *)
-		echo " The PCI library currently supports only Linux and FreeBSD"
+		echo " The PCI library currently supports only Linux, AIX and FreeBSD"
 		exit 1
 		;;
 esac

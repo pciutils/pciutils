@@ -1,5 +1,5 @@
 /*
- *	$Id: pciutils.h,v 1.12 1999/01/22 21:04:59 mj Exp $
+ *	$Id: pciutils.h,v 1.13 2000/04/21 11:58:01 mj Exp $
  *
  *	Linux PCI Utilities -- Declarations
  *
@@ -11,6 +11,11 @@
 #include "lib/pci.h"
 
 #define PCIUTILS_VERSION PCILIB_VERSION
+
+#if !defined(__GNUC__)
+#define __attribute__(x)
+#define inline
+#endif
 
 void __attribute__((noreturn)) die(char *msg, ...);
 void *xmalloc(unsigned int howmuch);

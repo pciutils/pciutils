@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.35 2000/01/23 05:57:04 mj Exp $
+ *	$Id: lspci.c,v 1.36 2000/04/21 11:58:00 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -72,6 +72,16 @@ static struct pci_access *pacc;
 #define IO_FORMAT "%04Lx"
 #else
 #define IO_FORMAT "%04lx"
+#endif
+
+/*
+ *  If we aren't being compiled by GCC, use malloc() instead of alloca().
+ *  This increases our memory footprint, but only slightly since we don't
+ *  use alloca() much.
+ */
+
+#ifndef __GNUC__
+#define alloca malloc
 #endif
 
 /* Our view of the PCI bus */
@@ -1006,7 +1016,10 @@ insert_dev(struct device *d, struct bridge *b)
       struct bridge *c;
       for(c=b->child; c; c=c->next)
 	if (c->secondary <= p->bus && p->bus <= c->subordinate)
-	  return insert_dev(d, c);
+          {
+            insert_dev(d, c);
+            return;
+          }
       bus = new_bus(b, p->bus);
     }
   /* Simple insertion at the end _does_ guarantee the correct order as the

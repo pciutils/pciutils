@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 1999/07/20 14:01:27 mj Exp $
+# $Id: Makefile,v 1.4 2000/04/21 11:58:00 mj Exp $
 # Makefile for The PCI Library
 # (c) 1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -28,6 +28,10 @@ OBJS += fbsd-device.o
 CFLAGS += -I/usr/src/sys
 endif
 
+ifdef HAVE_PM_AIX_DEVICE
+OBJS += aix-device.o
+endif
+
 ifdef HAVE_OWN_HEADER_H
 INCL += header.h
 endif
@@ -45,6 +49,7 @@ proc.o: proc.c $(INCL)
 generic.o: generic.c $(INCL)
 syscalls.o: syscalls.c $(INCL)
 fbsd-device.o: fbsd-device.c $(INCL)
+aix-device.o: aix-device.c $(INCL)
 dump.o: dump.c $(INCL)
 names.o: names.c $(INCL)
 filter.o: filter.c $(INCL)

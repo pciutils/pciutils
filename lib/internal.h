@@ -1,5 +1,5 @@
 /*
- *	$Id: internal.h,v 1.3 1999/07/20 14:01:32 mj Exp $
+ *	$Id: internal.h,v 1.4 2000/04/21 11:58:00 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
@@ -71,6 +71,7 @@ struct pci_methods {
   void (*cleanup_dev)(struct pci_dev *);
 };
 
+void pci_generic_scan_bus(struct pci_access *, byte *busmap, int bus);
 void pci_generic_scan(struct pci_access *);
 int pci_generic_fill_info(struct pci_dev *, int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
@@ -83,6 +84,11 @@ struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
-  pm_syscalls, pm_fbsd_device, pm_dump;
+  pm_syscalls, pm_fbsd_device, pm_aix_device, pm_dump;
 
+#ifdef __GNUC__
 #define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#define inline
+#endif

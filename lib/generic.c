@@ -1,9 +1,9 @@
 /*
- *	$Id: generic.c,v 1.5 1999/07/07 11:23:09 mj Exp $
+ *	$Id: generic.c,v 1.6 2000/04/21 11:58:00 mj Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2000 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -12,7 +12,7 @@
 
 #include "internal.h"
 
-static void
+void
 pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 {
   int dev, multi, ht;
