@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.13 1998/08/17 23:07:43 cort Exp $
+#	$Id: pci.ids,v 1.14 1998/11/04 17:40:24 ralf Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -1657,6 +1657,8 @@
 	8c02  ViRGE/MX+
 	8c03  ViRGE/MX+MV
 	ca00  SonicVibes
+5555  Genroco, Inc
+	0003  TURBOstor HFP-832 [HiPPI NIC]
 6374  c't Magazin für Computertechnik
 	6773  GPPCI
 6666  Decision Computer International Co.
