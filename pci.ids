@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.46 2000/01/02 20:32:11 mj Exp $
+#	$Id: pci.ids,v 1.47 2000/01/13 22:47:15 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -925,6 +925,16 @@
 	1330  PCI-6031E
 	1350  PCI-6071E
 	2a60  PCI-6023E
+	b001  IMAQ-PCI-1408
+	b011  IMAQ-PXI-1408
+	b021  IMAQ-PCI-1424
+	b031  IMAQ-PCI-1413
+	b041  IMAQ-PCI-1407
+	b051  IMAQ-PXI-1407
+	b061  IMAQ-PCI-1411
+	b071  IMAQ-PCI-1422
+	b081  IMAQ-PXI-1422
+	b091  IMAQ-PXI-1411
 	c801  PCI-GPIB
 1094  First International Computers [FIC]
 1095  CMD Technology Inc
@@ -3114,6 +3124,7 @@
 	0005  Permedia
 	0006  GLINT MX
 	0007  3D Extreme
+	0008  GLINT Gamma G1
 	0009  Permedia II 2D+3D
 		3d3d 0100  AccelStar II 3D Accelerator
 		3d3d 0111  Permedia 3:16
@@ -3123,6 +3134,7 @@
 		3d3d 0120  Santa Ana PCL
 		3d3d 0125  Oxygen VX1
 		3d3d 0127  Permedia3 Create!
+	000a  GLINT R3
 	0100  Permedia II 2D+3D
 	1004  Permedia
 	3d04  Permedia
@@ -3302,7 +3314,7 @@
 		0e11 b0dd  NC3131
 		0e11 b0de  NC3132
 		0e11 b0e1  NC3133
-		1014 005c  Ethernet Pro 10/100
+		1014 005c  82558B Ethernet Pro 10/100
 		1014 105c  Netfinity 10/100
 		1033 8000  PC-9821X-B06
 		1033 8016  PK-UG-X006
