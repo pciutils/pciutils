@@ -1,5 +1,7 @@
 2000-05-01  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lspci.c (show_pm): Updated according to PCI PM specs 1.1.
+
 	* pci.ids: Updated Contemporary Control ARCnet card entries.
 
 	* pci.ids: Synchronized class list with latest PCI SIG documents.

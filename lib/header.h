@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.5 2000/01/20 21:15:46 mj Exp $
+ *	$Id: header.h,v 1.6 2000/05/01 21:34:49 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -191,23 +191,27 @@
 
 /* Power Management Registers */
 
-#define  PCI_PM_CAP_VER_MASK	0x0007	/* Version */
-#define  PCI_PM_CAP_PME_CLOCK	0x0008	/* PME clock required */
-#define  PCI_PM_CAP_AUX_POWER	0x0010	/* Auxilliary power support */
-#define  PCI_PM_CAP_DSI		0x0020	/* Device specific initialization */
+#define  PCI_PM_CAP_VER_MASK	0x0007	/* Version (2=PM1.1) */
+#define  PCI_PM_CAP_PME_CLOCK	0x0008	/* Clock required for PME generation */
+#define  PCI_PM_CAP_DSI		0x0020	/* Device specific initialization required */
+#define  PCI_PM_CAP_AUX_C_MASK	0x01c0	/* Maximum aux current required in D3cold */
 #define  PCI_PM_CAP_D1		0x0200	/* D1 power state support */
 #define  PCI_PM_CAP_D2		0x0400	/* D2 power state support */
-#define  PCI_PM_CAP_PME		0x0800	/* PME pin supported */
+#define  PCI_PM_CAP_PME_D0	0x0800	/* PME can be asserted from D0 */
+#define  PCI_PM_CAP_PME_D1	0x1000	/* PME can be asserted from D1 */
+#define  PCI_PM_CAP_PME_D2	0x2000	/* PME can be asserted from D2 */
+#define  PCI_PM_CAP_PME_D3_HOT	0x4000	/* PME can be asserted from D3hot */
+#define  PCI_PM_CAP_PME_D3_COLD	0x8000	/* PME can be asserted from D3cold */
 #define PCI_PM_CTRL		4	/* PM control and status register */
 #define  PCI_PM_CTRL_STATE_MASK	0x0003	/* Current power state (D0 to D3) */
 #define  PCI_PM_CTRL_PME_ENABLE	0x0100	/* PME pin enable */
-#define  PCI_PM_CTRL_DATA_SEL_MASK	0x1e00	/* Data select (??) */
-#define  PCI_PM_CTRL_DATA_SCALE_MASK	0x6000	/* Data scale (??) */
+#define  PCI_PM_CTRL_DATA_SEL_MASK	0x1e00	/* PM table data index */
+#define  PCI_PM_CTRL_DATA_SCALE_MASK	0x6000	/* PM table data scaling factor */
 #define  PCI_PM_CTRL_PME_STATUS	0x8000	/* PME pin status */
-#define PCI_PM_PPB_EXTENSIONS	6	/* PPB support extensions (??) */
-#define  PCI_PM_PPB_B2_B3	0x40	/* Stop clock when in D3hot (??) */
-#define  PCI_PM_BPCC_ENABLE	0x80	/* Bus power/clock control enable (??) */
-#define PCI_PM_DATA_REGISTER	7	/* (??) */
+#define PCI_PM_PPB_EXTENSIONS	6	/* PPB support extensions */
+#define  PCI_PM_PPB_B2_B3	0x40	/* If bridge enters D3hot, bus enters: 0=B3, 1=B2 */
+#define  PCI_PM_BPCC_ENABLE	0x80	/* Secondary bus is power managed */
+#define PCI_PM_DATA_REGISTER	7	/* PM table contents read here */
 #define PCI_PM_SIZEOF		8
 
 /* AGP registers */

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.36 2000/04/21 11:58:00 mj Exp $
+ *	$Id: lspci.c,v 1.37 2000/05/01 21:34:49 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -375,26 +375,36 @@ show_bases(struct device *d, int cnt)
 static void
 show_pm(struct device *d, int where, int cap)
 {
-  int t;
+  int t, b;
+  static int pm_aux_current[8] = { 0, 55, 100, 160, 220, 270, 320, 375 };
 
   printf("Power Management version %d\n", cap & PCI_PM_CAP_VER_MASK);
   if (verbose < 2)
     return;
-  printf("\t\tFlags: PMEClk%c AuxPwr%c DSI%c D1%c D2%c PME%c\n",
+  printf("\t\tFlags: PMEClk%c DSI%c D1%c D2%c AuxCurrent=%dmA PME(D0%c,D1%c,D2%c,D3hot%c,D3cold%c)\n",
 	 FLAG(cap, PCI_PM_CAP_PME_CLOCK),
-	 FLAG(cap, PCI_PM_CAP_AUX_POWER),
 	 FLAG(cap, PCI_PM_CAP_DSI),
 	 FLAG(cap, PCI_PM_CAP_D1),
 	 FLAG(cap, PCI_PM_CAP_D2),
-	 FLAG(cap, PCI_PM_CAP_PME));
+	 pm_aux_current[(cap >> 6) & 7],
+	 FLAG(cap, PCI_PM_CAP_PME_D0),
+	 FLAG(cap, PCI_PM_CAP_PME_D1),
+	 FLAG(cap, PCI_PM_CAP_PME_D2),
+	 FLAG(cap, PCI_PM_CAP_PME_D3_HOT),
+	 FLAG(cap, PCI_PM_CAP_PME_D3_COLD));
   config_fetch(d, where + PCI_PM_CTRL, PCI_PM_SIZEOF - PCI_PM_CTRL);
   t = get_conf_word(d, where + PCI_PM_CTRL);
-  printf("\t\tStatus: D%d PME-Enable%c DSel=%x DScale=%x PME%c\n",
+  printf("\t\tStatus: D%d PME-Enable%c DSel=%d DScale=%d PME%c\n",
 	 t & PCI_PM_CTRL_STATE_MASK,
 	 FLAG(t, PCI_PM_CTRL_PME_ENABLE),
 	 (t & PCI_PM_CTRL_DATA_SEL_MASK) >> 9,
 	 (t & PCI_PM_CTRL_DATA_SCALE_MASK) >> 13,
 	 FLAG(t, PCI_PM_CTRL_PME_STATUS));
+  b = get_conf_byte(d, where + PCI_PM_PPB_EXTENSIONS);
+  if (b)
+    printf("\t\tBridge: PM%c B3%c\n",
+	   FLAG(t, PCI_PM_BPCC_ENABLE),
+	   FLAG(~t, PCI_PM_PPB_B2_B3));
 }
 
 static void
