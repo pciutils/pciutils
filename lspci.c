@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.12 1998/06/08 07:54:37 mj Exp $
+ *	$Id: lspci.c,v 1.13 1998/07/15 20:37:12 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -262,7 +262,7 @@ show_bases(struct device *d, int cnt)
   word cmd = get_conf_word(d, PCI_COMMAND);
   int i;
 
-  for(i=0; i<6; i++)
+  for(i=0; i<cnt; i++)
     {
       unsigned long pos;
       unsigned int flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
@@ -410,6 +410,59 @@ show_htype1(struct device *d)
 static void
 show_htype2(struct device *d)
 {
+  int i;
+  word cmd = get_conf_word(d, PCI_COMMAND);
+  word brc = get_conf_word(d, PCI_CB_BRIDGE_CONTROL);
+  word exca = get_conf_word(d, PCI_CB_LEGACY_MODE_BASE);
+
+  show_bases(d, 1);
+  printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
+	 get_conf_byte(d, PCI_CB_PRIMARY_BUS),
+	 get_conf_byte(d, PCI_CB_CARD_BUS),
+	 get_conf_byte(d, PCI_CB_SUBORDINATE_BUS),
+	 get_conf_byte(d, PCI_CB_LATENCY_TIMER));
+  for(i=0; i<2; i++)
+    {
+      int p = 8*i;
+      u32 base = get_conf_long(d, PCI_CB_MEMORY_BASE_0 + p);
+      u32 limit = get_conf_long(d, PCI_CB_MEMORY_LIMIT_0 + p);
+      if (limit > base)
+	printf("Memory window %d: %08x-%08x%s%s\n", i, base, limit,
+	       (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]",
+	       (brc & (PCI_CB_BRIDGE_CTL_PREFETCH_MEM0 << i)) ? " (prefetchable)" : "");
+    }
+  for(i=0; i<2; i++)
+    {
+      int p = 8*i;
+      u32 base = get_conf_long(d, PCI_CB_IO_BASE_0 + p);
+      u32 limit = get_conf_long(d, PCI_CB_IO_LIMIT_0 + p);
+      if (!(base & PCI_IO_RANGE_TYPE_32))
+	{
+	  base &= 0xffff;
+	  limit &= 0xffff;
+	}
+      base &= PCI_CB_IO_RANGE_MASK;
+      if (!base)
+	continue;
+      limit = (limit & PCI_CB_IO_RANGE_MASK) + 3;
+      printf("I/O window %d: %08x-%08x%s\n", i, base, limit,
+	     (cmd & PCI_COMMAND_IO) ? "" : " [disabled]");
+    }
+
+  if (get_conf_word(d, PCI_CB_SEC_STATUS) & PCI_STATUS_SIG_SYSTEM_ERROR)
+    printf("\tSecondary status: SERR\n");
+  if (verbose > 1)
+    printf("\tBridgeCtl: Parity%c SERR%c ISA%c VGA%c MAbort%c >Reset%c 16bInt%c PostWrite%c\n",
+	   (brc & PCI_CB_BRIDGE_CTL_PARITY) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_SERR) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_ISA) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_VGA) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_MASTER_ABORT) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_CB_RESET) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_16BIT_INT) ? '+' : '-',
+	   (brc & PCI_CB_BRIDGE_CTL_POST_WRITES) ? '+' : '-');
+  if (exca)
+    printf("\t16-bit legacy interface ports at %04x\n", exca);
 }
 
 static void
@@ -453,8 +506,9 @@ show_verbose(struct device *d)
     case PCI_HEADER_TYPE_CARDBUS:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	goto badhdr;
-      irq = int_line = int_pin = min_gnt = max_lat = 0;
-      subsys_v = subsys_d = 0;
+      min_gnt = max_lat = 0;
+      subsys_v = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+      subsys_d = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
       break;
     default:
       printf("\t!!! Unknown header type %02x\n", htype);
@@ -704,12 +758,23 @@ grow_tree(void)
   for(d=first_dev; d; d=d->next)
     {
       word class = get_conf_word(d, PCI_CLASS_DEVICE);
-      if (class == PCI_CLASS_BRIDGE_PCI && (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f) == 1)
+      byte ht = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+      if (class == PCI_CLASS_BRIDGE_PCI &&
+	  (ht == PCI_HEADER_TYPE_BRIDGE || ht == PCI_HEADER_TYPE_CARDBUS))
 	{
 	  b = xmalloc(sizeof(struct bridge));
-	  b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
-	  b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
-	  b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
+	  if (ht == PCI_HEADER_TYPE_BRIDGE)
+	    {
+	      b->primary = get_conf_byte(d, PCI_CB_PRIMARY_BUS);
+	      b->secondary = get_conf_byte(d, PCI_CB_CARD_BUS);
+	      b->subordinate = get_conf_byte(d, PCI_CB_SUBORDINATE_BUS);
+	    }
+	  else
+	    {
+	      b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
+	      b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
+	      b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
+	    }
 	  *last_br = b;
 	  last_br = &b->chain;
 	  b->next = b->child = NULL;

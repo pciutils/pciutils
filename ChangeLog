@@ -1,3 +1,13 @@
+Wed Jul 15 15:37:21 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_htype2 etc.): Displaying of CardBus headers.
+	(show_bases): Honor the `cnt' argument.
+	(grow_tree): Parse CardBus headers in tree mode as well.
+
+	* pci.h: Updated CardBus header field description. I still don't
+	have the CardBus standard available, but OZ6832 specs contain
+	full description of all header fields supported by the chip.
+
 Tue Jun  9 22:53:59 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 1.06.
