@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.9 1998/05/28 12:05:27 mj Exp $
+#	$Id: pci.ids,v 1.10 1998/06/08 07:53:25 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -27,7 +27,6 @@
 	ae40  Netelligent 10/100 Dual
 	ae43  ProLiant Integrated Netelligent 10/100
 	ae69  CETUS-L
-	ae6c  DRACO
 	ae6c  Northstar
 	b011  Integrated Netelligent 10/100
 	b012  Netelligent 10 T/2
