@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.16 1999/01/23 20:25:35 mj Exp $
+#	$Id: pci.ids,v 1.17 1999/01/24 21:36:18 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -209,7 +209,7 @@
 	051b  MGA 2164W [Millennium II]
 	051f  MGA 2164W AGP [Millennium II AGP]
 	0520  MGA G200 PCI
-	0521  MGA G200 AGP
+	0521  MGA G200-SD AGP [Millennium G200 SDRAM AGP]
 	0d10  MGA Ultima/Impression
 	1000  MGA G100 [multi monitor]
 	1001  MGA G100 AGP
@@ -538,6 +538,7 @@
 	1533  M1533
 	1541  M1541
 	1543  M1543
+	1621  M1621
 	3141  M3141
 	3143  M3143
 	3145  M3145
@@ -546,11 +547,12 @@
 	3151  M3151
 	3307  M3307
 	5215  M4803
-	5217  M5217h
+	5217  M5217H
 	5219  M5219
 	5229  M5229
-	5235  m5225
+	5235  M5225
 	5237  M5237
+	5247  M5247
 	7101  M7101
 10ba  Mitsubishi Electric Corp.
 10bb  Dapha Electronics Corporation
