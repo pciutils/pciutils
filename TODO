@@ -4,9 +4,3 @@
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".
 
 - names.c: rewrite
-
-- support for domains:
-	- filters: doc and helps
-	- reading of dumps
-	- tree view
-	- map mode

@@ -26,7 +26,7 @@ dump_init(struct pci_access *a)
   FILE *f;
   char buf[256];
   struct pci_dev *dev = NULL;
-  int len, bn, dn, fn, i, j;
+  int len, mn, bn, dn, fn, i, j;
 
   if (!a)
     a->error("dump: File name not given.");
@@ -41,10 +41,13 @@ dump_init(struct pci_access *a)
       if (z >= buf && *z == '\r')
 	*z-- = 0;
       len = z - buf + 1;
-      if (len >= 8 && buf[2] == ':' && buf[5] == '.' && buf[7] == ' ' &&
-	  sscanf(buf, "%x:%x.%d ", &bn, &dn, &fn) == 3)
+      mn = 0;
+      if ((len >= 8 && buf[2] == ':' && buf[5] == '.' && buf[7] == ' ' &&
+	   sscanf(buf, "%x:%x.%d ", &bn, &dn, &fn) == 3) ||
+	  (len >= 13 && buf[4] == ':' && buf[7] == ':' && buf[10] == '.' && buf[12] == ' ' &&
+	   sscanf(buf, "%x:%x:%x.%d", &mn, &bn, &dn, &fn) == 4))
 	{
-	  dev = pci_get_dev(a, 0, bn, dn, fn);
+	  dev = pci_get_dev(a, mn, bn, dn, fn);
 	  dev->aux = pci_malloc(a, 256);
 	  memset(dev->aux, 0xff, 256);
 	  pci_link_dev(a, dev);

@@ -1,7 +1,12 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lspci.man, setpci.man: Document domains and correct spelling.
+
+	* lib/dump.c (dump_init): Added ability to read domain numbers.
+
 	* lspci.c: Devices in domains different from 0 have their slot number
-	printed as "<domain>:<bus>:<slot>.<func>".
+	printed as "<domain>:<bus>:<slot>.<func>". Tree view supports domains
+	as well.
 
 	* lib/filter.c: Slot filters understand domains.
 

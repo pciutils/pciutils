@@ -1083,35 +1083,38 @@ struct bridge {
   struct bridge *chain;			/* Single-linked list of bridges */
   struct bridge *next, *child;		/* Tree of bridges */
   struct bus *first_bus;		/* List of busses connected to this bridge */
+  unsigned int domain;
   unsigned int primary, secondary, subordinate;	/* Bus numbers */
   struct device *br_dev;
 };
 
 struct bus {
+  unsigned int domain;
   unsigned int number;
   struct bus *sibling;
   struct device *first_dev, **last_dev;
 };
 
-static struct bridge host_bridge = { NULL, NULL, NULL, NULL, ~0, 0, ~0, NULL };
+static struct bridge host_bridge = { NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
 
 static struct bus *
-find_bus(struct bridge *b, unsigned int n)
+find_bus(struct bridge *b, unsigned int domain, unsigned int n)
 {
   struct bus *bus;
 
   for(bus=b->first_bus; bus; bus=bus->sibling)
-    if (bus->number == n)
+    if (bus->domain == domain && bus->number == n)
       break;
   return bus;
 }
 
 static struct bus *
-new_bus(struct bridge *b, unsigned int n)
+new_bus(struct bridge *b, unsigned int domain, unsigned int n)
 {
   struct bus *bus = xmalloc(sizeof(struct bus));
 
   bus = xmalloc(sizeof(struct bus));
+  bus->domain = domain;
   bus->number = n;
   bus->sibling = b->first_bus;
   bus->first_dev = NULL;
@@ -1126,19 +1129,19 @@ insert_dev(struct device *d, struct bridge *b)
   struct pci_dev *p = d->dev;
   struct bus *bus;
 
-  if (! (bus = find_bus(b, p->bus)))
+  if (! (bus = find_bus(b, p->domain, p->bus)))
     {
       struct bridge *c;
       for(c=b->child; c; c=c->next)
-	if (c->secondary <= p->bus && p->bus <= c->subordinate)
+	if (c->domain == p->domain && c->secondary <= p->bus && p->bus <= c->subordinate)
           {
             insert_dev(d, c);
             return;
           }
-      bus = new_bus(b, p->bus);
+      bus = new_bus(b, p->domain, p->bus);
     }
   /* Simple insertion at the end _does_ guarantee the correct order as the
-   * original device list was sorted by (bus, devfn) lexicographically
+   * original device list was sorted by (domain, bus, devfn) lexicographically
    * and all devices on the new list have the same bus number.
    */
   *bus->last_dev = d;
@@ -1163,6 +1166,7 @@ grow_tree(void)
 	  (ht == PCI_HEADER_TYPE_BRIDGE || ht == PCI_HEADER_TYPE_CARDBUS))
 	{
 	  b = xmalloc(sizeof(struct bridge));
+	  b->domain = d->dev->domain;
 	  if (ht == PCI_HEADER_TYPE_BRIDGE)
 	    {
 	      b->primary = get_conf_byte(d, PCI_CB_PRIMARY_BUS);
@@ -1191,7 +1195,8 @@ grow_tree(void)
       struct bridge *c, *best;
       best = NULL;
       for(c=&host_bridge; c; c=c->chain)
-	if (c != b && b->primary >= c->secondary && b->primary <= c->subordinate &&
+	if (c != b && (c == &host_bridge || b->domain == c->domain) &&
+	    b->primary >= c->secondary && b->primary <= c->subordinate &&
 	    (!best || best->subordinate - best->primary > c->subordinate - c->primary))
 	  best = c;
       if (best)
@@ -1204,8 +1209,8 @@ grow_tree(void)
   /* Insert secondary bus for each bridge */
 
   for(b=&host_bridge; b; b=b->chain)
-    if (!find_bus(b, b->secondary))
-      new_bus(b, b->secondary);
+    if (!find_bus(b, b->domain, b->secondary))
+      new_bus(b, b->domain, b->secondary);
 
   /* Create bus structs and link devices */
 
@@ -1244,9 +1249,9 @@ show_tree_dev(struct device *d, byte *line, byte *p)
     if (b->br_dev == d)
       {
 	if (b->secondary == b->subordinate)
-	  p += sprintf(p, "-[%02x]-", b->secondary);
+	  p += sprintf(p, "-[%04x:%02x]-", b->domain, b->secondary);
 	else
-	  p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
+	  p += sprintf(p, "-[%04x:%02x-%02x]-", b->domain, b->secondary, b->subordinate);
         show_tree_bridge(b, line, p);
         return;
       }
@@ -1292,7 +1297,7 @@ show_tree_bridge(struct bridge *b, byte *line, byte *p)
   if (!b->first_bus->sibling)
     {
       if (b == &host_bridge)
-        p += sprintf(p, "[%02x]-", b->first_bus->number);
+        p += sprintf(p, "[%04x:%02x]-", b->domain, b->first_bus->number);
       show_tree_bus(b->first_bus, line, p);
     }
   else
@@ -1302,11 +1307,11 @@ show_tree_bridge(struct bridge *b, byte *line, byte *p)
 
       while (u->sibling)
         {
-          k = p + sprintf(p, "+-[%02x]-", u->number);
+          k = p + sprintf(p, "+-[%04x:%02x]-", u->domain, u->number);
           show_tree_bus(u, line, k);
           u = u->sibling;
         }
-      k = p + sprintf(p, "\\-[%02x]-", u->number);
+      k = p + sprintf(p, "\\-[%04x:%02x]-", u->domain, u->number);
       show_tree_bus(u, line, k);
     }
 }
@@ -1376,6 +1381,7 @@ do_map_bus(int bus)
 	for(func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
+	      /* XXX: Bus mapping supports only domain 0 */
 	      struct pci_dev *p = pci_get_dev(pacc, 0, bus, dev, func);
 	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
 	      if (vendor && vendor != 0xffff)
