@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.49 2003/01/04 12:27:51 mj Exp $
+# $Id: Makefile,v 1.50 2003/01/04 12:43:31 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
@@ -10,32 +10,24 @@ VERSION=2.1.11
 #SUFFIX=-pre2
 DATE=2003-01-04
 
+PREFIX=/usr/local
+SBINDIR=$(PREFIX)/sbin
+SHAREDIR=$(PREFIX)/share
+MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
 INSTALL=install
 DIRINSTALL=install -d
 PCILIB=libpci.a
-ifeq ($(shell uname),FreeBSD)
-ROOT=/usr/local
-PREFIX=/usr/local
-else
+
 ifeq ($(shell uname),NetBSD)
-ROOT=$(PREFIX)
 PCILIB=libpciutils.a
 LDFLAGS+=-lpci
 else
 ifeq ($(shell uname),AIX)
-ROOT=/usr/local
-PREFIX=/usr/local
 CFLAGS=-g
 INSTALL=installbsd
 DIRINSTALL=mkdir -p
-else
-ROOT=/
-PREFIX=/usr
 endif
 endif
-endif
-MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
-DISTTMP=/tmp/pciutils-dist
 
 export
 
@@ -45,7 +37,7 @@ lib: lib/config.h
 	$(MAKE) -C lib all
 
 lib/config.h:
-	cd lib && ./configure $(PREFIX) $(VERSION)
+	cd lib && ./configure $(SHAREDIR) $(VERSION)
 
 lspci: lspci.o common.o lib/$(PCILIB)
 setpci: setpci.o common.o lib/$(PCILIB)
@@ -55,34 +47,26 @@ setpci.o: setpci.c pciutils.h
 common.o: common.c pciutils.h
 
 update-pciids: update-pciids.sh
-	sed <$< >$@ "s@^DEST=.*@DEST=$(PREFIX)/share/pci.ids@"
+	sed <$< >$@ "s@^DEST=.*@DEST=$(SHAREDIR)/pci.ids@"
 
 %.8: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)$(SUFFIX)/"
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
-	rm -f lspci setpci lib/config.* *.8
-	rm -rf dist
+	rm -f update-ids lspci setpci lib/config.* *.8
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
-	$(DIRINSTALL) -m 755 $(ROOT)/sbin $(PREFIX)/share $(MANDIR)/man8
-	$(INSTALL) -c -m 755 -s lspci setpci $(ROOT)/sbin
-	$(INSTALL) -c -m 755 -s update-pciids $(PREFIX)/sbin
-	if [ ! -f $(PREFIX)/share/pci.ids -o pci.ids -nt $(PREFIX)/share/pci.ids ] ; then \
-		$(INSTALL) -c -m 644 pci.ids $(PREFIX)/share ; \
-	elif [ -f $(PREFIX)/share/pci.ids ] ; then \
-		echo "$(PREFIX)/share/pci.ids is same or newer than the version to be installed, skipping." ; \
-	fi
+	$(DIRINSTALL) -m 755 $(SBINDIR) $(SHAREDIR) $(MANDIR)/man8
+	$(INSTALL) -c -m 755 -s lspci setpci update-pciids $(SBINDIR)
+	$(INSTALL) -c -m 644 pci.ids $(SHAREDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(MANDIR)/man8
-# Remove relics from old versions
-	rm -f $(ROOT)/etc/pci.ids
 
 uninstall: all
-	rm -f $(ROOT)/sbin/lspci $(ROOT)/sbin/setpci
-	rm -f $(PREFIX)/share/pci.ids
-	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
+	rm -f $(SBINDIR)/lspci $(SBINDIR)/setpci $(SBINDIR)/update-pciids
+	rm -f $(SHAREDIR)/pci.ids
+	rm -f $(MANDIR)/man8/lspci.8 $(MANDIR)/man8/setpci.8 $(MANDIR)/man8/update-pciids.8
 
 get-ids:
 	cp ~/tree/pciids/pci.ids pci.ids
@@ -99,6 +83,7 @@ release:
 	mv README.new README
 
 REL=pciutils-$(VERSION)$(SUFFIX)
+DISTTMP=/tmp/pciutils-dist
 
 dist: clean pci.ids
 	rm -rf $(DISTTMP)
@@ -111,4 +96,4 @@ dist: clean pci.ids
 upload: dist
 	maint/upload $(REL)
 
-.PHONY: all lib clean install uninstall dist man release upload update-ids get-ids
+.PHONY: all lib clean install uninstall dist man release upload get-ids

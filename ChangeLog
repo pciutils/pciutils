@@ -2,6 +2,18 @@
 
 	* Released as 2.1.11.
 
+	* Makefile: Changed configuration of installation directories --
+	all paths are now set at the top of the Makefile instead of being
+	scattered between the installation rules. The default installation
+	now goes always to /usr/local regardless of the OS as most distributions
+	already contain some version of pciutils and we don't want custom
+	installations to interfere with the default ones.
+
+	* Makefile: Removed a couple of ancient install hacks: we no longer
+	try to avoid overwriting a newer pci.ids file (users are now expected
+	to use update-ids) and we don't try to remove /etc/pci.ids (a long time
+	has passed since the last version which used it).
+
 	* Added the update-ids utility.
 
 	* lib: Removed partially implemented "syscall" access method which will
