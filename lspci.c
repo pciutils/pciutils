@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.8 1998/02/15 09:30:39 mj Exp $
+ *	$Id: lspci.c,v 1.9 1998/03/19 15:56:43 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -715,11 +715,11 @@ static void
 grow_tree(void)
 {
   struct device *d, *d2;
-  struct bridge *first_br, *b;
+  struct bridge **last_br, *b;
 
   /* Build list of bridges */
 
-  first_br = &host_bridge;
+  last_br = &host_bridge.chain;
   for(d=first_dev; d; d=d->next)
     {
       word class = get_conf_word(d, PCI_CLASS_DEVICE);
@@ -729,21 +729,22 @@ grow_tree(void)
 	  b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
 	  b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
 	  b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
-	  b->chain = first_br;
-	  first_br = b;
+	  *last_br = b;
+	  last_br = &b->chain;
 	  b->next = b->child = NULL;
 	  b->first_bus = NULL;
 	  b->br_dev = d;
 	}
     }
+  *last_br = NULL;
 
   /* Create a bridge tree */
 
-  for(b=first_br; b; b=b->chain)
+  for(b=&host_bridge; b; b=b->chain)
     {
       struct bridge *c, *best;
       best = NULL;
-      for(c=first_br; c; c=c->chain)
+      for(c=&host_bridge; c; c=c->chain)
 	if (c != b && b->primary >= c->secondary && b->primary <= c->subordinate &&
 	    (!best || best->subordinate - best->primary > c->subordinate - c->primary))
 	  best = c;
@@ -756,7 +757,7 @@ grow_tree(void)
 
   /* Insert secondary bus for each bridge */
 
-  for(b=first_br; b; b=b->chain)
+  for(b=&host_bridge; b; b=b->chain)
     if (!find_bus(b, b->secondary))
       new_bus(b, b->secondary);
 
@@ -777,7 +778,7 @@ print_it(byte *line, byte *p)
   *p = 0;
   fputs(line, stdout);
   for(p=line; *p; p++)
-    if (*p == '+')
+    if (*p == '+' || *p == '|')
       *p = '|';
     else
       *p = ' ';
@@ -794,7 +795,10 @@ show_tree_dev(struct device *d, byte *line, byte *p)
   for(b=&host_bridge; b; b=b->chain)
     if (b->br_dev == d)
       {
-	p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
+	if (b->secondary == b->subordinate)
+	  p += sprintf(p, "-[%02x]-", b->secondary);
+	else
+	  p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
         show_tree_bridge(b, line, p);
         return;
       }
