@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.25 1999/04/26 19:45:57 mj Exp $
+ *	$Id: lspci.c,v 1.26 1999/06/17 17:51:45 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -370,6 +370,7 @@ show_agp(struct device *d, int where, int cap)
 	 (t & PCI_AGP_STATUS_RATE4) ? "4" : "",
 	 (t & PCI_AGP_STATUS_RATE2) ? "2" : "",
 	 (t & PCI_AGP_STATUS_RATE1) ? "1" : "");
+  t = get_conf_long(d, where + PCI_AGP_COMMAND);
   printf("\t\tCommand: RQ=%d SBA%c AGP%c 64bit%c FW%c Rate=%s%s%s\n",
 	 (t & PCI_AGP_COMMAND_RQ_MASK) >> 24U,
 	 FLAG(t, PCI_AGP_COMMAND_SBA),
