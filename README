@@ -1,4 +1,4 @@
-This package contains the Linux PCI Utilities, version 1.07.
+This package contains the Linux PCI Utilities, version 1.08.
 
 Copyright (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -20,6 +20,8 @@ bus in Linux:
 	  registers. For example, you can adjust the latency timers with it.
 
    See manual pages for more details.
+
+   You _NEED_ kernel 2.1.82 or newer which supports /proc/bus/pci.
 
    If you have any bug reports or suggestions, send them to the author.
 

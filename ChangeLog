@@ -1,3 +1,16 @@
+Mon Oct 19 21:53:30 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as version 1.08.
+
+	* setpci.c: glibc 2.1.x already defines pread() and pwrite().
+
+	* lspci.8: Changed warning about lspci -xxx.
+
+	* lspci.c: Require "-xxx" for full configuration space dump, so that
+	it's impossible to crash the machine by single typo.
+
+	* specs: Added (courtesy of Krzysztof G. Baranowski <kgb@knm.org.pl>).
+
 Wed Sep  9 12:03:24 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_bases): Better displaying of unassigned and

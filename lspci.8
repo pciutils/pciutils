@@ -1,4 +1,4 @@
-.TH lspci 8 "17 July 1998" "pciutils-1.07" "Linux PCI Utilities"
+.TH lspci 8 "19 October 1998" "pciutils-1.08" "Linux PCI Utilities"
 .IX lspci
 .SH NAME
 lspci \- list all PCI devices
@@ -41,10 +41,12 @@ header). Useful for debugging of drivers and
 .I lspci
 itself.
 .TP
-.B -xx
+.B -xxx
 Show hexadecimal dump of whole PCI configuration space. Available only for root
-as several PCI devices crash when you try to read undefined portions of the config
-space (although this directly violates the PCI standard).
+as several PCI devices
+.B crash
+when you try to read undefined portions of the config space (this behaviour probably
+doesn't violate the PCI standard, but it's at least very stupid).
 .TP
 .B -b
 Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
