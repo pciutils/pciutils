@@ -22,6 +22,12 @@
 
 	* Makefile: Added some more warnings.
 
+	* setpci.c: Cleaned up mask/value code.
+
+2003-12-08 Thayne Harbaugh <tharbaugh@lnxi.com>
+
+	* setpci.c: Individual bits to be set can be specified as <value>:<mask>.
+
 2003-11-29  Martin Mares  <mj@ucw.cz>
 
 	* Imported the pciutils sources to my Arch repository. Good-bye, CVS.

@@ -74,10 +74,17 @@ To set a register, write
 .BR reg = values
 where
 .B reg
-is the same you would use to query the register and
+is the same as you would use to query the register and
 .B values
 is a comma-separated list of values you want to write starting with the given
-address.
+address. Each value to be written can be specified either as a hexadecimal number
+or as a
+.BR bits : mask
+pair which causes the bits corresponding to binary ones in the
+.B mask
+to be changed to values of the corresponding bits in the
+.B bits
+.
 
 .SH REGISTER NAMES
 .PP
@@ -195,6 +202,11 @@ Increase debug level of the library. (All systems)
 .PP
 `setpci -s 12:3.4 3c.l=1,2,3' writes longword 1 to register 3c, 2 to register 3d
 and 3 to register 3e of device at bus 12, slot 3, function 4.
+.PP
+`setpci -s 13:8.4 40.b=50:d0,04:0c,ff' works on bus 13, device 8, function
+4: turns bit 7 off and bits 6 and 4 on in the byte register 40; turns
+bit 3 off and bit 2 on in the byte register 41; sets byte register
+42 to ff.
 
 .SH SEE ALSO
 .BR lspci (8)

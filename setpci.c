@@ -1,7 +1,7 @@
 /*
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1998--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -20,16 +20,22 @@ static int demo_mode;			/* Only show */
 
 static struct pci_access *pacc;
 
+struct value {
+  unsigned int value;
+  unsigned int mask;
+};
+
 struct op {
   struct op *next;
   struct pci_dev **dev_vector;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
   int num_values;			/* Number of values to write; <0=read */
-  unsigned int values[0];
+  struct value values[0];
 };
 
 static struct op *first_op, **last_op = &first_op;
+static unsigned int max_values[] = { 0, 0xff, 0xffff, 0, 0xffffffff };
 
 static struct pci_dev **
 select_devices(struct pci_filter *filt)
@@ -51,45 +57,76 @@ select_devices(struct pci_filter *filt)
 static void
 exec_op(struct op *op, struct pci_dev *dev)
 {
-  char *mm[] = { NULL, "%02x", "%04x", NULL, "%08x" };
-  char *m = mm[op->width];
-  unsigned int x;
+  char *formats[] = { NULL, "%02x", "%04x", NULL, "%08x" };
+  char *mask_formats[] = { NULL, "%02x->(%02x:%02x)->%02x", "%04x->(%04x:%04x)->%04x", NULL, "%08x->(%08x:%08x)->%08x" };
+  unsigned int x, y;
   int i, addr;
+  int width = op->width;
 
   if (verbose)
     printf("%02x:%02x.%x:%02x", dev->bus, dev->dev, dev->func, op->addr);
   addr = op->addr;
   if (op->num_values >= 0)
-    for(i=0; i<op->num_values; i++)
-      {
-	if (verbose)
-	  {
-	    putchar(' ');
-	    printf(m, op->values[i]);
-	  }
-	if (demo_mode)
-	  continue;
-	switch (op->width)
-	  {
-	  case 1:
-	    pci_write_byte(dev, addr, op->values[i]);
-	    break;
-	  case 2:
-	    pci_write_word(dev, addr, op->values[i]);
-	    break;
-	  default:
-	    pci_write_long(dev, addr, op->values[i]);
-	    break;
-	  }
-	addr += op->width;
-      }
+    {
+      for(i=0; i<op->num_values; i++)
+	{
+	  if ((op->values[i].mask & max_values[width]) == max_values[width])
+	    {
+	      x = op->values[i].value;
+	      if (verbose)
+		{
+		  putchar(' ');
+		  printf(formats[width], op->values[i].value);
+		}
+	    }
+	  else
+	    {
+	      switch (width)
+		{
+		case 1:
+		  y = pci_read_byte(dev, addr);
+		  break;
+		case 2:
+		  y = pci_read_word(dev, addr);
+		  break;
+		default:
+		  y = pci_read_long(dev, addr);
+		  break;
+		}
+	      x = (y & ~op->values[i].mask) | op->values[i].value;
+	      if (verbose)
+		{
+		  putchar(' ');
+		  printf(mask_formats[width], y, op->values[i].value, op->values[i].mask, x);
+		}
+	    }
+	  if (!demo_mode)
+	    {
+	      switch (width)
+		{
+		case 1:
+		  pci_write_byte(dev, addr, x);
+		  break;
+		case 2:
+		  pci_write_word(dev, addr, x);
+		  break;
+		default:
+		  pci_write_long(dev, addr, x);
+		  break;
+		}
+	    }
+	  addr += width;
+	}
+      if (verbose)
+	putchar('\n');
+    }
   else
     {
       if (verbose)
 	printf(" = ");
       if (!demo_mode)
 	{
-	  switch (op->width)
+	  switch (width)
 	    {
 	    case 1:
 	      x = pci_read_byte(dev, addr);
@@ -101,12 +138,12 @@ exec_op(struct op *op, struct pci_dev *dev)
 	      x = pci_read_long(dev, addr);
 	      break;
 	    }
-	  printf(m, x);
+	  printf(formats[width], x);
 	}
       else
 	putchar('?');
+      putchar('\n');
     }
-  putchar('\n');
 }
 
 static void
@@ -141,10 +178,10 @@ scan_ops(struct op *op)
 struct reg_name {
   int offset;
   int width;
-  char *name;
+  const char *name;
 };
 
-static struct reg_name pci_reg_names[] = {
+static const struct reg_name pci_reg_names[] = {
   { 0x00, 2, "VENDOR_ID", },
   { 0x02, 2, "DEVICE_ID", },
   { 0x04, 2, "COMMAND", },
@@ -223,12 +260,13 @@ usage(void)
 -v\t\tBe verbose\n\
 -D\t\tList changes, don't commit them\n"
 GENERIC_HELP
-"<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n\
-\t|\t-d [<vendor>]:[<device>]\n\
-<reg>:\t\t<number>[.(B|W|L)]\n\
-     |\t\t<name>\n\
-<values>:\t<value>[,<value>...]\n\
-");
+"<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n"
+"\t|\t-d [<vendor>]:[<device>]\n"
+"<reg>:\t\t<number>[.(B|W|L)]\n"
+"     |\t\t<name>\n"
+"<values>:\t<value>[,<value>...]\n"
+"<value>:\t<hex>\n"
+"       |\t<hex>:<mask>\n");
   exit(1);
 }
 
@@ -317,7 +355,8 @@ next:
       char *d, *e, *f;
       int n, i;
       struct op *op;
-      unsigned long ll, lim;
+      unsigned long ll;
+      unsigned int lim;
 
       if (*c == '-')
 	{
@@ -361,6 +400,7 @@ next:
 	  if (!selected_devices[0] && !force)
 	    fprintf(stderr, "setpci: Warning: No devices selected for `%s'.\n", c);
 	  state = STATE_GOT_OP;
+	  /* look for setting of values and count how many */
 	  d = strchr(c, '=');
 	  if (d)
 	    {
@@ -370,7 +410,7 @@ next:
 	      for(e=d, n=1; *e; e++)
 		if (*e == ',')
 		  n++;
-	      op = xmalloc(sizeof(struct op) + n*sizeof(unsigned int));
+	      op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
 	    }
 	  else
 	    {
@@ -402,7 +442,7 @@ next:
 	  ll = strtol(c, &f, 16);
 	  if (f && *f)
 	    {
-	      struct reg_name *r;
+	      const struct reg_name *r;
 	      for(r = pci_reg_names; r->name; r++)
 		if (!strcasecmp(r->name, c))
 		  break;
@@ -416,17 +456,39 @@ next:
 	  if (ll & (op->width - 1))
 	    die("Unaligned register address!");
 	  op->addr = ll;
+	  /* read in all the values to be set */
 	  for(i=0; i<n; i++)
 	    {
 	      e = strchr(d, ',');
 	      if (e)
 		*e++ = 0;
 	      ll = strtoul(d, &f, 16);
-	      lim = (2 << ((op->width << 3) - 1)) - 1;
-	      if (f && *f ||
+	      lim = max_values[op->width];
+	      if (f && *f && (*f != ':') ||
 		  (ll > lim && ll < ~0UL - lim))
-		usage();
-	      op->values[i] = ll;
+		{
+		  fprintf(stderr, "bad value \"%s\"\n\n", d);
+		  usage();
+		}
+	      if (f && *f == ':')
+		{
+		  op->values[i].value = ll;
+		  d = ++f;
+		  ll = strtoul(d, &f, 16);
+		  if (f && *f ||
+		      (ll > lim && ll < ~0UL - lim))
+		    {
+		      fprintf(stderr, "bad value:mask pair \"%s\"\n\n", d);
+		      usage();
+		    }
+		  op->values[i].mask = ll;
+		  op->values[i].value &= op->values[i].mask;
+		}
+	      else
+		{
+		  op->values[i].value = ll;
+		  op->values[i].mask = ~0U;
+		}
 	      d = e;
 	    }
 	  *last_op = op;
