@@ -1,4 +1,4 @@
-This package contains the PCI Utilities, version 2.0.
+This package contains the PCI Utilities, version 2.1.
 
 Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -44,7 +44,7 @@ notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.html .
 
    There also exists a utility called PowerTweak which is able to fine tune
 parameters of many chipsets much better than the Bridge Optimization code
-in Linux kernel (to be removed soon). See http://linux.powertweak.com/
+in Linux kernel (already removed in 2.3.x). See http://linux.powertweak.com/
 for more information.
 
 					Have fun
