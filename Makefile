@@ -4,9 +4,8 @@
 OPT=-O2 -fomit-frame-pointer
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.1.12
-SUFFIX=-pre1
-DATE=2003-12-26
+VERSION=2.1.99-test1
+DATE=2003-12-27
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
@@ -49,7 +48,7 @@ update-pciids: update-pciids.sh
 	sed <$< >$@ "s@^DEST=.*@DEST=$(SHAREDIR)/pci.ids@"
 
 %.8: %.man
-	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)$(SUFFIX)/;s#@SHAREDIR@#$(SHAREDIR)#"
+	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@SHAREDIR@#$(SHAREDIR)#"
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
@@ -75,21 +74,21 @@ pci.ids:
 	@ [ -f pci.ids ] || echo >&2 "The pci.ids file is no longer part of the CVS. Please do run update-ids.sh to download them." && false
 
 release:
-	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new
-	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/" <pciutils.spec >pciutils.spec.new
-	sed "s/\\(, version \\).*\./\\1$(VERSION)$(SUFFIX)./" <README >README.new
+	sed "s/^\\(Version:[ 	]*\\).*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new
+	sed "s/^\\(Version:[ 	]*\\).*/\\1$(VERSION)/" <pciutils.spec >pciutils.spec.new
+	sed "s/\\(, version \\).*\./\\1$(VERSION)./" <README >README.new
 	mv pciutils.lsm.new pciutils.lsm
 	mv pciutils.spec.new pciutils.spec
 	mv README.new README
 
-REL=pciutils-$(VERSION)$(SUFFIX)
+REL=pciutils-$(VERSION)
 DISTTMP=/tmp/pciutils-dist
 
 dist: clean pci.ids
 	rm -rf $(DISTTMP)
 	mkdir $(DISTTMP)
 	cp -a . $(DISTTMP)/$(REL)
-	rm -rf `find $(DISTTMP)/$(REL) -name CVS -o -name tmp -o -name maint`
+	rm -rf `find $(DISTTMP)/$(REL) -name "{arch}" -o -name CVS -o -name tmp -o -name maint`
 	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
 	rm -rf $(DISTTMP)
 

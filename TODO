@@ -1,3 +1,4 @@
-- lspci: don't die when non-root tries to dump cardbus data
+- lspci: don't die when non-root tries to dump cardbus data; mention the
+  "available only to root" things in the man page.
 
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".

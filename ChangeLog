@@ -1,5 +1,7 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test1.
+
 	* pciutils.h, common.c, lspci.man, setpci.man, lib/internal.h:
 	Remove shadows of the syscall access method which was never
 	implemented.
