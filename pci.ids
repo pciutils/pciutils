@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.43 1999/12/04 12:32:55 mj Exp $
+#	$Id: pci.ids,v 1.44 1999/12/11 22:38:43 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -2108,6 +2108,7 @@
 	8888  Cinemaster C 3.0 DVD Decoder
 1240  Marathon Technologies Corp.
 1241  DSC Communications
+1242  Jaycor Networks, Inc.
 1243  Delphax
 1244  AVM Audiovisuelles MKTG & Computer System GmbH
 	0700  B1 ISDN

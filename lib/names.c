@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.3 1999/10/09 13:26:12 mj Exp $
+ *	$Id: names.c,v 1.4 1999/12/11 22:38:55 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
@@ -299,9 +299,9 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
 	  e = nl_lookup(a, 0, NL_VENDOR, arg3, 0, 0, 0);
 	  e2 = nl_lookup(a, 0, NL_SUBSYSTEM, arg1, arg2, arg3, arg4);
 	  if (!e)
-	    res = snprintf(buf, size, "Unknown device %04x:%04x", arg1, arg2);
+	    res = snprintf(buf, size, "Unknown device %04x:%04x", arg3, arg4);
 	  else if (!e2)
-	    res = snprintf(buf, size, "%s: Unknown device %04x", e->name, arg2);
+	    res = snprintf(buf, size, "%s: Unknown device %04x", e->name, arg4);
 	  else
 	    res = snprintf(buf, size, "%s %s", e->name, e2->name);
 	}

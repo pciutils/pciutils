@@ -1,3 +1,9 @@
+Sat Dec 11 23:34:48 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as version 2.1.2.
+
+	* lib/names.c (pci_lookup_name): Fixed printing of unknown subsystem ID's.
+
 Sat Dec  4 13:11:03 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as version 2.1.1.

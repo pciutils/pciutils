@@ -1,7 +1,7 @@
 Begin3
 Title:          Linux PCI Utilities
-Version:        2.1.1
-Entered-date:   991204
+Version:        2.1.2
+Entered-date:   991211
 Description:    This package contains various utilities for inspecting and
 		setting of devices connected to the PCI bus. Requires
 		kernel version 2.1.82 or newer (supporting the /proc/bus/pci
@@ -9,7 +9,7 @@ Description:    This package contains various utilities for inspecting and
 Keywords:       kernel, pci, proc, lspci, setpci
 Author:         mj@atrey.karlin.mff.cuni.cz (Martin Mares)
 Maintained-by:  mj@atrey.karlin.mff.cuni.cz (Martin Mares)
-Primary-site:   atrey.karlin.mff.cuni.cz pub/linux/pci/pciutils-2.1.1.tar.gz
-Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-2.1.1.tar.gz
+Primary-site:   atrey.karlin.mff.cuni.cz pub/linux/pci/pciutils-2.1.2.tar.gz
+Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-2.1.2.tar.gz
 Copying-policy: GPL
 End
