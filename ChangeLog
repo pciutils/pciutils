@@ -1,3 +1,7 @@
+Sun Nov 29 20:05:56 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pciutils.spec (Name): Update from Krzysztof G. Baranowski.
+
 Sun Nov 22 10:49:56 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Makefile, pciutils.h: Moved pci.ids to /usr/share.
