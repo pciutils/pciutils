@@ -1,10 +1,10 @@
-# $Id: Makefile,v 1.38 2001/11/04 15:33:07 mj Exp $
+# $Id: Makefile,v 1.39 2002/03/24 12:35:39 mj Exp $
 # Makefile for Linux PCI Utilities
-# (c) 1998--2000 Martin Mares <mj@ucw.cz>
+# (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
 OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
-CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
+CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes
 
 VERSION=2.1.9
 #SUFFIX=-pre2
