@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.5 1998/02/15 09:30:40 mj Exp $
+#	$Id: pci.ids,v 1.6 1998/03/15 13:59:19 ecd Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -399,9 +399,11 @@
 	0014  OC-2326
 	0021  OC-6151/6152 [RapidFire ATM PCI 155]
 108e  Sun Microsystems Computer Corp.
-	1000  EBUS
-	1001  Happy Meal
+	1000  PCI-EBus Bridge
+	1001  Happy Meal Ethernet
+	5000  Advanced PCI Bridge
 	8000  PCI Bus Module
+	a000  Ultra IIi PCI
 108f  Systemsoft
 1090  Encore Computer Corporation
 1091  Intergraph Corporation
