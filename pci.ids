@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.41 1999/10/30 09:25:10 mj Exp $
+#	$Id: pci.ids,v 1.42 1999/11/29 12:35:29 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -543,14 +543,16 @@
 	0406  85C501/2
 	0496  85C496
 	0530  530 Host
+	0540  540 Host
 	0597  5513C
 	0601  85C601
 	0620  620 Host
+	0630  630 Host
 	0900  SiS900 10/100 Ethernet
 	3602  83C602
 	5107  5107
 	5511  5511/5512
-	5513  5513
+	5513  5513 [IDE]
 	5517  5517
 	5571  5571
 	5591  5591/5592 Host
@@ -647,9 +649,12 @@
 		1092 0157  FIRE GL 1000 PRO
 		1097 3d01  Jeronimo Pro
 		3d3d 0100  Reference Permedia 2 3D
-	8000  LYNX FireWire Host Controller
+	8000  PCILynx/PCILynx2 IEEE 1394 Link Layer Controller
+		e4bf 1010 CF1-1-SNARE
+		e4bf 1020 CF1-2-SNARE 
 	8009  OHCI Compliant FireWire Controller
 	8019  TSB12LV23 OHCI Compliant IEEE-1394 Controller
+		e4bf 1010 CF2-1-CYMBAL
 	a001  TDC1570
 	a100  TDC1561
 	ac10  PCI1050
@@ -691,16 +696,17 @@
 1056  ICL
 # Motorola made a mistake and used this value, please duplicate Moto
 # entries here -- Cort
-1507  Motorola Computer Group
+1507  Motorola
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
+	0003  MPC8240 [Kahlua]
 	0100  MC145575 [HFC-PCI]
 	0431  KTI829c 100VG
 	4801  Raven
 	4802  Falcon
 	4803  Hawk
 	4806  CPX8216
-1057  Motorola Computer Group
+1057  Motorola
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
 	0100  MC145575 [HFC-PCI]
@@ -762,7 +768,7 @@
 	0002  IIT3204/3501
 1062  Maspar Computer Corp
 1063  Ocean Office Automation
-1064  Alcatel CIT
+1064  Alcatel
 1065  Texas Microsystems
 1066  PicoPower Technology
 	0000  PT80C826
@@ -804,6 +810,7 @@
 	000C  YMF-740C [DS-1L Audio Controller]
 	000D  YMF-724F [DS-1 Audio Controller]
 	0010  YMF-744B [DS-1S Audio Controller]
+	0012  YMF-754 [DS-1E Audio Controller]
 1074  NexGen Microsystems
 	4e78  82c500/1
 1075  Advanced Integrations Research
@@ -1560,7 +1567,13 @@
 		1148 5843  FDDI SK-5843 (SK-NET FDDI-LP64)
 		1148 5844  FDDI SK-5844 (SK-NET FDDI-LP64 DAS)
 	4200  Token ring adaptor
-	4300  GE
+	4300  Gigabit Ethernet
+		1148 9821  SK-9821 (1000Base-T single link)
+		1148 9822  SK-9822 (1000Base-T dual link)
+		1148 9841  SK-9841 (1000Base-LX single link)
+		1148 9842  SK-9842 (1000Base-LX dual link)
+		1148 9843  SK-9843 (1000Base-SX single link)
+		1148 9844  SK-9844 (1000Base-SX dual link)
 1149  Win System Corporation
 114a  VMIC
 	7587  VMIVME-7587
@@ -2192,6 +2205,7 @@
 1280  Photoscript Group Ltd.
 1281  Yokogawa Electric Corporation
 1282  Davicom Semiconductor, Inc.
+	9102  Ethernet 100/10 MBit
 1283  Integrated Technology Express, Inc.
 	673a  IT8330G
 	8330  IT8330G
@@ -2562,7 +2576,9 @@
 1395  Ambicom Inc
 1396  Cipher Systems Inc
 1397  Cologne Chip Designs GmbH
-	2bd0  ISDN network controller
+	2bd0  ISDN network controller [HFC-PCI]
+		1397 2bd0 ISDN Board
+		e4bf 1000 CI1-1-Harp
 1398  Clarion co. Ltd
 1399  Rios systems Co Ltd
 139a  Alacritech Inc
@@ -3095,7 +3111,8 @@
 	5000  NV5000SC
 4b10  Buslogic Inc.
 4c48  LUNG HWA Electronics
-4d51  MEDIAQ Inc.
+4d51  MediaQ Inc.
+	0200  MQ-200
 4ddc  ILC Data Device Corp
 5053  Voyetra Technologies
 	2010  Daytona Audio Adapter
@@ -3299,6 +3316,11 @@
 		103c 10C7  MegaRaid T5
 		1111 1111  MegaRaid 466
 		113c 03A2  MegaRaid
+	2410  82801 82810 Chipset ISA Bridge (LPC)
+	2411  82801 82810 Chipset IDE
+	2412  82801 82810 Chipset USB
+	2413  82801 82810 Chipset SMBus
+	2418  82801 82810 PCI Bridge
 	5200  EtherExpress PRO/100
 	5201  EtherExpress PRO/100
 	7000  82371SB PIIX3 ISA [Natoma/Triton II]
@@ -3314,8 +3336,8 @@
 	7121  82810 CGC [Chipset Graphics Controller]
 	7122  82810-DC100 GMCH [Graphics Memory Controller Hub]
 	7123  82810-DC100 CGC [Chipset Graphics Controller]
-	7180  440LX - 82443LX Host bridge
-	7181  440LX - 82443LX AGP bridge
+	7180  440LX/EX - 82443LX/EX Host bridge
+	7181  440LX/EX - 82443LX/EX AGP bridge
 	7190  440BX/ZX - 82443BX/ZX Host bridge
 		0e11 0500  Armada 1750 Laptop System Chipset
 	7191  440BX/ZX - 82443BX/ZX AGP bridge
@@ -3474,6 +3496,7 @@ e159  Tiger Jet Network Inc.
 	0001  Model 300 128k
 		0059 0001  128k ISDN-S/T Adapter
 		0059 0003  128k ISDN-U Adapter
+e4bf  EKF Elektronik GmbH
 eabb  Aashima Technology B.V.
 ecc0  Echo Corporation
 edd8  ARK Logic Inc
