@@ -1,7 +1,7 @@
 /*
  *	Linux PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -391,7 +391,8 @@ show_pm(struct device *d, int where, int cap)
 	 FLAG(cap, PCI_PM_CAP_PME_D2),
 	 FLAG(cap, PCI_PM_CAP_PME_D3_HOT),
 	 FLAG(cap, PCI_PM_CAP_PME_D3_COLD));
-  config_fetch(d, where + PCI_PM_CTRL, PCI_PM_SIZEOF - PCI_PM_CTRL);
+  if (!config_fetch(d, where + PCI_PM_CTRL, PCI_PM_SIZEOF - PCI_PM_CTRL))
+    return;
   t = get_conf_word(d, where + PCI_PM_CTRL);
   printf("\t\tStatus: D%d PME-Enable%c DSel=%d DScale=%d PME%c\n",
 	 t & PCI_PM_CTRL_STATE_MASK,
@@ -439,7 +440,8 @@ show_agp(struct device *d, int where, int cap)
   printf("AGP version %x.%x\n", ver, rev);
   if (verbose < 2)
     return;
-  config_fetch(d, where + PCI_AGP_STATUS, PCI_AGP_SIZEOF - PCI_AGP_STATUS);
+  if (!config_fetch(d, where + PCI_AGP_STATUS, PCI_AGP_SIZEOF - PCI_AGP_STATUS))
+    return;
   t = get_conf_long(d, where + PCI_AGP_STATUS);
   if (ver >= 3 && (t & PCI_AGP_STATUS_AGP3))
     agp3 = 1;
@@ -474,11 +476,19 @@ show_agp(struct device *d, int where, int cap)
 static void
 show_pcix_nobridge(struct device *d, int where)
 {
-  u16 command = get_conf_word(d, where + PCI_PCIX_COMMAND);
-  u32 status = get_conf_long(d, where + PCI_PCIX_STATUS);
+  u16 command;
+  u32 status;
+
   printf("PCI-X non-bridge device.\n");
+      
   if (verbose < 2)
     return;
+
+  if (!config_fetch(d, where + PCI_PCIX_STATUS, 4))
+    return;
+  
+  command = get_conf_word(d, where + PCI_PCIX_COMMAND);
+  status = get_conf_long(d, where + PCI_PCIX_STATUS);
   printf("\t\tCommand: DPERE%c ERO%c RBC=%d OST=%d\n",
 	 FLAG(command, PCI_PCIX_COMMAND_DPERE),
 	 FLAG(command, PCI_PCIX_COMMAND_ERO),
@@ -487,7 +497,7 @@ show_pcix_nobridge(struct device *d, int where)
   printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, DC=%s, DMMRBC=%u, DMOST=%u, DMCRS=%u, RSCEM%c",
 	 ((status >> 8) & 0xffU), // bus
 	 ((status >> 3) & 0x1fU), // dev
-	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION), // function
+	 (status & PCI_PCIX_STATUS_FUNCTION), // function
 	 FLAG(status, PCI_PCIX_STATUS_64BIT),
 	 FLAG(status, PCI_PCIX_STATUS_133MHZ),
 	 FLAG(status, PCI_PCIX_STATUS_SC_DISCARDED),
@@ -502,11 +512,18 @@ show_pcix_nobridge(struct device *d, int where)
 static void
 show_pcix_bridge(struct device *d, int where)
 {
+
   u16 secstatus;
   u32 status, upstcr, downstcr;
+  
   printf("PCI-X bridge device.\n");
+  
   if (verbose < 2)
     return;
+  
+  if (!config_fetch(d, where + PCI_PCIX_BRIDGE_STATUS, 12))
+    return;
+  
   secstatus = get_conf_word(d, where + PCI_PCIX_BRIDGE_SEC_STATUS);
   printf("\t\tSecondary Status: 64bit%c, 133MHz%c, SCD%c, USC%c, SCO%c, SRD%c Freq=%d\n",
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_64BIT),
@@ -586,7 +603,8 @@ show_msi(struct device *d, int where, int cap)
   if (verbose < 2)
     return;
   is64 = cap & PCI_MSI_FLAGS_64BIT;
-  config_fetch(d, where + PCI_MSI_ADDRESS_LO, (is64 ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32) + 2 - PCI_MSI_ADDRESS_LO);
+  if (!config_fetch(d, where + PCI_MSI_ADDRESS_LO, (is64 ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32) + 2 - PCI_MSI_ADDRESS_LO))
+    return;
   printf("\t\tAddress: ");
   if (is64)
     {

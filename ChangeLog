@@ -1,5 +1,12 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (show_pcix_bridge, show_pcix_nobridge): Don't forget to call
+	config_fetch() to ensure that the registers have been read. Thanks to
+	Bill Wood <bill.wood@hp.com> for the patch.
+
+	* lspci.c: Ensure that failure of config_fetch() is handled correctly
+	at all places.
+
 	* lspci.man: There was one more explicit reference to /usr/share/pci.ids.
 	Changed to @SHAREDIR@. Patch from Maciej W. Rozycki <macro@ds2.pg.gda.pl>.
 
