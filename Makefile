@@ -1,6 +1,6 @@
-# $Id: Makefile,v 1.46 2002/12/27 20:00:14 mj Exp $
+# $Id: Makefile,v 1.47 2003/01/04 11:16:25 mj Exp $
 # Makefile for Linux PCI Utilities
-# (c) 1998--2002 Martin Mares <mj@ucw.cz>
+# (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
 OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
@@ -81,7 +81,7 @@ uninstall: all
 	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
 
 update-ids:
-	if [ ! -f pci.ids.orig ] ; then mv pci.ids pci.ids.orig ; fi
+	if [ -f pci.ids.orig ] ; then mv pci.ids pci.ids.orig ; fi
 	wget http://pciids.sf.net/pci.ids.bz2
 	bzip2 -d pci.ids.bz2
 
