@@ -1181,7 +1181,7 @@ show_verbose(struct device *d)
       subsys_d = get_conf_word(d, PCI_SUBSYSTEM_ID);
       break;
     case PCI_HEADER_TYPE_BRIDGE:
-      if (class != PCI_CLASS_BRIDGE_PCI)
+      if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       irq = int_pin = min_gnt = max_lat = 0;
       subsys_v = subsys_d = 0;
