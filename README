@@ -53,4 +53,3 @@ notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.html.
 TODO:
 	- lspci: "scan hard" function
 	- lib: "syscall" access method
-	- .lsm and .spec

@@ -1,3 +1,10 @@
+Mon Jan 25 21:28:49 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile: Added target `release' which substitutes new version
+	number to .spec, .lsm and README. Also rewrote target `dist'.
+
+	* Released as 1.99.3.
+
 Sun Jan 24 22:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/header.h: Until kernel adopts new layout of PCI
