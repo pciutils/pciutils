@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.21 1999/03/28 10:27:33 mj Exp $
+#	$Id: pci.ids,v 1.22 1999/04/18 19:04:16 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -30,6 +30,7 @@
 	ae6c  Northstar
 	b011  Integrated Netelligent 10/100
 	b012  Netelligent 10 T/2
+	b030  Netelligent WS 5100
 	f130  NetFlex-3/P ThunderLAN 1.0
 	f150  NetFlex-3/P ThunderLAN 2.3
 1000  Symbios Logic Inc. (formerly NCR)
@@ -44,6 +45,8 @@
 	000d  53c885
 	000f  53c875
 	008f  53c875J
+	0701  83C885 gigabit ethernet
+	0702  Yellowfin G-NIC gigabit ethernet
 	0901  61C102
 	1000  63C815
 1002  ATI Technologies Inc
@@ -159,6 +162,7 @@
 1018  Unisys Systems
 1019  Elitegroup Computer Systems
 101a  AT&T GIS (NCR)
+	0005  100VG ethernet
 101b  Vitesse Semiconductor
 101c  Western Digital
 	0193  33C193A
@@ -213,8 +217,8 @@
 	0520  MGA G200 PCI
 	0521  MGA G200 AGP [Millennium G200 AGP]
 	0d10  MGA Ultima/Impression
-	1000  MGA G100 [multi monitor]
-	1001  MGA G100 AGP
+	1000  MGA G100 [Millennium multi monitor]
+	1001  MGA G100 [Millennium AGP]
 102c  Chips and Technologies
 	00b8  64310
 	00d8  65545
@@ -255,6 +259,7 @@
 	5571  5571
 	5591  5591/5592 Host
 	5597  5597 [SiS5582]
+	6236  6236 AGP
 	7001  7001
 103a  Seiko Epson Corporation
 103b  Tatung Co. of America
@@ -289,6 +294,7 @@
 	c814  82C814 [Firebridge 1]
 	c822  82C822
 	c824  82C824
+	c861  82C861
 	d568  82C825 [Firebridge 2]
 1046  IPC Corporation, Ltd.
 1047  Genoa Systems Corp
@@ -372,6 +378,7 @@
 	0000  PT80C826
 	0001  PT86C52x [Vesuvius]
 	0002  PT80C524 [Nile]
+	8002  PT80C524 [Nile]
 1067  Mitsubishi Electronics
 1068  Diversified Technology
 1069  Mylex Corporation
@@ -399,6 +406,7 @@
 1077  Q Logic
 	1020  ISP1020
 	1022  ISP1022
+	2100  ISP2100
 1078  Cyrix Corporation
 	0000  5510 [Grappa]
 	0001  PCI_Master
@@ -457,6 +465,7 @@
 	0643  PCI0643
 	0646  PCI0646
 	0650  PBC0650A
+	0647  647
 	0670  670
 1096  Alacron
 1097  Appian Technology
@@ -471,6 +480,9 @@
 109e  Brooktree Corporation
 	0350  Bt848
 	0351  Bt849A
+	036e  Bt878
+	036f  Bt879
+	0878  Bt878
 	8472  Bt8472
 	8474  Bt8474
 109f  Trigem Computer Inc.
@@ -507,6 +519,7 @@
 	9036  9036
 	9050  PCI <-> IOBus Bridge
 	9060  9060
+	906d  9060SD
 	906e  9060ES
 	9080  9080
 10b6  Madge Networks
@@ -580,6 +593,8 @@
 	0002  NM2090 [MagicGraph 128V]
 	0003  NM2093 [MagicGraph 128ZV]
 	0004  NM2160 [MagicGraph 128XD]
+	0005  [MagicGraph 256AV]
+	0083  [MagicGraph 128ZV Plus]
 10c9  Dataexpert Corporation
 10ca  Fujitsu Microelectr., Inc.
 10cb  Omron Corporation
@@ -620,6 +635,7 @@
 	5026  IMS5026/27/28
 	8849  8849
 	9128  IMS9129
+# FIXME: This should probably be ID 80e1
 10e1  Tekram Technology Co.,Ltd.
 	690c  690c
 	dc29  DC290
@@ -677,6 +693,7 @@
 	0002  SB Live!
 	7002  SB Live! Daughterboard
 1103  Triones Technologies, Inc.
+	0003  HPT343
 1104  RasterOps Corp.
 1105  Sigma Designs, Inc.
 1106  VIA Technologies, Inc.
@@ -687,8 +704,10 @@
 	0585  VT82C585VP [Apollo VP1/VPX]
 	0586  VT82C586 ISA [Apollo VP]
 	0595  VT82C595 [Apollo VP2]
+	0596  VT82C596 ISA [Apollo PRO]
 	0597  VT82C597 [Apollo VP3]
 	0598  VT82C598 [Apollo MVP3]
+	0691  VT82C691 [Apollo PRO]
 	0926  VT82C926 [Amazon]
 	1000  82C570MV
 	1106  82C570MV
@@ -696,7 +715,9 @@
 	1595  VT82C595/97 [Apollo VP2/97]
 	3038  VT82C586B USB
 	3040  VT82C586B ACPI
+	5030  VT82C596 ACPI [Apollo PRO]
 	6100  VT85C100A [Rhine II]
+	8596  VT82C596 [Apollo PRO AGP]
 	8597  VT82C597 [Apollo VP3 AGP]
 	8598  VT82C598 [Apollo MVP3 AGP]
 1107  Stratus Computers
@@ -716,6 +737,7 @@
 1111  Santa Cruz Operation
 1112  RNS - Div. of Meret Communications Inc
 1113  Accton Technology Corporation
+	1211  SMC2-1211TX
 1114  Atmel Corporation
 1115  3D Labs
 1116  Data Translation
@@ -748,12 +770,24 @@
 	0113  GDT 6557RP1
 	0114  GDT 6111RP1/6511RP1
 	0115  GDT 6121RP1/6521RP1
+	0118  GDT 6x18RD
+	0119  GDT 6x28RD
+	011A  GDT 6x38RD
+	011B  GDT 6x58RD
 	0120  GDT 6117RP2/6517RP2
 	0121  GDT 6127RP2/6527RP2
 	0122  GDT 6537RP2
 	0123  GDT 6557RP2
 	0124  GDT 6111RP2/6511RP2
 	0125  GDT 6121RP2/6521RP2
+	0168  GDT 7x18RN
+	0169  GDT 7x28RN
+	016A  GDT 7x38RN
+	016B  GDT 7x58RN
+	0210  GDT 6x19RD
+	0211  GDT 6x29RD
+	0260  GDT 7x19RN
+	0261  GDT 7x29RN
 111a  Efficient Networks, Inc
 	0000  155P-MF1 (FPGA)
 	0002  155P-MF1 (ASIC)
@@ -819,6 +853,9 @@
 1146  Force Computers
 1147  Interface Corp
 1148  Schneider & Koch
+	4000  FP
+	4200  TR
+	4300  GE
 1149  Win System Corporation
 114a  VMIC
 	7587  VMIVME-7587
@@ -830,6 +867,7 @@
 	0002  AccelePort EPC
 	0003  RightSwitch SE-6
 	0004  AccelePort Xem
+	0005  AccelePort Xr
 	0006  AccelePort Xr,C/X
 	0009  AccelePort Xr/J
 	000a  AccelePort EPC/J
@@ -889,7 +927,10 @@
 117e  T/R Systems
 117f  Integrated Circuit Systems
 1180  Ricoh Co Ltd
+	0465  RL5C465
 	0466  RL5C466
+	0475  RL5C475
+	0478  RL5C478
 1181  Telmatics International
 1183  Fujikura Ltd
 1184  Forks Inc
@@ -1044,6 +1085,11 @@
 	0002  RocketPort 8 Intf
 	0003  RocketPort 16 Intf
 	0004  RocketPort 32 Intf
+	0005  RocketPort Octacable
+	0006  RocketPort 8J
+	000A  RocketPort Plus Quadcable
+	000B  RocketPort Plus Octacable
+	000C  RocketPort 8-port Modem
 11ff  Scion Corporation
 1200  CSS Corporation
 1201  Vista Controls Corp
@@ -1059,8 +1105,14 @@
 120c  Technical Corp.
 120d  Compression Labs, Inc.
 120e  Cyclades Corporation
-	0100  Cyclom_Y
-	0200  Cyclom_Z
+	0100  Cyclom_Y below first megabyte
+	0101  Cyclom_Y above first megabyte
+	0102  Cyclom_4Y below first megabyte
+	0103  Cyclom_4Y above first megabyte
+	0104  Cyclom_8Y below first megabyte
+	0105  Cyclom_8Y above first megabyte
+	0200  Cyclom_Z below first megabyte
+	0201  Cyclom_Z above first megabyte
 120f  Essential Communications
 	0001  Roadrunner serial HIPPI
 1210  Hyperparallel Technologies
@@ -1074,11 +1126,13 @@
 	6729  6729
 	673a  6730
 	6832  6832
+	6836  6836
 1218  Hybricon Corp.
 1219  First Virtual Corporation
 121a  3Dfx Interactive, Inc.
 	0001  Voodoo
 	0002  Voodoo2
+	0003  Voodoo Banshee
 121b  Advanced Telecommunications Modules
 121c  Nippon Texaco., Ltd
 121d  Lippert Automationstechnik GmbH
@@ -1121,6 +1175,7 @@
 1241  DSC Communications
 1243  Delphax
 1244  AVM Audiovisuelles MKTG & Computer System GmbH
+	0700  B1 ISDN
 1245  A.P.D., S.A.
 1246  Dipix Technologies, Inc.
 1247  Xylon Research, Inc.
@@ -1153,6 +1208,10 @@
 125b  Asix Electronics Corporation
 125c  Aurora Technologies, Inc.
 125d  ESS Technology
+	1948  Solo?
+	1968  Maestro 2
+	1969  ESS 1969
+	1978  Maestro 2E
 125e  Specialvideo Engineering SRL
 125f  Concurrent Technologies, Inc.
 1260  Harris Semiconductor
@@ -1179,7 +1238,8 @@
 1273  Hughes Network Systems
 	0002  DirecPC
 1274  Ensoniq
-	5000  AudioPCI
+	1371  ES1371
+	5000  ES1370 [AudioPCI]
 1275  Network Appliance Corporation
 1276  Switched Network Technologies, Inc.
 1277  Comstream
@@ -1446,6 +1506,7 @@
 1383  Controlnet Inc
 1384  Reality Simulation Systems Inc
 1385  Netgear
+	620a  GA620
 1386  Video Domain Technologies
 1387  Systran Corp
 1388  Hitachi Information Technology Co Ltd
@@ -1626,6 +1687,9 @@
 1b13  Jaton Corp
 1c1c  Symphony
 	0001  82C101
+1de1  Tekram Technology Co.,Ltd.
+	690c  690c
+	dc29  DC290
 21c3  21st Century Computer Corp.
 270b  Xantel Corporation
 270f  Chaintech Computer Co. Ltd
@@ -1692,6 +1756,7 @@
 6374  c't Magazin für Computertechnik
 	6773  GPPCI
 6666  Decision Computer International Co.
+	0001  PCCOM4
 8008  Quancm Electronic GmbH
 	0010  WDOG1 [PCI-Watchdog 1]
 	0011  PWDOG2 [Watchdog2/PCI]
@@ -1747,12 +1812,15 @@
 	3000  ET32P2
 9004  Adaptec
 	1078  AIC-7810
+	2178  AIC-7821
 	5078  AIC-7850
 	5178  7851
 	5278  7852
 	5575  2930
 	5578  AIC-7855
 	5800  AIC-5800
+	6038  AIC-3860
+# FIXME: This is a cardbus card.  The declaration may be duplicative.
 	6075  AIC-1480
 	6078  AIC-7860
 	6178  AIC-7861
@@ -1773,7 +1841,25 @@
 	8478  AIC-7884U
 	8578  7885
 	8678  7886
+	8778  7887
+	8878  7888
 	8b78  ABA-1030
+9005  Adaptec
+	0010  2940U2
+	0011  2930U2
+	0013  78902
+	001f  7890
+	0050  3940U2
+	0051  3950U2D
+	005f  7896
+	0080  7892A
+	0081  7892B
+	0083  7892D
+	008f  7892P
+	00c0  7899A
+	00c1  7899B
+	00c3  7899D
+	00cf  7899P
 907f  Atronics
 	2015  IDE-2015PL
 9412  Holtek
