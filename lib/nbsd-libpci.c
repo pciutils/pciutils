@@ -104,7 +104,7 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
    */
 
   shift = 8*(pos % 4);
-  pos &= 3;
+  pos &= ~3;
   if (len != 4)
     {
       if (pcibus_conf_read(d->access->fd, d->bus, d->dev, d->func, pos, &val) < 0)
@@ -114,10 +114,10 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   switch (len)
     {
     case 1:
-      val = (val & ~(0xff << shift)) | buf[0];
+      val = (val & ~(0xff << shift)) | (buf[0] << shift);
       break;
     case 2:
-      val = (val & ~(0xffff << shift)) | le16_to_cpu(*(u16*)buf);
+      val = (val & ~(0xffff << shift)) | (le16_to_cpu(*(u16*)buf) << shift);
       break;
     case 4:
       val = le32_to_cpu(*(u32*)buf);
