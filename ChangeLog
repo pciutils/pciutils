@@ -1,5 +1,7 @@
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test8.
+
 	* lib/types.h, lib/pci.h, lib/sysdep.h: `byte' and `word' are
 	no longer exported to the outside world.
 

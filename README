@@ -16,6 +16,7 @@ Some more things I intend to merge before the 2.2.0 release:
    o  pcimodules and possibly other Linux module related stuff
    o  New ID's from the pciids project
    o  Avoid calling show_ext_caps() for non-ext devices.
+   o  Kill memory leaks in lib/names.c
 
 ############################################################################
 

@@ -9,6 +9,7 @@ require "maint/release.pm";
 my $r = new UCW::Release("pciutils");
 my $ver = $r->GetVersionFromFile("Makefile", "VERSION=(.*)");
 $r->GetVersionsFromChangelog("ChangeLog", "Released as (.*)\.");
+push @{$r->{"rules"}}, '^win32/config.h' => 's';
 if ($ver =~ /-/) {
 	$r->{"ALPHADIR"} = "alpha/";
 	$r->{"conditions"}->{"ALPHA_VERSION"} = 1;
@@ -30,7 +31,6 @@ $r->InitDist("maint/dist");
 my $reldir = $r->GenPackage;
 $r->GenFile("README");
 $r->GenFile("pciutils.lsm");
-$r->GenFile("win32/config.h");
 $r->Dispatch;
 if ($r->{"do_upload"}) {
 	print "Uploading pci.ids to Jabberwock\n";
