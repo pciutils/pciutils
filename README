@@ -68,6 +68,7 @@ accessing the PCI registers. Here is a list of them:
    dumps		reading of dumps produced by `lspci -x'.
    lsdev + odmget	used on AIX
    /dev/pci		used on FreeBSD
+   libpci		used on NetBSD
 
 
 5. Using the library
