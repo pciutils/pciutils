@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.39 1999/10/15 08:43:47 mj Exp $
+#	$Id: pci.ids,v 1.40 1999/10/28 17:44:51 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -26,7 +26,7 @@
 0e11  Compaq Computer Corporation
 	0001  PCI to EISA Bridge
 	0002  PCI to ISA Bridge
-	0508  Netelligent 4/16
+	0508  Netelligent 4/16 Token Ring
 	1000  Triflex/Pentium Bridge, Model 1000
 	2000  Triflex/Pentium Bridge, Model 2000
 	3032  QVision 1280/p
@@ -359,6 +359,9 @@
 	0194  82C194
 	2000  4DWave DX
 	2001  4DWave NX
+	8400  CyberBlade/i7
+	8420  CyberBlade/i7d
+	8500  CyberBlade/i1
 	9320  TGUI 9320
 	9382  Cyber 9382 [Reference design]
 	9383  Cyber 9383 [Reference design]
@@ -502,10 +505,13 @@
 	0004  R4000 PCI Bridge
 	0005  PCI to 486-like bus Bridge
 	0007  PCI to UX-Bus Bridge
+	001a  [Nile II]
+	0021  Vrc4373 [Nile I]
 	0029  PowerVR PCX1
 	002a  PowerVR 3D
 	0035  USB
 	0046  PowerVR PCX2 [midas]
+	005a  Vrc5074 [Nile 4]
 	0063  Firewarden
 	0067  PowerVR Neon 250 Chipset
 		1010 0020  PowerVR Neon 250 AGP 32Mb
@@ -518,6 +524,7 @@
 		1010 0120  PowerVR Neon 250 AGP 32Mb
 	0074  56k Voice Modem
 		1033 8014  RCV56ACF 56k Voice Modem
+	009b  Vrc5476
 1034  Framatome Connectors USA Inc.
 1035  Comp. & Comm. Research Lab
 1036  Future Domain Corp.
@@ -535,8 +542,10 @@
 	0205  SG86C205
 	0406  85C501/2
 	0496  85C496
+	0530  530 Host
 	0597  5513C
 	0601  85C601
+	0620  620 Host
 	0900  SiS900 10/100 Ethernet
 	3602  83C602
 	5107  5107
@@ -546,8 +555,10 @@
 	5571  5571
 	5591  5591/5592 Host
 	5597  5597 [SiS5582]
+	5600  5600 Host
 	6204  Video decoder & MPEG interface
-	6236  6236 AGP
+	6236  6236 3D-AGP
+	6306  6306 3D-AGP
 	6326  86C326
 		1092 0a50  SpeedStar A50
 		1092 0a70  SpeedStar A70
@@ -655,6 +666,7 @@
 	ac1c  PCI1225
 	ac1d  PCI1251
 	ac20  TI 2030
+	fe00  FireWire Host Controller
 	fe03  12C01A FireWire Host Controller
 104d  Sony Corporation
 104e  Oak Technology, Inc
@@ -668,8 +680,9 @@
 	0000  NE2000
 	0001  W83769F
 	0105  W82C105
-	0840  89C840
-	0940  89C940
+	0840  W89C840
+	0940  W89C940
+	5a5a  W89C940F
 	9970  W9970CF
 1051  Anigma, Inc.
 1053  Young Micro Systems
@@ -1044,7 +1057,7 @@
 	1521  M1521 [Aladdin III]
 	1523  M1523
 	1531  M1531 [Aladdin IV]
-	1533  M1533 [Aladdin IV]
+	1533  M1533 PCI to ISA Bridge [Aladdin IV]
 	1541  M1541
 	1543  M1543
 	1621  M1621
@@ -1061,12 +1074,12 @@
 	5217  M5217H
 	5219  M5219
 	5225  M5225
-	5229  M5229
+	5229  M5229 IDE
 	5235  M5225
-	5237  M5237
+	5237  M5237 USB
 	5243  M5243
 	5247  M5247
-	7101  M7101
+	7101  M7101 PMU
 10ba  Mitsubishi Electric Corp.
 	0301  AccelGraphics AccelECLIPSE
 10bb  Dapha Electronics Corporation
@@ -1120,7 +1133,7 @@
 	8625  MX86250
 	8888  MX86200
 10da  Compaq IPG-Austin
-	0508  TC4048
+	0508  TC4048 Token Ring 4/16
 	3390  Tl3c3x9
 10db  Rohm LSI Systems, Inc.
 10dc  CERN/ECP/EDU
@@ -1289,6 +1302,7 @@
 1105  Sigma Designs, Inc.
 	8300  REALmagic Hollywood Plus DVD Decoder
 1106  VIA Technologies, Inc.
+	0501  VT8501
 	0505  VT82C505
 	0561  VT82C561
 	0571  VT82C586 IDE [Apollo]
@@ -1300,6 +1314,8 @@
 	0596  VT82C596 ISA [Apollo PRO]
 	0597  VT82C597 [Apollo VP3]
 	0598  VT82C598 [Apollo MVP3]
+	0680  VT82C680 [Apollo P6]
+	0686  VT82C686 [Appolo Super]
 	0691  VT82C691 [Apollo PRO]
 	0693  VT82C693 [Apollo Pro Plus]
 	0926  VT82C926 [Amazon]
@@ -1313,8 +1329,12 @@
 	3043  VT86C100A [Rhine 10/100]
 		1106 0100  VT86C100A
 		1186 1400  DFE-530TX
+	3057  VT82C686 [Apollo Super ACPI]
+	3058  VT82C686 [Apollo Super AC97/Audio]
+	3068  VT82C686 [Apollo Super AC97/Modem]
 	5030  VT82C596 ACPI [Apollo PRO]
 	6100  VT85C100A [Rhine II]
+	8501  VT8501
 	8596  VT82C596 [Apollo PRO AGP]
 	8597  VT82C597 [Apollo VP3 AGP]
 	8598  VT82C598 [Apollo MVP3 AGP]
@@ -1661,7 +1681,7 @@
 	0465  RL5c465
 	0466  RL5c466
 	0475  RL5c475
-	0476  RL5c476
+	0476  RL5c476 II
 	0477  RL5c477
 	0478  RL5c478
 1181  Telmatics International
@@ -3169,6 +3189,7 @@
 	0002  PCCOM8
 7604  O.N. Electronic Co Ltd.
 7bde  MIDAC Corporation
+7fed  PowerTV
 8008  Quancom Electronic GmbH
 	0010  WDOG1 [PCI-Watchdog 1]
 	0011  PWDOG2 [PCI-Watchdog 2]
