@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.62 2000/06/28 10:56:36 mj Exp $
+#	$Id: pci.ids,v 1.63 2000/06/28 10:59:00 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -1469,8 +1469,6 @@
 	5055  3c555 Laptop Hurricane
 	5057  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus PC Card
-	5b57  3c575 [Megahertz] 10/100 LAN CardBus
-		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus
 	5157  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5b57  3C575 Megahertz 10/100 LAN Cardbus PC Card
 	5257  3CCFE575CT Cyclone CardBus
