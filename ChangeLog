@@ -1,5 +1,8 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* lspci.man: There was one more explicit reference to /usr/share/pci.ids.
+	Changed to @SHAREDIR@. Patch from Maciej W. Rozycki <macro@ds2.pg.gda.pl>.
+
 	* setpci.c (main): Better error messages.
 
 	* setpci.c (ex_op): The demo mode should disable only writing, not reading.

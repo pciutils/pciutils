@@ -70,7 +70,7 @@ hexadecimal and may be omitted or given as "*" meaning "any value".
 Use
 .B
 <file>
-as PCI ID database instead of /usr/share/pci.ids.
+as PCI ID database instead of @SHAREDIR@/pci.ids.
 .TP
 .B -p <dir>
 Use
