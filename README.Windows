@@ -1,0 +1,17 @@
+Since 2.1.99-test5, pciutils should also be compilable on Windows.
+
+However, you need to configure the package manually:
+
+lib/config.mk:
+
+ARCH_I386=1
+HAVE_PM_INTEL_CONF=1 
+OS_WINDOWS=1 
+
+lib/config.h:
+
+#define ARCH_I386
+#define OS_WINDOWS
+#define HAVE_PM_INTEL_CONF
+#define PATH_PCI_IDS "pci.ids"
+#define PCILIB_VERSION "2.1.99-test5"

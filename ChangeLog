@@ -1,5 +1,7 @@
 2004-05-29  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test5.
+
 	* lib/pci.h: Windows don't have the standard u_int* types.
 
 	* lib/internal.h: <sys/param.h> required on Windows for endianity
