@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.37 2001/11/04 15:27:15 mj Exp $
+# $Id: Makefile,v 1.38 2001/11/04 15:33:07 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2000 Martin Mares <mj@ucw.cz>
 
@@ -29,6 +29,7 @@ PREFIX=/usr
 endif
 endif
 MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
+DISTTMP=/tmp/pciutils-dist
 
 export
 
@@ -80,11 +81,13 @@ release:
 REL=pciutils-$(VERSION)$(SUFFIX)
 
 dist: clean
-	mkdir dist
-	cp -a . dist/$(REL)
-	rm -rf `find dist/$(REL) -name CVS -o -name tmp` dist/$(REL)/dist
-	[ -f dist/$(REL)/lib/header.h ] || cp /usr/src/linux/include/linux/pci.h dist/$(REL)/lib/header.h
-	cd dist ; tar czvvf /tmp/$(REL).tar.gz $(REL)
+	rm -rf $(DISTTMP)
+	mkdir $(DISTTMP)
+	cp -a . $(DISTTMP)/$(REL)
+	rm -rf `find $(DISTTMP)/$(REL) -name CVS -o -name tmp`
+	[ -f $(DISTTMP)/$(REL)/lib/header.h ] || cp /usr/src/linux/include/linux/pci.h dist/$(REL)/lib/header.h
+	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
+	rm -rf $(DISTTMP)
 
 upload: dist
 	tmp/upload $(REL)
