@@ -1,5 +1,7 @@
 2004-06-27  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test6.
+
 	* lspci.c (show_msix), lib/header.h: Added dumping of MSI-X cap.
 	Patch by Roland Dreier <roland@topspin.com>, cleaned up by me.
 
