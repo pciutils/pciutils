@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.9 1998/03/19 15:56:43 mj Exp $
+ *	$Id: lspci.c,v 1.10 1998/03/31 21:02:16 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -21,27 +21,24 @@
 static int verbose;			/* Show detailed information */
 static int buscentric_view;		/* Show bus addresses/IRQ's instead of CPU-visible ones */
 static int show_hex;			/* Show contents of config space as hexadecimal numbers */
-static int bus_filter = -1;		/* Bus, slot, function, vendor and device ID filtering */
-static int slot_filter = -1;
-static int func_filter = -1;
-static int vend_filter = -1;
-static int dev_filter = -1;
+static struct pci_filter filter;	/* Device filter */
 static int show_tree;			/* Show bus tree */
 static int machine_readable;		/* Generate machine-readable output */
 static char *pci_dir = PROC_BUS_PCI;
 
-static char options[] = "nvbxB:S:F:V:D:ti:p:m";
+static char options[] = "nvbxs:d:ti:p:m";
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
 \n\
--v\tBe verbose\n\
--n\tShow numeric ID's\n\
--b\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
--x\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
--B <bus>, -S <slot>, -F <func>, -V <vendor>, -D <device>  Show only selected devices\n\
--t\tShow bus tree\n\
--m\tProduce machine-readable output\n\
+-v\t\tBe verbose\n\
+-n\t\tShow numeric ID's\n\
+-b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
+-x\t\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
+-s [[<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
+-d [<vendor>]:[<device>]\tShow only selected devices\n\
+-t\t\tShow bus tree\n\
+-m\t\tProduce machine-readable output\n\
 -i <file>\tUse specified ID database instead of " ETC_PCI_IDS "\n\
 -p <dir>\tUse specified bus directory instead of " PROC_BUS_PCI "\n\
 ";
@@ -81,18 +78,6 @@ xmalloc(unsigned int howmuch)
   return p;
 }
 
-/* Filtering */
-
-static inline int
-filter_out(struct device *d)
-{
-  return (bus_filter >= 0 && d->bus != bus_filter ||
-	  slot_filter >= 0 && PCI_SLOT(d->devfn) != slot_filter ||
-	  func_filter >= 0 && PCI_FUNC(d->devfn) != func_filter ||
-	  vend_filter >= 0 && d->vendid != vend_filter ||
-	  dev_filter >= 0 && d->devid != dev_filter);
-}
-
 /* Interface for /proc/bus/pci */
 
 static void
@@ -127,7 +112,7 @@ scan_dev_list(void)
       d->devfn = dfn & 0xff;
       d->vendid = vend >> 16U;
       d->devid = vend & 0xffff;
-      if (!filter_out(d))
+      if (filter_match(&filter, d->bus, d->devfn, d->vendid, d->devid))
 	{
 	  *last_dev = d;
 	  last_dev = &d->next;
@@ -875,7 +860,9 @@ int
 main(int argc, char **argv)
 {
   int i;
+  char *msg;
 
+  filter_init(&filter);
   while ((i = getopt(argc, argv, options)) != -1)
     switch (i)
       {
@@ -888,20 +875,19 @@ main(int argc, char **argv)
       case 'b':
 	buscentric_view = 1;
 	break;
-      case 'B':
-	bus_filter = strtol(optarg, NULL, 16);
+      case 's':
+	if (msg = filter_parse_slot(&filter, optarg))
+	  {
+	    fprintf(stderr, "lspci: -f: %s\n", msg);
+	    return 1;
+	  }
 	break;
-      case 'S':
-	slot_filter = strtol(optarg, NULL, 16);
-	break;
-      case 'F':
-	func_filter = strtol(optarg, NULL, 16);
-	break;
-      case 'V':
-	vend_filter = strtol(optarg, NULL, 16);
-	break;
-      case 'D':
-	dev_filter = strtol(optarg, NULL, 16);
+      case 'd':
+	if (msg = filter_parse_id(&filter, optarg))
+	  {
+	    fprintf(stderr, "lspci: -d: %s\n", msg);
+	    return 1;
+	  }
 	break;
       case 'x':
 	show_hex++;

@@ -54,24 +54,16 @@ PCI bus instead of as seen by the kernel.
 Show a tree-like diagram containing all busses, bridges, devices and connections
 between them.
 .TP
-.B -B <bus>
-Show only devices on specified bus.
+.B -s [[<bus>]:][<slot>][.[<func>]]
+Show only devices in specified bus, slot and function. Each component of the device
+address can be omitted or set as "*" meaning "any value". All numbers are
+hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of device 0
+on any bus, "0.3" selects third function of device 0 on all busses and ".4" shows only
+fourth function of each device.
 .TP
-.B -S <slot>
-Show only devices in specified slot number.
-.TP
-.B -F <func>
-Show only specified function number of all devices (you can mix it with
-.B -B
-and
-.B -S
-to select single device).
-.TP
-.B -V <vendor>
-Show only devices having specified vendor ID.
-.TP
-.B -D <devid>
-Show only devices having specified device ID.
+.B -d [<vendor>]:[<device>]
+Show only devices with specified vendor and device ID. Both ID's are given in
+hexadecimal and may be omitted or given as "*" meaning "any value".
 .TP
 .B -i <file>
 Use

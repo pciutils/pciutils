@@ -1,3 +1,15 @@
+Tue Mar 31 23:11:57 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* setpci.c: Added.
+
+Sun Mar 22 15:39:08 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.8: Updated the documentation.
+
+	* lspci.c: Modified to use the new filtering mechanism (options -f and -d).
+
+	* filter.c: Introduced new generic device filter.
+
 Thu Mar 19 17:03:48 1998  Martin Mares  <mj@lomikel.karlin.mff.cuni.cz>
 
 	* lspci.c (grow_tree, show_tree_dev, print_it): Fixed displaying

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 1998/02/09 12:32:52 mj Exp $
+# $Id: Makefile,v 1.7 1998/03/31 21:02:12 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -12,14 +12,21 @@ MANPREFIX=/usr
 
 all: lspci
 
-lspci: lspci.o names.o
+#all: lspci setpci
+
+lspci: lspci.o names.o filter.o
 
 lspci.o: lspci.c pciutils.h
 names.o: names.c pciutils.h
+filter.o: filter.c pciutils.h
+
+setpci: setpci.o filter.o
+
+setpci.o: setpci.c
 
 clean:
 	rm -f `find . -name "*~" -or -name "*.[oa]" -or -name "\#*\#" -or -name TAGS -or -name core`
-	rm -f lspci pci.h
+	rm -f lspci setpci pci.h
 
 install: all
 	install -o root -g root -m 755 -s lspci $(PREFIX)/sbin
