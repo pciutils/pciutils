@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.26 1999/05/19 12:01:31 mj Exp $
+#	$Id: pci.ids,v 1.27 1999/06/17 17:53:04 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -426,7 +426,9 @@
 	0002  YGV615 [RPA3 3D-Graphics Controller]
 	0003  YMF-740
 	0004  YMF-724
-	000D  YMF-724F
+	000C  YMF-740C [DS-1L Audio Controller]
+	000D  YMF-724F [DS-1 Audio Controller]
+	0010  YMF-744B [DS-1S Audio Controller]
 1074  NexGen Microsystems
 	4e78  82c501
 1075  Advanced Integrations Research
@@ -1092,7 +1094,14 @@
 11ed  Mediamatics
 11ee  Dome Imaging Systems Inc
 11ef  Nicolet Technologies B.V.
-11f0  Compu-Shack GmbH
+11f0  Compu-Shack
+	4231  FDDI
+	4232  FASTline UTP Quattro
+	4233  FASTline FO
+	4234  FASTline UTP
+	4235  FASTline-II UTP
+	4236  FASTline-II FO
+	4731  GIGAline
 11f1  Symbios Logic Inc
 11f2  Picture Tel Japan K.K.
 11f3  Keithley Metrabyte
@@ -1163,6 +1172,7 @@
 	0001  Voodoo
 	0002  Voodoo2
 	0003  Voodoo Banshee
+	0005  Voodoo3
 121b  Advanced Telecommunications Modules
 121c  Nippon Texaco., Ltd
 121d  Lippert Automationstechnik GmbH
@@ -1374,7 +1384,14 @@
 12d0  GDE Systems, Inc.
 12d1  PSITech
 12d2  NVidia / SGS Thomson (Joint Venture)
+	0008  NV1
+	0009  DAC64
 	0018  Riva128
+	0020  TNT
+	0028  TNT2
+	0029  UTNT2
+	002C  VTNT2
+	00A0  ITNT2
 12d3  Vingmed Sound A/S
 12d4  DGM&S
 12d5  Equator Technologies
@@ -1830,6 +1847,8 @@
 	7111  82371AB PIIX4 IDE
 	7112  82371AB PIIX4 USB
 	7113  82371AB PIIX4 ACPI
+	7120  82810 GMCH
+	7122  82810-DC100 GMCH
 	7180  440LX - 82443LX Host bridge
 	7181  440LX - 82443LX AGP bridge
 	7190  440BX/ZX - 82443BX/ZX Host bridge
@@ -1864,6 +1883,7 @@
 	6178  AIC-7861
 	6278  AIC-7860
 	6378  AIC-7860
+	6915  Starfire 6915
 	7078  AIC-7870
 	7178  AIC-7871
 	7278  AIC-7872
@@ -2000,3 +2020,9 @@ C 0E  Intelligent controller
 
 S 10b4  STB Systems Inc
 	273e  Velocity 4400
+
+S 1102  Creative Labs
+	1015  Graphics Blaster CT6710
+
+S 125c  Aurora Technologies, Inc.
+	0640  Aries 16000P

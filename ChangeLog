@@ -1,3 +1,14 @@
+Thu Jun 17 19:48:21 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_agp): Bug fix from Petr Vandrovec
+	<vandrove@vc.cvut.cz>. The command register was displayed
+	incorrectly.
+
+Wed Jun  2 22:42:44 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lib/proc.c (SYS_pread, SYS_pwrite): Use hard-coded
+	numbers if not supplied by the libc.
+
 Wed May 19 13:24:39 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released the whole package as version 2.0.
