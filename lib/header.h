@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.8 2002/03/30 15:39:25 mj Exp $
+ *	$Id: header.h,v 1.9 2002/12/26 20:24:50 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -221,21 +221,31 @@
 #define PCI_AGP_RFU		3	/* Rest of capability flags */
 #define PCI_AGP_STATUS		4	/* Status register */
 #define  PCI_AGP_STATUS_RQ_MASK	0xff000000	/* Maximum number of requests - 1 */
+#define  PCI_AGP_STATUS_ISOCH	0x10000	/* Isochronous transactions supported */
+#define  PCI_AGP_STATUS_ARQSZ_MASK	0xe000	/* log2(optimum async req size in bytes) - 4 */
+#define  PCI_AGP_STATUS_CAL_MASK	0x1c00	/* Calibration cycle timing */
 #define  PCI_AGP_STATUS_SBA	0x0200	/* Sideband addressing supported */
-#define  PCI_AGP_STATUS_64BIT	0x0020	/* 64-bit addressing supported */
-#define  PCI_AGP_STATUS_FW	0x0010	/* FW transfers supported */
-#define  PCI_AGP_STATUS_RATE4	0x0004	/* 4x transfer rate supported */
-#define  PCI_AGP_STATUS_RATE2	0x0002	/* 2x transfer rate supported */
-#define  PCI_AGP_STATUS_RATE1	0x0001	/* 1x transfer rate supported */
+#define  PCI_AGP_STATUS_ITA_COH	0x0100	/* In-aperture accesses always coherent */
+#define  PCI_AGP_STATUS_GART64	0x0080	/* 64-bit GART entries supported */
+#define  PCI_AGP_STATUS_HTRANS	0x0040	/* If 0, core logic can xlate host CPU accesses thru aperture */
+#define  PCI_AGP_STATUS_64BIT	0x0020	/* 64-bit addressing cycles supported */
+#define  PCI_AGP_STATUS_FW	0x0010	/* Fast write transfers supported */
+#define  PCI_AGP_STATUS_AGP3	0x0008	/* AGP3 mode supported */
+#define  PCI_AGP_STATUS_RATE4	0x0004	/* 4x transfer rate supported (RFU in AGP3 mode) */
+#define  PCI_AGP_STATUS_RATE2	0x0002	/* 2x transfer rate supported (8x in AGP3 mode) */
+#define  PCI_AGP_STATUS_RATE1	0x0001	/* 1x transfer rate supported (4x in AGP3 mode) */
 #define PCI_AGP_COMMAND		8	/* Control register */
 #define  PCI_AGP_COMMAND_RQ_MASK 0xff000000  /* Master: Maximum number of requests */
+#define  PCI_AGP_COMMAND_ARQSZ_MASK	0xe000	/* log2(optimum async req size in bytes) - 4 */
+#define  PCI_AGP_COMMAND_CAL_MASK	0x1c00	/* Calibration cycle timing */
 #define  PCI_AGP_COMMAND_SBA	0x0200	/* Sideband addressing enabled */
 #define  PCI_AGP_COMMAND_AGP	0x0100	/* Allow processing of AGP transactions */
-#define  PCI_AGP_COMMAND_64BIT	0x0020 	/* Allow processing of 64-bit addresses */
-#define  PCI_AGP_COMMAND_FW	0x0010 	/* Force FW transfers */
-#define  PCI_AGP_COMMAND_RATE4	0x0004	/* Use 4x rate */
-#define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 2x rate */
-#define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 1x rate */
+#define  PCI_AGP_COMMAND_GART64	0x0080	/* 64-bit GART entries enabled */
+#define  PCI_AGP_COMMAND_64BIT	0x0020 	/* Allow generation of 64-bit addr cycles */
+#define  PCI_AGP_COMMAND_FW	0x0010 	/* Enable FW transfers */
+#define  PCI_AGP_COMMAND_RATE4	0x0004	/* Use 4x rate (RFU in AGP3 mode) */
+#define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 2x rate (8x in AGP3 mode) */
+#define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 1x rate (4x in AGP3 mode) */
 #define PCI_AGP_SIZEOF		12
 
 /* Slot Identification */

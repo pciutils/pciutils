@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.42 2002/04/06 12:08:26 mj Exp $
+ *	$Id: lspci.c,v 1.43 2002/12/26 20:24:50 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -409,7 +409,7 @@ show_pm(struct device *d, int where, int cap)
 }
 
 static void
-format_agp_rate(int rate, char *buf)
+format_agp_rate(int rate, char *buf, int agp3)
 {
   char *c = buf;
   int i;
@@ -420,7 +420,7 @@ format_agp_rate(int rate, char *buf)
 	if (c != buf)
 	  *c++ = ',';
 	*c++ = 'x';
-	*c++ = '0' + (1 << i);
+	*c++ = '0' + (1 << (i + 2*agp3));
       }
   if (c != buf)
     *c = 0;
@@ -433,26 +433,41 @@ show_agp(struct device *d, int where, int cap)
 {
   u32 t;
   char rate[8];
+  int ver, rev;
+  int agp3 = 0;
 
-  t = cap & 0xff;
-  printf("AGP version %x.%x\n", cap/16, cap%16);
+  ver = (cap >> 4) & 0x0f;
+  rev = cap & 0x0f;
+  printf("AGP version %x.%x\n", ver, rev);
   if (verbose < 2)
     return;
   config_fetch(d, where + PCI_AGP_STATUS, PCI_AGP_SIZEOF - PCI_AGP_STATUS);
   t = get_conf_long(d, where + PCI_AGP_STATUS);
-  format_agp_rate(t & 7, rate);
-  printf("\t\tStatus: RQ=%d SBA%c 64bit%c FW%c Rate=%s\n",
-	 (t & PCI_AGP_STATUS_RQ_MASK) >> 24U,
+  if (ver >= 3 && (t & PCI_AGP_STATUS_AGP3))
+    agp3 = 1;
+  format_agp_rate(t & 7, rate, agp3);
+  printf("\t\tStatus: RQ=%d Iso%c ArqSz=%d Cal=%d SBA%c ITACoh%c GART64%c HTrans%c 64bit%c FW%c AGP3%c Rate=%s\n",
+	 ((t & PCI_AGP_STATUS_RQ_MASK) >> 24U) + 1,
+	 FLAG(t, PCI_AGP_STATUS_ISOCH),
+	 ((t & PCI_AGP_STATUS_ARQSZ_MASK) >> 13),
+	 ((t & PCI_AGP_STATUS_CAL_MASK) >> 10),
 	 FLAG(t, PCI_AGP_STATUS_SBA),
+	 FLAG(t, PCI_AGP_STATUS_ITA_COH),
+	 FLAG(t, PCI_AGP_STATUS_GART64),
+	 FLAG(t, PCI_AGP_STATUS_HTRANS),
 	 FLAG(t, PCI_AGP_STATUS_64BIT),
 	 FLAG(t, PCI_AGP_STATUS_FW),
+	 FLAG(t, PCI_AGP_STATUS_AGP3),
 	 rate);
   t = get_conf_long(d, where + PCI_AGP_COMMAND);
-  format_agp_rate(t & 7, rate);
-  printf("\t\tCommand: RQ=%d SBA%c AGP%c 64bit%c FW%c Rate=%s\n",
-	 (t & PCI_AGP_COMMAND_RQ_MASK) >> 24U,
+  format_agp_rate(t & 7, rate, agp3);
+  printf("\t\tCommand: RQ=%d ArqSz=%d Cal=%d SBA%c AGP%c GART64%c 64bit%c FW%c Rate=%s\n",
+	 ((t & PCI_AGP_COMMAND_RQ_MASK) >> 24U) + 1,
+	 ((t & PCI_AGP_COMMAND_ARQSZ_MASK) >> 13),
+	 ((t & PCI_AGP_COMMAND_CAL_MASK) >> 10),
 	 FLAG(t, PCI_AGP_COMMAND_SBA),
 	 FLAG(t, PCI_AGP_COMMAND_AGP),
+	 FLAG(t, PCI_AGP_COMMAND_GART64),
 	 FLAG(t, PCI_AGP_COMMAND_64BIT),
 	 FLAG(t, PCI_AGP_COMMAND_FW),
 	 rate);
