@@ -11,7 +11,7 @@ Group: 		Utilities/System
 
 %description
 This package contains various utilities for inspecting and
-setting of devices connected to the PCI bus. Requires kernel
+setting of devices connected to the PCI bus.
 
 %description -l pl
 Pakiet zawiera narzêdzia do ustawiania i odczytywania informacji
