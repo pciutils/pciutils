@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.61 2000/05/20 14:34:32 mj Exp $
+#	$Id: pci.ids,v 1.62 2000/06/28 10:56:36 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -238,11 +238,12 @@
 100a  Phoenix Technologies
 100b  National Semiconductor Corporation
 	0001  DP83810
-	0002  87415
+	0002  87415/87560 IDE
+	000e  87560 Legacy I/O
 	000f  OHCI Compliant FireWire Controller
 	0011  National PCI System I/O
 	0012  USB Controller
-	d001  87410
+	d001  87410 IDE
 100c  Tseng Labs Inc
 	3202  ET4000/W32p rev A
 	3205  ET4000/W32p rev B
@@ -570,6 +571,10 @@
 	0001  PowerEdge Expandable RAID Controller 2/Si
 	0002  PowerEdge Expandable RAID Controller 3/Di
 	0003  PowerEdge Expandable RAID Controller 3/Si
+	0004  PowerEdge Expandable RAID Controller 3/Si
+	0005  PowerEdge Expandable RAID Controller 3/Di
+	0006  PowerEdge Expandable RAID Controller 3/Di
+	0008  PowerEdge Expandable RAID Controller 3/Di
 1029  Siemens Nixdorf IS
 102a  LSI Logic
 	0000  HYDRA
@@ -919,6 +924,7 @@
 	8009  CXD1947Q i.LINK Controller
 	8039  CXD3222 i.LINK Controller
 	8056  Rockwell HCF 56K modem
+	808a  Memory Stick Controller
 104e  Oak Technology, Inc
 	0017  OTI-64017
 	0107  OTI-107 [Spitfire]
@@ -977,6 +983,7 @@
 1058  Electronics & Telecommunications RSH
 1059  Teknor Industrial Computers Inc
 105a  Promise Technology, Inc.
+	4d30  20267
 	4d33  20246
 	4d38  20262
 	5300  DC5300
@@ -1229,6 +1236,7 @@
 	0646  PCI0646
 	0647  PCI0647
 	0648  PCI0648
+	0649  PCI0649
 	0650  PBC0650A
 	0670  USB0670
 	0673  USB0673
@@ -1248,6 +1256,7 @@
 	036c  Bt879(??) Video Capture
 		13e9 0070  Win/TV (Video Section)
 	036e  Bt878
+		0070 13eb  WinTV/GO
 		127a 0001  Bt878 Mediastream Controller NTSC
 		127a 0002  Bt878 Mediastream Controller PAL BG
 		127a 0003  Bt878a Mediastream Controller PAL BG
@@ -1295,6 +1304,7 @@
 		1851 1851  FlyVideo'98 EZ - video
 		1852 1852  FlyVideo'98 (with FM Tuner)
 	0878  Bt878
+		0070 13eb  WinTV/GO
 		127a 0001  Bt878 Video Capture (Audio Section)
 		127a 0002  Bt878 Video Capture (Audio Section)
 		127a 0003  Bt878 Video Capture (Audio Section)
@@ -1459,6 +1469,8 @@
 	5055  3c555 Laptop Hurricane
 	5057  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus PC Card
+	5b57  3c575 [Megahertz] 10/100 LAN CardBus
+		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus
 	5157  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5b57  3C575 Megahertz 10/100 LAN Cardbus PC Card
 	5257  3CCFE575CT Cyclone CardBus
@@ -1468,8 +1480,11 @@
 	5951  3c595 100BaseT4 [Vortex]
 	5952  3c595 100Base-MII [Vortex]
 	5970  3c597 EISA Fast Demon/Vortex
+	5b57  3c595 [Megahertz] 10/100 LAN CardBus
+		10b7 5b57  3C575 Megahertz 10/100 LAN Cardbus PC Card
 	6560  3CCFE656 Cyclone CardBus
-	6562  3CCFEM656 Cyclone CardBus
+	6562  3CCFEM656 [id 6562] Cyclone CardBus
+	6564  3CCFEM656 [id 6564] Cyclone CardBus
 	7646  3cSOHO100-TX Hurricane
 	8811  Token ring
 	9000  3c900 10BaseT [Boomerang]
@@ -1504,12 +1519,15 @@
 		1028 0098  3C905B Fast Etherlink XL 10/100
 		1028 0099  3C905B Fast Etherlink XL 10/100
 		10b7 9055  3C905B Fast Etherlink XL 10/100
+	9056  3c905B-T4
 	9058  3c905B-Combo [Deluxe Etherlink XL 10/100]
 	905a  3c905B-FX [Fast Etherlink XL FX 10/100]
 	9200  3c905C-TX [Fast Etherlink]
 		10b7 1000  3C905C-TX Fast Etherlink for PC Management NIC
 	9800  3c980-TX [Fast Etherlink XL Server Adapter]
 		10b7 9800  3c980-TX Fast Etherlink XL Server Adapter
+	9805  3c980-TX 10/100baseTX NIC [Python-T]
+		10b7 9805  3c980 10/100baseTX NIC [Python-T]
 10b8  Standard Microsystems Corp [SMC]
 	0005  83C170QF
 		1055 e000  LANEPIC
@@ -1745,11 +1763,13 @@
 		1043 400a  AGP-V6800 DDR SGRAM
 		1043 400b  AGP-V6800 DDR SDRAM
 		1102 102e  CT6971 GeForce 256 DDR
+		14af 5021  3D Prophet DDR-DVI
 	0103  Quadro (GeForce 256 GL)
 	0110  NV11
 	0111  NV11 DDR
 	0113  NV11 GL
 	0150  NV15 (Geforce2 GTS)
+		107d 2840  WinFast GeForce2 GTS with TV output
 	0151  NV15 DDR (Geforce2 GTS)
 	0152  NV15 Bladerunner (Geforce2 GTS)
 	0153  NV15 GL (Quadro2)
@@ -2045,10 +2065,18 @@
 111a  Efficient Networks, Inc
 	0000  155P-MF1 (FPGA)
 	0002  155P-MF1 (ASIC)
-	0003  ENI-25P ATM Adapter
+	0003  ENI-25P ATM
 		111a 0000  ENI-25p Miniport ATM Adapter
-	0005  Speedstream 30xx ATM Adapter
-		111a 0001  SS-3010 Miniport ATM Adapter
+	0005  SpeedStream (LANAI)
+		111a 0001  ENI-3010 ATM
+		111a 0101  ENI-3010 ATM
+		111a 0009  ENI-3060 ADSL (VPI=0)
+		111a 0109  ENI-3060CO ADSL (VPI=0)
+		111a 0809  ENI-3060 ADSL (VPI=0 or 8)
+		111a 0909  ENI-3060CO ADSL (VPI=0 or 8)
+		111a 0a09  ENI-3060 ADSL (VPI=<0..15>)
+	0007  SpeedStream ADSL 
+		111a 1001  ENI-3061 ADSL [ASIC]
 111b  Teledyne Electronic Systems
 111c  Tricord Systems Inc.
 	0001  Powerbis Bridge
@@ -2108,7 +2136,7 @@
 		1133 e004  DIVA 2.0 U
 	e010  DIVA Server BRI-2M
 		1133 e010  DIVA Server BRI-2M
-	e014  DIVA Server PRO-30M
+	e014  DIVA Server PRI-30M
 		1133 e014  DIVA Server PRI-30M
 1134  Mercury Computer Systems
 	0001  Raceway Bridge
@@ -2270,10 +2298,14 @@
 1164  Advanced Peripherals Technologies
 1165  Imagraph Corporation
 	0001  Motion TPEG Recorder/Player with audio
-1166  Relience Computer
+1166  ServerWorks
 	0007  CNB20-LE CPU to PCI Bridge
 	0008  CNB20HE
-	0009  CNB20HE
+	0009  CNB20LE
+	0010  CIOB30
+	0011  CMIC-HE
+	0200  OSB4
+	0201  CSB5
 1167  Mutoh Industries Inc
 1168  Thine Electronics Inc
 1169  Centre for Development of Advanced Computing
@@ -2413,7 +2445,7 @@
 		11ad f003  LNE100TX
 		11ad ffff  LNE100TX
 		1385 f004  FA310TX
-	c115  LNE100TX Fast Ethernet Adapter
+	c115  LNE100TX [Linksys EtherFast 10/100]
 11ae  Aztech System Ltd
 11af  Avid Technology Inc.
 11b0  V3 Semiconductor Inc.
@@ -2714,7 +2746,17 @@
 	1220  AMCC 5933 TMS320C80 DSP/Imaging board
 1221  Contec Co., Ltd
 1222  Ancor Communications, Inc.
-1223  Heurikon/Computer Products
+1223  Artesyn Communication Products
+	0003  PM/Link
+	0004  PM/T1
+	0005  PM/E1
+	0008  PM/SLS
+	0009  BajaSpan Resource Target
+	000a  BajaSpan Section 0
+	000b  BajaSpan Section 1
+	000c  BajaSpan Section 2
+	000d  BajaSpan Section 3
+	000e  PM/PPC
 1224  Interactive Images
 1225  Power I/O, Inc.
 1227  Tech-Source
@@ -2931,7 +2973,10 @@
 1277  Comstream
 1278  Transtech Parallel Systems Ltd.
 1279  Transmeta Corporation
-	0295  Virtual Northbridge
+	0295  Northbridge
+	0395  LongRun Northbridge
+	0396  SDRAM controller
+	0397  BIOS scratchpad
 127a  Rockwell International
 	1002  HCF 56k V90 FaxModem
 		127a 1002  HCF 56k V90 Modem
@@ -4504,15 +4549,22 @@
 		11d4 5340  SoundMAX Integrated Digital Audio
 	2416  82801AA AC'97 Modem
 	2418  82801AA PCI Bridge
-	2420  82801AB Chipset ISA Bridge (LPC)
-	2421  82801AB Chipset IDE
-	2422  82801AB Chipset USB
-	2423  82801AB Chipset SMBus
+	2420  82801AB ISA Bridge (LPC)
+	2421  82801AB IDE
+	2422  82801AB USB
+	2423  82801AB SMBus
 	2425  82801AB AC'97 Audio
 		11d4 0040  SoundMAX Integrated Digital Audio
 		11d4 0048  SoundMAX Integrated Digital Audio
 	2426  82801AB AC'97 Modem
 	2428  82801AB PCI Bridge
+	2440  82820 820 (Camino 2) Chipset ISA Bridge (ICH2)
+	2442  82820 820 (Camino 2) Chipset USB (Hub A)
+	2443  82820 820 (Camino 2) Chipset SMBus
+	2444  82820 820 (Camino 2) Chipset USB (Hub B)
+	2449  82820 820 (Camino 2) Chipset Ethernet
+	244b  82820 820 (Camino 2) Chipset IDE U100
+	244e  82820 820 (Camino 2) Chipset PCI
 	2500  82820 820 (Camino) Chipset Host Bridge (MCH)
 		1043 801c  P3C-2000 system chipset
 	2501  82820 820 (Camino) Chipset Host Bridge (MCH)
