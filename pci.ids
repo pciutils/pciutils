@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.6 1998/03/15 13:59:19 ecd Exp $
+#	$Id: pci.ids,v 1.7 1998/04/22 07:55:16 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -44,12 +44,14 @@
 	4742  215GB [Mach64 GB]
 	4744  215GD [Mach64 GD]
 	4749  215GI [Mach64 GI]
-	4750  264GP [Mach64 GP]
+	4750  215GP [Mach64 GP]
+	4751  215GQ [Mach64 GQ]
 	4754  215GT [Mach64 GT]
 	4755  215GTB [Mach64 GT]
 	4758  210888GX [Mach64 GX]
+	4c47  215LG [Mach64 LG]
+	4c54  264LT [Mach64 LT]
 	5654  264VT [Mach64 VT]
-	5c54  264LT [Mach64 LT]
 1003  ULSI Systems
 	0201  US201
 1004  VLSI Technology Inc
@@ -128,7 +130,8 @@
 	0022  IBM27-82351
 	002e  ServeRAID controller
 	0036  Miami
-	007d  MPEG2
+	003e  TR_Wake
+	007d  3780IDSP [MWave]
 1015  LSI Logic Corp of Canada
 1016  ICL Personal Systems
 1017  SPEA Software AG
@@ -193,6 +196,7 @@
 	00dc  65548
 	00e0  65550
 	00e4  65554
+	00e5  65555
 102d  Wyse Technology Inc.
 102e  Olivetti Advanced Technology
 102f  Toshiba America
@@ -208,10 +212,11 @@
 1037  Hitachi Micro Systems
 1038  AMP, Inc
 1039  Silicon Integrated Systems
-	0001  SG86C201
+	0001  5591/5592 AGP
 	0002  SG86C202
 	0008  85C503
-	0200  5598
+	0009  ACPI
+	0200  5597/5598 VGA
 	0204  82C204
 	0205  SG86C205
 	0406  85C501/2
@@ -222,6 +227,7 @@
 	5511  5511/5512
 	5513  5513
 	5571  5571
+	5591  5591/5592 Host
 	5597  5597 [SiS5582]
 	7001  7001
 103a  Seiko Epson Corporation
@@ -302,6 +308,7 @@
 105d  Number 9 Computer Company
 	2309  Imagine 128
 	2339  Imagine 128-II
+	493d  Imagine 128 T2R [Ticket to Ride]
 105e  Vtech Computers Ltd
 105f  Infotronic America Inc
 1060  United Microelectronics
@@ -379,6 +386,7 @@
 	0802  SL82C105
 1080  Contaq Microsystems
 	0600  82C599
+	c693  82c693
 1081  Supermac Technology
 1082  EFA Corporation of America
 1083  Forex Computer Corporation
@@ -399,8 +407,8 @@
 	0014  OC-2326
 	0021  OC-6151/6152 [RapidFire ATM PCI 155]
 108e  Sun Microsystems Computer Corp.
-	1000  PCI-EBus Bridge
-	1001  Happy Meal Ethernet
+	1000  EBUS
+	1001  Happy Meal
 	5000  Advanced PCI Bridge
 	8000  PCI Bus Module
 	a000  Ultra IIi PCI
@@ -467,8 +475,10 @@
 	906e  9060ES
 	9080  9080
 10b6  Madge Networks
-	0001  Smart 16/4 PCI Ringnode
+	0001  Smart
+	0002  Smart 16/4 BM Mk2 PCI Ringnode
 10b7  3Com Corporation
+	3390  Token Link Velocity
 	5900  3c590 10BaseT [Vortex]
 	5950  3c595 100BaseTX [Vortex]
 	5951  3c595 100BaseT4 [Vortex]
@@ -477,6 +487,7 @@
 	9001  3c900 Combo [Boomerang]
 	9050  3c905 100BaseTX
 	9051  3c905 100BaseT4
+	9055  3c905B 100BaseTX
 10b8  Standard Microsystems
 	0005  9432 TX
 	1000  37c665
@@ -494,6 +505,8 @@
 	1523  M1523
 	1531  M1531
 	1533  M1533
+	1541  M1541
+	1543  M1543
 	3141  M3141
 	3143  M3143
 	3145  M3145
@@ -507,6 +520,7 @@
 	5229  M5229
 	5235  m5225
 	5237  M5237
+	7101  M7101
 10ba  Mitsubishi Electric Corp.
 10bb  Dapha Electronics Corporation
 10bc  Advanced Logic Research
@@ -548,11 +562,15 @@
 10d7  BCM Advanced Research
 10d8  Advanced Peripherals Labs
 10d9  Macronix, Inc.
+	0512  MX98713
+	0531  MX987x5
 10da  Compaq IPG-Austin
 10db  Rohm LSI Systems, Inc.
 10dc  CERN/ECP/EDU
 	0001  STAR/RD24 SCI-PCI (PMC)
 	0002  TAR/RD24 SCI-PCI (PMC) [ATT 2C15-3 (FPGA)  SCI bridge  on PCI 5 Volt card]
+	0021  HIPPI destination
+	0022  HIPPI source
 10dd  Evans & Sutherland
 10de  Nvidia Corporation
 	0008  NV1
@@ -576,6 +594,7 @@
 10e8  Applied Micro Circuits Corporation
 	5920  S5920
 	8043  LANai4.x [Myrinet LANai interface chip]
+	8062  S5933_PARASTATION
 	807d  S5933 [Matchmaker]
 	809c  S5933_HEPC3
 10e9  Alps Electric Co., Ltd.
@@ -587,6 +606,7 @@
 10ec  Realtek Semiconductor Co., Ltd.
 	8029  8029
 	8129  8129
+	8139  8139
 10ed  Ascii Corporation
 	7310  V7310
 10ee  Xilinx, Inc.
@@ -633,6 +653,7 @@
 	1595  VT82C595/97 [Apollo VP2/97]
 	3038  VT82C586B USB
 	3040  VT82C586B ACPI
+	6100  VT85C100A [Rhine II]
 	8597  VT82C597 [Apollo VP3 AGP]
 1107  Stratus Computers
 1108  Proteon, Inc.
@@ -763,6 +784,7 @@
 	0006  AccelePort Xr,C/X
 	0009  AccelePort Xr/J
 	000a  AccelePort EPC/J
+	0027  AccelePort Xr 920
 1150  Thinking Machines Corp
 1151  JAE Electronics Inc.
 1152  Megatek
@@ -955,6 +977,7 @@
 11f2  Picture Tel Japan K.K.
 11f3  Keithley Metrabyte
 11f4  Kinetic Systems Corporation
+	2915  CAMAC controller
 11f5  Computing Devices International
 11f6  Compex
 	0112  ENet100VG4
@@ -990,6 +1013,7 @@
 	0100  Cyclom_Y
 	0200  Cyclom_Z
 120f  Essential Communications
+	0001  Roadrunner serial HIPPI
 1210  Hyperparallel Technologies
 1211  Braintech Inc
 1212  Kingston Technology Corp.
@@ -1002,7 +1026,8 @@
 1218  Hybricon Corp.
 1219  First Virtual Corporation
 121a  3Dfx Interactive, Inc.
-	0001  Voodoo [voodoo]
+	0001  Voodoo
+	0002  Voodoo2
 121b  Advanced Telecommunications Modules
 121c  Nippon Texaco., Ltd
 121d  Lippert Automationstechnik GmbH
@@ -1040,6 +1065,7 @@
 123d  Engineering Design Team, Inc.
 123e  Simutech, Inc.
 123f  C-Cube Microsystems
+	00e4  MPEG
 1240  Marathon Technologies Corp.
 1241  DSC Communications
 1243  Delphax
@@ -1084,6 +1110,8 @@
 1265  Casio Computer Co., Ltd.
 1266  Microdyne Corporation
 1267  S. A. Telecommunications
+	5352  PCR2101
+	5a4b  Telsat Turbo
 1268  Tektronix
 1269  Thomson-CSF/TTM
 126a  Lexmark International, Inc.
@@ -1229,6 +1257,8 @@
 12f5  Forks
 12f6  Dawson France
 12f7  Cognex
+1307  ComputerBoards
+	0001  DAS1602/16
 1c1c  Symphony
 	0001  82C101
 270f  Chaintech Computer Co. Ltd
@@ -1237,6 +1267,7 @@
 	0002  GLINT 500TX
 	0003  GLINT Delta
 	0004  Permedia
+	0006  GLINT MX
 4005  Avance Logic Inc.
 	2064  ALG2064i
 	2301  ALG2301
@@ -1307,6 +1338,7 @@
 	1234  430MX - 82371MX MPIIX [430MX PCIset - 82371MX Mobile PCI I/O IDE Xcelerator (MPIIX)]
 	1235  430MX - 82437MX MTSC [430MX PCIset - 82437MX Mobile System Controller (MTSC) and 82438MX Mobile Data Path (MTDP)]
 	1237  440FX - 82441FX PMC [Natoma]
+	124b  82380FB
 	1250  430HX - 82439HX TXC [Triton II]
 	1960  80960RP [i960RP Microprocessor]
 	7000  82371SB PIIX3 ISA [Natoma/Triton II]
@@ -1320,6 +1352,9 @@
 	7113  82371AB PIIX4 ACPI
 	7180  440LX - 82443LX PAC Host
 	7181  440LX - 82443LX PAC AGP
+	7190  440BX - 82443BX Host
+	7191  440BX - 82443BX AGP
+	7192  440BX - 82443BX (AGP disabled)
 	84c4  82450KX [Orion]
 	84c5  82450GX [Orion]
 8800  Trigem Computer Inc.
@@ -1354,12 +1389,14 @@
 	8478  AIC-7884U
 	8578  7885
 	8678  7886
+	8b78  ABA-1030
 907f  Atronics
 	2015  IDE-2015PL
 9412  Holtek
 	6565  6565
 c0fe  Motion Engineering, Inc.
 e159  Tiger Jet Network Inc.
+	0001  300
 edd8  ARK Logic Inc
 	a091  1000PV [Stingray]
 	a099  2000PV [Stingray]
