@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.16 1998/10/19 13:36:19 mj Exp $
+ *	$Id: lspci.c,v 1.17 1998/11/18 14:06:07 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -399,7 +399,7 @@ show_htype1(struct device *d)
       pref_base = (pref_base & PCI_PREF_RANGE_MASK) << 16;
       pref_limit = (pref_limit & PCI_PREF_RANGE_MASK) << 16;
       if (pref_type == PCI_PREF_RANGE_TYPE_32)
-	printf("\tPrefetchable memory behind bridge: %08x-%08x\n", pref_base, pref_limit);
+	printf("\tPrefetchable memory behind bridge: %08x-%08x\n", pref_base, pref_limit + 0xfffff);
       else
 	printf("\tPrefetchable memory behind bridge: %08x%08x-%08x%08x\n",
 	       get_conf_long(d, PCI_PREF_BASE_UPPER32),

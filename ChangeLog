@@ -1,3 +1,8 @@
+Wed Nov 18 15:47:05 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_htype1): Fixed displaying of prefetchable memory behind
+	bridge. Thanks to Petr Vandrovec <vandrove@vc.cvut.cz> for bug report.
+
 Fri Oct 23 18:59:19 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* setpci.c: Don't include <syscall-list.h> with glibc >= 2.1.
