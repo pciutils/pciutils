@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.12 1998/08/07 23:33:36 cort Exp $
+#	$Id: pci.ids,v 1.13 1998/08/17 23:07:43 cort Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -148,8 +148,9 @@
 	002e  ServeRAID controller
 	0036  Miami
 	003e  TR_Wake
+	0046  MPIC interrupt controller
 	007d  3780IDSP [MWave]
-	0046  Total Impact PowerMP
+	ffff  MPIC-2 interrupt controller
 1015  LSI Logic Corp of Canada
 1016  ICL Personal Systems
 1017  SPEA Software AG
