@@ -34,6 +34,7 @@ Usage: lspci [<switches>]\n\
 -b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
 -x\t\tShow hex-dump of the standard portion of config space\n\
 -xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n\
+-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n\
 -s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\
@@ -71,7 +72,6 @@ static struct device *first_dev;
 static struct device *
 scan_device(struct pci_dev *p)
 {
-  int how_much = (show_hex > 2) ? 256 : 64;
   struct device *d;
 
   if (!pci_filter_match(&filter, p))
@@ -79,16 +79,16 @@ scan_device(struct pci_dev *p)
   d = xmalloc(sizeof(struct device));
   bzero(d, sizeof(*d));
   d->dev = p;
-  if (!pci_read_block(p, 0, d->config, how_much))
-    die("Unable to read %d bytes of configuration space.", how_much);
-  if (how_much < 128 && (d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
+  d->config_cnt = 64;
+  if (!pci_read_block(p, 0, d->config, 64))
+    die("Unable to read the configuration space header.");
+  if ((d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
     {
       /* For cardbus bridges, we need to fetch 64 bytes more to get the full standard header... */
       if (!pci_read_block(p, 64, d->config+64, 64))
 	die("Unable to read cardbus bridge extension data.");
-      how_much = 128;
+      d->config_cnt = 128;
     }
-  d->config_cnt = how_much;
   pci_setup_cache(p, d->config, d->config_cnt);
   pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
   return d;
@@ -110,26 +110,10 @@ scan_devices(void)
 }
 
 static int
-check_root(void)
-{
-#ifdef OS_WINDOWS
-  return 1;
-#else
-  static int is_root = -1;
-
-  if (is_root < 0)
-    is_root = !geteuid();
-  return is_root;
-#endif
-}
-
-static int
 config_fetch(struct device *d, unsigned int pos, unsigned int len)
 {
   if (pos + len < d->config_cnt)
     return 1;
-  if (pacc->method != PCI_ACCESS_DUMP && !check_root())
-    return 0;
   return pci_read_block(d->dev, pos, d->config + pos, len);
 }
 
@@ -1308,9 +1292,17 @@ show_verbose(struct device *d)
 static void
 show_hex_dump(struct device *d)
 {
-  unsigned int i;
+  unsigned int i, cnt;
 
-  for(i=0; i<d->config_cnt; i++)
+  cnt = d->config_cnt;
+  if (show_hex >= 3 && config_fetch(d, cnt, 256-cnt))
+    {
+      cnt = 256;
+      if (show_hex >= 4 && config_fetch(d, 256, 4096-256))
+	cnt = 4096;
+    }
+
+  for(i=0; i<cnt; i++)
     {
       if (! (i & 15))
 	printf("%02x:", i);
@@ -1815,8 +1807,6 @@ map_the_bus(void)
   if (pacc->method == PCI_ACCESS_PROC_BUS_PCI ||
       pacc->method == PCI_ACCESS_DUMP)
     printf("WARNING: Bus mapping can be reliable only with direct hardware access enabled.\n\n");
-  else if (!check_root())
-    die("Only root can map the bus.");
   bus_info = xmalloc(sizeof(struct bus_info) * 256);
   bzero(bus_info, sizeof(struct bus_info) * 256);
   if (filter.bus >= 0)

@@ -222,10 +222,7 @@ static int sysfs_read(struct pci_dev *d, int pos, byte *buf, int len)
       return 0;
     }
   else if (res != len)
-    {
-      d->access->warning("sysfs_read: tried to read %d bytes at %d, but got only %d", len, pos, res);
-      return 0;
-    }
+    return 0;
   return 1;
 }
 
@@ -244,7 +241,7 @@ static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
     }
   else if (res != len)
     {
-      d->access->warning("sysfs_write: tried to write %d bytes at %d, but got only %d", len, pos, res);
+      d->access->warning("sysfs_write: tried to write %d bytes at %d, but only %d succeeded", len, pos, res);
       return 0;
     }
   return 1;

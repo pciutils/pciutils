@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1998--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -454,7 +454,7 @@ next:
 	      ll = r->offset;
 	      op->width = r->width;
 	    }
-	  if (ll > 0x100 || ll + op->width*((n < 0) ? 1 : n) > 0x100)
+	  if (ll > 0x1000 || ll + op->width*((n < 0) ? 1 : n) > 0x1000)
 	    die("Register number out of range!");
 	  if (ll & (op->width - 1))
 	    die("Unaligned register address!");

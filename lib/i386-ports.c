@@ -102,6 +102,10 @@ static int
 conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xcfc + (pos&3);
+
+  if (pos >= 256)
+    return 0;
+
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -125,6 +129,10 @@ static int
 conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xcfc + (pos&3);
+
+  if (pos >= 256)
+    return 0;
+
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -173,6 +181,9 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xc000 | (d->dev << 8) | pos;
 
+  if (pos >= 256)
+    return 0;
+
   if (d->dev >= 16)
     /* conf2 supports only 16 devices per bus */
     return 0;
@@ -201,6 +212,9 @@ static int
 conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xc000 | (d->dev << 8) | pos;
+
+  if (pos >= 256)
+    return 0;
 
   if (d->dev >= 16)
     d->access->error("conf2_write: only first 16 devices exist.");

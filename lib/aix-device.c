@@ -222,8 +222,12 @@ static int
 aix_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   struct mdio mdio;
-  int fd = aix_bus_open(d->access, d->bus);
+  int fd;
 
+  if (pos + len > 256)
+    return 0;
+
+  fd = aix_bus_open(d->access, d->bus);
   mdio.md_addr = (ulong) pos;
   mdio.md_size = len;
   mdio.md_incr = MV_BYTE;
@@ -240,8 +244,12 @@ static int
 aix_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
   struct mdio mdio;
-  int fd = aix_bus_open(d->access, d->bus);
+  int fd;
 
+  if (pos + len > 256)
+    return 0;
+
+  fd = aix_bus_open(d->access, d->bus);
   mdio.md_addr = (ulong) pos;
   mdio.md_size = len;
   mdio.md_incr = MV_BYTE;

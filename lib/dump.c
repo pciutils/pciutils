@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Reading of Bus Dumps
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -13,10 +13,24 @@
 
 #include "internal.h"
 
+struct dump_data {
+  int len;
+  byte data[1];
+};
+
 static int
 dump_detect(struct pci_access *a)
 {
   return !!a->method_params[PCI_ACCESS_DUMP];
+}
+
+static void
+dump_alloc_data(struct pci_dev *dev, int len)
+{
+  struct dump_data *dd = pci_malloc(dev->access, sizeof(struct dump_data) + len - 1);
+  dd->len = len;
+  memset(dd->data, 0xff, len);
+  dev->aux = dd;
 }
 
 static void
@@ -48,22 +62,32 @@ dump_init(struct pci_access *a)
 	   sscanf(buf, "%x:%x:%x.%d", &mn, &bn, &dn, &fn) == 4))
 	{
 	  dev = pci_get_dev(a, mn, bn, dn, fn);
-	  dev->aux = pci_malloc(a, 256);
-	  memset(dev->aux, 0xff, 256);
+	  dump_alloc_data(dev, 256);
 	  pci_link_dev(a, dev);
 	}
       else if (!len)
 	dev = NULL;
-      else if (dev && len >= 51 && buf[2] == ':' && buf[3] == ' ' &&
+      else if (dev &&
+	       (len >= 51 && buf[2] == ':' && buf[3] == ' ' || len >= 52 && buf[3] == ':' && buf[4] == ' ') &&
 	       sscanf(buf, "%x: ", &i) == 1)
 	{
-	  z = buf+3;
+	  struct dump_data *dd = dev->aux;
+	  z = strchr(buf, ' ') + 1;
 	  while (isspace(z[0]) && isxdigit(z[1]) && isxdigit(z[2]))
 	    {
 	      z++;
 	      if (sscanf(z, "%x", &j) != 1 || i >= 256)
 		a->error("dump: Malformed line");
-	      ((byte *) dev->aux)[i++] = j;
+	      if (i >= 4096)
+		break;
+	      if (i > dd->len)		/* Need to re-allocate the buffer */
+		{
+		  dump_alloc_data(dev, 4096);
+		  memcpy(((struct dump_data *) dev->aux)->data, dd->data, 256);
+		  pci_mfree(dd);
+		  dd = dev->aux;
+		}
+	      dd->data[i++] = j;
 	      z += 2;
 	    }
 	}
@@ -83,17 +107,19 @@ dump_scan(struct pci_access *a UNUSED)
 static int
 dump_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  if (!d->aux)
+  struct dump_data *dd;
+  if (!(dd = d->aux))
     {
       struct pci_dev *e = d->access->devices;
       while (e && (e->bus != d->bus || e->dev != d->dev || e->func != d->func))
 	e = e->next;
-      if (e)
-	d = e;
-      else
+      if (!e)
 	return 0;
+      dd = e->aux;
     }
-  memcpy(buf, (byte *) d->aux + pos, len);
+  if (pos + len > dd->len)
+    return 0;
+  memcpy(buf, dd->data + pos, len);
   return 1;
 }
 

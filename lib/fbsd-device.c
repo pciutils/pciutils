@@ -74,6 +74,9 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
       return pci_generic_block_read(d, pos, buf, len);
     }
 
+  if (pos >= 256)
+    return 0;
+
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;
   pi.pi_sel.pc_func = d->func;
@@ -108,6 +111,9 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
     {
       return pci_generic_block_write(d, pos, buf, len);
     }
+
+  if (pos >= 256)
+    return 0;
 
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;

@@ -1,3 +1,20 @@
+2004-06-27  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (check_root): Gone. No explicit checks for root are needed,
+	report correct errors reported by the libpci instead.
+
+	* lspci.c: Added dumping of the extended config space on "-xxxx".
+	Better caching of config registers.
+
+	* setpci.c (main): Allow access to whole 4096 bytes of the config space.
+
+	* lib/sysfs.c, lib/proc.c: Don't print error messages on short reads,
+	just return the appropriate error code.
+
+	* lib: Added support for extended (4096-byte) configuration space,
+	currently implemented only in Linux proc and sysfs access methods
+	and of course in the dump reader.
+
 2004-05-29  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test5.
