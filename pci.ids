@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.55 2000/04/17 16:07:37 mj Exp $
+#	$Id: pci.ids,v 1.56 2000/04/17 16:11:58 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -39,7 +39,7 @@
 	a0ec  Fibre Channel Host Controller
 	a0f0  Advanced System Management Controller
 	a0f3  Triflex PCI to ISA Bridge
-	a0f7  PCI Hotplug Controller (Cirrus Logic VGA Video Controller???)
+	a0f7  PCI Hotplug Controller
 	a0f8  USB Open Host Controller
 	ae10  Smart-2/P RAID Controller
 		0e11 4030  Smart-2/P Array Controller
@@ -1763,7 +1763,7 @@
 	80d9  PCI-9118
 	80da  PCI-9812
 	811a  PCI-IEEE1355-DS-DE Interface
-	8170  S5933 "Matchmaker" PCI Chipset Development Tool
+	8170  S5933 "Matchmaker" [PCI Chipset Development Tool]
 10e9  Alps Electric Co., Ltd.
 10ea  Intergraphics Systems
 	1680  IGA-1680
