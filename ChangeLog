@@ -1,3 +1,12 @@
+2002-03-24  Martin Mares  <mj@ucw.cz>
+
+	* lib/filter.c (pci_filter_parse_slot): Allow bus 0xff, slot 0x1f and
+	function 7.
+
+	* lib/names.c (pci_lookup_name): When printing unknown subsystem vendor
+	or device hexadecimally, don't confuse it with chip vendor/device ID.
+	First reported by Marc Boucher <marc@mbsi.ca>.
+
 2001-11-04  Martin Mares  <mj@ucw.cz>
 
 	* pci.ids: Synced with the PCI ID Repository at SourceForge

@@ -1,9 +1,9 @@
 /*
- *	$Id: names.c,v 1.6 2000/04/29 12:56:23 mj Exp $
+ *	$Id: names.c,v 1.7 2002/03/24 12:14:40 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2000 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2002 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -284,7 +284,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
       if (n = nl_lookup(a, num, NL_VENDOR, arg3, 0, 0, 0))
 	return n->name;
       else
-	res = snprintf(buf, size, "%04x", arg1);
+	res = snprintf(buf, size, "%04x", arg2);
       break;
     case PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       if (n = nl_lookup(a, num, NL_SUBSYSTEM, arg1, arg2, arg3, arg4))
@@ -292,7 +292,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
       else if (arg1 == arg3 && arg2 == arg4 && (n = nl_lookup(a, num, NL_DEVICE, arg1, arg2, 0, 0)))
 	return n->name;
       else
-	res = snprintf(buf, size, "%04x", arg2);
+	res = snprintf(buf, size, "%04x", arg4);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       if (!num)
