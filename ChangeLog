@@ -1,5 +1,7 @@
 2003-01-04  Martin Mares  <mj@ucw.cz>
 
+	* Releasing as 2.1.11.
+
 	* lib: Removed partially implemented "syscall" access method which will
 	probably never be needed.
 
