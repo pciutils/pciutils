@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.1 1997/12/23 10:29:18 mj Exp $
+#	$Id: pci.ids,v 1.2 1997/12/27 11:57:13 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -30,12 +30,13 @@
 	000c  53c895
 	000d  53c885
 	000f  53c875
-	008f  53c876
+	008f  53c875J
 1002  ATI
 	4158  68800AX
 	4354  215CT222
 	4358  210888CX
 	4742  Mach64 GB
+	4744  Mach64 GD (Rage Pro)
 	4750  Mach64 GP (Rage Pro)
 	4754  Mach64 GT (Rage II)
 	4755  Mach64 GT (Rage II)
@@ -102,7 +103,7 @@
 1023  Trident
 	9420  TG 9420
 	9440  TG 9440
-	9660  TG 9660
+	9660  TG 9660 / Cyber9385
 	9750  Image 975
 1025  Acer Incorporated
 	1435  M1435
@@ -203,6 +204,15 @@
 1077  Q Logic
 	1020  ISP1020
 	1022  ISP1022
+1078  Cyrix
+	0000  5510
+	0001  PCI Master
+	0002  5520
+	0100  5530 Kahlua Legacy
+	0101  5530 Kahlua SMI
+	0102  5530 Kahlua IDE
+	0103  5530 Kahlua Audio
+	0104  5530 Kahlua Video
 107d  Leadtek Research
 	0000  S3 805
 1080  Contaq
@@ -287,7 +297,8 @@
 	0000  CA91C042 Universe
 10e8  AMCC
 	8043  Myrinet PCI (M2-PCI-32)
-	807d  S5933
+	807d  S5933 PCI44
+	809c  S5933 Traquair HEPC3
 10ea  Intergraphics
 	1680  IGA-1680
 	1682  IGA-1682
@@ -369,6 +380,7 @@
 	0001  MV-1000
 1163  Rendition
 	0001  Verite 1000
+	2000  Verite 2100
 1179  Toshiba
 	0601  Laptop
 1180  Ricoh
@@ -410,6 +422,10 @@
 	0001  Voodoo
 1236  Sigma Designs
 	6401  REALmagic64/GX
+124d  Stallion
+	0000  EasyConnection 8/32
+	0002  EasyConnection 8/64
+	0003  EasyIO
 1255  Optibase
 	1110  MPEG Forge
 	1210  MPEG Fusion
@@ -454,6 +470,9 @@
 	8902  PLATO/PX (graphics)
 	8a01  ViRGE/DX or /GX
 	8a10  ViRGE/GX2
+	8c01  ViRGE/MX
+	8c02  ViRGE/MX+
+	8c03  ViRGE/MX+MV
 8086  Intel
 	0482  82375EB
 	0483  82424ZX Saturn

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.2 1997/12/23 17:12:02 mj Exp $
+ *	$Id: lspci.c,v 1.3 1997/12/27 11:57:12 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -41,6 +41,14 @@ Usage: lspci [<switches>]\n\
 -B <bus>, -S <slot>, -F <func>, -V <vendor>, -D <device>  Show only selected devices\n\
 -t\tShow bus tree\n\
 ";
+
+/* Format strings used for IRQ numbers */
+
+#ifdef __sparc_v9__
+#define IRQ_FORMAT "%08x"
+#else
+#define IRQ_FORMAT "%d"
+#endif
 
 /* Our view of the PCI bus */
 
@@ -270,10 +278,11 @@ show_bases(struct device *d, int cnt)
       else
 	putchar('\t');
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
-	printf("I/O ports at %04lx%s\n",
-	       pos & PCI_BASE_ADDRESS_IO_MASK,
-	       (cmd & PCI_COMMAND_IO) ? "" : " [disabled]");
-      else
+	{
+	  if (cmd & PCI_COMMAND_IO)
+	    printf("I/O ports at %04lx\n", pos & PCI_BASE_ADDRESS_IO_MASK);
+	}
+      else if (cmd & PCI_COMMAND_MEMORY)
 	{
 	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
 	  printf("Memory at ");
@@ -288,13 +297,12 @@ show_bases(struct device *d, int cnt)
 	      else
 		printf("????????");
 	    }
-	  printf("%08lx (%s, %sprefetchable)%s\n",
+	  printf("%08lx (%s, %sprefetchable)\n",
 		 pos & PCI_BASE_ADDRESS_MEM_MASK,
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M 32-bit" : "???",
-		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-",
-		 (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]");
+		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
 	}
     }
 }
@@ -495,7 +503,7 @@ show_verbose(struct device *d)
 	  putchar('\n');
 	}
       if (int_pin)
-	printf("\tInterrupt: pin %c routed to IRQ %d\n", 'A' + int_pin - 1, irq);
+	printf("\tInterrupt: pin %c routed to IRQ " IRQ_FORMAT "\n", 'A' + int_pin - 1, irq);
     }
   else
     {
@@ -520,7 +528,7 @@ show_verbose(struct device *d)
 	printf(", latency %d", latency);
       if (int_pin)
 	if (d->kernel_irq)
-	  printf(", IRQ %d", irq);
+	  printf(", IRQ " IRQ_FORMAT, irq);
 	else
 	  printf(", IRQ ?");
       putchar('\n');
