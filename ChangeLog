@@ -1,4 +1,20 @@
+Wed Jan 27 14:59:16 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c: Implemented bus mapping mode (-M).
+
+	* lspci.c (scan_devices): Split to scan_devices() and scan_device().
+	(show): Split to show() and show_device().
+
+	* lib/access.c (pci_init): When a->method == PCI_ACCESS_AUTO,
+	set it to the real access method afterwards.
+
+Mon Jan 25 23:46:13 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lib/generic.c (pci_generic_fill_info): If in buscentric mode,
+	don't check PCI_COMMAND for I/O and memory enables.
+
 Mon Jan 25 21:28:49 1999  Martin Mares  <mj@albireo.ucw.cz>
+
 
 	* Makefile: Added target `release' which substitutes new version
 	number to .spec, .lsm and README. Also rewrote target `dist'.

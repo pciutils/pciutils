@@ -1,5 +1,5 @@
 /*
- *	$Id: access.c,v 1.2 1999/01/24 21:35:35 mj Exp $
+ *	$Id: access.c,v 1.3 1999/01/27 14:53:02 mj Exp $
  *
  *	The PCI Library -- User Access
  *
@@ -139,6 +139,7 @@ pci_init(struct pci_access *a)
 	      {
 		a->debug("...OK\n");
 		a->methods = pci_methods[i];
+		a->method = i;
 		break;
 	      }
 	    a->debug("...No.\n");

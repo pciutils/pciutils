@@ -1,5 +1,5 @@
 /*
- *	$Id: generic.c,v 1.2 1999/01/25 22:10:45 geert Exp $
+ *	$Id: generic.c,v 1.3 1999/01/27 14:53:03 mj Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
@@ -115,10 +115,10 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	      d->base_addr[i] = x;
 	      if (x & PCI_BASE_ADDRESS_SPACE_IO)
 		{
-		  if (!(cmd & PCI_COMMAND_IO))
+		  if (!a->buscentric && !(cmd & PCI_COMMAND_IO))
 		    d->base_addr[i] = 0;
 		}
-	      else if (cmd & PCI_COMMAND_MEMORY)
+	      else if (a->buscentric || (cmd & PCI_COMMAND_MEMORY))
 		{
 		  if ((x & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
 		    {

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.20 1999/01/24 21:38:47 mj Exp $
+ *	$Id: lspci.c,v 1.21 1999/01/27 14:52:55 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -24,8 +24,9 @@ static int show_hex;			/* Show contents of config space as hexadecimal numbers *
 static struct pci_filter filter;	/* Device filter */
 static int show_tree;			/* Show bus tree */
 static int machine_readable;		/* Generate machine-readable output */
+static int map_mode;			/* Bus mapping mode enabled */
 
-static char options[] = "nvbxs:d:ti:mg" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:ti:mgM" GENERIC_OPTIONS ;
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -38,7 +39,8 @@ Usage: lspci [<switches>]\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\
 -m\t\tProduce machine-readable output\n\
--i <file>\tUse specified ID database instead of %s\n"
+-i <file>\tUse specified ID database instead of %s\n\
+-M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
 GENERIC_HELP
 ;
 
@@ -71,35 +73,45 @@ struct device {
 
 static struct device *first_dev;
 
+static struct device *
+scan_device(struct pci_dev *p)
+{
+  int how_much = (show_hex > 2) ? 256 : 64;
+  struct device *d;
+
+  if (!pci_filter_match(&filter, p))
+    return NULL;
+  d = xmalloc(sizeof(struct device));
+  bzero(d, sizeof(*d));
+  d->dev = p;
+  if (!pci_read_block(p, 0, d->config, how_much))
+    die("Unable to read %d bytes of configuration space.", how_much);
+  if (how_much < 128 && (d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
+    {
+      /* For cardbus bridges, we need to fetch 64 bytes more to get the full standard header... */
+      if (!pci_read_block(p, 0, d->config+64, 64))
+	die("Unable to read cardbus bridge extension data.");
+      how_much = 128;
+    }
+  d->config_cnt = how_much;
+  pci_setup_cache(p, d->config, d->config_cnt);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE);
+  return d;
+}
+
 static void
 scan_devices(void)
 {
   struct device *d;
-  int how_much = (show_hex > 2) ? 256 : 64;
   struct pci_dev *p;
 
   pci_scan_bus(pacc);
   for(p=pacc->devices; p; p=p->next)
-    {
-      if (!pci_filter_match(&filter, p))
-	continue;
-      d = xmalloc(sizeof(struct device));
-      d->next = first_dev;
-      first_dev = d;
-      d->dev = p;
-      if (!pci_read_block(p, 0, d->config, how_much))
-	die("Unable to read %d bytes of configuration space.", how_much);
-      if (how_much < 128 && (d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
-	{
-	  /* For cardbus bridges, we need to fetch 64 bytes more to get the full standard header... */
-	  if (!pci_read_block(p, 0, d->config+64, 64))
-	    die("Unable to read cardbus bridge extension data.");
-	  how_much = 128;
-	}
-      d->config_cnt = how_much;
-      pci_setup_cache(p, d->config, d->config_cnt);
-      pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE);
-    }
+    if (d = scan_device(p))
+      {
+	d->next = first_dev;
+	first_dev = d;
+      }
 }
 
 static int
@@ -719,23 +731,27 @@ show_machine(struct device *d)
 }
 
 static void
+show_device(struct device *d)
+{
+  if (machine_readable)
+    show_machine(d);
+  else if (verbose)
+    show_verbose(d);
+  else
+    show_terse(d);
+  if (show_hex)
+    show_hex_dump(d);
+  if (verbose || show_hex)
+    putchar('\n');
+}
+
+static void
 show(void)
 {
   struct device *d;
 
   for(d=first_dev; d; d=d->next)
-    {
-      if (machine_readable)
-	show_machine(d);
-      else if (verbose)
-	show_verbose(d);
-      else
-	show_terse(d);
-      if (show_hex)
-	show_hex_dump(d);
-      if (verbose || show_hex)
-	putchar('\n');
-    }
+    show_device(d);
 }
 
 /* Tree output */
@@ -978,6 +994,108 @@ show_forest(void)
   show_tree_bridge(&host_bridge, line, line);
 }
 
+/* Bus mapping mode */
+
+struct bus_bridge {
+  struct bus_bridge *next;
+  byte first, last;
+};
+
+struct bus_info {
+  byte exists;
+  byte covered;
+  struct bus_bridge *bridges;
+};
+
+static struct bus_info *bus_info;
+
+static void
+map_bridge(struct bus_info *bi, struct device *d, int np, int ns, int nl)
+{
+  struct bus_bridge *b = xmalloc(sizeof(struct bus_bridge));
+  struct pci_dev *p = d->dev;
+  int prim = get_conf_byte(d, np);
+
+  b->next = bi->bridges;
+  bi->bridges = b;
+  b->first = get_conf_byte(d, ns);
+  b->last = get_conf_byte(d, nl);
+  printf("## %02x.%02x:%d is a bridge from %02x to %02x-%02x\n",
+	 p->bus, p->dev, p->func, prim, b->first, b->last);
+  if (prim != p->bus)
+    printf("!!! Bridge points to invalid primary bus.\n");
+  if (b->first > b->last)
+    {
+      printf("!!! Bridge points to invalid bus range.\n");
+      b->last = b->first;
+    }
+}
+
+static void
+do_map_bus(int bus)
+{
+  int dev, func;
+  int verbose = pacc->debugging;
+  struct bus_info *bi = bus_info + bus;
+  struct device *d;
+
+  if (verbose)
+    printf("Mapping bus %02x\n", bus);
+  for(dev = 0; dev < 32; dev++)
+    if (filter.slot < 0 || filter.slot == dev)
+      {
+	for(func = 0; func < 8; func++)
+	  if (filter.func < 0 || filter.func == func)
+	    {
+	      struct pci_dev *p = pci_get_dev(pacc, bus, dev, func);
+	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
+	      if (vendor && vendor != 0xffff)
+		{
+		  if (verbose)
+		    printf("Discovered device %02x:%02x.%d\n", bus, dev, func);
+		  bi->exists = 1;
+		  if (d = scan_device(p))
+		    {
+		      show_device(d);
+		      switch (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f)
+			{
+			case PCI_HEADER_TYPE_BRIDGE:
+			  map_bridge(bi, d, PCI_PRIMARY_BUS, PCI_SECONDARY_BUS, PCI_SUBORDINATE_BUS);
+			  break;
+			case PCI_HEADER_TYPE_CARDBUS:
+			  map_bridge(bi, d, PCI_CB_PRIMARY_BUS, PCI_CB_CARD_BUS, PCI_CB_SUBORDINATE_BUS);
+			  break;
+			}
+		      free(d);
+		    }
+		  else if (verbose)
+		    printf("But it was filtered out.\n");
+		}
+	      pci_free_dev(p);
+	    }
+      }
+}
+
+static void
+map_the_bus(void)
+{
+  if (pacc->method == PCI_ACCESS_PROC_BUS_PCI ||
+      pacc->method == PCI_ACCESS_DUMP)
+    printf("WARNING: Bus mapping can be reliable only with direct hardware access enabled.\n\n");
+  else if (!check_root())
+    die("Only root can map the bus.");
+  bus_info = xmalloc(sizeof(struct bus_info) * 256);
+  bzero(bus_info, sizeof(struct bus_info) * 256);
+  if (filter.bus >= 0)
+    do_map_bus(filter.bus);
+  else
+    {
+      int bus;
+      for(bus=0; bus<256; bus++)
+	do_map_bus(bus);
+    }
+}
+
 /* Main */
 
 int
@@ -1029,6 +1147,9 @@ main(int argc, char **argv)
       case 'm':
 	machine_readable++;
 	break;
+      case 'M':
+	map_mode++;
+	break;
       default:
 	if (parse_generic_option(i, pacc, optarg))
 	  break;
@@ -1040,12 +1161,17 @@ main(int argc, char **argv)
     goto bad;
 
   pci_init(pacc);
-  scan_devices();
-  sort_them();
-  if (show_tree)
-    show_forest();
+  if (map_mode)
+    map_the_bus();
   else
-    show();
+    {
+      scan_devices();
+      sort_them();
+      if (show_tree)
+	show_forest();
+      else
+	show();
+    }
   pci_cleanup(pacc);
 
   return 0;

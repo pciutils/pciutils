@@ -85,6 +85,15 @@ as directory containing PCI bus information instead of /proc/bus/pci.
 .B -m
 Dump PCI device data in machine readable form (both normal and verbose format supported)
 for easy parsing by scripts.
+.TP
+.B -M
+Invoke bus mapping mode which scans the bus extensively to find all devices including
+those behind misconfigured bridges etc. Please note that this is intended only for
+debugging and as it can crash the machine (only in case of buggy devices, but
+unfortunately these happen to exist), it's available only to root. Also using
+-M on PCI access methods which don't directly touch the hardware has no
+sense since the results are (modulo bugs in lspci) identical to normal listing
+modes.
 
 .SH PCILIB OPTIONS
 The PCI utilities use PCILIB (a portable library providing platform-independent
