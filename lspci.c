@@ -554,6 +554,322 @@ show_pcix(struct device *d, int where)
     }
 }
 
+static inline char *
+ht_link_width(unsigned width)
+{
+  static char * const widths[8] = { "8bit", "16bit", "[2]", "32bit", "2bit", "4bit", "[6]", "N/C" };
+  return widths[width];
+}
+
+static inline char *
+ht_link_freq(unsigned freq)
+{
+  static char * const freqs[16] = { "200MHz", "300MHz", "400MHz", "500MHz", "600MHz", "800MHz", "1.0GHz", "1.2GHz",
+				    "1.4GHz", "1.6GHz", "[a]", "[b]", "[c]", "[d]", "[e]", "Vend" };
+  return freqs[freq];
+}
+
+static void
+show_ht_pri(struct device *d, int where, int cmd)
+{
+  u16 lctr0, lcnf0, lctr1, lcnf1, eh;
+  u8 rid, lfrer0, lfcap0, ftr, lfrer1, lfcap1, mbu, mlu, bn;
+
+  printf("HyperTransport: Slave or Primary Interface\n");
+  if (verbose < 2)
+    return;
+
+  printf("\t\tCommand: BaseUnitID=%u UnitCnt=%u MastHost%c DefDir%c DUL%c\n",
+	 (cmd & PCI_HT_PRI_CMD_BUID),
+	 (cmd & PCI_HT_PRI_CMD_UC) >> 5,
+	 FLAG(cmd, PCI_HT_PRI_CMD_MH),
+	 FLAG(cmd, PCI_HT_PRI_CMD_DD),
+	 FLAG(cmd, PCI_HT_PRI_CMD_DUL));
+  config_fetch(d, where + PCI_HT_PRI_LCTR0, PCI_HT_PRI_SIZEOF - PCI_HT_PRI_LCTR0);
+  lctr0 = get_conf_word(d, where + PCI_HT_PRI_LCTR0);
+  printf("\t\tLink Control 0: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n",
+	 FLAG(lctr0, PCI_HT_LCTR_CFLE),
+	 FLAG(lctr0, PCI_HT_LCTR_CST),
+	 FLAG(lctr0, PCI_HT_LCTR_CFE),
+	 FLAG(lctr0, PCI_HT_LCTR_LKFAIL),
+	 FLAG(lctr0, PCI_HT_LCTR_INIT),
+	 FLAG(lctr0, PCI_HT_LCTR_EOC),
+	 FLAG(lctr0, PCI_HT_LCTR_TXO),
+	 (lctr0 & PCI_HT_LCTR_CRCERR) >> 8,
+	 FLAG(lctr0, PCI_HT_LCTR_ISOCEN),
+	 FLAG(lctr0, PCI_HT_LCTR_LSEN),
+	 FLAG(lctr0, PCI_HT_LCTR_EXTCTL),
+	 FLAG(lctr0, PCI_HT_LCTR_64B));
+  lcnf0 = get_conf_word(d, where + PCI_HT_PRI_LCNF0);
+  printf("\t\tLink Config 0: MLWI=%s DwFcIn%c MLWO=%s DwFcOut%c LWI=%s DwFcInEn%c LWO=%s DwFcOutEn%c\n",
+	 ht_link_width(lcnf0 & PCI_HT_LCNF_MLWI),
+	 FLAG(lcnf0, PCI_HT_LCNF_DFI),
+	 ht_link_width((lcnf0 & PCI_HT_LCNF_MLWO) >> 4),
+	 FLAG(lcnf0, PCI_HT_LCNF_DFO),
+	 ht_link_width((lcnf0 & PCI_HT_LCNF_LWI) >> 8),
+	 FLAG(lcnf0, PCI_HT_LCNF_DFIE),
+	 ht_link_width((lcnf0 & PCI_HT_LCNF_LWO) >> 12),
+	 FLAG(lcnf0, PCI_HT_LCNF_DFOE));
+  lctr1 = get_conf_word(d, where + PCI_HT_PRI_LCTR1);
+  printf("\t\tLink Control 1: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n",
+	 FLAG(lctr1, PCI_HT_LCTR_CFLE),
+	 FLAG(lctr1, PCI_HT_LCTR_CST),
+	 FLAG(lctr1, PCI_HT_LCTR_CFE),
+	 FLAG(lctr1, PCI_HT_LCTR_LKFAIL),
+	 FLAG(lctr1, PCI_HT_LCTR_INIT),
+	 FLAG(lctr1, PCI_HT_LCTR_EOC),
+	 FLAG(lctr1, PCI_HT_LCTR_TXO),
+	 (lctr1 & PCI_HT_LCTR_CRCERR) >> 8,
+	 FLAG(lctr1, PCI_HT_LCTR_ISOCEN),
+	 FLAG(lctr1, PCI_HT_LCTR_LSEN),
+	 FLAG(lctr1, PCI_HT_LCTR_EXTCTL),
+	 FLAG(lctr1, PCI_HT_LCTR_64B));
+  lcnf1 = get_conf_word(d, where + PCI_HT_PRI_LCNF1);
+  printf("\t\tLink Config 1: MLWI=%s DwFcIn%c MLWO=%s DwFcOut%c LWI=%s DwFcInEn%c LWO=%s DwFcOutEn%c\n",
+	 ht_link_width(lcnf1 & PCI_HT_LCNF_MLWI),
+	 FLAG(lcnf1, PCI_HT_LCNF_DFI),
+	 ht_link_width((lcnf1 & PCI_HT_LCNF_MLWO) >> 4),
+	 FLAG(lcnf1, PCI_HT_LCNF_DFO),
+	 ht_link_width((lcnf1 & PCI_HT_LCNF_LWI) >> 8),
+	 FLAG(lcnf1, PCI_HT_LCNF_DFIE),
+	 ht_link_width((lcnf1 & PCI_HT_LCNF_LWO) >> 12),
+	 FLAG(lcnf1, PCI_HT_LCNF_DFOE));
+  rid = get_conf_byte(d, where + PCI_HT_PRI_RID);
+  printf("\t\tRevision ID: %u.%02u\n",
+	 (rid & PCI_HT_RID_MAJ) >> 5, (rid & PCI_HT_RID_MIN));
+  lfrer0 = get_conf_byte(d, where + PCI_HT_PRI_LFRER0);
+  printf("\t\tLink Frequency 0: %s\n", ht_link_freq(lfrer0 & PCI_HT_LFRER_FREQ));
+  printf("\t\tLink Error 0: <Prot%c <Ovfl%c <EOC%c CTLTm%c\n",
+	 FLAG(lfrer0, PCI_HT_LFRER_PROT),
+	 FLAG(lfrer0, PCI_HT_LFRER_OV),
+	 FLAG(lfrer0, PCI_HT_LFRER_EOC),
+	 FLAG(lfrer0, PCI_HT_LFRER_CTLT));
+  lfcap0 = get_conf_byte(d, where + PCI_HT_PRI_LFCAP0);
+  printf("\t\tLink Frequency Capability 0: 200MHz%c 300MHz%c 400MHz%c 500MHz%c 600MHz%c 800MHz%c 1.0GHz%c 1.2GHz%c 1.4GHz%c 1.6GHz%c Vend%c\n",
+	 FLAG(lfcap0, PCI_HT_LFCAP_200),
+	 FLAG(lfcap0, PCI_HT_LFCAP_300),
+	 FLAG(lfcap0, PCI_HT_LFCAP_400),
+	 FLAG(lfcap0, PCI_HT_LFCAP_500),
+	 FLAG(lfcap0, PCI_HT_LFCAP_600),
+	 FLAG(lfcap0, PCI_HT_LFCAP_800),
+	 FLAG(lfcap0, PCI_HT_LFCAP_1000),
+	 FLAG(lfcap0, PCI_HT_LFCAP_1200),
+	 FLAG(lfcap0, PCI_HT_LFCAP_1400),
+	 FLAG(lfcap0, PCI_HT_LFCAP_1600),
+	 FLAG(lfcap0, PCI_HT_LFCAP_VEND));
+  ftr = get_conf_byte(d, where + PCI_HT_PRI_FTR);
+  printf("\t\tFeature Capability: IsocFC%c LDTSTOP%c CRCTM%c ECTLT%c 64bA%c UIDRD%c\n",
+	 FLAG(ftr, PCI_HT_FTR_ISOCFC),
+	 FLAG(ftr, PCI_HT_FTR_LDTSTOP),
+	 FLAG(ftr, PCI_HT_FTR_CRCTM),
+	 FLAG(ftr, PCI_HT_FTR_ECTLT),
+	 FLAG(ftr, PCI_HT_FTR_64BA),
+	 FLAG(ftr, PCI_HT_FTR_UIDRD));
+  lfrer1 = get_conf_byte(d, where + PCI_HT_PRI_LFRER1);
+  printf("\t\tLink Frequency 1: %s\n", ht_link_freq(lfrer1 & PCI_HT_LFRER_FREQ));
+  printf("\t\tLink Error 1: <Prot%c <Ovfl%c <EOC%c CTLTm%c\n",
+	 FLAG(lfrer1, PCI_HT_LFRER_PROT),
+	 FLAG(lfrer1, PCI_HT_LFRER_OV),
+	 FLAG(lfrer1, PCI_HT_LFRER_EOC),
+	 FLAG(lfrer1, PCI_HT_LFRER_CTLT));
+  lfcap1 = get_conf_byte(d, where + PCI_HT_PRI_LFCAP1);
+  printf("\t\tLink Frequency Capability 1: 200MHz%c 300MHz%c 400MHz%c 500MHz%c 600MHz%c 800MHz%c 1.0GHz%c 1.2GHz%c 1.4GHz%c 1.6GHz%c Vend%c\n",
+	 FLAG(lfcap1, PCI_HT_LFCAP_200),
+	 FLAG(lfcap1, PCI_HT_LFCAP_300),
+	 FLAG(lfcap1, PCI_HT_LFCAP_400),
+	 FLAG(lfcap1, PCI_HT_LFCAP_500),
+	 FLAG(lfcap1, PCI_HT_LFCAP_600),
+	 FLAG(lfcap1, PCI_HT_LFCAP_800),
+	 FLAG(lfcap1, PCI_HT_LFCAP_1000),
+	 FLAG(lfcap1, PCI_HT_LFCAP_1200),
+	 FLAG(lfcap1, PCI_HT_LFCAP_1400),
+	 FLAG(lfcap1, PCI_HT_LFCAP_1600),
+	 FLAG(lfcap1, PCI_HT_LFCAP_VEND));
+  eh = get_conf_word(d, where + PCI_HT_PRI_EH);
+  printf("\t\tError Handling: PFlE%c OFlE%c PFE%c OFE%c EOCFE%c RFE%c CRCFE%c SERRFE%c CF%c RE%c PNFE%c ONFE%c EOCNFE%c RNFE%c CRCNFE%c SERRNFE%c\n",
+	 FLAG(eh, PCI_HT_EH_PFLE),
+	 FLAG(eh, PCI_HT_EH_OFLE),
+	 FLAG(eh, PCI_HT_EH_PFE),
+	 FLAG(eh, PCI_HT_EH_OFE),
+	 FLAG(eh, PCI_HT_EH_EOCFE),
+	 FLAG(eh, PCI_HT_EH_RFE),
+	 FLAG(eh, PCI_HT_EH_CRCFE),
+	 FLAG(eh, PCI_HT_EH_SERRFE),
+	 FLAG(eh, PCI_HT_EH_CF),
+	 FLAG(eh, PCI_HT_EH_RE),
+	 FLAG(eh, PCI_HT_EH_PNFE),
+	 FLAG(eh, PCI_HT_EH_ONFE),
+	 FLAG(eh, PCI_HT_EH_EOCNFE),
+	 FLAG(eh, PCI_HT_EH_RNFE),
+	 FLAG(eh, PCI_HT_EH_CRCNFE),
+	 FLAG(eh, PCI_HT_EH_SERRNFE));
+  mbu = get_conf_byte(d, where + PCI_HT_PRI_MBU);
+  mlu = get_conf_byte(d, where + PCI_HT_PRI_MLU);
+  printf("\t\tPrefetchable memory behind bridge Upper: %02x-%02x\n", mbu, mlu);
+  bn = get_conf_byte(d, where + PCI_HT_PRI_BN);
+  printf("\t\tBus Number: %02x\n", bn);
+}
+
+static void
+show_ht_sec(struct device *d, int where, int cmd)
+{
+  u16 lctr, lcnf, ftr, eh;
+  u8 rid, lfrer, lfcap, mbu, mlu;
+
+  printf("HyperTransport: Host or Secondary Interface\n");
+  if (verbose < 2)
+    return;
+
+  printf("\t\tCommand: WarmRst%c DblEnd%c DevNum=%u ChainSide%c HostHide%c Slave%c <EOCErr%c DUL%c\n",
+	 FLAG(cmd, PCI_HT_SEC_CMD_WR),
+	 FLAG(cmd, PCI_HT_SEC_CMD_DE),
+	 (cmd & PCI_HT_SEC_CMD_DN) >> 2,
+	 FLAG(cmd, PCI_HT_SEC_CMD_CS),
+	 FLAG(cmd, PCI_HT_SEC_CMD_HH),
+	 FLAG(cmd, PCI_HT_SEC_CMD_AS),
+	 FLAG(cmd, PCI_HT_SEC_CMD_HIECE),
+	 FLAG(cmd, PCI_HT_SEC_CMD_DUL));
+  config_fetch(d, where + PCI_HT_SEC_LCTR, PCI_HT_SEC_SIZEOF - PCI_HT_SEC_LCTR);
+  lctr = get_conf_word(d, where + PCI_HT_SEC_LCTR);
+  printf("\t\tLink Control: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n",
+	 FLAG(lctr, PCI_HT_LCTR_CFLE),
+	 FLAG(lctr, PCI_HT_LCTR_CST),
+	 FLAG(lctr, PCI_HT_LCTR_CFE),
+	 FLAG(lctr, PCI_HT_LCTR_LKFAIL),
+	 FLAG(lctr, PCI_HT_LCTR_INIT),
+	 FLAG(lctr, PCI_HT_LCTR_EOC),
+	 FLAG(lctr, PCI_HT_LCTR_TXO),
+	 (lctr & PCI_HT_LCTR_CRCERR) >> 8,
+	 FLAG(lctr, PCI_HT_LCTR_ISOCEN),
+	 FLAG(lctr, PCI_HT_LCTR_LSEN),
+	 FLAG(lctr, PCI_HT_LCTR_EXTCTL),
+	 FLAG(lctr, PCI_HT_LCTR_64B));
+  lcnf = get_conf_word(d, where + PCI_HT_SEC_LCNF);
+  printf("\t\tLink Config: MLWI=%s DwFcIn%c MLWO=%s DwFcOut%c LWI=%s DwFcInEn%c LWO=%s DwFcOutEn%c\n",
+	 ht_link_width(lcnf & PCI_HT_LCNF_MLWI),
+	 FLAG(lcnf, PCI_HT_LCNF_DFI),
+	 ht_link_width((lcnf & PCI_HT_LCNF_MLWO) >> 4),
+	 FLAG(lcnf, PCI_HT_LCNF_DFO),
+	 ht_link_width((lcnf & PCI_HT_LCNF_LWI) >> 8),
+	 FLAG(lcnf, PCI_HT_LCNF_DFIE),
+	 ht_link_width((lcnf & PCI_HT_LCNF_LWO) >> 12),
+	 FLAG(lcnf, PCI_HT_LCNF_DFOE));
+  rid = get_conf_byte(d, where + PCI_HT_SEC_RID);
+  printf("\t\tRevision ID: %u.%02u\n",
+	 (rid & PCI_HT_RID_MAJ) >> 5, (rid & PCI_HT_RID_MIN));
+  lfrer = get_conf_byte(d, where + PCI_HT_SEC_LFRER);
+  printf("\t\tLink Frequency: %s\n", ht_link_freq(lfrer & PCI_HT_LFRER_FREQ));
+  printf("\t\tLink Error: <Prot%c <Ovfl%c <EOC%c CTLTm%c\n",
+	 FLAG(lfrer, PCI_HT_LFRER_PROT),
+	 FLAG(lfrer, PCI_HT_LFRER_OV),
+	 FLAG(lfrer, PCI_HT_LFRER_EOC),
+	 FLAG(lfrer, PCI_HT_LFRER_CTLT));
+  lfcap = get_conf_byte(d, where + PCI_HT_SEC_LFCAP);
+  printf("\t\tLink Frequency Capability: 200MHz%c 300MHz%c 400MHz%c 500MHz%c 600MHz%c 800MHz%c 1.0GHz%c 1.2GHz%c 1.4GHz%c 1.6GHz%c Vend%c\n",
+	 FLAG(lfcap, PCI_HT_LFCAP_200),
+	 FLAG(lfcap, PCI_HT_LFCAP_300),
+	 FLAG(lfcap, PCI_HT_LFCAP_400),
+	 FLAG(lfcap, PCI_HT_LFCAP_500),
+	 FLAG(lfcap, PCI_HT_LFCAP_600),
+	 FLAG(lfcap, PCI_HT_LFCAP_800),
+	 FLAG(lfcap, PCI_HT_LFCAP_1000),
+	 FLAG(lfcap, PCI_HT_LFCAP_1200),
+	 FLAG(lfcap, PCI_HT_LFCAP_1400),
+	 FLAG(lfcap, PCI_HT_LFCAP_1600),
+	 FLAG(lfcap, PCI_HT_LFCAP_VEND));
+  ftr = get_conf_word(d, where + PCI_HT_SEC_FTR);
+  printf("\t\tFeature Capability: IsocFC%c LDTSTOP%c CRCTM%c ECTLT%c 64bA%c UIDRD%c ExtRS%c UCnfE%c\n",
+	 FLAG(ftr, PCI_HT_FTR_ISOCFC),
+	 FLAG(ftr, PCI_HT_FTR_LDTSTOP),
+	 FLAG(ftr, PCI_HT_FTR_CRCTM),
+	 FLAG(ftr, PCI_HT_FTR_ECTLT),
+	 FLAG(ftr, PCI_HT_FTR_64BA),
+	 FLAG(ftr, PCI_HT_FTR_UIDRD),
+	 FLAG(ftr, PCI_HT_SEC_FTR_EXTRS),
+	 FLAG(ftr, PCI_HT_SEC_FTR_UCNFE));
+  if (ftr & PCI_HT_SEC_FTR_EXTRS)
+    {
+      eh = get_conf_word(d, where + PCI_HT_SEC_EH);
+      printf("\t\tError Handling: PFlE%c OFlE%c PFE%c OFE%c EOCFE%c RFE%c CRCFE%c SERRFE%c CF%c RE%c PNFE%c ONFE%c EOCNFE%c RNFE%c CRCNFE%c SERRNFE%c\n",
+	     FLAG(eh, PCI_HT_EH_PFLE),
+	     FLAG(eh, PCI_HT_EH_OFLE),
+	     FLAG(eh, PCI_HT_EH_PFE),
+	     FLAG(eh, PCI_HT_EH_OFE),
+	     FLAG(eh, PCI_HT_EH_EOCFE),
+	     FLAG(eh, PCI_HT_EH_RFE),
+	     FLAG(eh, PCI_HT_EH_CRCFE),
+	     FLAG(eh, PCI_HT_EH_SERRFE),
+	     FLAG(eh, PCI_HT_EH_CF),
+	     FLAG(eh, PCI_HT_EH_RE),
+	     FLAG(eh, PCI_HT_EH_PNFE),
+	     FLAG(eh, PCI_HT_EH_ONFE),
+	     FLAG(eh, PCI_HT_EH_EOCNFE),
+	     FLAG(eh, PCI_HT_EH_RNFE),
+	     FLAG(eh, PCI_HT_EH_CRCNFE),
+	     FLAG(eh, PCI_HT_EH_SERRNFE));
+      mbu = get_conf_byte(d, where + PCI_HT_SEC_MBU);
+      mlu = get_conf_byte(d, where + PCI_HT_SEC_MLU);
+      printf("\t\tPrefetchable memory behind bridge Upper: %02x-%02x\n", mbu, mlu);
+    }
+}
+
+static void
+show_ht(struct device *d, int where, int cmd)
+{
+  int type;
+
+  switch (cmd & PCI_HT_CMD_TYP_HI)
+    {
+    case PCI_HT_CMD_TYP_HI_PRI:
+      show_ht_pri(d, where, cmd);
+      return;
+    case PCI_HT_CMD_TYP_HI_SEC:
+      show_ht_sec(d, where, cmd);
+      return;
+    }
+
+  type = cmd & PCI_HT_CMD_TYP;
+  switch (type)
+    {
+    case PCI_HT_CMD_TYP_SW:
+      printf("HyperTransport: Switch\n");
+      break;
+    case PCI_HT_CMD_TYP_IDC:
+      printf("HyperTransport: Interrupt Discovery and Configuration\n");
+      break;
+    case PCI_HT_CMD_TYP_RID:
+      printf("HyperTransport: Revision ID: %u.%02u\n",
+	     (cmd & PCI_HT_RID_MAJ) >> 5, (cmd & PCI_HT_RID_MIN));
+      break;
+    case PCI_HT_CMD_TYP_UIDC:
+      printf("HyperTransport: UnitID Clumping\n");
+      break;
+    case PCI_HT_CMD_TYP_ECSA:
+      printf("HyperTransport: Extended Configuration Space Access\n");
+      break;
+    case PCI_HT_CMD_TYP_AM:
+      printf("HyperTransport: Address Mapping\n");
+      break;
+    case PCI_HT_CMD_TYP_MSIM:
+      printf("HyperTransport: MSI Mapping\n");
+      break;
+    case PCI_HT_CMD_TYP_DR:
+      printf("HyperTransport: DirectRoute\n");
+      break;
+    case PCI_HT_CMD_TYP_VCS:
+      printf("HyperTransport: VCSet\n");
+      break;
+    case PCI_HT_CMD_TYP_RM:
+      printf("HyperTransport: Retry Mode\n");
+      break;
+    case PCI_HT_CMD_TYP_X86:
+      printf("HyperTransport: X86 (reserved)\n");
+      break;
+    default:
+      printf("HyperTransport: #%02x\n", type >> 11);
+    }
+}
+
 static void
 show_rom(struct device *d)
 {
@@ -659,6 +975,9 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_PCIX:
 	      show_pcix(d, where);
+	      break;
+	    case PCI_CAP_ID_HT:
+	      show_ht(d, where, cap);
 	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);

@@ -1,7 +1,7 @@
 /*
- *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
+ *	The PCI Library -- PCI Header Structure (based on <linux/pci.h>)
  *
- *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -184,6 +184,7 @@
 #define  PCI_CAP_ID_MSI		0x05	/* Message Signalled Interrupts */
 #define  PCI_CAP_ID_CHSWP	0x06	/* CompactPCI HotSwap */
 #define  PCI_CAP_ID_PCIX        0x07    /* PCI-X */
+#define  PCI_CAP_ID_HT          0x08    /* HyperTransport */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
@@ -315,6 +316,350 @@
 #define PCI_PCIX_BRIDGE_STR_CAPACITY                           0x0000ffff
 #define PCI_PCIX_BRIDGE_STR_COMMITMENT_LIMIT                   0xffff0000
 #define PCI_PCIX_BRIDGE_SIZEOF 12
+
+/* HyperTransport */
+#define PCI_HT_CMD		2	/* Command Register */
+#define  PCI_HT_CMD_TYP_HI	0xe000	/* Capability Type high part */
+#define  PCI_HT_CMD_TYP_HI_PRI	0x0000	/* Slave or Primary Interface */
+#define  PCI_HT_CMD_TYP_HI_SEC	0x2000	/* Host or Secondary Interface */
+#define  PCI_HT_CMD_TYP		0xf800	/* Capability Type */
+#define  PCI_HT_CMD_TYP_SW	0x4000	/* Switch */
+#define  PCI_HT_CMD_TYP_IDC	0x8000	/* Interrupt Discovery and Configuration */
+#define  PCI_HT_CMD_TYP_RID	0x8800	/* Revision ID */
+#define  PCI_HT_CMD_TYP_UIDC	0x9000	/* UnitID Clumping */
+#define  PCI_HT_CMD_TYP_ECSA	0x9800	/* Extended Configuration Space Access */
+#define  PCI_HT_CMD_TYP_AM	0xa000	/* Address Mapping */
+#define  PCI_HT_CMD_TYP_MSIM	0xa800	/* MSI Mapping */
+#define  PCI_HT_CMD_TYP_DR	0xb000	/* DirectRoute */
+#define  PCI_HT_CMD_TYP_VCS	0xb800	/* VCSet */
+#define  PCI_HT_CMD_TYP_RM	0xc000	/* Retry Mode */
+#define  PCI_HT_CMD_TYP_X86	0xc800	/* X86 (reserved) */
+
+					/* Link Control Register */
+#define  PCI_HT_LCTR_CFLE	0x0002	/* CRC Flood Enable */
+#define  PCI_HT_LCTR_CST	0x0004	/* CRC Start Test */
+#define  PCI_HT_LCTR_CFE	0x0008	/* CRC Force Error */
+#define  PCI_HT_LCTR_LKFAIL	0x0010	/* Link Failure */
+#define  PCI_HT_LCTR_INIT	0x0020	/* Initialization Complete */
+#define  PCI_HT_LCTR_EOC	0x0040	/* End of Chain */
+#define  PCI_HT_LCTR_TXO	0x0080	/* Transmitter Off */
+#define  PCI_HT_LCTR_CRCERR	0x0f00	/* CRC Error */
+#define  PCI_HT_LCTR_ISOCEN	0x1000	/* Isochronous Flow Control Enable */
+#define  PCI_HT_LCTR_LSEN	0x2000	/* LDTSTOP# Tristate Enable */
+#define  PCI_HT_LCTR_EXTCTL	0x4000	/* Extended CTL Time */
+#define  PCI_HT_LCTR_64B	0x8000	/* 64-bit Addressing Enable */
+
+					/* Link Configuration Register */
+#define  PCI_HT_LCNF_MLWI	0x0007	/* Max Link Width In */
+#define  PCI_HT_LCNF_LW_8B	0x0	/* Link Width 8 bits */
+#define  PCI_HT_LCNF_LW_16B	0x1	/* Link Width 16 bits */
+#define  PCI_HT_LCNF_LW_32B	0x3	/* Link Width 32 bits */
+#define  PCI_HT_LCNF_LW_2B	0x4	/* Link Width 2 bits */
+#define  PCI_HT_LCNF_LW_4B	0x5	/* Link Width 4 bits */
+#define  PCI_HT_LCNF_LW_NC	0x7	/* Link physically not connected */
+#define  PCI_HT_LCNF_DFI	0x0008	/* Doubleword Flow Control In */
+#define  PCI_HT_LCNF_MLWO	0x0070	/* Max Link Width Out */
+#define  PCI_HT_LCNF_DFO	0x0080	/* Doubleword Flow Control Out */
+#define  PCI_HT_LCNF_LWI	0x0700	/* Link Width In */
+#define  PCI_HT_LCNF_DFIE	0x0800	/* Doubleword Flow Control In Enable */
+#define  PCI_HT_LCNF_LWO	0x7000	/* Link Width Out */
+#define  PCI_HT_LCNF_DFOE	0x8000	/* Doubleword Flow Control Out Enable */
+
+					/* Revision ID Register */
+#define  PCI_HT_RID_MIN		0x1f	/* Minor Revision */
+#define  PCI_HT_RID_MAJ		0xe0	/* Major Revision */
+
+					/* Link Frequency/Error Register */
+#define  PCI_HT_LFRER_FREQ	0x0f	/* Transmitter Clock Frequency */
+#define  PCI_HT_LFRER_200	0x00	/* 200MHz */
+#define  PCI_HT_LFRER_300	0x01	/* 300MHz */
+#define  PCI_HT_LFRER_400	0x02	/* 400MHz */
+#define  PCI_HT_LFRER_500	0x03	/* 500MHz */
+#define  PCI_HT_LFRER_600	0x04	/* 600MHz */
+#define  PCI_HT_LFRER_800	0x05	/* 800MHz */
+#define  PCI_HT_LFRER_1000	0x06	/* 1.0GHz */
+#define  PCI_HT_LFRER_1200	0x07	/* 1.2GHz */
+#define  PCI_HT_LFRER_1400	0x08	/* 1.4GHz */
+#define  PCI_HT_LFRER_1600	0x09	/* 1.6GHz */
+#define  PCI_HT_LFRER_VEND	0x0f	/* Vendor-Specific */
+#define  PCI_HT_LFRER_ERR	0xf0	/* Link Error */
+#define  PCI_HT_LFRER_PROT	0x10	/* Protocol Error */
+#define  PCI_HT_LFRER_OV	0x20	/* Overflow Error */
+#define  PCI_HT_LFRER_EOC	0x40	/* End of Chain Error */
+#define  PCI_HT_LFRER_CTLT	0x80	/* CTL Timeout */
+
+					/* Link Frequency Capability Register */
+#define  PCI_HT_LFCAP_200	0x0001	/* 200MHz */
+#define  PCI_HT_LFCAP_300	0x0002	/* 300MHz */
+#define  PCI_HT_LFCAP_400	0x0004	/* 400MHz */
+#define  PCI_HT_LFCAP_500	0x0008	/* 500MHz */
+#define  PCI_HT_LFCAP_600	0x0010	/* 600MHz */
+#define  PCI_HT_LFCAP_800	0x0020	/* 800MHz */
+#define  PCI_HT_LFCAP_1000	0x0040	/* 1.0GHz */
+#define  PCI_HT_LFCAP_1200	0x0080	/* 1.2GHz */
+#define  PCI_HT_LFCAP_1400	0x0100	/* 1.4GHz */
+#define  PCI_HT_LFCAP_1600	0x0200	/* 1.6GHz */
+#define  PCI_HT_LFCAP_VEND	0x8000	/* Vendor-Specific */
+
+					/* Feature Register */
+#define  PCI_HT_FTR_ISOCFC	0x0001	/* Isochronous Flow Control Mode */
+#define  PCI_HT_FTR_LDTSTOP	0x0002	/* LDTSTOP# Supported */
+#define  PCI_HT_FTR_CRCTM	0x0004	/* CRC Test Mode */
+#define  PCI_HT_FTR_ECTLT	0x0008	/* Extended CTL Time Required */
+#define  PCI_HT_FTR_64BA	0x0010	/* 64-bit Addressing */
+#define  PCI_HT_FTR_UIDRD	0x0020	/* UnitID Reorder Disable */
+
+					/* Error Handling Register */
+#define  PCI_HT_EH_PFLE		0x0001	/* Protocol Error Flood Enable */
+#define  PCI_HT_EH_OFLE		0x0002	/* Overflow Error Flood Enable */
+#define  PCI_HT_EH_PFE		0x0004	/* Protocol Error Fatal Enable */
+#define  PCI_HT_EH_OFE		0x0008	/* Overflow Error Fatal Enable */
+#define  PCI_HT_EH_EOCFE	0x0010	/* End of Chain Error Fatal Enable */
+#define  PCI_HT_EH_RFE		0x0020	/* Response Error Fatal Enable */
+#define  PCI_HT_EH_CRCFE	0x0040	/* CRC Error Fatal Enable */
+#define  PCI_HT_EH_SERRFE	0x0080	/* System Error Fatal Enable (B */
+#define  PCI_HT_EH_CF		0x0100	/* Chain Fail */
+#define  PCI_HT_EH_RE		0x0200	/* Response Error */
+#define  PCI_HT_EH_PNFE		0x0400	/* Protocol Error Nonfatal Enable */
+#define  PCI_HT_EH_ONFE		0x0800	/* Overflow Error Nonfatal Enable */
+#define  PCI_HT_EH_EOCNFE	0x1000	/* End of Chain Error Nonfatal Enable */
+#define  PCI_HT_EH_RNFE		0x2000	/* Response Error Nonfatal Enable */
+#define  PCI_HT_EH_CRCNFE	0x4000	/* CRC Error Nonfatal Enable */
+#define  PCI_HT_EH_SERRNFE	0x8000	/* System Error Nonfatal Enable */
+
+/* HyperTransport: Slave or Primary Interface */
+#define PCI_HT_PRI_CMD		2	/* Command Register */
+#define  PCI_HT_PRI_CMD_BUID	0x001f	/* Base UnitID */
+#define  PCI_HT_PRI_CMD_UC	0x03e0	/* Unit Count */
+#define  PCI_HT_PRI_CMD_MH	0x0400	/* Master Host */
+#define  PCI_HT_PRI_CMD_DD	0x0800	/* Default Direction */
+#define  PCI_HT_PRI_CMD_DUL	0x1000	/* Drop on Uninitialized Link */
+
+#define PCI_HT_PRI_LCTR0	4	/* Link Control 0 Register */
+#define PCI_HT_PRI_LCNF0	6	/* Link Config 0 Register */
+#define PCI_HT_PRI_LCTR1	8	/* Link Control 1 Register */
+#define PCI_HT_PRI_LCNF1	10	/* Link Config 1 Register */
+#define PCI_HT_PRI_RID		12	/* Revision ID Register */
+#define PCI_HT_PRI_LFRER0	13	/* Link Frequency/Error 0 Register */
+#define PCI_HT_PRI_LFCAP0	14	/* Link Frequency Capability 0 Register */
+#define PCI_HT_PRI_FTR		16	/* Feature Register */
+#define PCI_HT_PRI_LFRER1	17	/* Link Frequency/Error 1 Register */
+#define PCI_HT_PRI_LFCAP1	18	/* Link Frequency Capability 1 Register */
+#define PCI_HT_PRI_ES		20	/* Enumeration Scratchpad Register */
+#define PCI_HT_PRI_EH		22	/* Error Handling Register */
+#define PCI_HT_PRI_MBU		24	/* Memory Base Upper Register */
+#define PCI_HT_PRI_MLU		25	/* Memory Limit Upper Register */
+#define PCI_HT_PRI_BN		26	/* Bus Number Register */
+#define PCI_HT_PRI_SIZEOF	28
+
+/* HyperTransport: Host or Secondary Interface */
+#define PCI_HT_SEC_CMD		2	/* Command Register */
+#define  PCI_HT_SEC_CMD_WR	0x0001	/* Warm Reset */
+#define  PCI_HT_SEC_CMD_DE	0x0002	/* Double-Ended */
+#define  PCI_HT_SEC_CMD_DN	0x0076	/* Device Number */
+#define  PCI_HT_SEC_CMD_CS	0x0080	/* Chain Side */
+#define  PCI_HT_SEC_CMD_HH	0x0100	/* Host Hide */
+#define  PCI_HT_SEC_CMD_AS	0x0400	/* Act as Slave */
+#define  PCI_HT_SEC_CMD_HIECE	0x0800	/* Host Inbound End of Chain Error */
+#define  PCI_HT_SEC_CMD_DUL	0x1000	/* Drop on Uninitialized Link */
+
+#define PCI_HT_SEC_LCTR		4	/* Link Control Register */
+#define PCI_HT_SEC_LCNF		6	/* Link Config Register */
+#define PCI_HT_SEC_RID		8	/* Revision ID Register */
+#define PCI_HT_SEC_LFRER	9	/* Link Frequency/Error Register */
+#define PCI_HT_SEC_LFCAP	10	/* Link Frequency Capability Register */
+#define PCI_HT_SEC_FTR		12	/* Feature Register */
+#define  PCI_HT_SEC_FTR_EXTRS	0x0100	/* Extended Register Set */
+#define  PCI_HT_SEC_FTR_UCNFE	0x0200	/* Upstream Configuration Enable */
+#define PCI_HT_SEC_ES		16	/* Enumeration Scratchpad Register */
+#define PCI_HT_SEC_EH		18	/* Error Handling Register */
+#define PCI_HT_SEC_MBU		20	/* Memory Base Upper Register */
+#define PCI_HT_SEC_MLU		21	/* Memory Limit Upper Register */
+#define PCI_HT_SEC_SIZEOF	24
+
+/* HyperTransport: Switch */
+#define PCI_HT_SW_CMD		2	/* Switch Command Register */
+#define  PCI_HT_SW_CMD_VIBERR	0x0080	/* VIB Error */
+#define  PCI_HT_SW_CMD_VIBFL	0x0100	/* VIB Flood */
+#define  PCI_HT_SW_CMD_VIBFT	0x0200	/* VIB Fatal */
+#define  PCI_HT_SW_CMD_VIBNFT	0x0400	/* VIB Nonfatal */
+#define PCI_HT_SW_PMASK		4	/* Partition Mask Register */
+#define PCI_HT_SW_SWINF		8	/* Switch Info Register */
+#define  PCI_HT_SW_SWINF_DP	0x0000001f /* Default Port */
+#define  PCI_HT_SW_SWINF_EN	0x00000020 /* Enable Decode */
+#define  PCI_HT_SW_SWINF_CR	0x00000040 /* Cold Reset */
+#define  PCI_HT_SW_SWINF_PCIDX	0x00000f00 /* Performance Counter Index */
+#define  PCI_HT_SW_SWINF_BLRIDX	0x0003f000 /* Base/Limit Range Index */
+#define  PCI_HT_SW_SWINF_SBIDX	0x00002000 /* Secondary Base Range Index */
+#define  PCI_HT_SW_SWINF_HP	0x00040000 /* Hot Plug */
+#define  PCI_HT_SW_SWINF_HIDE	0x00080000 /* Hide Port */
+#define PCI_HT_SW_PCD		12	/* Performance Counter Data Register */
+#define PCI_HT_SW_BLRD		16	/* Base/Limit Range Data Register */
+#define PCI_HT_SW_SBD		20	/* Secondary Base Data Register */
+#define PCI_HT_SW_SIZEOF	24
+
+					/* Counter indices */
+#define  PCI_HT_SW_PC_PCR	0x0	/* Posted Command Receive */
+#define  PCI_HT_SW_PC_NPCR	0x1	/* Nonposted Command Receive */
+#define  PCI_HT_SW_PC_RCR	0x2	/* Response Command Receive */
+#define  PCI_HT_SW_PC_PDWR	0x3	/* Posted DW Receive */
+#define  PCI_HT_SW_PC_NPDWR	0x4	/* Nonposted DW Receive */
+#define  PCI_HT_SW_PC_RDWR	0x5	/* Response DW Receive */
+#define  PCI_HT_SW_PC_PCT	0x6	/* Posted Command Transmit */
+#define  PCI_HT_SW_PC_NPCT	0x7	/* Nonposted Command Transmit */
+#define  PCI_HT_SW_PC_RCT	0x8	/* Response Command Transmit */
+#define  PCI_HT_SW_PC_PDWT	0x9	/* Posted DW Transmit */
+#define  PCI_HT_SW_PC_NPDWT	0xa	/* Nonposted DW Transmit */
+#define  PCI_HT_SW_PC_RDWT	0xb	/* Response DW Transmit */
+
+					/* Base/Limit Range indices */
+#define  PCI_HT_SW_BLR_BASE0_LO	0x0	/* Base 0[31:1], Enable */
+#define  PCI_HT_SW_BLR_BASE0_HI	0x1	/* Base 0 Upper */
+#define  PCI_HT_SW_BLR_LIM0_LO	0x2	/* Limit 0 Lower */
+#define  PCI_HT_SW_BLR_LIM0_HI	0x3	/* Limit 0 Upper */
+
+					/* Secondary Base indices */
+#define  PCI_HT_SW_SB_LO	0x0	/* Secondary Base[31:1], Enable */
+#define  PCI_HT_SW_S0_HI	0x1	/* Secondary Base Upper */
+
+/* HyperTransport: Interrupt Discovery and Configuration */
+#define PCI_HT_IDC_IDX		2	/* Index Register */
+#define PCI_HT_IDC_DATA		4	/* Data Register */
+#define PCI_HT_IDC_SIZEOF	8
+
+					/* Register indices */
+#define  PCI_HT_IDC_IDX_LINT	0x01	/* Last Interrupt Register */
+#define   PCI_HT_IDC_LINT	0x00ff0000 /* Last interrupt definition */
+#define  PCI_HT_IDC_IDX_IDR	0x10	/* Interrupt Definition Registers */
+					/* Low part (at index) */
+#define   PCI_HT_IDC_IDR_MASK	0x10000001 /* Mask */
+#define   PCI_HT_IDC_IDR_POL	0x10000002 /* Polarity */
+#define   PCI_HT_IDC_IDR_II_2	0x1000001c /* IntrInfo[4:2]: Message Type */
+#define   PCI_HT_IDC_IDR_II_5	0x10000020 /* IntrInfo[5]: Request EOI */
+#define   PCI_HT_IDC_IDR_II_6	0x00ffffc0 /* IntrInfo[23:6] */
+#define   PCI_HT_IDC_IDR_II_24	0xff000000 /* IntrInfo[31:24] */
+					/* High part (at index + 1) */
+#define   PCI_HT_IDC_IDR_II_32	0x00ffffff /* IntrInfo[55:32] */
+#define   PCI_HT_IDC_IDR_PASSPW	0x40000000 /* PassPW setting for messages */
+#define   PCI_HT_IDC_IDR_WEOI	0x80000000 /* Waiting for EOI */
+
+/* HyperTransport: Revision ID */
+#define PCI_HT_RID_RID		2	/* Revision Register */
+#define PCI_HT_RID_SIZEOF	4
+
+/* HyperTransport: UnitID Clumping */
+#define PCI_HT_UIDC_CS		4	/* Clumping Support Register */
+#define PCI_HT_UIDC_CE		8	/* Clumping Enable Register */
+#define PCI_HT_UIDC_SIZEOF	12
+
+/* HyperTransport: Extended Configuration Space Access */
+#define PCI_HT_ECSA_ADDR	4	/* Configuration Address Register */
+#define  PCI_HT_ECSA_ADDR_REG	0x00000ffc /* Register */
+#define  PCI_HT_ECSA_ADDR_FUN	0x00007000 /* Function */
+#define  PCI_HT_ECSA_ADDR_DEV	0x000f1000 /* Device */
+#define  PCI_HT_ECSA_ADDR_BUS	0x0ff00000 /* Bus Number */
+#define  PCI_HT_ECSA_ADDR_TYPE	0x10000000 /* Access Type */
+#define PCI_HT_ECSA_DATA	8	/* Configuration Data Register */
+#define PCI_HT_ECSA_SIZEOF	12
+
+/* HyperTransport: Address Mapping */
+#define PCI_HT_AM_CMD		2	/* Command Register */
+#define  PCI_HT_AM_CMD_NDMA	0x000f	/* Number of DMA Mappings */
+#define  PCI_HT_AM_CMD_IOSIZ	0x01f0	/* I/O Size */
+#define  PCI_HT_AM_CMD_MT	0x0600	/* Map Type */
+#define  PCI_HT_AM_CMD_MT_40B	0x0000	/* 40-bit */
+#define  PCI_HT_AM_CMD_MT_64B	0x0200	/* 64-bit */
+
+					/* Window Control Register bits */
+#define  PCI_HT_AM_SBW_CTR_COMP	0x1	/* Compat */
+#define  PCI_HT_AM_SBW_CTR_NCOH	0x2	/* NonCoherent */
+#define  PCI_HT_AM_SBW_CTR_ISOC	0x4	/* Isochronous */
+#define  PCI_HT_AM_SBW_CTR_EN	0x8	/* Enable */
+
+/* HyperTransport: 40-bit Address Mapping */
+#define PCI_HT_AM40_SBNPW	4	/* Secondary Bus Non-Prefetchable Window Register */
+#define  PCI_HT_AM40_SBW_BASE	0x000fffff /* Window Base */
+#define  PCI_HT_AM40_SBW_CTR	0xf0000000 /* Window Control */
+#define PCI_HT_AM40_SBPW	8	/* Secondary Bus Prefetchable Window Register */
+#define PCI_HT_AM40_DMA_PBASE0	12	/* DMA Window Primary Base 0 Register */
+#define PCI_HT_AM40_DMA_CTR0	15	/* DMA Window Control 0 Register */
+#define  PCI_HT_AM40_DMA_CTR_CTR 0xf0	/* Window Control */
+#define PCI_HT_AM40_DMA_SLIM0	16	/* DMA Window Secondary Limit 0 Register */
+#define PCI_HT_AM40_DMA_SBASE0	18	/* DMA Window Secondary Base 0 Register */
+#define PCI_HT_AM40_SIZEOF	12	/* size is variable: 12 + 8 * NDMA */
+
+/* HyperTransport: 64-bit Address Mapping */
+#define PCI_HT_AM64_IDX		4	/* Index Register */
+#define PCI_HT_AM64_DATA_LO	8	/* Data Lower Register */
+#define PCI_HT_AM64_DATA_HI	12	/* Data Upper Register */
+#define PCI_HT_AM64_SIZEOF	16
+
+					/* Register indices */
+#define  PCI_HT_AM64_IDX_SBNPW	0x00	/* Secondary Bus Non-Prefetchable Window Register */
+#define   PCI_HT_AM64_W_BASE_LO	0xfff00000 /* Window Base Lower */
+#define   PCI_HT_AM64_W_CTR	0x0000000f /* Window Control */
+#define  PCI_HT_AM64_IDX_SBPW	0x01	/* Secondary Bus Prefetchable Window Register */
+#define   PCI_HT_AM64_IDX_PBNPW	0x02	/* Primary Bus Non-Prefetchable Window Register */
+#define   PCI_HT_AM64_IDX_DMAPB0 0x04	/* DMA Window Primary Base 0 Register */
+#define   PCI_HT_AM64_IDX_DMASB0 0x05	/* DMA Window Secondary Base 0 Register */
+#define   PCI_HT_AM64_IDX_DMASL0 0x06	/* DMA Window Secondary Limit 0 Register */
+
+/* HyperTransport: MSI Mapping */
+#define PCI_HT_MSIM_CMD		2	/* Command Register */
+#define  PCI_HT_MSIM_CMD_EN	0x0001	/* Mapping Active */
+#define  PCI_HT_MSIM_CMD_FIXD	0x0002	/* MSI Mapping Address Fixed */
+#define PCI_HT_MSIM_ADDR_LO	4	/* MSI Mapping Address Lower Register */
+#define PCI_HT_MSIM_ADDR_HI	8	/* MSI Mapping Address Upper Register */
+#define PCI_HT_MSIM_SIZEOF	12
+
+/* HyperTransport: DirectRoute */
+#define PCI_HT_DR_CMD		2	/* Command Register */
+#define  PCI_HT_DR_CMD_NDRS	0x000f	/* Number of DirectRoute Spaces */
+#define  PCI_HT_DR_CMD_IDX	0x01f0	/* Index */
+#define PCI_HT_DR_EN		4	/* Enable Vector Register */
+#define PCI_HT_DR_DATA		8	/* Data Register */
+#define PCI_HT_DR_SIZEOF	12
+
+					/* Register indices */
+#define  PCI_HT_DR_IDX_BASE_LO	0x00	/* DirectRoute Base Lower Register */
+#define   PCI_HT_DR_OTNRD	0x00000001 /* Opposite to Normal Request Direction */
+#define   PCI_HT_DR_BL_LO	0xffffff00 /* Base/Limit Lower */
+#define  PCI_HT_DR_IDX_BASE_HI	0x01	/* DirectRoute Base Upper Register */
+#define  PCI_HT_DR_IDX_LIMIT_LO	0x02	/* DirectRoute Limit Lower Register */
+#define  PCI_HT_DR_IDX_LIMIT_HI	0x03	/* DirectRoute Limit Upper Register */
+
+/* HyperTransport: VCSet */
+#define PCI_HT_VCS_SUP		4	/* VCSets Supported Register */
+#define PCI_HT_VCS_L1EN		5	/* Link 1 VCSets Enabled Register */
+#define PCI_HT_VCS_L0EN		6	/* Link 0 VCSets Enabled Register */
+#define PCI_HT_VCS_SBD		8	/* Stream Bucket Depth Register */
+#define PCI_HT_VCS_SINT		9	/* Stream Interval Register */
+#define PCI_HT_VCS_SSUP		10	/* Number of Streaming VCs Supported Register */
+#define  PCI_HT_VCS_SSUP_0	0x00	/* Streaming VC 0 */
+#define  PCI_HT_VCS_SSUP_3	0x01	/* Streaming VCs 0-3 */
+#define  PCI_HT_VCS_SSUP_15	0x02	/* Streaming VCs 0-15 */
+#define PCI_HT_VCS_NFCBD	12	/* Non-FC Bucket Depth Register */
+#define PCI_HT_VCS_NFCINT	13	/* Non-FC Bucket Interval Register */
+#define PCI_HT_VCS_SIZEOF	16
+
+/* HyperTransport: Retry Mode */
+#define PCI_HT_RM_CTR0		4	/* Control 0 Register */
+#define  PCI_HT_RM_CTR_LRETEN	0x01	/* Link Retry Enable */
+#define  PCI_HT_RM_CTR_FSER	0x02	/* Force Single Error */
+#define  PCI_HT_RM_CTR_ROLNEN	0x04	/* Rollover Nonfatal Enable */
+#define  PCI_HT_RM_CTR_FSS	0x08	/* Force Single Stomp */
+#define  PCI_HT_RM_CTR_RETNEN	0x10	/* Retry Nonfatal Enable */
+#define  PCI_HT_RM_CTR_RETFEN	0x20	/* Retry Fatal Enable */
+#define  PCI_HT_RM_CTR_AA	0xc0	/* Allowed Attempts */
+#define PCI_HT_RM_STS0		5	/* Status 0 Register */
+#define  PCI_HT_RM_STS_RETSNT	0x01	/* Retry Sent */
+#define  PCI_HT_RM_STS_CNTROL	0x02	/* Count Rollover */
+#define  PCI_HT_RM_STS_SRCV	0x04	/* Stomp Received */
+#define PCI_HT_RM_CTR1		6	/* Control 1 Register */
+#define PCI_HT_RM_STS1		7	/* Status 1 Register */
+#define PCI_HT_RM_CNT0		8	/* Retry Count 0 Register */
+#define PCI_HT_RM_CNT1		10	/* Retry Count 1 Register */
+#define PCI_HT_RM_SIZEOF	12
 
 /*
  * The PCI interface treats multi-function devices as independent
