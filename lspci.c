@@ -404,8 +404,7 @@ format_agp_rate(int rate, char *buf, int agp3)
       {
 	if (c != buf)
 	  *c++ = ',';
-	*c++ = 'x';
-	*c++ = '0' + (1 << (i + 2*agp3));
+	c += sprintf(c, "x%d", 1 << (i + 2*agp3));
       }
   if (c != buf)
     *c = 0;
@@ -417,7 +416,7 @@ static void
 show_agp(struct device *d, int where, int cap)
 {
   u32 t;
-  char rate[8];
+  char rate[16];
   int ver, rev;
   int agp3 = 0;
 

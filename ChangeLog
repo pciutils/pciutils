@@ -1,5 +1,9 @@
 2004-05-28  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (format_agp_rate): Write "x16", not "x@".
+	(show_agp): rate[] could overflow.
+	Bugs reported by Jakub Bogusz <qboosh@pld-linux.org>.
+
 	* lspci.c (show_ht_*): Show HyperTransport capability with all its
 	details. Once again code by Maciej simplified (i.e., possibly broken)
 	by me.
