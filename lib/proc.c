@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.6 1999/08/31 05:58:07 ecd Exp $
+ *	$Id: proc.c,v 1.7 2000/01/20 21:14:44 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -46,13 +46,16 @@ static int pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
 #elif defined(i386)
 /* old libc on i386 -> call syscalls directly the old way */
 #include <asm/unistd.h>
-static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
-static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
+static _syscall5(int, pread, unsigned int, fd, void *, buf, size_t, size, u32, where_lo, u32, where_hi);
+static _syscall5(int, pwrite, unsigned int, fd, void *, buf, size_t, size, u32, where_lo, u32, where_hi);
+static int do_read(struct pci_dev *d __attribute__((unused)), int fd, void *buf, size_t size, int where) { return pread(fd, buf, size, where, 0); }
+static int do_write(struct pci_dev *d __attribute__((unused)), int fd, void *buf, size_t size, int where) { return pwrite(fd, buf, size, where, 0); }
+#define HAVE_DO_READ
 
 #else
 /* In all other cases we use lseek/read/write instead to be safe */
 #define make_rw_glue(op) \
-	static int do_##op(struct pci_dev *d, int fd, void *buf, size_t size, loff_t where)	\
+	static int do_##op(struct pci_dev *d, int fd, void *buf, size_t size, int where)	\
 	{											\
 	  struct pci_access *a = d->access;							\
 	  int r;										\
