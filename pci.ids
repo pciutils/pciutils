@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.45 1999/12/21 09:16:24 mj Exp $
+#	$Id: pci.ids,v 1.46 2000/01/02 20:32:11 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -866,13 +866,14 @@
 	0010  VME Bridge Model 618
 	3000  VME Bridge Model 2706
 108c  Oakleigh Systems Inc.
-108d  Olicom
-	0001  OC-3136/3137
+108d Olicom
+	0001  Token-Ring 16/4 PCI Adapter (3136/3137)
 	0002  16/4 Token Ring
-	0004  OC-3139/3140 RapidFire Token-Ring 16/4
-	0005  OC-3250 GoCard Token-Ring 16/4
+	0004  RapidFire 3139 Token-Ring 16/4 PCI Adapter
+	0005  GoCard 3250 Token-Ring 16/4 CardBus PC Card
 	0006  OC-3530 RapidFire Token-Ring 100
-	0007  OC-3141 RapidFire Token-Ring 16/4
+	0007  RapidFire 3141 Token-Ring 16/4 PCI Fiber Adapter
+	0008  RapidFire 3540 HSTR 100/16/4 PCI Adapter
 	0011  OC-2315
 	0012  OC-2325
 	0013  OC-2183/2185
@@ -1013,17 +1014,23 @@
 	9080  9080
 		10b5 9080  9080 [real subsystem ID not set]
 10b6  Madge Networks
-	0001  Smart 16/4 Ringnode
-	0002  Smart 16/4 BM Mk2 Ringnode
-	0003  Smart 16/4 Ringnode
-		0e11 b0fd  NC4621 4/16 Token-Ring Adapter + WOL
-		10b6 0003  Smart 16/4 Ringnode Mk3
-		10b6 0007  Presto Mk2
-	0004  Smart 16/4 Ringnode (BM)
+	0001  Smart 16/4 PCI Ringnode
+	0002  Smart 16/4 PCI Ringnode Mk2
+		10b6 0002  Smart 16/4 PCI Ringnode Mk2
+		10b6 0006  16/4 CardBus Adapter
+	0003  Smart 16/4 PCI Ringnode Mk3
+		0e11 b0fd  Compaq NC4621 PCI, 4/16, WOL
+		10b6 0003  Smart 16/4 PCI Ringnode Mk3
+		10b6 0007  Presto PCI Plus Adapter
+	0004  Smart 16/4 PCI Ringnode Mk1
 	0006  16/4 Cardbus Adapter
-	0007  Presto
-	1000  Collage 25 ATM adaptor
-	1001  Collage 155 Server
+		10b6 0006  16/4 CardBus Adapter
+	0007  Presto PCI Adapter
+	0009  Smart 100/16/4 PCI-HS Ringnode
+	000a  Smart 100/16/4 PCI Ringnode
+	000b  16/4 CardBus Adapter Mk2
+	1000  Collage 25 ATM Adapter
+	1001  Collage 155 ATM Server Adapter
 10b7  3Com Corporation
 	0001  3c985 1000BaseSX
 	3390  Token Link Velocity
@@ -2110,6 +2117,7 @@
 1240  Marathon Technologies Corp.
 1241  DSC Communications
 1242  Jaycor Networks, Inc.
+	4643  FCI-1063 Fibre Channel Adapter
 1243  Delphax
 1244  AVM Audiovisuelles MKTG & Computer System GmbH
 	0700  B1 ISDN
@@ -2152,7 +2160,7 @@
 	1948  Solo?
 	1968  ES1968 Maestro 2
 	1969  ES1969 Solo-1 Audiodrive
-	1978  ES1978 Maestro Audiodrive
+	1978  ES1978 Maestro 2E
 	2808  ES336H Fax Modem (Later Model)
 	2898  ES2898 Modem
 125e  Specialvideo Engineering SRL
@@ -2218,7 +2226,7 @@
 	e886  IT8330G
 1284  Sahara Networks, Inc.
 1285  Platform Technologies, Inc.
-	0100  PT-201C-O-P AGOGO-XP sound chip
+	0100  AGOGO sound chip (aka ESS Maestro 1)
 1286  Mazet GmbH
 1287  M-Pact, Inc.
 	001e  LS220D DVD Decoder
@@ -2297,7 +2305,8 @@
 12c4  Connect Tech Inc
 12c5  Picture Elements Incorporated
 	0081  PCIVST [Grayscale Thresholding Engine]
-	0086  THR2 Thresholder
+	0085  Video Simulator/Sender
+	0086  THR2 Multi-scale Thresholder
 12c6  Mitani Corporation
 12c7  Dialogic Corp
 12c8  G Force Co, Ltd
@@ -3273,6 +3282,7 @@
 		0e11 b123  NC1634 Gigabit Ethernet Adapter
 		1014 0119  Netfinity Gigabit Ethernet SX Adapter
 		8086 1000  EtherExpress PRO/1000 Gigabit Server Adapter
+	1030  82559 InBusiness 10/100
 	1209  82559ER
 	1221  82092AA_0
 	1222  82092AA_1
