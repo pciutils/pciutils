@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.51 2003/01/04 12:43:59 mj Exp $
+# $Id: Makefile,v 1.52 2003/01/04 12:46:45 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
@@ -59,7 +59,8 @@ clean:
 install: all
 # -c is ignored on Linux, but required on FreeBSD
 	$(DIRINSTALL) -m 755 $(SBINDIR) $(SHAREDIR) $(MANDIR)/man8
-	$(INSTALL) -c -m 755 -s lspci setpci update-pciids $(SBINDIR)
+	$(INSTALL) -c -m 755 -s lspci setpci $(SBINDIR)
+	$(INSTALL) -c -m 755 update-pciids $(SBINDIR)
 	$(INSTALL) -c -m 644 pci.ids $(SHAREDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(MANDIR)/man8
 
