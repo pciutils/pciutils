@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Reading of Bus Dumps
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -68,12 +68,12 @@ dump_init(struct pci_access *a)
 }
 
 static void
-dump_cleanup(struct pci_access * UNUSED a)
+dump_cleanup(struct pci_access *a UNUSED)
 {
 }
 
 static void
-dump_scan(struct pci_access * UNUSED a)
+dump_scan(struct pci_access *a UNUSED)
 {
 }
 
@@ -95,7 +95,7 @@ dump_read(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 static int
-dump_write(struct pci_dev * UNUSED d, int UNUSED pos, byte * UNUSED buf, int UNUSED len)
+dump_write(struct pci_dev *d UNUSED, int pos UNUSED, byte *buf UNUSED, int len UNUSED)
 {
   d->access->error("Writing to dump files is not supported.");
   return 0;

@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Direct Configuration access via i386 Ports
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -34,7 +34,7 @@ conf12_init(struct pci_access *a)
 }
 
 static void
-conf12_cleanup(struct pci_access * UNUSED a)
+conf12_cleanup(struct pci_access *a UNUSED)
 {
   iopl(3);
   intel_iopl_set = -1;

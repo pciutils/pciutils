@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- User Access
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -114,7 +114,7 @@ pci_generic_debug(char *msg, ...)
 }
 
 static void
-pci_null_debug(char * UNUSED msg, ...)
+pci_null_debug(char *msg UNUSED, ...)
 {
 }
 

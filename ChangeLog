@@ -1,5 +1,10 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* Replaced obsolete syntax of __attribute__((unused)) in the middle of
+	parameter declarations (which is no longer supported by GCC 3.1) by the
+	current syntax (attribute at the end). Thanks to pixel@mandrakesoft.com
+	for reporting this problem.
+
 	* Removed CVS $Id$ tags from all files.
 
 	* Makefile: Added some more warnings.
