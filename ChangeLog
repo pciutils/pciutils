@@ -1,5 +1,7 @@
 2004-05-28  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test4.
+
 	* lspci.c (show_verbose): Header type 1 is probably legal for all
 	types of bridges, not only for PCI-to-PCI bridges.
 
