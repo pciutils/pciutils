@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.29 1999/07/07 11:23:05 mj Exp $
+#	$Id: pci.ids,v 1.30 1999/07/08 22:31:25 ralf Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -793,6 +793,7 @@
 10a8  Sierra Semiconductor
 	0000  STB Horizon 64
 10a9  Silicon Graphics
+	0003  IOC3
 10aa  ACC Microelectronics
 	0000  ACCM 2188
 10ab  Digicom
