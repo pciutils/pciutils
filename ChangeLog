@@ -1,0 +1,19 @@
+Sat Feb  7 15:15:46 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* README: Updated.
+
+	* lspci.8: Created a man page.
+
+	* Releasing as version 1.0.
+
+Tue Feb  3 20:56:00 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile: Recognize architecture by calling uname and pass it as ARCH_xxx
+	to all the C sources. This should eliminate problems with 32-bit compilers
+	on sparc64.
+
+	* lspci.c (show_verbose): Recognize CardBus bridge header type.
+	(show_htype2): Stub routine.
+	(scan_config): Write sensible error message if the kernel denies reading of
+	upper part of the PCI config space.
+

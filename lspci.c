@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.5 1998/01/27 11:50:08 mj Exp $
+ *	$Id: lspci.c,v 1.6 1998/02/08 10:58:54 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -47,7 +47,7 @@ Usage: lspci [<switches>]\n\
 
 /* Format strings used for IRQ numbers */
 
-#ifdef __sparc_v9__
+#ifdef ARCH_SPARC64
 #define IRQ_FORMAT "%08x"
 #else
 #define IRQ_FORMAT "%d"
@@ -148,7 +148,7 @@ scan_config(void)
 {
   struct device *d;
   char name[64];
-  int fd;
+  int fd, res;
   int how_much = (show_hex > 1) ? 256 : 64;
 
   for(d=first_dev; d; d=d->next)
@@ -159,9 +159,15 @@ scan_config(void)
 	  fprintf(stderr, "lspci: Unable to open %s: %m\n", name);
 	  exit(1);
 	}
-      if (read(fd, d->config, how_much) != how_much)
+      res = read(fd, d->config, how_much);
+      if (res < 0)
 	{
 	  fprintf(stderr, "lspci: Error reading %s: %m\n", name);
+	  exit(1);
+	}
+      if (res != how_much)
+	{
+	  fprintf(stderr, "lspci: Only %d bytes of config space available to you\n", res);
 	  exit(1);
 	}
       close(fd);
@@ -420,6 +426,11 @@ show_htype1(struct device *d)
 }
 
 static void
+show_htype2(struct device *d)
+{
+}
+
+static void
 show_verbose(struct device *d)
 {
   word status = get_conf_word(d, PCI_STATUS);
@@ -432,34 +443,34 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   byte int_line = get_conf_byte(d, PCI_INTERRUPT_LINE);
-  unsigned int irq, ex_htype;
+  unsigned int irq;
   word subsys_v, subsys_d;
 
   show_terse(d);
 
-  switch (class)
-    {
-    case PCI_CLASS_BRIDGE_PCI:
-      ex_htype = 1;
-      break;
-    default:
-      ex_htype = 0;
-    }
-  if (ex_htype != htype)
-    {
-      printf("\t!!! Header type %02x doesn't match class code %04x\n", htype, class);
-      return;
-    }
-
   switch (htype)
     {
-    case 0:
+    case PCI_HEADER_TYPE_NORMAL:
+      if (class == PCI_CLASS_BRIDGE_PCI)
+	{
+	badhdr:
+	  printf("\t!!! Header type %02x doesn't match class code %04x\n", htype, class);
+	  return;
+	}
       max_lat = get_conf_byte(d, PCI_MAX_LAT);
       min_gnt = get_conf_byte(d, PCI_MIN_GNT);
       subsys_v = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
       subsys_d = get_conf_word(d, PCI_SUBSYSTEM_ID);
       break;
-    case 1:
+    case PCI_HEADER_TYPE_BRIDGE:
+      if (class != PCI_CLASS_BRIDGE_PCI)
+	goto badhdr;
+      irq = int_line = int_pin = min_gnt = max_lat = 0;
+      subsys_v = subsys_d = 0;
+      break;
+    case PCI_HEADER_TYPE_CARDBUS:
+      if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
+	goto badhdr;
       irq = int_line = int_pin = min_gnt = max_lat = 0;
       subsys_v = subsys_d = 0;
       break;
@@ -555,11 +566,14 @@ show_verbose(struct device *d)
 
   switch (htype)
     {
-    case 0:
+    case PCI_HEADER_TYPE_NORMAL:
       show_htype0(d);
       break;
-    case 1:
+    case PCI_HEADER_TYPE_BRIDGE:
       show_htype1(d);
+      break;
+    case PCI_HEADER_TYPE_CARDBUS:
+      show_htype2(d);
       break;
     }
 }

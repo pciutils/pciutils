@@ -1,0 +1,100 @@
+.TH lspci 8 "7 February 98" "pciutils-0.92" "Linux PCI Utilities"
+.IX lspci
+.SH NAME
+lspci \- list all PCI devices
+.SH SYNOPSIS
+.B lspci
+.RB [ options ]
+.SH DESCRIPTION
+.B lspci
+is a utility for displaying information about all PCI busses in the system and
+all devices connected to them. It requires Linux kernel 2.1.82 or newer and
+supersedes the original /proc/pci interface found in earlier kernels.
+
+If you are going to report bugs in PCI device drivers or in
+.I lspci
+itself, please include output of "lspci -vvx".
+
+.SH OPTIONS
+.TP
+.B -v
+Tells
+.I lspci
+to be verbose and display detailed information about all devices.
+.TP
+.B -vv
+Tells
+.I lspci
+to be very verbose and display even more information (actually everything the
+PCI device is able to tell). The exact meaning of these data is not explained
+in this manual page, if you want to know more, consult
+.B /usr/include/linux/pci.h
+or the PCI specs.
+.TP
+.B -n
+Show PCI vendor and device codes as numbers instead of looking them up in the
+PCI ID database.
+.TP
+.B -x
+Show hexadecimal dump of first 64 bytes of the PCI configuration space (the standard
+header). Useful for debugging of drivers and
+.I lspci
+itself.
+.TP
+.B -xx
+Show hexadecimal dump of whole PCI configuration space. Available only for root
+as several PCI devices crash when you try to read undefined portions of the config
+space (although this directly violates the PCI standard).
+.TP
+.B -b
+Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
+PCI bus instead of as seen by the kernel.
+.TP
+.B -t
+Show a tree-like diagram containing all busses, bridges, devices and connections
+between them.
+.TP
+.B -B <bus>
+Show only devices on specified bus.
+.TP
+.B -S <slot>
+Show only devices in specified slot number.
+.TP
+.B -F <func>
+Show only specified function number of all devices (you can mix it with
+.B -B
+and
+.B -S
+to select single device).
+.TP
+.B -V <vendor>
+Show only devices having specified vendor ID.
+.TP
+.B -D <devid>
+Show only devices having specified device ID.
+.TP
+.B -i <file>
+Use
+.B
+<file>
+as PCI ID database instead of /etc/pci.ids.
+.TP
+.B -p <dir>
+Use
+.B <dir>
+as directory containing PCI bus information instead of /proc/bus/pci.
+
+.SH FILES
+.TP
+.B /etc/pci.ids
+A list of all known PCI ID's (vendors, devices, classes and subclasses).
+.TP
+.B /proc/bus/pci
+An interface to PCI bus configuration space provided by the kernel. Contains
+per-bus subdirectories with per-card config space files and a
+.I
+devices
+file containing a list of all PCI devices.
+
+.SH AUTHOR
+The Linux PCI Utilities are maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>.
