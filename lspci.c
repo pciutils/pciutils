@@ -1,6 +1,4 @@
 /*
- *	$Id: lspci.c,v 1.43 2002/12/26 20:24:50 mj Exp $
- *
  *	Linux PCI Utilities -- List All PCI Devices
  *
  *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>

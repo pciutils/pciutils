@@ -1,6 +1,4 @@
 /*
- *	$Id: access.c,v 1.10 2003/01/04 11:04:39 mj Exp $
- *
  *	The PCI Library -- User Access
  *
  *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>

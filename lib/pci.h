@@ -1,6 +1,4 @@
 /*
- *	$Id: pci.h,v 1.12 2003/01/04 11:04:39 mj Exp $
- *
  *	The PCI Library
  *
  *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>

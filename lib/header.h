@@ -1,6 +1,4 @@
 /*
- *	$Id: header.h,v 1.9 2002/12/26 20:24:50 mj Exp $
- *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
  *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>

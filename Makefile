@@ -1,4 +1,3 @@
-# $Id: Makefile,v 1.54 2003/01/04 12:53:01 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 

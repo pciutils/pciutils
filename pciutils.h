@@ -1,6 +1,4 @@
 /*
- *	$Id: pciutils.h,v 1.14 2002/03/30 15:39:24 mj Exp $
- *
  *	Linux PCI Utilities -- Declarations
  *
  *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>

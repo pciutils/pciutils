@@ -1,6 +1,4 @@
 /*
- *	$Id: generic.c,v 1.8 2002/12/27 19:01:51 mj Exp $
- *
  *	The PCI Library -- Generic Direct Access Functions
  *
  *	Copyright (c) 1997--2000 Martin Mares <mj@ucw.cz>

@@ -1,3 +1,9 @@
+2003-12-26  Martin Mares  <mj@ucw.cz>
+
+	* Removed CVS $Id$ tags from all files.
+
+	* Makefile: Added some more warnings.
+
 2003-11-29  Martin Mares  <mj@ucw.cz>
 
 	* Imported the pciutils sources to my Arch repository. Good-bye, CVS.

@@ -1,6 +1,4 @@
 /*
- *	$Id: common.c,v 1.2 2002/03/30 15:39:24 mj Exp $
- *
  *	Linux PCI Utilities -- Common Functions
  *
  *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>

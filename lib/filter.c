@@ -1,6 +1,4 @@
 /*
- *	$Id: filter.c,v 1.3 2002/03/30 15:39:25 mj Exp $
- *
  *	Linux PCI Library -- Device Filtering
  *
  *	Copyright (c) 1998--2002 Martin Mares <mj@ucw.cz>

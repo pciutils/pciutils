@@ -1,6 +1,4 @@
 /*
- *	$Id: names.c,v 1.9 2002/03/30 15:39:25 mj Exp $
- *
  *	The PCI Library -- ID to Name Translation
  *
  *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>

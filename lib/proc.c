@@ -1,6 +1,4 @@
 /*
- *	$Id: proc.c,v 1.10 2002/12/26 20:24:08 mj Exp $
- *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
  *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>

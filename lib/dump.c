@@ -1,6 +1,4 @@
 /*
- *	$Id: dump.c,v 1.2 2002/03/30 15:39:25 mj Exp $
- *
  *	The PCI Library -- Reading of Bus Dumps
  *
  *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
