@@ -1,5 +1,20 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test2.
+
+	* README, pciutils.lsm, pciutils.spec: Use @VERSION@ to make the
+	release scripts insert the current version. "make release" is gone.
+
+	* maint/release, maint/release.pm: Added a new system of scripts for
+	making releases including inter-version diffs etc.
+
+	* Makefile: Cleaned up.
+
+	* lib/fbsd-device.c: I patched another copy of this file by mistake,
+	this time the version checks should be right.
+
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
 	* Released as 2.1.99-test1.
 
 	* pciutils.h, common.c, lspci.man, setpci.man, lib/internal.h:

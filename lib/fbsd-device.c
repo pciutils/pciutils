@@ -2,21 +2,27 @@
  *	The PCI Library -- FreeBSD /dev/pci access
  *
  *	Copyright (c) 1999 Jari Kirma <kirma@cs.hut.fi>
+ *	Updated in 2003 by Samy Al Bahra <samy@kerneled.com>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
- */
-
-/*
- *      Read functionality of this driver is briefly tested, and seems
- *      to supply basic information correctly, but I promise no more.
  */
 
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <osreldate.h>
 
-#include <pci/pcivar.h>
-#include <pci/pci_ioctl.h>
+#if __FreeBSD_version < 500000
+#  include <pci/pcivar.h>
+#else
+#  include <dev/pci/pcivar.h>
+#endif
+
+#if __FreeBSD_version < 430000
+#  include <pci/pci_ioctl.h>
+#else
+#  include <sys/pciio.h>
+#endif
 
 #include "internal.h"
 

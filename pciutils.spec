@@ -1,5 +1,5 @@
 Name:		pciutils
-Version:	2.1.99-test1
+Version:	@VERSION@
 Release: 	1
 Source:		ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/%{name}-%{version}.tar.gz
 Copyright:	GNU GPL

@@ -4,7 +4,7 @@
 OPT=-O2 -fomit-frame-pointer
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.1.99-test1
+VERSION=2.1.99-test2
 DATE=2003-12-27
 
 PREFIX=/usr/local
@@ -53,6 +53,9 @@ update-pciids: update-pciids.sh
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
 	rm -f update-pciids lspci setpci lib/config.* *.8 pci.ids.*
+	rm -rf maint/dist
+
+distclean: clean
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
@@ -70,29 +73,4 @@ uninstall: all
 get-ids:
 	cp ~/tree/pciids/pci.ids pci.ids
 
-pci.ids:
-	@ [ -f pci.ids ] || echo >&2 "The pci.ids file is no longer part of the CVS. Please do run update-ids.sh to download them." && false
-
-release:
-	sed "s/^\\(Version:[ 	]*\\).*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new
-	sed "s/^\\(Version:[ 	]*\\).*/\\1$(VERSION)/" <pciutils.spec >pciutils.spec.new
-	sed "s/\\(, version \\).*\./\\1$(VERSION)./" <README >README.new
-	mv pciutils.lsm.new pciutils.lsm
-	mv pciutils.spec.new pciutils.spec
-	mv README.new README
-
-REL=pciutils-$(VERSION)
-DISTTMP=/tmp/pciutils-dist
-
-dist: clean pci.ids
-	rm -rf $(DISTTMP)
-	mkdir $(DISTTMP)
-	cp -a . $(DISTTMP)/$(REL)
-	rm -rf `find $(DISTTMP)/$(REL) -name .arch-ids -o -name "{arch}" -o -name CVS -o -name tmp -o -name maint`
-	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
-	rm -rf $(DISTTMP)
-
-upload: dist
-	maint/upload $(REL)
-
-.PHONY: all lib clean install uninstall dist man release upload get-ids
+.PHONY: all clean distclean install uninstall get-ids

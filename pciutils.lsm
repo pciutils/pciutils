@@ -1,14 +1,16 @@
 Begin3
 Title:          Linux PCI Utilities
-Version:        2.1.99-test1
-Entered-date:   031227
+Version:        @VERSION@
+Entered-date:   @LSMDATE@
 Description:    This package contains various utilities for inspecting and
 		setting of devices connected to the PCI bus.
 Keywords:       kernel, pci, lspci, setpci, libpci
 Author:         mj@ucw.cz (Martin Mares)
 Maintained-by:  mj@ucw.cz (Martin Mares)
-Primary-site:   atrey.karlin.mff.cuni.cz pub/linux/pci/pciutils-2.1.99-test1.tar.gz
-Alternate-site: ftp.kernel.org pub/software/utils/pciutils/pciutils-2.1.99-test1.tar.gz
-Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-2.1.99-test1.tar.gz
+Primary-site:   atrey.karlin.mff.cuni.cz pub/linux/pci/@ALPHADIR@pciutils-@VERSION@.tar.gz
+Alternate-site: ftp.kernel.org pub/software/utils/pciutils/@ALPHADIR@pciutils-@VERSION@.tar.gz
+#ifndef ALPHA_VERSION
+Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-@VERSION@.tar.gz
+#endif
 Copying-policy: GPL
 End
