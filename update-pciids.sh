@@ -41,6 +41,8 @@ fi
 
 if [ -f $DEST ] ; then
 	mv $DEST $DEST.old
+	# --reference is supported only by chmod from GNU file, so let's ignore any errors
+	chmod -f --reference=$DEST.old $DEST.neww 2>/dev/null || true
 fi
 mv $DEST.neww $DEST
 rm $DEST.new

@@ -1,5 +1,8 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* update-pciids.sh: Try to preserve permissions of the old file
+	if chmod supports --reference. Should close Debian Bug #223740.
+
 	* lib/proc.c (proc_setup): Increased path name length limit to 1024.
 	Thanks for Redhat and Mandrake for inspiration.
 
