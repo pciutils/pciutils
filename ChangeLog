@@ -1,3 +1,7 @@
+Tue Sep 14 09:31:01 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: New ID's. Again.
+
 Thu Aug  5 17:45:42 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_size): Don't show size if it's zero (usually

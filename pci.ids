@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.35 1999/08/20 08:32:23 mj Exp $
+#	$Id: pci.ids,v 1.36 1999/09/14 07:33:37 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -61,7 +61,7 @@
 	000f  53c875
 	0012  53c895a
 	008f  53c875J
-	0701  83C885 gigabit ethernet
+	0701  83C885
 	0702  Yellowfin G-NIC gigabit ethernet
 	0901  61C102
 	1000  63C815
@@ -367,6 +367,7 @@
 	1000  MGA G100 [Productiva]
 	1001  MGA G100 [Productiva] AGP
 	2007  MGA Mistral
+	4536  VIA Framegrabber
 102c  Chips and Technologies
 	00b8  64310
 	00c0  F69000 HiQVideo
@@ -965,11 +966,12 @@
 	0022  HIPPI source
 	10dc  ATT2C15-3 FPGA
 10dd  Evans & Sutherland
-10de  Nvidia Corporation
+10de  nVidia Corporation
 	0008  NV1 EDGE 3D
 	0009  NV1 EDGE 3D
 	0020  Riva TNT 128
 	0028  Riva TNT2
+	0029  Riva TNT2 Ultra
 	002c  Vanta
 	002d  Riva TNT2 Model 64
 	00a0  Riva TNT2
@@ -1056,6 +1058,7 @@
 	7002  SB Live!
 1103  Triones Technologies, Inc.
 	0003  HPT343
+	0004  HPT366
 1104  RasterOps Corp.
 1105  Sigma Designs, Inc.
 	8300  REALmagic Hollywood Plus DVD Decoder
@@ -2058,6 +2061,7 @@
 	7401  Four Port PCI RS-232 Interface
 	7402  Four Port PCI RS-422/485 Interface
 	7801  Eight Port PCI RS-232 Interface
+	8001  8001 Digital I/O Adapter
 1360  Meinberg Funkuhren
 1361  Soliton Systems K.K.
 1362  Fujifacom Corporation
@@ -2211,7 +2215,9 @@
 13f4  Troika Design Inc
 13f5  Kansai Electric Co. Ltd
 13f6  C-Media Electronics Inc
-	0100  CMI8338
+	0100  CM8338A
+	0101  CM8338B
+	0111  CM8738
 13f7  Wildfire Communications
 13f8  Ad Lib Multimedia Inc
 13f9  NTT Advanced Technology Corp.
@@ -2735,6 +2741,7 @@
 	04d0  82437FX [Triton FX]
 	0960  80960RP [i960 RP Microprocessor/Bridge]
 	1000  82542 Gigabit Ethernet Adapter
+	1209  82559ER
 	1221  82092AA_0
 	1222  82092AA_1
 	1223  SAA7116
