@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.4 1999/07/07 11:23:10 mj Exp $
+ *	$Id: header.h,v 1.5 2000/01/20 21:15:46 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -229,8 +229,8 @@
 #define  PCI_AGP_COMMAND_64BIT	0x0020 	/* Allow processing of 64-bit addresses */
 #define  PCI_AGP_COMMAND_FW	0x0010 	/* Force FW transfers */
 #define  PCI_AGP_COMMAND_RATE4	0x0004	/* Use 4x rate */
-#define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 4x rate */
-#define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 4x rate */
+#define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 2x rate */
+#define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 1x rate */
 #define PCI_AGP_SIZEOF		12
 
 /* Slot Identification */

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.32 2000/01/13 22:50:13 mj Exp $
+ *	$Id: lspci.c,v 1.33 2000/01/20 21:15:41 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -388,9 +388,30 @@ show_pm(struct device *d, int where, int cap)
 }
 
 static void
+format_agp_rate(int rate, char *buf)
+{
+  char *c = buf;
+  int i;
+
+  for(i=0; i<2; i++)
+    if (rate & (1 << i))
+      {
+	if (c != buf)
+	  *c++ = ',';
+	*c++ = 'x';
+	*c++ = '0' + (4 >> i);
+      }
+  if (c != buf)
+    *c = 0;
+  else
+    strcpy(buf, "<none>");
+}
+
+static void
 show_agp(struct device *d, int where, int cap)
 {
   u32 t;
+  char rate[8];
 
   t = cap & 0xff;
   printf("AGP version %x.%x\n", cap/16, cap%16);
@@ -398,24 +419,22 @@ show_agp(struct device *d, int where, int cap)
     return;
   config_fetch(d, where + PCI_AGP_STATUS, PCI_AGP_SIZEOF - PCI_AGP_STATUS);
   t = get_conf_long(d, where + PCI_AGP_STATUS);
-  printf("\t\tStatus: RQ=%d SBA%c 64bit%c FW%c Rate=%s%s%s\n",
+  format_agp_rate(t & 7, rate);
+  printf("\t\tStatus: RQ=%d SBA%c 64bit%c FW%c Rate=%s\n",
 	 (t & PCI_AGP_STATUS_RQ_MASK) >> 24U,
 	 FLAG(t, PCI_AGP_STATUS_SBA),
 	 FLAG(t, PCI_AGP_STATUS_64BIT),
 	 FLAG(t, PCI_AGP_STATUS_FW),
-	 (t & PCI_AGP_STATUS_RATE4) ? "4" : "",
-	 (t & PCI_AGP_STATUS_RATE2) ? "2" : "",
-	 (t & PCI_AGP_STATUS_RATE1) ? "1" : "");
+	 rate);
   t = get_conf_long(d, where + PCI_AGP_COMMAND);
-  printf("\t\tCommand: RQ=%d SBA%c AGP%c 64bit%c FW%c Rate=%s%s%s\n",
+  format_agp_rate(t & 7, rate);
+  printf("\t\tCommand: RQ=%d SBA%c AGP%c 64bit%c FW%c Rate=%s\n",
 	 (t & PCI_AGP_COMMAND_RQ_MASK) >> 24U,
 	 FLAG(t, PCI_AGP_COMMAND_SBA),
 	 FLAG(t, PCI_AGP_COMMAND_AGP),
 	 FLAG(t, PCI_AGP_COMMAND_64BIT),
 	 FLAG(t, PCI_AGP_COMMAND_FW),
-	 (t & PCI_AGP_COMMAND_RATE4) ? "4" : "",
-	 (t & PCI_AGP_COMMAND_RATE2) ? "2" : "",
-	 (t & PCI_AGP_COMMAND_RATE1) ? "1" : "");
+	 rate);
 }
 
 static void
@@ -644,7 +663,7 @@ show_htype2(struct device *d)
       u32 base = get_conf_long(d, PCI_CB_MEMORY_BASE_0 + p);
       u32 limit = get_conf_long(d, PCI_CB_MEMORY_LIMIT_0 + p);
       if (limit > base || verb)
-	printf("Memory window %d: %08x-%08x%s%s\n", i, base, limit,
+	printf("\tMemory window %d: %08x-%08x%s%s\n", i, base, limit,
 	       (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]",
 	       (brc & (PCI_CB_BRIDGE_CTL_PREFETCH_MEM0 << i)) ? " (prefetchable)" : "");
     }

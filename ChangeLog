@@ -1,5 +1,11 @@
 Thu Jan 20 11:08:32 2000  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lib/proc.c: pread/pwrite fixed again, this time on libc5 :(
+
+	* lspci.c (format_agp_rate): Better formatting of AGP rates.
+
+	* pci.ids: New ID's.
+
 	* lib/configure: Added configuration for ia64 (the same as for Alpha).
 	Patch from Stephane Eranian <eranian@cello.hpl.hp.com>.
 
