@@ -1,9 +1,9 @@
 /*
- *	$Id: names.c,v 1.8 2002/03/30 15:13:06 mj Exp $
+ *	$Id: names.c,v 1.9 2002/03/30 15:39:25 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2002 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */

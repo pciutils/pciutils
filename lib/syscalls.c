@@ -1,9 +1,9 @@
 /*
- *	$Id: syscalls.c,v 1.1 1999/01/22 21:05:42 mj Exp $
+ *	$Id: syscalls.c,v 1.2 2002/03/30 15:39:25 mj Exp $
  *
  *	The PCI Library -- Configuration Access via Syscalls
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */

@@ -1,9 +1,9 @@
 /*
- *	$Id: i386-ports.c,v 1.2 2000/01/24 15:36:09 mj Exp $
+ *	$Id: i386-ports.c,v 1.3 2002/03/30 15:39:25 mj Exp $
  *
  *	The PCI Library -- Direct Configuration access via i386 Ports
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */

@@ -1,9 +1,9 @@
 /*
- *	$Id: internal.h,v 1.5 2000/04/29 12:56:23 mj Exp $
+ *	$Id: internal.h,v 1.6 2002/03/30 15:39:25 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
- *	Copyright (c) 1997--2000 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2000 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */

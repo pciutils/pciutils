@@ -1,6 +1,6 @@
-# $Id: Makefile,v 1.4 2000/04/21 11:58:00 mj Exp $
+# $Id: Makefile,v 1.5 2002/03/30 15:39:25 mj Exp $
 # Makefile for The PCI Library
-# (c) 1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+# (c) 1999 Martin Mares <mj@ucw.cz>
 
 include config.mk
 

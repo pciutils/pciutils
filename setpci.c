@@ -1,9 +1,9 @@
 /*
- *	$Id: setpci.c,v 1.11 2000/02/14 19:29:58 mj Exp $
+ *	$Id: setpci.c,v 1.12 2002/03/30 15:39:24 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1998 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
