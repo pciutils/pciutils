@@ -1,3 +1,11 @@
+Sat Dec  4 13:11:03 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Several new ID's.
+
+	* setpci.c (exec_op): Don't forget to increment address after writing
+	single value, so that `30.b=12,34,56,78' works as expected. Reported
+	by Petr Soucek <petr@ryston.cz>.
+
 Wed Nov  3 10:24:38 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_terse): If prog-if is zero, but it's present in the

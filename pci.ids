@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.42 1999/11/29 12:35:29 mj Exp $
+#	$Id: pci.ids,v 1.43 1999/12/04 12:32:55 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -221,6 +221,7 @@
 		1113 1207  EN-1207-TX Fast Ethernet
 		1109 2400  ANA-6944A/TX Fast Ethernet
 		1186 1100  DFE-500TX Fast Ethernet
+		1186 1112  DFE-570TX Fast Ethernet
 		1282 9100  AEF-380TXD Fast Ethernet
 		2646 0001  KNE100TX Fast Ethernet
 	000a  21230 Video Codec
@@ -674,6 +675,7 @@
 	fe00  FireWire Host Controller
 	fe03  12C01A FireWire Host Controller
 104d  Sony Corporation
+	8039  CXD3222 iLINK Controller
 104e  Oak Technology, Inc
 	0017  OTI-64017
 	0107  OTI-107 [Spitfire]
@@ -1239,6 +1241,8 @@
 	1683  IGA-1683
 	2000  CyberPro 2000
 	2010  CyberPro 2000A
+	5000  CyberPro 5000
+	5050  CyberPro 5050
 10eb  Artists Graphics
 	0101  3GA
 	8111  Twist3 Frame Grabber
@@ -1486,7 +1490,7 @@
 112e  Infomedia Microelectronics Inc.
 112f  Imaging Technology Inc
 	0000  MVC IC-PCI
-	0001  Video frame grabber/processor
+	0001  MVC IM-PCI Video frame grabber/processor
 1130  Computervision
 1131  Philips Semiconductors
 	7145  SAA7145
@@ -2275,6 +2279,7 @@
 12b8  Korg
 12b9  US Robotics/3Com
 	1006  WinModem
+	1008  56K FaxModem Model 5610
 12ba  PMC Sierra
 12bb  Nippon Unisoft Corporation
 12bc  Array Microsystems
@@ -2290,6 +2295,7 @@
 12c4  Connect Tech Inc
 12c5  Picture Elements Incorporated
 	0081  PCIVST [Grayscale Thresholding Engine]
+	0086  THR2 Thresholder
 12c6  Mitani Corporation
 12c7  Dialogic Corp
 12c8  G Force Co, Ltd
@@ -2440,22 +2446,40 @@
 131d  Sysmic, Inc.
 131e  Xinex Networks Inc
 131f  Siig Inc
+	1000  CyberSerial (1-port) 16550
+	1001  CyberSerial (1-port) 16650
+	1002  CyberSerial (1-port) 16850
 	1010  Duet 1S(16550)+1P
 	1011  Duet 1S(16650)+1P
 	1012  Duet 1S(16850)+1P
 	1020  CyberParallel (1-port)
 	1021  CyberParallel (2-port)
+	1030  CyberSerial (2-port) 16550
+	1031  CyberSerial (2-port) 16650
+	1032  CyberSerial (2-port) 16850
 	1034  Trio 2S(16550)+1P
 	1035  Trio 2S(16650)+1P
 	1036  Trio 2S(16850)+1P
+	1050  CyberSerial (4-port) 16550
+	1051  CyberSerial (4-port) 16650
+	1052  CyberSerial (4-port) 16850
+	2000  CyberSerial (1-port) 16550
+	2001  CyberSerial (1-port) 16650
+	2002  CyberSerial (1-port) 16850
 	2010  Duet 1S(16550)+1P
 	2011  Duet 1S(16650)+1P
 	2012  Duet 1S(16850)+1P
 	2020  CyberParallel (1-port)
 	2021  CyberParallel (2-port)
+	2030  CyberSerial (2-port) 16550
+	2031  CyberSerial (2-port) 16650
+	2032  CyberSerial (2-port) 16850
 	2040  Trio 1S(16550)+2P
 	2041  Trio 1S(16650)+2P
 	2042  Trio 1S(16850)+2P
+	2050  CyberSerial (4-port) 16550
+	2051  CyberSerial (4-port) 16650
+	2052  CyberSerial (4-port) 16850
 	2060  Trio 2S(16550)+1P
 	2061  Trio 2S(16650)+1P
 	2062  Trio 2S(16850)+1P
@@ -2711,6 +2735,7 @@
 1410  Midas lab Inc
 1411  Ikos Systems Inc
 1412  IC Ensemble Inc
+	1712  ICE1712 [Envy24]
 1413  Addonics
 1414  Microsoft Corporation
 1415  Oxford Semiconductor Ltd
@@ -2975,7 +3000,10 @@
 1517  ECHOTEK Corp
 1518  PEP MODULAR Computers GmbH
 1519  TELEFON AKTIEBOLAGET LM Ericsson
-151a  GLOBETEK Inc
+151a  Globetek
+	1002  PCI-1002
+	1004  PCI-1004
+	1008  PCI-1008
 151b  COMBOX Ltd
 151c  DIGITAL AUDIO LABS Inc
 151d  Fujitsu Computer Products Of America

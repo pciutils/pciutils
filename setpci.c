@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.9 1999/01/22 21:05:02 mj Exp $
+ *	$Id: setpci.c,v 1.10 1999/12/04 12:32:57 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -56,10 +56,11 @@ exec_op(struct op *op, struct pci_dev *dev)
   char *mm[] = { NULL, "%02x", "%04x", NULL, "%08x" };
   char *m = mm[op->width];
   unsigned int x;
-  int i;
+  int i, addr;
 
   if (verbose)
     printf("%02x:%02x.%x:%02x", dev->bus, dev->dev, dev->func, op->addr);
+  addr = op->addr;
   if (op->num_values >= 0)
     for(i=0; i<op->num_values; i++)
       {
@@ -73,15 +74,16 @@ exec_op(struct op *op, struct pci_dev *dev)
 	switch (op->width)
 	  {
 	  case 1:
-	    pci_write_byte(dev, op->addr, op->values[i]);
+	    pci_write_byte(dev, addr, op->values[i]);
 	    break;
 	  case 2:
-	    pci_write_word(dev, op->addr, op->values[i]);
+	    pci_write_word(dev, addr, op->values[i]);
 	    break;
 	  default:
-	    pci_write_long(dev, op->addr, op->values[i]);
+	    pci_write_long(dev, addr, op->values[i]);
 	    break;
 	  }
+	addr += op->width;
       }
   else
     {
@@ -92,13 +94,13 @@ exec_op(struct op *op, struct pci_dev *dev)
 	  switch (op->width)
 	    {
 	    case 1:
-	      x = pci_read_byte(dev, op->addr);
+	      x = pci_read_byte(dev, addr);
 	      break;
 	    case 2:
-	      x = pci_read_word(dev, op->addr);
+	      x = pci_read_word(dev, addr);
 	      break;
 	    default:
-	      x = pci_read_long(dev, op->addr);
+	      x = pci_read_long(dev, addr);
 	      break;
 	    }
 	  printf(m, x);
