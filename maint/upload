@@ -1,0 +1,17 @@
+#!/bin/sh
+rel=$1.tar.gz
+rf=/tmp/$rel
+echo "Uploading $rel"
+echo "atrey"
+scp $rf README pciutils.lsm atrey:~ftp/pub/linux/pci
+echo "kernel.org"
+scp $rf README pciutils.lsm master.kernel.org:~ftp/pub/software/utils/pciutils/
+echo "metalab"
+ftp -v metalab.unc.edu <<EOF
+cd incoming/Linux
+put $rf $rel
+put pciutils.lsm
+quit
+EOF
+echo "jabberwock"
+scp -C pci.ids pciids@jabberwock.ucw.cz:origs/05-$1
