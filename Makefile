@@ -4,8 +4,8 @@
 OPT=-O2 -fomit-frame-pointer
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.1.99-test6
-DATE=2004-06-27
+VERSION=2.1.99-test7
+DATE=2004-07-05
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
