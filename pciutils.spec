@@ -12,19 +12,14 @@ Group: 		Utilities/System
 %description
 This package contains various utilities for inspecting and
 setting of devices connected to the PCI bus. Requires kernel
-version 2.1.82 or newer (supporting the /proc/bus/pci interface).
 
 %description -l pl
 Pakiet zawiera narzêdzia do ustawiania i odczytywania informacji
 o urz±dzeniach pod³±czonych do szyny PCI w Twoim komputerze.
-Wymaga kernela 2.1.82 lub nowszego (udostêpniaj±cego odpowiednie
-informacje poprzez /proc/bus/pci).
 
 %description -l de
 Dieses Paket enthält verschiedene Programme zum Anzeigen und
-Einstellen von PCI-Bus Erweiterungen.  Benötigt wird ein Kernel
-Version 2.1.82 oder neuer (mit Unterstützung für die /proc/bus/pci
-Schnittstelle).
+Einstellen von PCI-Bus Erweiterungen.
 
 %prep
 %setup -q
