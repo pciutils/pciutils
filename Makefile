@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 1999/01/22 21:04:46 mj Exp $
+# $Id: Makefile,v 1.11 1999/01/24 21:48:11 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -34,7 +34,7 @@ common.o: common.c pciutils.h lib/libpci.a
 
 clean:
 	rm -f `find . -name "*~" -or -name "*.[oa]" -or -name "\#*\#" -or -name TAGS -or -name core`
-	rm -f lspci setpci lib/config.* lib/header.h *.8
+	rm -f lspci setpci lib/config.* *.8
 
 install: all
 	install -o root -g root -m 755 -s lspci setpci $(ROOT)/sbin
@@ -44,8 +44,8 @@ install: all
 	rm -f $(ROOT)/etc/pci.ids
 
 dist: clean
-	cp /usr/src/linux/include/linux/pci.h lib/header.h
+#	cp /usr/src/linux/include/linux/pci.h lib/header.h
 	sh -c 'X=`pwd` ; X=`basename $$X` ; cd .. ; tar czvvf /tmp/$$X.tar.gz $$X --exclude CVS --exclude tmp'
-	rm -f lib/header.h
+#	rm -f lib/header.h
 
 .PHONY: all lib clean install dist man

@@ -1,5 +1,10 @@
 Sun Jan 24 22:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lib/header.h: Until kernel adopts new layout of PCI
+	includes (i.e., separate declaration of header structure,
+	functions and device IDs), which is not going to happen
+	before 2.3, we'll use our own definiton of the header.
+
 	* lspci.c (show_verbose): Display `Cap' flag in device status.
 
 	* lspci.c (show_htype0): Display capability lists whereever
