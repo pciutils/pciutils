@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.49 2000/01/20 21:24:51 mj Exp $
+#	$Id: pci.ids,v 1.50 2000/01/23 05:57:06 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -953,8 +953,9 @@
 	0640  PCI0640
 	0643  PCI0643
 	0646  PCI0646
-	0650  PBC0650A
 	0647  PCI0647
+	0648  PCI0648
+	0650  PBC0650A
 	0670  USB0670
 	0673  USB0673
 1096  Alacron

@@ -1,3 +1,9 @@
+Sun Jan 23 10:52:34 2000  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Synced with Linux 2.3.40.
+
+	* Released as version 2.1.4.
+
 Thu Jan 20 11:08:32 2000  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (scan_device): Fixed bug in reading of cardbus extensions.
