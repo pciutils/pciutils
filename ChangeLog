@@ -1,3 +1,7 @@
+2004-05-29  Martin Mares  <mj@ucw.cz>
+
+	* Makefile, lib/configure: Cross-compilation support, patch by Maciej.
+
 2004-05-28  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test4.

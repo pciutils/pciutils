@@ -22,7 +22,12 @@ then
 else
 	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
 fi
-echo " $sys/$cpu $rel"
+host=${3:-$cpu-$sys}
+host=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)$/\1--\2/' | tr 'A-Z' 'a-z'`
+cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+rel=${4:-$rel}
+echo " $host $rel"
 
 c=config.h
 echo >$c "#define ARCH_`echo $cpu | tr 'a-z' 'A-Z'`"
@@ -31,7 +36,7 @@ echo >>$c "#define OS_`echo $sys | tr 'a-z' 'A-Z'`"
 echo_n "Looking for access methods..."
 
 case $sys in
-	Linux)
+	linux*)
 		case $rel in
 			2.[1-9]*|[3-9]*)	echo_n "sysfs proc"
 						echo >>$c '#define HAVE_PM_LINUX_SYSFS'
@@ -52,7 +57,7 @@ case $sys in
 						;;
 		esac
 		;;
-	SunOS)
+	sunos)
 		case $cpu in
 				i386)		echo_n " i386-ports"
 						echo >>$c "#define HAVE_PM_INTEL_CONF"
@@ -65,24 +70,24 @@ case $sys in
 		esac
 		;;
 		
-	FreeBSD)
+	freebsd)
 		echo_n " fbsd-device"
 		echo >>$c '#define HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PATH_FBSD_DEVICE "/dev/pci"'
 		ok=1
 		;;
-	AIX)
+	aix)
 		echo_n " aix-device"
 		echo >>$c '#define HAVE_PM_AIX_DEVICE'
 		ok=1
 		;;
-	NetBSD)
+	netbsd)
 		echo_n " nbsd-libpci"
 		echo >>$c '#define HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PATH_NBSD_DEVICE "/dev/pci0"'
 		ok=1
 		;;
-    	GNU)
+    	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define HAVE_PM_INTEL_CONF'
 		ok=1

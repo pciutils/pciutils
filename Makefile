@@ -27,6 +27,9 @@ DIRINSTALL=mkdir -p
 endif
 endif
 
+HOST=
+RELEASE=
+
 export
 
 all: $(PCILIB) lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 pci.ids
@@ -37,7 +40,7 @@ $(PCILIB): $(PCIINC) force
 force:
 
 lib/config.h:
-	cd lib && ./configure $(SHAREDIR) $(VERSION)
+	cd lib && ./configure $(SHAREDIR) $(VERSION) $(HOST) $(RELEASE)
 
 lspci: lspci.o common.o $(PCILIB)
 setpci: setpci.o common.o $(PCILIB)

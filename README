@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -15,7 +15,6 @@ Some more things I intend to merge before the 2.2.0 release:
 
    o  pcimodules and possibly other Linux module related stuff
    o  New ID's from the pciids project
-   o  Cross-compilation support
 
 ############################################################################
 
