@@ -4,26 +4,35 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.8 1998/05/13 21:03:20 ecd Exp $
+#	$Id: pci.ids,v 1.9 1998/05/28 12:05:27 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
 
-003d  Lockheed Martin
+0000  Gammagraphx, Inc.
+001a  Ascend Communications, Inc.
+003d  Lockheed Martin-Marietta Corp
 0e11  Compaq Computer Corporation
-	3032  QVision 1280P
-	3033  QVision 1280/p
-	3034  QVision2
-	4000  4000 [TriFlex]
+	3032  QVision 1280/p Rev 0
+	3033  QVision 1280/p Rev 1
+	3034  QVision 1280/p Rev 2
+	4000  4000 [Triflex]
 	ae10  Smart-2/P RAID Controller
+	ae29  MIS-L
+	ae2a  MPC
+	ae2b  MIS-E
 	ae32  Netelligent 10/100
 	ae34  Netelligent 10
 	ae35  Integrated NetFlex-3/P
 	ae40  Netelligent 10/100 Dual
 	ae43  ProLiant Integrated Netelligent 10/100
+	ae69  CETUS-L
+	ae6c  DRACO
+	ae6c  Northstar
 	b011  Integrated Netelligent 10/100
-	f130  NetFlex-3/P TLAN 1.0
-	f150  NetFlex-3/P TLAN 2.3
+	b012  Netelligent 10 T/2
+	f130  NetFlex-3/P ThunderLAN 1.0
+	f150  NetFlex-3/P ThunderLAN 2.3
 1000  Symbios Logic Inc. (formerly NCR)
 	0001  53c810
 	0002  53c820
@@ -36,9 +45,11 @@
 	000d  53c885
 	000f  53c875
 	008f  53c875J
+	0901  61C102
+	1000  63C815
 1002  ATI Technologies Inc
 	4158  68800AX [Mach32]
-	4354  215CT222 [Mach64 CT]
+	4354  215CT [Mach64 CT]
 	4358  210888CX [Mach64 CX]
 	4554  210888ET [Mach64 ET]
 	4742  215GB [Mach64 GB]
@@ -47,22 +58,27 @@
 	4750  215GP [Mach64 GP]
 	4751  215GQ [Mach64 GQ]
 	4754  215GT [Mach64 GT]
-	4755  215GTB [Mach64 GT]
+	4755  215GTB [Mach64 GTB]
+	4756  215IIC [Mach64 GT IIC]
 	4758  210888GX [Mach64 GX]
 	4c47  215LG [Mach64 LG]
 	4c54  264LT [Mach64 LT]
 	5654  264VT [Mach64 VT]
+	5655  264VTB [Mach64 VTB]
+	5656  264VT4 [Mach64 VT4]
 1003  ULSI Systems
 	0201  US201
 1004  VLSI Technology Inc
 	0005  82C592-FC1
 	0006  82C593-FC1
 	0007  82C594-AFC2
-	0008  82C597-AFC2
+	0008  82C596/7 [Wildcat]
+	0009  82C597-AFC2
 	000c  82C541 [Lynx]
 	000d  82C543 [Lynx]
 	0101  82C532
 	0102  82C534
+	0103  82C538
 	0104  82C535
 	0105  82C147
 	0200  82C975
@@ -70,6 +86,8 @@
 	0702  VAS96011 [Golden Gate II]
 1005  Avance Logic, Inc.
 	2301  ALG2301
+	2302  ALG2302
+	2364  ALG2364
 1006  Reply Group
 1007  NetFrame Systems Inc
 1008  Epson
@@ -202,8 +220,9 @@
 102f  Toshiba America
 1030  TMC Research
 1031  Miro Computer Products AG
-	5601  ZR36050
+	5601  DC20 ASIC
 1033  NEC Corporation
+	0035  USB
 	0046  PowerVR PCX2 [midas]
 1034  Framatome Connectors USA Inc.
 1035  Comp. & Comm. Research Lab
@@ -263,7 +282,7 @@
 	d568  82C825 [Firebridge 2]
 1046  IPC Corporation, Ltd.
 1047  Genoa Systems Corp
-1048  Elsa GmbH
+1048  Elsa AG
 1049  Fountain Technologies, Inc.
 104a  SGS Thomson Microelectronics
 	0008  STG 2000X
@@ -283,6 +302,7 @@
 	ac13  PCI1031
 	ac15  PCI1131
 	ac16  PCI-1250
+	ac17  PCI-1220
 104d  Sony Corporation
 104e  Oak Technology, Inc
 	0107  OTI107
@@ -438,6 +458,7 @@
 109e  Brooktree Corporation
 	0350  Bt848
 	0351  Bt849A
+	8472  Bt8472
 	8474  Bt8474
 109f  Trigem Computer Inc.
 10a0  Meidensha Corporation
@@ -486,9 +507,9 @@
 	5952  3c595 100Base-MII [Vortex]
 	9000  3c900 10BaseT [Boomerang]
 	9001  3c900 Combo [Boomerang]
-	9050  3c905 100BaseTX
+	9050  3c905 100BaseTX [Boomerang]
 	9051  3c905 100BaseT4
-	9055  3c905B 100BaseTX
+	9055  3c905B 100BaseTX [Cyclone]
 10b8  Standard Microsystems
 	0005  9432 TX
 	1000  37c665
@@ -585,7 +606,7 @@
 	690c  690c
 	dc29  DC290
 10e2  Aptix Corporation
-10e3  Tundra Semiconductor
+10e3  Tundra Semiconductor Corp.
 	0000  CA91C042 [Universe]
 	0860  CA91C860 [QSpan]
 10e4  Tandem Computers
@@ -738,9 +759,14 @@
 	0000  MVC IC-PCI
 1130  Computervision
 1131  Philips Semiconductors
+	7145  SAA7145
 	7146  SAA7146
 1132  Mitel Corp.
 1133  Eicon Technology Corporation
+	e001  DIVA20PRO
+	e002  DIVA20
+	e003  DIVA20PRO_U
+	e004  DIVA20_U
 1134  Mercury Computer Systems
 1135  Fuji Xerox Co Ltd
 1136  Momentum Data Systems
@@ -756,7 +782,7 @@
 	0912  PCI-912 [i960CF-based Intelligent I/O Controller]
 	0913  PCI-913
 113d  Leading Edge Products Inc
-113e  Sanyo Electric Co
+113e  Sanyo Electric Co - Computer Engineering Dept
 113f  Equinox Systems, Inc.
 1140  Intervoice Inc
 1141  Crest Microsystem Inc
@@ -1022,7 +1048,9 @@
 1214  Performance Technologies, Inc.
 1215  Interware Co., Ltd
 1216  Purup Prepress A/S
-1217  02 Micro, Inc.
+1217  O2 Micro, Inc.
+	6729  6729
+	673a  6730
 	6832  6832
 1218  Hybricon Corp.
 1219  First Virtual Corporation
@@ -1070,14 +1098,14 @@
 1240  Marathon Technologies Corp.
 1241  DSC Communications
 1243  Delphax
-1244  AVM Audiovisuelles MKTG & Computer GmbH
+1244  AVM Audiovisuelles MKTG & Computer System GmbH
 1245  A.P.D., S.A.
 1246  Dipix Technologies, Inc.
 1247  Xylon Research, Inc.
 1248  Central Data Corporation
 1249  Samsung Electronics Co., Ltd.
 124a  AEG Electrocom GmbH
-124b  Greenspring Computers Inc.
+124b  SBS/Greenspring Modular I/O
 124c  Solitron Technologies, Inc.
 124d  Stallion Technologies, Inc.
 	0000  EasyConnection 8/32 - PCI
@@ -1086,6 +1114,7 @@
 124e  Cylink
 124f  Infotrend Technology, Inc.
 1250  Hitachi Microcomputer System Ltd
+1251  VLSI Solutions Oy
 1253  Guzik Technical Enterprises
 1254  Linear Systems Ltd.
 1255  Optibase Ltd
@@ -1105,6 +1134,7 @@
 125e  Specialvideo Engineering SRL
 125f  Concurrent Technologies, Inc.
 1260  Harris Semiconductor
+1261  Matsushita-Kotobuki Electronics Industries, Ltd.
 1262  ES Computer Company, Ltd.
 1263  Sonic Solutions
 1264  Aval Nagasaki Corporation
@@ -1125,6 +1155,7 @@
 1271  GW Instruments
 1272  Telematics International
 1273  Hughes Network Systems
+	0002  DirecPC
 1274  Ensoniq
 	5000  AudioPCI
 1275  Network Appliance Corporation
@@ -1156,6 +1187,7 @@
 128f  Tateno Dennou, Inc.
 1290  Sord Computer Corporation
 1291  NCS Computer Italia
+1292  Tritech Microelectronics Inc
 1293  Media Reality Technology
 1294  Rhetorex, Inc.
 1295  Imagenation Corporation
@@ -1191,14 +1223,14 @@
 12b4  FutureTel Inc
 12b5  Granite Systems Inc.
 12b6  Natural Microsystems
-12b7  Acumen
+12b7  Cognex Modular Vision Systems Div. - Acumen Inc.
 12b8  Korg
 12b9  US Robotics
 12ba  PMC Sierra
 12bb  Nippon Unisoft Corporation
 12bc  Array Microsystems
 12bd  Computerm Corp.
-12be  Anchor Chips
+12be  Anchor Chips Inc.
 12bf  Fujifilm Microdevices
 12c0  Infimed
 12c1  GMM Research Corp
@@ -1228,7 +1260,7 @@
 12d7  Biotronic SRL
 12d8  Pericom Semiconductor
 12d9  Aculab PLC
-12da  True Time
+12da  True Time Inc.
 12db  Annapolis Micro Systems, Inc
 12dc  Symicron Computer Communication Ltd.
 12dd  Management Graphics
@@ -1239,7 +1271,7 @@
 12e2  Datum Inc. Bancomm-Timing Division
 12e3  Imation Corp - Medical Imaging Systems
 12e4  Brooktrout Technology Inc
-12e5  Apex Inc
+12e5  Apex Semiconductor Inc
 12e6  Cirel Systems
 12e7  Sunsgroup Corporation
 12e8  Crisc Corp
@@ -1258,11 +1290,315 @@
 12f5  Forks
 12f6  Dawson France
 12f7  Cognex
-1307  ComputerBoards
+12f8  Electronic Design GmbH
+12f9  Four Fold Ltd
+12fb  Spectrum Signal Processing
+12fc  Capital Equipment Corp
+12fd  I2S
+12fe  ESD Electronic System Design GmbH
+12ff  Lexicon
+1300  Harman International Industries Inc
+1302  Computer Sciences Corp
+1303  Innovative Integration
+1304  Juniper Networks
+1305  Netphone, Inc
+1306  Duet Technologies
+1307  Computer Boards
 	0001  DAS1602/16
+1308  Jato Technologies Inc.
+1309  AB Semiconductor Ltd
+130a  Mitsubishi Electric Microcomputer
+130b  Colorgraphic Communications Corp
+130c  Ambex Technologies, Inc
+130d  Accelerix Inc
+130e  Yamatake-Honeywell Co. Ltd
+130f  Advanet Inc
+1310  Gespac
+1311  Videoserver, Inc
+1312  Acuity Imaging, Inc
+1313  Yaskawa Electric Co.
+1316  Teradyne Inc
+1317  Bridgecom, Inc
+1318  Packet Engines Inc.
+1319  Fortemedia, Inc
+131a  Finisar Corp.
+131c  Nippon Electro-Sensory Devices Corp
+131d  Sysmic, Inc.
+131e  Xinex Networks Inc
+131f  Siig Inc
+1320  Crypto AG
+1321  Arcobel Graphics BV
+1322  MTT Co., Ltd
+1323  Dome Inc
+1324  Sphere Communications
+1325  Salix Technologies, Inc
+1326  Seachange international
+1327  Voss scientific
+1328  quadrant international
+1329  Productivity Enhancement
+132a  Microcom Inc.
+132b  Broadband Technologies
+132c  Micrel Inc
+132d  Integrated Silicon Solution, Inc.
+1330  MMC Networks
+1331  Radisys Corp.
+1332  Micro Memory
+1334  Redcreek Communications, Inc
+1335  Videomail, Inc
+1337  Third Planet Publishing
+1338  BT Electronics
+133a  Vtel Corp
+133b  Softcom Microsystems
+133c  Holontech Corp
+133d  SS Technologies
+133e  Virtual Computer Corp
+133f  SCM Microsystems
+1340  Atalla Corp
+1341  Kyoto Microcomputer Co
+1342  Promax Systems Inc
+1343  Phylon Communications Inc
+1344  Crucial Technology
+1345  Arescom Inc
+1347  Odetics
+1349  Sumitomo Electric Industries, Ltd.
+134a  DTC Technology Corp.
+134b  ARK Research Corp.
+134c  Chori Joho System Co. Ltd
+134d  PCTel Inc
+134e  CSTI
+134f  Algo System Co Ltd
+1350  Systec Co. Ltd
+1351  Sonix Inc
+1353  Dassault A.T.
+1354  Dwave System Inc
+1355  Kratos Analytical Ltd
+1356  The Logical Co
+1359  Prisa Networks
+135a  Brain Boxes
+135b  Giganet Inc
+135c  Quatech Inc
+135d  ABB Network Partner AB
+135e  Sealevel Systems Inc
+135f  I-Data International A-S
+1360  Meinberg Funkuhren
+1361  Soliton Systems K.K.
+1362  Fujifacom Corporation
+1363  Phoenix Technology Ltd
+1364  ATM Communications Inc
+1365  Hypercope GmbH
+1366  Teijin Seiki Co. Ltd
+1367  Hitachi Zosen Corporation
+1368  Skyware Corporation
+1369  Digigram
+136a  High Soft Tech
+136b  Kawasaki Steel Corporation
+136c  Adtek System Science Co Ltd
+136d  Gigalabs Inc
+136f  Applied Magic Inc
+1370  ATL Products
+1371  CNet Technology Inc
+1373  Silicon Vision Inc
+1374  Silicom Ltd
+1375  Argosystems Inc
+1376  LMC
+1377  Electronic Equipment Production & Distribution GmbH
+1378  Telemann Co. Ltd
+1379  Asahi Kasei Microsystems Co Ltd
+137a  Mark of the Unicorn Inc
+137b  PPT Vision
+137c  Iwatsu Electric Co Ltd
+137d  Dynachip Corporation
+137e  Patriot Scientific Corporation
+137f  Japan Satellite Systems Inc
+1380  Sanritz Automation Co Ltd
+1381  Brains Co. Ltd
+1382  Marian - Electronic & Software
+1383  Controlnet Inc
+1384  Reality Simulation Systems Inc
+1385  Netgear
+1386  Video Domain Technologies
+1387  Systran Corp
+1388  Hitachi Information Technology Co Ltd
+1389  Applicom International
+138a  Fusion Micromedia Corp
+138b  Tokimec Inc
+138c  Silicon Reality
+138d  Future Techno Designs pte Ltd
+138e  Basler GmbH
+138f  Patapsco Designs Inc
+1390  Concept Development Inc
+1391  Development Concepts Inc
+1392  Medialight Inc
+1393  Moxa Technologies Co Ltd
+1394  Level One Communications
+1395  Ambicom Inc
+1396  Cipher Systems Inc
+1397  Cologne Chip Designs GmbH
+1398  Clarion co. Ltd
+1399  Rios systems Co Ltd
+139a  Alacritech Inc
+139b  Mediasonic Multimedia Systems Ltd
+139c  Quantum 3d Inc
+139d  EPL limited
+139e  Media4
+139f  Aethra s.r.l.
+13a0  Crystal Group Inc
+13a1  Kawasaki Heavy Industries Ltd
+13a2  Ositech Communications Inc
+13a3  Hi-Fn
+13a4  Rascom Inc
+13a5  Audio Digital Imaging Inc
+13a6  Videonics Inc
+13a7  Teles AG
+13a8  Exar Corp.
+13a9  Siemens Medical Systems, Ultrasound Group
+13aa  Broadband Networks Inc
+13ab  Arcom Control Systems Ltd
+13ac  Motion Media Technology Ltd
+13ad  Nexus Inc
+13ae  ALD Technology Ltd
+13af  T.Sqware
+13b0  Maxspeed Corp
+13b1  Tamura corporation
+13b2  Techno Chips Co. Ltd
+13b3  Lanart Corporation
+13b4  Wellbean Co Inc
+13b5  ARM
+13b6  Dlog GmbH
+13b7  Logic Devices Inc
+13b8  Nokia Telecommunications oy
+13b9  Elecom Co Ltd
+13ba  Oxford Instruments
+13bb  Sanyo Technosound Co Ltd
+13bc  Bitran Corporation
+13bd  Sharp corporation
+13be  Miroku Jyoho Service Co. Ltd
+13bf  Sharewave Inc
+13c0  Microgate Corporation
+13c1  3ware Inc
+13c2  Technotrend Systemtechnik GmbH
+13c3  Janz Computer AG
+13c4  Phase Metrics
+13c5  Alphi Technology Corp
+13c6  Condor Engineering Inc
+13c7  Blue Chip Technology Ltd
+13c8  Apptech Inc
+13c9  Eaton Corporation
+13ca  Iomega Corporation
+13cb  Yano Electric Co Ltd
+13cc  Metheus Corporation
+13cd  Compatible Systems Corporation
+13ce  Cocom A/S
+13cf  Studio Audio & Video Ltd
+13d0  Techsan Electronics Co Ltd
+13d1  Abocom Systems Inc
+13d2  Shark Multimedia Inc
+13d3  IMC Networks
+13d4  Graphics Microsystems Inc
+13d5  Media 100 Inc
+13d6  K.I. Technology Co Ltd
+13d7  Toshiba Engineering Corporation
+13d8  Phobos corporation
+13d9  Apex PC Solutions Inc
+13da  Intresource Systems pte Ltd
+13db  Janich & Klass Computertechnik GmbH
+13dc  Netboost Corporation
+13dd  Multimedia Bundle Inc
+13de  ABB Robotics Products AB
+13df  E-Tech Inc
+13e0  GVC Corporation
+13e1  Silicom Multimedia Systems Inc
+13e2  Dynamics Research Corporation
+13e3  Nest Inc
+13e4  Calculex Inc
+13e5  Telesoft Design Ltd
+13e6  Argosy research Inc
+13e7  NAC Incorporated
+13e8  Chip Express Corporation
+13e9  Chip Express Corporation
+13ea  Dallas Semiconductor
+13eb  Hauppauge Computer Works Inc
+13ec  Zydacron Inc
+13ed  Raytheion E-Systems
+13ee  Hayes Microcomputer Products Inc
+13ef  Coppercom Inc
+13f0  Sundance technology Inc
+13f1  Oce' - Technologies B.V.
+13f2  Ford Microelectronics Inc
+13f3  Mcdata Corporation
+13f4  Troika Design Inc
+13f5  Kansai Electric Co. Ltd
+13f6  C-Media Electronics Inc
+13f7  Wildfire Communications
+13f8  Ad Lib Multimedia Inc
+13f9  NTT Advanced Technology Corp.
+13fa  Pentland Systems Ltd
+13fb  Aydin Corp
+13fc  Computer Peripherals International
+13fd  Micro Science Inc
+13fe  Advantech Co. Ltd
+13ff  Silicon Spice Inc
+1400  Artx Inc
+1401  CR-Systems A/S
+1402  Meilhaus Electronic GmbH
+1403  Ascor Inc
+1404  Fundamental Software Inc
+1405  Excalibur Systems Inc
+1406  Oce' Printing Systems GmbH
+1407  Lava Computer mfg Inc
+1408  Aloka Co. Ltd
+1409  Timedia Technology Co Ltd
+140a  DSP Research Inc
+140b  Ramix Inc
+140c  Elmic Systems Inc
+140d  Matsushita Electric Works Ltd
+140e  Goepel Electronic GmbH
+140f  Salient Systems Corp
+1410  Midas lab Inc
+1411  Ikos Systems Inc
+1412  IC Ensemble Inc
+1413  Addonics
+1414  Microsoft Corporation
+1415  Oxford Semiconductor Ltd
+1416  Multiwave Innovation pte Ltd
+1417  Convergenet Technologies Inc
+1418  Kyushu electronics systems Inc
+1419  Excel Switching Corp
+141a  Apache Micro Peripherals Inc
+141b  Zoom Telephonics Inc
+141d  Digitan Systems Inc
+141e  Fanuc Ltd
+141f  Visiontech Ltd
+1420  Psion Dacom plc
+1421  Ads Technologies Inc
+1422  Ygrec Systems Co Ltd
+1423  Custom Technology Corp.
+1424  Videoserver Connections
+1425  ASIC Designers Inc
+1426  Storage Technology Corp.
+1427  Better On-Line Solutions
+1428  Edec Co Ltd
+1429  Unex Technology Corp.
+142a  Kingmax Technology Inc
+142b  Radiolan
+142c  Minton Optic Industry Co Ltd
+142d  Pix stream Inc
+142e  Vitec Multimedia
+142f  Radicom Research Inc
+1430  ITT Aerospace/Communications Division
+1431  Gilat Satellite Networks
+1432  Edimax Computer Co.
+1433  Eltec Elektronik GmbH
+1435  Real Time Devices US Inc.
+1436  CIS Technology Inc
+1668  Action Tec Electronics Inc
+1b13  Jaton Corp
 1c1c  Symphony
 	0001  82C101
+21c3  21st Century Computer Corp.
+270b  Xantel Corporation
 270f  Chaintech Computer Co. Ltd
+3388  Hint Corp
 3d3d  3DLabs
 	0001  GLINT 300SX
 	0002  GLINT 500TX
@@ -1273,9 +1609,15 @@
 	2064  ALG2064i
 	2301  ALG2301
 	2302  ALG2302
+4444  Internext Compression Inc
 4680  Umax Computer Corp
+4843  Hercules Computer Technology Inc
+4978  Axil Computer Inc
 4a14  NetVin
 	5000  PCI NV5000SC
+4ddc  ILC Data Device Corp
+5053  Voyetra Technologies
+5143  Qualcomm Inc
 5333  S3 Inc.
 	0551  Plato/PX (system)
 	5631  86C325 [ViRGE]
@@ -1316,6 +1658,7 @@
 	ca00  SonicVibes
 6374  c't Magazin für Computertechnik
 	6773  GPPCI
+6666  Decision Computer International Co.
 8008  Quancm Electronic GmbH
 	0010  WDOG1 [PCI-Watchdog 1]
 	0011  PWDOG2 [Watchdog2/PCI]
@@ -1356,6 +1699,7 @@
 	7190  440BX - 82443BX Host
 	7191  440BX - 82443BX AGP
 	7192  440BX - 82443BX (AGP disabled)
+	7800  i740
 	84c4  82450KX [Orion]
 	84c5  82450GX [Orion]
 8800  Trigem Computer Inc.
@@ -1371,6 +1715,7 @@
 	5575  2930
 	5578  AIC-7855
 	5800  AIC-5800
+	6075  AIC-1480
 	6078  AIC-7860
 	6178  AIC-7861
 	6278  AIC-7860
@@ -1395,9 +1740,22 @@
 	2015  IDE-2015PL
 9412  Holtek
 	6565  6565
+a200  NEC Corporation
+a259  Hewlett Packard
+a25b  Hewlett Packard GmbH PL24-MKT
+a304  Sony
+a727  3Com Corporation
+aa42  Scitex Digital Video
+b1b3  Shiva Europe Limited
+c001  TSI Telsys
+c0a9  Micron/Crucial Technology
+c0de  Motorola
 c0fe  Motion Engineering, Inc.
+cafe  Chrysalis-ITS
+d4d4  Dy4 Systems Inc
 e159  Tiger Jet Network Inc.
 	0001  300
+ecc0  Echo Corporation
 edd8  ARK Logic Inc
 	a091  1000PV [Stingray]
 	a099  2000PV [Stingray]
