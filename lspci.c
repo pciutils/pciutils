@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.3 1997/12/27 11:57:12 mj Exp $
+ *	$Id: lspci.c,v 1.4 1998/01/01 19:36:23 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -273,18 +273,24 @@ show_bases(struct device *d, int cnt)
 	pos = d->kernel_base_addr[i];
       if (!pos || pos == 0xffffffff)
 	continue;
-      if (verbose > 1)
-	printf("\tRegion %d: ", i);
-      else
-	putchar('\t');
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
 	{
 	  if (cmd & PCI_COMMAND_IO)
-	    printf("I/O ports at %04lx\n", pos & PCI_BASE_ADDRESS_IO_MASK);
+	    {
+	      if (verbose > 1)
+		printf("\tRegion %d: ", i);
+	      else
+		putchar('\t');
+	      printf("I/O ports at %04lx\n", pos & PCI_BASE_ADDRESS_IO_MASK);
+	    }
 	}
       else if (cmd & PCI_COMMAND_MEMORY)
 	{
 	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
+	  if (verbose > 1)
+	    printf("\tRegion %d: ", i);
+	  else
+	    putchar('\t');
 	  printf("Memory at ");
 	  if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
 	    {
