@@ -20,9 +20,6 @@ typedef u_int16_t u16;
 typedef u_int32_t u32;
 #endif
 
-typedef u8 byte;
-typedef u16 word;
-
 #ifdef PCI_HAVE_64BIT_ADDRESS
 #include <limits.h>
 #if ULONG_MAX > 0xffffffff

@@ -1,5 +1,8 @@
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
+	* lib/types.h, lib/pci.h, lib/sysdep.h: `byte' and `word' are
+	no longer exported to the outside world.
+
 	* README.Windows: Updated.
 
 	* maint/release: Substitute version number in win32/config.h.

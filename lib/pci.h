@@ -78,11 +78,11 @@ void pci_free_dev(struct pci_dev *);
 struct pci_dev {
   struct pci_dev *next;			/* Next device in the chain */
   u16 domain;				/* PCI domain (host bridge) */
-  byte bus, dev, func;			/* Bus inside domain, device and function */
+  u8 bus, dev, func;			/* Bus inside domain, device and function */
 
   /* These fields are set by pci_fill_info() */
   int known_fields;			/* Set of info fields already known */
-  word vendor_id, device_id;		/* Identity of the device */
+  u16 vendor_id, device_id;		/* Identity of the device */
   int irq;				/* IRQ number */
   pciaddr_t base_addr[6];		/* Base addresses */
   pciaddr_t size[6];			/* Region sizes */
@@ -92,7 +92,7 @@ struct pci_dev {
   /* Fields used internally: */
   struct pci_access *access;
   struct pci_methods *methods;
-  byte *cache;				/* Cached config registers */
+  u8 *cache;				/* Cached config registers */
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
   void *aux;				/* Auxillary data */
@@ -101,14 +101,14 @@ struct pci_dev {
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
 #define PCI_ADDR_MEM_MASK (~(pciaddr_t) 0xf)
 
-byte pci_read_byte(struct pci_dev *, int pos); /* Access to configuration space */
-word pci_read_word(struct pci_dev *, int pos);
+u8 pci_read_byte(struct pci_dev *, int pos); /* Access to configuration space */
+u16 pci_read_word(struct pci_dev *, int pos);
 u32  pci_read_long(struct pci_dev *, int pos);
-int pci_read_block(struct pci_dev *, int pos, byte *buf, int len);
-int pci_write_byte(struct pci_dev *, int pos, byte data);
-int pci_write_word(struct pci_dev *, int pos, word data);
+int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len);
+int pci_write_byte(struct pci_dev *, int pos, u8 data);
+int pci_write_word(struct pci_dev *, int pos, u16 data);
 int pci_write_long(struct pci_dev *, int pos, u32 data);
-int pci_write_block(struct pci_dev *, int pos, byte *buf, int len);
+int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len);
 
 int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
 
@@ -119,7 +119,7 @@ int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
 #define PCI_FILL_SIZES		16
 #define PCI_FILL_RESCAN		0x10000
 
-void pci_setup_cache(struct pci_dev *, byte *cache, int len);
+void pci_setup_cache(struct pci_dev *, u8 *cache, int len);
 
 /*
  *	Filters
