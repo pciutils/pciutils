@@ -1,3 +1,9 @@
+2000-06-13  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile (uninstall): Fixed.
+
+	* pci.ids: ID updates.
+
 2000-05-20  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 2.1.8.

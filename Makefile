@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.35 2000/05/20 14:53:39 mj Exp $
+# $Id: Makefile,v 1.36 2000/06/28 11:01:04 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2000 Martin Mares <mj@suse.cz>
 
@@ -66,7 +66,7 @@ install: all
 
 uninstall: all
 	rm -f $(ROOT)/sbin/lspci $(ROOT)/sbin/setpci
-	rm -f $(PREFIX)/pci.ids
+	rm -f $(PREFIX)/share/pci.ids
 	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
 
 release:
