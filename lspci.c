@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.31 1999/11/03 09:30:11 mj Exp $
+ *	$Id: lspci.c,v 1.32 2000/01/13 22:50:13 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -68,7 +68,7 @@ static struct pci_access *pacc;
 
 #ifdef ARCH_SPARC64
 #define IO_FORMAT "%016Lx"
-#elif defined(HAVE_64BIT_ADDRESS)
+#elif defined(HAVE_LONG_ADDRESS)
 #define IO_FORMAT "%04Lx"
 #else
 #define IO_FORMAT "%04lx"
