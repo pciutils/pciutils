@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.23 1999/02/28 20:23:07 mj Exp $
+ *	$Id: lspci.c,v 1.24 1999/04/18 19:07:16 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -292,7 +292,7 @@ show_bases(struct device *d, int cnt)
 		  if (buscentric_view)
 		    {
 		      if (a || z)
-			printf("%08x%08lx", z, a);
+			printf("%08x" ADDR_FORMAT, z, a);
 		      else
 			printf("<unassigned>");
 		      done = 1;

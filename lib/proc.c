@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.1 1999/01/22 21:05:39 mj Exp $
+ *	$Id: proc.c,v 1.2 1999/04/18 19:08:12 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -107,7 +107,12 @@ proc_scan(struct pci_access *a)
       struct pci_dev *d = pci_alloc_dev(a);
       unsigned int dfn, vend;
 
-      sscanf(buf, "%x %x %x %lx %lx %lx %lx %lx %lx %lx",
+      sscanf(buf,
+#ifdef HAVE_64BIT_ADDRESS
+	     "%x %x %x %llx %llx %llx %llx %llx %llx %llx",
+#else
+	     "%x %x %x %lx %lx %lx %lx %lx %lx %lx",
+#endif
 	     &dfn,
 	     &vend,
 	     &d->irq,
