@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.10 1999/12/04 12:32:57 mj Exp $
+ *	$Id: setpci.c,v 1.11 2000/02/14 19:29:58 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -327,7 +327,7 @@ next:
 	    usage();
 	  if (c[2])
 	    d = (c[2] == '=') ? c+3 : c+2;
-	  else if (argc)
+	  else if (argc > 1)
 	    {
 	      argc--;
 	      argv++;
