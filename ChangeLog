@@ -1,3 +1,19 @@
+Sun Jan 24 22:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_verbose): Display `Cap' flag in device status.
+
+	* lspci.c (show_htype0): Display capability lists whereever
+	available. The only capability name we recognize now is `AGP'.
+	Unfortunately, capabilities are stored in device-dependent
+	portion of the configuration space and are thus available
+	only to root unless you read a dump.
+
+	* lspci.c (scan_devices): Use cache instead of buffering.
+
+	* lib/buffer.c: Removed (obsoleted by the cache).
+
+	* lib/access.c: Added general caching mechanism.
+
 Sat Jan 23 21:30:54 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* pci.ids: Added few devices.

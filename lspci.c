@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.19 1999/01/22 21:04:54 mj Exp $
+ *	$Id: lspci.c,v 1.20 1999/01/24 21:38:47 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -65,7 +65,7 @@ static struct pci_access *pacc;
 struct device {
   struct device *next;
   struct pci_dev *dev;
-  int config_cnt;
+  unsigned int config_cnt;
   byte config[256];
 };
 
@@ -97,9 +97,29 @@ scan_devices(void)
 	  how_much = 128;
 	}
       d->config_cnt = how_much;
-      pci_setup_buffer(p, d->config);
+      pci_setup_cache(p, d->config, d->config_cnt);
       pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE);
     }
+}
+
+static int
+check_root(void)
+{
+  static int is_root = -1;
+
+  if (is_root < 0)
+    is_root = !geteuid();
+  return is_root;
+}
+
+static int
+config_fetch(struct device *d, unsigned int pos, unsigned int len)
+{
+  if (pos + len < d->config_cnt)
+    return 1;
+  if (pacc->method != PCI_ACCESS_DUMP && !check_root())
+    return 0;
+  return pci_read_block(d->dev, pos, d->config + pos, len);
 }
 
 /* Config space accesses */
@@ -294,6 +314,38 @@ show_htype0(struct device *d)
   if (rom & 1)
     printf("\tExpansion ROM at %08lx%s\n", rom & PCI_ROM_ADDRESS_MASK,
 	   (rom & PCI_ROM_ADDRESS_ENABLE) ? "" : " [disabled]");
+  if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
+    {
+      int where = get_conf_byte(d, PCI_CAPABILITY_LIST);
+      while (where)
+	{
+	  int id, next, ver;
+	  printf("\tCapabilities: ");
+	  if (!config_fetch(d, where, 4))
+	    {
+	      puts("<available only to root>");
+	      break;
+	    }
+	  id = get_conf_byte(d, where);
+	  next = get_conf_byte(d, where+1);
+	  ver = get_conf_byte(d, where+2);
+	  if (id == 0xff)
+	    {
+	      printf("<chain broken at %02x>\n", where);
+	      break;
+	    }
+	  switch (id)
+	    {
+	    case 2:
+	      printf("AGP");
+	      break;
+	    default:
+	      printf("C%02x", id);
+	    }
+	  printf(" version %x.%x at %02x\n", ver/16, ver%16, where);
+	  where = next;
+	}
+    }
 }
 
 static void
@@ -508,7 +560,8 @@ show_verbose(struct device *d)
 	     (cmd & PCI_COMMAND_WAIT) ? '+' : '-',
 	     (cmd & PCI_COMMAND_SERR) ? '+' : '-',
 	     (cmd & PCI_COMMAND_FAST_BACK) ? '+' : '-');
-      printf("\tStatus: 66Mhz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+      printf("\tStatus: Cap%c 66Mhz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+	     (status & PCI_STATUS_CAP_LIST) ? '+' : '-',
 	     (status & PCI_STATUS_66MHZ) ? '+' : '-',
 	     (status & PCI_STATUS_UDF) ? '+' : '-',
 	     (status & PCI_STATUS_FAST_BACK) ? '+' : '-',
@@ -588,7 +641,7 @@ show_verbose(struct device *d)
 static void
 show_hex_dump(struct device *d)
 {
-  int i;
+  unsigned int i;
 
   for(i=0; i<d->config_cnt; i++)
     {
