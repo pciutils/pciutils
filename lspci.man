@@ -144,4 +144,4 @@ file containing a list of all PCI devices.
 .BR setpci (8)
 
 .SH AUTHOR
-The Linux PCI Utilities are maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>.
+The Linux PCI Utilities are maintained by Martin Mares <mj@suse.cz>.

@@ -1,3 +1,14 @@
+Thu Jan 13 23:01:52 2000  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as version 2.1.3.
+
+	* pci.ids: New ID's.
+
+	* lspci.c: Alpha IO_FORMAT fix by Andrea Arcangeli.
+
+	* lib/access.c: Corrected order of access methods -- it's wonderful how
+	long could such a bug remain unspotted. Thanks go to Andreas Schockenhoff.
+
 Sat Dec 11 23:34:48 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as version 2.1.2.
