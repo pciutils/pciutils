@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.20 1999/03/10 04:19:07 cort Exp $
+#	$Id: pci.ids,v 1.21 1999/03/28 10:27:33 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -275,7 +275,10 @@
 	3020  Samurai_IDE
 1043  Asustek Computer, Inc.
 1044  Distributed Processing Technology
-	a400  SmartCache/Raid III or IV
+	1012  Domino RAID Engine
+	a400  SmartCache/Raid I-IV Controller
+	a500  PCI Bridge
+	a501  SmartRAID V Controller
 1045  OPTi Inc.
 	c178  92C178
 	c557  82C557 [Viper-M]
@@ -853,7 +856,7 @@
 1162  OA Laboratory Co Ltd
 1163  Rendition
 	0001  Verite 1000 PCI
-	2000  Verite V2100
+	2000  Verite V2100/V2200
 1164  Advanced Peripherals Technologies
 1165  Imagraph Corporation
 1166  Pequr Technology
@@ -1304,6 +1307,7 @@
 12e9  GE Spacenet
 12ea  Zuken
 12eb  Aureal Semiconductor
+	0001  Vortex 1
 12ec  3A International, Inc.
 12ed  Optivision Inc.
 12ee  Orange Micro
@@ -1867,6 +1871,8 @@ C 0C  Serial bus controller
 	0002  SSA
 	0003  USB Controller
 	0004  Fiber Channel
+C 0E  Intelligent controller
+	0000  I2O
 
 S 10b4  STB Systems Inc
 	273e  Velocity 4400
