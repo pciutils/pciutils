@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.47 2000/01/13 22:47:15 mj Exp $
+#	$Id: pci.ids,v 1.48 2000/01/20 21:12:52 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -356,6 +356,12 @@
 	2001  79c978 [HomePNA]
 	2020  53c974 [PCscsi]
 	2040  79c974
+	7006  AMD-751 [Irongate] System Controller
+	7007  AMD-751 [Irongate] AGP Bridge
+	7408  AMD-756 [Irongate] ISA Bridge
+	7409  AMD-756 [Irongate] IDE
+	740b  AMD-756 [Irongate] ACPI
+	740c  AMD-756 [Irongate] USB
 1023  Trident Microsystems
 	0194  82C194
 	2000  4DWave DX
@@ -676,6 +682,7 @@
 	fe03  12C01A FireWire Host Controller
 104d  Sony Corporation
 	8039  CXD3222 iLINK Controller
+	8056  Rockwell HCF 56K modem
 104e  Oak Technology, Inc
 	0017  OTI-64017
 	0107  OTI-107 [Spitfire]
@@ -2220,6 +2227,7 @@
 		127a 1005  PCI56RVP Modem 
 		13df 1005  PCI56RVP Modem 
 		1436 1005  WS-5614PS3G
+	2005  HCF 56k V90 FaxModem
 	8234  RapidFire 616X ATM155 Adapter
 127b  Pixera Corporation
 127c  Crosspoint Solutions, Inc.
@@ -3368,13 +3376,13 @@
 		103c 10C7  MegaRaid T5
 		1111 1111  MegaRaid 466
 		113c 03A2  MegaRaid
-	2410  82801 82810 Chipset ISA Bridge (LPC)
-	2411  82801 82810 Chipset IDE
-	2412  82801 82810 Chipset USB
-	2413  82801 82810 Chipset SMBus
-	2415  82801 82810 AC'97 Audio
-	2416  82801 82810 AC'97 Modem
-	2418  82801 82810 PCI Bridge
+	2410  82801AA 82810 Chipset ISA Bridge (LPC)
+	2411  82801AA 82810 Chipset IDE
+	2412  82801AA 82810 Chipset USB
+	2413  82801AA 82810 Chipset SMBus
+	2415  82801AA 82810 AC'97 Audio
+	2416  82801AA 82810 AC'97 Modem
+	2418  82801AA 82810 PCI Bridge
 	2420  82801AB 82810 Chipset ISA Bridge (LPC)
 	2421  82801AB 82810 Chipset IDE
 	2422  82801AB 82810 Chipset USB
@@ -3397,6 +3405,8 @@
 	7121  82810 CGC [Chipset Graphics Controller]
 	7122  82810-DC100 GMCH [Graphics Memory Controller Hub]
 	7123  82810-DC100 CGC [Chipset Graphics Controller]
+	7124  82810E GMCH [Graphics Memory Controller Hub]
+	7125  82810E CGC [Chipset Graphics Controller]
 	7180  440LX/EX - 82443LX/EX Host bridge
 	7181  440LX/EX - 82443LX/EX AGP bridge
 	7190  440BX/ZX - 82443BX/ZX Host bridge
