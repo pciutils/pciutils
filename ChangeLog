@@ -1,5 +1,8 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* Makefile (MANDIR): Use `:=' instead of `=' to avoid executing the shell
+	command every time $(MANDIR) is referenced.
+
 	* lspci.c (main): The error message for `lspci -s' incorrectly mentioned
 	a `-f' switch. Reported by Steve Finney <Steve.Finney@SpirentCom.COM>.
 
