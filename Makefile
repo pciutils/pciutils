@@ -4,7 +4,7 @@
 OPT=-O2 -fomit-frame-pointer
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.1.99-test2
+VERSION=2.1.99-test3
 DATE=2003-12-27
 
 PREFIX=/usr/local

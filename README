@@ -14,8 +14,6 @@ Beware, this is a preliminary test version!  Anything might not work!
 Some more things I intend to merge before the 2.2.0 release:
 
    o  pcimodules and possibly other Linux module related stuff
-   o  Linux sysfs support
-   o  Support for PCI domains (at least partially; needed for sysfs)
    o  New ID's from the pciids project
    o  Cross-compilation support
 
@@ -29,9 +27,10 @@ The PCI Utilities package contains a library for portable access to PCI bus
 configuration registers and several utilities based on this library.
 
 Currently, pciutils work on all versions of Linux and they also have somewhat
-experimental support for FreeBSD, NetBSD and AIX. It should be very easy to add
-support for other systems as well (volunteers wanted; if you want to try that,
-please send the patches to me, so that I can include them in the next version).
+experimental support for FreeBSD, NetBSD, AIX, GNU Hurd and Solaris/x86.
+It should be very easy to add support for other systems as well (volunteers
+wanted; if you want to try that, I'll be very glad to see the patches and
+include them in the next version).
 
 The utilities include:  (See manual pages for more details)
 
@@ -74,16 +73,19 @@ sf.net web page.
 4. Available access methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The library (and therefore all the utilities) know a variety of methods for
-accessing the PCI registers. Here is a list of them:
+accessing the PCI registers. Here is a list of them, sorted by autodetection
+priority:
 
    /proc/bus/pci	on all Linux systems since kernel 2.1.82.
-   direct port access	on all Linux systems with i386, to be used when
-			/proc/bus/pci is unavailable or you want to scan
-			the bus manually when hunting kernel bugs.
-   dumps		reading of dumps produced by `lspci -x'.
-   lsdev + odmget	used on AIX
+   /sys/bus/pci		on all Linux systems since kernel 2.5.xx.
+   direct port access	on i386 systems running Linux, GNU Hurd or Solaris/x86;
+			available only to root, useful if no other access
+			method is available or you want to hunt kernel bugs
    /dev/pci		used on FreeBSD
+   lsdev + odmget	used on AIX
    libpci		used on NetBSD
+   dumps		reading of dumps produced by `lspci -x'
+			(this one is not autodetected)
 
 
 5. Using the library
@@ -109,7 +111,7 @@ the Linux PCI support will be probably discussed there, too.
 7. Miscellanea
 ~~~~~~~~~~~~~~
 You also might want to look at the pciutils web page containing release
-notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.html .
+notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml .
 
 There also exists a utility called PowerTweak which is able to fine tune
 parameters of many chipsets much better than the Bridge Optimization code

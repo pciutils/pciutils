@@ -4,3 +4,5 @@
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".
 
 - names.c: rewrite
+
+- spelling: buses x busses

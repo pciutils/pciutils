@@ -1,5 +1,7 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test3.
+
 	* lspci.man, setpci.man: Document domains and correct spelling.
 
 	* lib/dump.c (dump_init): Added ability to read domain numbers.
