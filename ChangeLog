@@ -1,3 +1,27 @@
+Mon Jun  8 10:59:22 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 1.05.
+
+	* setpci.c: Problems with pread()/pwrite() with glibc on Alpha
+	should be gone. Again thanks to Steve for bug report.
+
+	* filter.c (filter_parse_slot): Fixed ":x" type filters.
+
+	* pci.ids: Killed duplicate entry. Thanks to Stephen Williams
+	<steve@icarus.com> for reporting this.
+
+Sun Jun  7 19:27:51 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (main), setpci.c (main): Implemented "--version".
+
+	* Released as 1.04.
+
+	* pciutils.h (PCIUTILS_VERSION): Added version string.
+
+	* filter.c, names.c: Extraneous #include <linux/pci.h> removed.
+	Thanks to Geert Uytterhoeven <Geert.Uytterhoeven@cs.kuleuven.ac.be>
+	for bug report.
+
 Thu May 28 14:45:58 1998  Martin Mares  <mj@lomikel.karlin.mff.cuni.cz>
 
 	* pci.ids: More updates from Jens Maurer.
