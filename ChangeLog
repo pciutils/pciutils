@@ -1,3 +1,10 @@
+Sun Apr 18 21:14:58 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c, lib/proc.c: Alpha compilation fixes from Matthew Jacob
+	<mjacob@feral.com>.
+
+	* pci.ids: A lot of updates from Adam J. Richter <adam@yggdrasil.com>.
+
 Sun Feb 28 22:26:21 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (do_map_bus): Don't dump functions 1--7 if not flagged
