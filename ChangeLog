@@ -1,3 +1,7 @@
+2003-11-29  Martin Mares  <mj@ucw.cz>
+
+	* Imported the pciutils sources to my Arch repository. Good-bye, CVS.
+
 2003-01-04  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.11.
