@@ -19,7 +19,7 @@ if ($ver =~ /-/) {
 push @{$r->{"uploads"}}, {
 	"url" => "scp://atrey.karlin.mff.cuni.cz/~ftp/pub/linux/pci/" . $r->{"ALPHADIR"}
 	},{
-	"url" => "scp://master.kernel.org/~ftp/pub/software/utils/pciutils/" . $r->{"ALPHADIR"}
+	"url" => "scp://master.kernel.org/pub/software/utils/pciutils/" . $r->{"ALPHADIR"}
 	};
 push @{$r->{"uploads"}}, {
 	"url" => "ftp://metalab.unc.edu/incoming/linux/",
