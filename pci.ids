@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.25 1999/05/10 22:10:02 cort Exp $
+#	$Id: pci.ids,v 1.26 1999/05/19 12:01:31 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -360,6 +360,7 @@
 1059  Teknor Industrial Computers Inc
 105a  Promise Technology, Inc.
 	4d33  20246
+	4d38  20262
 	5300  DC5300
 105b  Foxconn International, Inc.
 105c  Wipro Infotech Limited
@@ -598,6 +599,7 @@
 	5229  M5229
 	5235  M5225
 	5237  M5237
+	5243  M5243
 	5247  M5247
 	7101  M7101
 10ba  Mitsubishi Electric Corp.
@@ -1716,6 +1718,8 @@
 1433  Eltec Elektronik GmbH
 1435  Real Time Devices US Inc.
 1436  CIS Technology Inc
+14b9  Aironet
+	0001  PC4800
 1668  Action Tec Electronics Inc
 1b13  Jaton Corp
 1c1c  Symphony

@@ -1,3 +1,12 @@
+Wed May 19 13:24:39 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released the whole package as version 2.0.
+
+Fri May 14 22:42:02 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Added several new ID's contributed by people
+	on the linux-pci list.
+
 Mon Apr 19 15:21:08 1999  Jakub Jelinek  <jj@ultra.linux.cz>
 
 	* lspci.c: Display I/O addresses correctly on sparc64.
