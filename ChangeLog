@@ -1,3 +1,11 @@
+2000-04-17  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 2.1.6.
+
+	* pci.ids: Added a large batch of ID's contributed by Gunther
+	Mayer <gunther.mayer@braunschweig.netsurf.de> and synced the
+	list with the 2.3.99pre6 kernel.
+
 Thu Mar  9 13:11:39 2000  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/example.c: Added a simple example of how to use

@@ -1,7 +1,7 @@
 Begin3
 Title:          Linux PCI Utilities
 Version:        2.1.5
-Entered-date:   
+Entered-date:   000215
 Description:    This package contains various utilities for inspecting and
 		setting of devices connected to the PCI bus.
 Keywords:       kernel, pci, lspci, setpci, libpci
