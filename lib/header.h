@@ -330,7 +330,7 @@
 #define PCI_PCIX_BRIDGE_STR_COMMITMENT_LIMIT                   0xffff0000
 #define PCI_PCIX_BRIDGE_SIZEOF 12
 
-/* HyperTransport */
+/* HyperTransport (as of spec rev. 2.00) */
 #define PCI_HT_CMD		2	/* Command Register */
 #define  PCI_HT_CMD_TYP_HI	0xe000	/* Capability Type high part */
 #define  PCI_HT_CMD_TYP_HI_PRI	0x0000	/* Slave or Primary Interface */

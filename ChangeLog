@@ -1,3 +1,7 @@
+2004-07-30  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c: HyperTransport improvements from Maciej.
+
 2004-07-11  Martin Mares  <mj@ucw.cz>
 
 	* lib/sysfs.c (sysfs_get_resources): Arguments now correspond
