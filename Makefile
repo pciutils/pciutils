@@ -88,7 +88,7 @@ dist: clean pci.ids
 	rm -rf $(DISTTMP)
 	mkdir $(DISTTMP)
 	cp -a . $(DISTTMP)/$(REL)
-	rm -rf `find $(DISTTMP)/$(REL) -name "{arch}" -o -name CVS -o -name tmp -o -name maint`
+	rm -rf `find $(DISTTMP)/$(REL) -name .arch-ids -o -name "{arch}" -o -name CVS -o -name tmp -o -name maint`
 	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
 	rm -rf $(DISTTMP)
 

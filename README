@@ -7,6 +7,22 @@ to the terms of the GNU General Public License, either version 2 or
 (at your opinion) any newer version. See http://www.gnu.org/ for details.
 
 
+############################################################################
+
+Beware, this is a preliminary test version!  Anything might not work!
+
+Some more things I intend to merge before the 2.2.0 release:
+
+   o  pcimodules and possibly other Linux module related stuff
+   o  Linux sysfs support
+   o  Support for PCI domains (at least partially; needed for sysfs)
+   o  New ID's from the pciids project
+   o  Cross-compilation support
+
+############################################################################
+
+
+
 1. What's that?
 ~~~~~~~~~~~~~~~
 The PCI Utilities package contains a library for portable access to PCI bus
