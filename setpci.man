@@ -205,4 +205,4 @@ and 3 to register 3e of device at bus 12, slot 3, function 4.
 .BR lspci (8)
 
 .SH AUTHOR
-The Linux PCI Utilities are maintained by Martin Mares <mj@suse.cz>.
+The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

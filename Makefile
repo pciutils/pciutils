@@ -1,15 +1,15 @@
-# $Id: Makefile,v 1.36 2000/06/28 11:01:04 mj Exp $
+# $Id: Makefile,v 1.37 2001/11/04 15:27:15 mj Exp $
 # Makefile for Linux PCI Utilities
-# (c) 1998--2000 Martin Mares <mj@suse.cz>
+# (c) 1998--2000 Martin Mares <mj@ucw.cz>
 
 OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
 
-VERSION=2.1.8
+VERSION=2.1.9
 #SUFFIX=-pre2
 #SUFFIX=-alpha
-DATE=2000-05-20
+DATE=2001-11-04
 
 INSTALL=install
 DIRINSTALL=install -d
