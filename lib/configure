@@ -87,8 +87,5 @@ if [ -z "$ok" ] ; then
 	echo "WARNING: No real configuration access method is available."
 fi
 echo >>$c "#define PATH_PCI_IDS \"$prefix/share/pci.ids\""
-if [ -f header.h ] ; then
-	echo >>$c '#define HAVE_OWN_HEADER_H'
-fi
 echo >>$c "#define PCILIB_VERSION \"$version\""
 sed '/^#define [^ ]*$/!d;s/^#define \(.*\)/\1=1/' <$c >config.mk

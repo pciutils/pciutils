@@ -1,9 +1,9 @@
 /*
- *	$Id: pci.h,v 1.10 2002/12/26 19:28:33 mj Exp $
+ *	$Id: pci.h,v 1.11 2002/12/26 20:24:32 mj Exp $
  *
  *	The PCI Library
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -12,12 +12,7 @@
 #define _PCI_LIB_H
 
 #include "config.h"
-
-#ifdef HAVE_OWN_HEADER_H
 #include "header.h"
-#else
-#include <linux/pci.h>
-#endif
 
 /*
  *	Types
