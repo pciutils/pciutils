@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.3 1998/01/27 11:50:10 mj Exp $
+ *	$Id: names.c,v 1.4 1998/06/08 07:56:20 mj Exp $
  *
  *	Linux PCI Utilities -- Device ID to Name Translation
  *
@@ -14,7 +14,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <linux/pci.h>
 
 #include "pciutils.h"
 
