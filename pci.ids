@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.63 2000/06/28 10:59:00 mj Exp $
+#	$Id: pci.ids,v 1.64 2000/07/23 08:41:53 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -140,16 +140,19 @@
 		0e11 b10e  3D Rage LT Pro (Compaq Armada 1750)
 		1028 0085  Rage 3D LT Pro
 	4c44  3D Rage LT Pro AGP-66
-	4c46  Mobility M3 AGP 2x
+	4c45  Rage Mobility M3 AGP
+	4c46  Rage Mobility M3 AGP 2x
 	4c47  3D Rage LT-G 215LG
 	4c49  3D Rage LT Pro
-	4c4d  3D Rage P/M Mobility AGP 2x
-	4c4e  3D Rage L Mobility AGP 2x
+	4c4d  Rage Mobility P/M AGP 2x
+	4c4e  Rage Mobility L AGP 2x
 	4c50  3D Rage LT Pro
 	4c51  3D Rage LT Pro
-	4c52  3D Rage P/M Mobility
-	4c53  3D Rage L Mobility
+	4c52  Rage Mobility P/M
+	4c53  Rage Mobility L
 	4c54  264LT [Mach64 LT]
+	4d46  Rage Mobility M4 AGP
+	4d4c  Rage Mobility M4 AGP
 	5041  Rage 128 PA
 	5042  Rage 128 PB
 	5043  Rage 128 PC
@@ -1103,14 +1106,16 @@
 1075  Advanced Integrations Research
 1076  Chaintech Computer Co. Ltd
 1077  Q Logic
+	1016  QLA10160
 	1020  ISP1020
 	1022  ISP1022
-	1080  ISP1080
-	1240  ISP1240
-	1280  ISP1280
+	1080  QLA1080
+	1216  QLA12160
+	1240  QLA1240
+	1280  QLA1280
 	2020  ISP2020A
-	2100  ISP2100
-	2200  ISP2200
+	2100  QLA2100
+	2200  QLA2200
 1078  Cyrix Corporation
 	0000  5510 [Grappa]
 	0001  PCI Master
@@ -1438,6 +1443,8 @@
 	906e  9060ES
 	9080  9080
 		10b5 9080  9080 [real subsystem ID not set]
+	a001  GTEK Jetport II 2 port serial adaptor
+	c001  GTEK Cyclone 16/32 port serial adaptor
 10b6  Madge Networks
 	0001  Smart 16/4 PCI Ringnode
 	0002  Smart 16/4 PCI Ringnode Mk2
@@ -4456,6 +4463,8 @@
 		1014 0119  Netfinity Gigabit Ethernet SX Adapter
 		8086 1000  EtherExpress PRO/1000 Gigabit Server Adapter
 	1030  82559 InBusiness 10/100
+	1130  82815 815 Chipset Host Bridge and Memory Controller Hub
+	1132  82815 CGC [Chipset Graphics Controller] 
 	1161  82806AA PCI64 Hub Advanced Programmable Interrupt Controller
 	1209  82559ER
 	1221  82092AA_0
