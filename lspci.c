@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.41 2002/03/30 15:39:24 mj Exp $
+ *	$Id: lspci.c,v 1.42 2002/04/06 12:08:26 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -34,7 +34,8 @@ Usage: lspci [<switches>]\n\
 -v\t\tBe verbose\n\
 -n\t\tShow numeric ID's\n\
 -b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
--x\t\tShow hex-dump of config space\n\
+-x\t\tShow hex-dump of the standard portion of config space\n\
+-xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n\
 -s [[<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\

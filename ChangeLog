@@ -1,3 +1,7 @@
+2002-04-06  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c: Mention "-xxx" in the help.
+
 2002-03-30  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.10.
