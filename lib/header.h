@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.6 2000/05/01 21:34:49 mj Exp $
+ *	$Id: header.h,v 1.7 2002/03/24 12:58:05 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -185,6 +185,7 @@
 #define  PCI_CAP_ID_SLOTID	0x04	/* Slot Identification */
 #define  PCI_CAP_ID_MSI		0x05	/* Message Signalled Interrupts */
 #define  PCI_CAP_ID_CHSWP	0x06	/* CompactPCI HotSwap */
+#define  PCI_CAP_ID_PCIX        0x07    /* PCI-X */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
@@ -256,6 +257,56 @@
 #define PCI_MSI_ADDRESS_HI	8	/* Upper 32 bits (if PCI_MSI_FLAGS_64BIT set) */
 #define PCI_MSI_DATA_32		8	/* 16 bits of data for 32-bit devices */
 #define PCI_MSI_DATA_64		12	/* 16 bits of data for 64-bit devices */
+
+/* PCI-X */
+#define PCI_PCIX_COMMAND                                                2 /* Command register offset */
+#define PCI_PCIX_COMMAND_DPERE                                     0x0001 /* Data Parity Error Recover Enable */
+#define PCI_PCIX_COMMAND_ERO                                       0x0002 /* Enable Relaxed Ordering */
+#define PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT                   0x000c /* Maximum Memory Read Byte Count */
+#define PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS               0x0070  
+#define PCI_PCIX_COMMAND_RESERVED                                   0xf80
+#define PCI_PCIX_STATUS                                                 4 /* Status register offset */
+#define PCI_PCIX_STATUS_FUNCTION                               0x00000007
+#define PCI_PCIX_STATUS_DEVICE                                 0x000000f8
+#define PCI_PCIX_STATUS_BUS                                    0x0000ff00
+#define PCI_PCIX_STATUS_64BIT                                  0x00010000
+#define PCI_PCIX_STATUS_133MHZ                                 0x00020000
+#define PCI_PCIX_STATUS_SC_DISCARDED                           0x00040000 /* Split Completion Discarded */
+#define PCI_PCIX_STATUS_UNEXPECTED_SC                          0x00080000 /* Unexpected Split Completion */
+#define PCI_PCIX_STATUS_DEVICE_COMPLEXITY                      0x00100000 /* 0 = simple device, 1 = bridge device */
+#define PCI_PCIX_STATUS_DESIGNED_MAX_MEM_READ_BYTE_COUNT       0x00600000 /* 0 = 512 bytes, 1 = 1024, 2 = 2048, 3 = 4096 */
+#define PCI_PCIX_STATUS_DESIGNED_MAX_OUTSTANDING_SPLIT_TRANS   0x03800000
+#define PCI_PCIX_STATUS_DESIGNED_MAX_CUMULATIVE_READ_SIZE      0x1c000000
+#define PCI_PCIX_STATUS_RCVD_SC_ERR_MESS                       0x20000000 /* Received Split Completion Error Message */
+#define PCI_PCIX_STATUS_RESERVED                               0xc0000000
+#define PCI_PCIX_SIZEOF		4
+
+/* PCI-X Bridges */
+#define PCI_PCIX_BRIDGE_SEC_STATUS                                      2 /* Secondary bus status register offset */
+#define PCI_PCIX_BRIDGE_SEC_STATUS_64BIT                           0x0001
+#define PCI_PCIX_BRIDGE_SEC_STATUS_133MHZ                          0x0002
+#define PCI_PCIX_BRIDGE_SEC_STATUS_SC_DISCARDED                    0x0004 /* Split Completion Discarded on secondary bus */
+#define PCI_PCIX_BRIDGE_SEC_STATUS_UNEXPECTED_SC                   0x0008 /* Unexpected Split Completion on secondary bus */
+#define PCI_PCIX_BRIDGE_SEC_STATUS_SC_OVERRUN                      0x0010 /* Split Completion Overrun on secondary bus */
+#define PCI_PCIX_BRIDGE_SEC_STATUS_SPLIT_REQUEST_DELAYED           0x0020
+#define PCI_PCIX_BRIDGE_SEC_STATUS_CLOCK_FREQ                      0x01c0
+#define PCI_PCIX_BRIDGE_SEC_STATUS_RESERVED                        0xfe00
+#define PCI_PCIX_BRIDGE_STATUS                                          4 /* Primary bus status register offset */
+#define PCI_PCIX_BRIDGE_STATUS_FUNCTION                        0x00000007
+#define PCI_PCIX_BRIDGE_STATUS_DEVICE                          0x000000f8
+#define PCI_PCIX_BRIDGE_STATUS_BUS                             0x0000ff00
+#define PCI_PCIX_BRIDGE_STATUS_64BIT                           0x00010000
+#define PCI_PCIX_BRIDGE_STATUS_133MHZ                          0x00020000
+#define PCI_PCIX_BRIDGE_STATUS_SC_DISCARDED                    0x00040000 /* Split Completion Discarded */
+#define PCI_PCIX_BRIDGE_STATUS_UNEXPECTED_SC                   0x00080000 /* Unexpected Split Completion */
+#define PCI_PCIX_BRIDGE_STATUS_SC_OVERRUN                      0x00100000 /* Split Completion Overrun */
+#define PCI_PCIX_BRIDGE_STATUS_SPLIT_REQUEST_DELAYED           0x00200000
+#define PCI_PCIX_BRIDGE_STATUS_RESERVED                        0xffc00000
+#define PCI_PCIX_BRIDGE_UPSTREAM_SPLIT_TRANS_CTRL                       8 /* Upstream Split Transaction Register offset */
+#define PCI_PCIX_BRIDGE_DOWNSTREAM_SPLIT_TRANS_CTRL                    12 /* Downstream Split Transaction Register offset */
+#define PCI_PCIX_BRIDGE_STR_CAPACITY                           0x0000ffff
+#define PCI_PCIX_BRIDGE_STR_COMMITMENT_LIMIT                   0xffff0000
+#define PCI_PCIX_BRIDGE_SIZEOF 12
 
 /*
  * The PCI interface treats multi-function devices as independent

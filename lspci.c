@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.39 2002/03/24 12:24:34 mj Exp $
+ *	$Id: lspci.c,v 1.40 2002/03/24 12:58:05 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -458,6 +458,86 @@ show_agp(struct device *d, int where, int cap)
 }
 
 static void
+show_pcix_nobridge(struct device *d, int where)
+{
+  u16 command = get_conf_word(d, where + PCI_PCIX_COMMAND);
+  u32 status = get_conf_long(d, where + PCI_PCIX_STATUS);
+  printf("PCI-X non-bridge device.\n");
+  if (verbose < 2)
+    return;
+  printf("\t\tCommand: DPERE%c ERO%c RBC=%d OST=%d\n",
+	 FLAG(command, PCI_PCIX_COMMAND_DPERE),
+	 FLAG(command, PCI_PCIX_COMMAND_ERO),
+	 ((command & PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT) >> 2U),
+	 ((command & PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS) >> 4U));
+  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, DC=%s, DMMRBC=%u, DMOST=%u, DMCRS=%u, RSCEM%c",
+	 ((status >> 8) & 0xffU), // bus
+	 ((status >> 3) & 0x1fU), // dev
+	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION), // function
+	 FLAG(status, PCI_PCIX_STATUS_64BIT),
+	 FLAG(status, PCI_PCIX_STATUS_133MHZ),
+	 FLAG(status, PCI_PCIX_STATUS_SC_DISCARDED),
+	 FLAG(status, PCI_PCIX_STATUS_UNEXPECTED_SC),
+	 ((status & PCI_PCIX_STATUS_DEVICE_COMPLEXITY) ? "bridge" : "simple"),
+	 ((status >> 21) & 3U),
+	 ((status >> 23) & 7U),
+	 ((status >> 26) & 7U),
+	 FLAG(status, PCI_PCIX_STATUS_RCVD_SC_ERR_MESS));
+}
+
+static void
+show_pcix_bridge(struct device *d, int where)
+{
+  u16 secstatus;
+  u32 status, upstcr, downstcr;
+  printf("PCI-X bridge device.\n");
+  if (verbose < 2)
+    return;
+  secstatus = get_conf_word(d, where + PCI_PCIX_BRIDGE_SEC_STATUS);
+  printf("\t\tSecondary Status: 64bit%c, 133MHz%c, SCD%c, USC%c, SCO%c, SRD%c Freq=%d\n",
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_64BIT),
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_133MHZ),
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SC_DISCARDED),
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_UNEXPECTED_SC),
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SC_OVERRUN),
+	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SPLIT_REQUEST_DELAYED),
+	 ((secstatus >> 6) & 7));
+  status = get_conf_long(d, where + PCI_PCIX_BRIDGE_STATUS);
+  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, SCO%c, SRD%c\n", 
+	 ((status >> 8) & 0xff), // bus
+	 ((status >> 3) & 0x1f), // dev
+	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION), // function
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_64BIT),
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_133MHZ),
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SC_DISCARDED),
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_UNEXPECTED_SC),
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SC_OVERRUN),
+	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SPLIT_REQUEST_DELAYED));
+  upstcr = get_conf_long(d, where + PCI_PCIX_BRIDGE_UPSTREAM_SPLIT_TRANS_CTRL);
+  printf("\t\t: Upstream: Capacity=%u, Commitment Limit=%u\n",
+	 (upstcr & PCI_PCIX_BRIDGE_STR_CAPACITY),
+	 (upstcr >> 16) & 0xffff);
+  downstcr = get_conf_long(d, where + PCI_PCIX_BRIDGE_DOWNSTREAM_SPLIT_TRANS_CTRL);
+  printf("\t\t: Downstream: Capacity=%u, Commitment Limit=%u\n",
+	 (downstcr & PCI_PCIX_BRIDGE_STR_CAPACITY),
+	 (downstcr >> 16) & 0xffff);
+}
+
+static void
+show_pcix(struct device *d, int where)
+{
+  switch (d->dev->hdrtype)
+    {
+    case PCI_HEADER_TYPE_NORMAL:
+      show_pcix_nobridge(d, where);
+      break;
+    case PCI_HEADER_TYPE_BRIDGE:
+      show_pcix_bridge(d, where);
+      break;
+    }
+}
+
+static void
 show_rom(struct device *d)
 {
   struct pci_dev *p = d->dev;
@@ -558,6 +638,9 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_MSI:
 	      show_msi(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_PCIX:
+	      show_pcix(d, where);
 	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);
