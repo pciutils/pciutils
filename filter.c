@@ -1,5 +1,5 @@
 /*
- *	$Id: filter.c,v 1.1 1998/03/31 21:02:14 mj Exp $
+ *	$Id: filter.c,v 1.2 1998/06/08 07:51:45 mj Exp $
  *
  *	Linux PCI Utilities -- Device Filtering
  *
@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <linux/pci.h>
 
 #include "pciutils.h"
 
@@ -48,7 +47,7 @@ filter_parse_slot(struct pci_filter *f, char *str)
     *dot++ = 0;
   if (mid[0] && strcmp(mid, "*"))
     {
-      long int x = strtol(str, &e, 16);
+      long int x = strtol(mid, &e, 16);
       if ((e && *e) || (x < 0 || x >= 0x1f))
 	return "Invalid slot number";
       f->slot = x;
