@@ -1,5 +1,8 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* lib/generic.c: Removed memory leak in pci_generic_bus_scan().
+	Reported by Gary Parnes <gary_parnes@terago.com>.
+
 	* Replaced obsolete syntax of __attribute__((unused)) in the middle of
 	parameter declarations (which is no longer supported by GCC 3.1) by the
 	current syntax (attribute at the end). Thanks to pixel@mandrakesoft.com

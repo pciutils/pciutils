@@ -14,7 +14,7 @@ void
 pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 {
   int dev, multi, ht;
-  struct pci_dev *t = pci_alloc_dev(a);
+  struct pci_dev *t;
 
   a->debug("Scanning bus %02x for devices...\n", bus);
   if (busmap[bus])
@@ -23,6 +23,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
       return;
     }
   busmap[bus] = 1;
+  t = pci_alloc_dev(a);
   t->bus = bus;
   for(dev=0; dev<32; dev++)
     {
@@ -61,6 +62,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	    }
 	}
     }
+  pci_free_dev(t);
 }
 
 void
