@@ -1,3 +1,13 @@
+Mon Feb  9 13:17:43 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile, pciutils.h: Include local pci.h instead of <linux/pci.h>
+	if available. This should avoid all problems with official kernel
+	not synchronized to newer PCI code in CVS -- standard distribution
+	of pciutils now contains pci.h from current CVS kernel, pciutils
+	in CVS contain no pci.h and use the correct kernel include.
+
+	* Makefile: Fixed installation path for man pages.
+
 Sat Feb  7 15:15:46 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* README: Updated.

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.6 1998/02/08 10:58:54 mj Exp $
+ *	$Id: lspci.c,v 1.7 1998/02/09 12:32:54 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <linux/pci.h>
 
 #include "pciutils.h"
 

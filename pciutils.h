@@ -1,5 +1,5 @@
 /*
- *	$Id: pciutils.h,v 1.2 1998/01/27 11:50:13 mj Exp $
+ *	$Id: pciutils.h,v 1.3 1998/02/09 12:32:56 mj Exp $
  *
  *	Linux PCI Utilities -- Declarations
  *
@@ -9,6 +9,12 @@
  */
 
 #include <linux/types.h>
+
+#ifdef KERNEL_PCI_H
+#include <linux/pci.h>
+#else
+#include "pci.h"
+#endif
 
 #define PROC_BUS_PCI "/proc/bus/pci"
 #define ETC_PCI_IDS "/etc/pci.ids"
