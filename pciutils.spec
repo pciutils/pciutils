@@ -1,5 +1,5 @@
 Name:		pciutils
-Version:	2.1.5
+Version:	2.1.7
 Release: 	1
 Source:		ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/%{name}-%{version}.tar.gz
 Copyright:	GNU GPL
@@ -19,6 +19,12 @@ Pakiet zawiera narzêdzia do ustawiania i odczytywania informacji
 o urz±dzeniach pod³±czonych do szyny PCI w Twoim komputerze.
 Wymaga kernela 2.1.82 lub nowszego (udostêpniaj±cego odpowiednie
 informacje poprzez /proc/bus/pci).
+
+%description -l de
+Dieses Paket enthält verschiedene Programme zum Anzeigen und
+Einstellen von PCI-Bus Erweiterungen.  Benötigt wird ein Kernel
+Version 2.1.82 oder neuer (mit Unterstützung für die /proc/bus/pci
+Schnittstelle).
 
 %prep
 %setup -q

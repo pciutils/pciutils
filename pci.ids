@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.56 2000/04/17 16:11:58 mj Exp $
+#	$Id: pci.ids,v 1.57 2000/04/21 12:00:12 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -315,7 +315,8 @@
 	0046  DECchip 21554
 		9005 1364  Dell PowerEdge RAID Controller 2
 		9005 1365  Dell PowerEdge RAID Controller 2
-	1065  RAID Controller
+	1065  DECchip 21285
+		1069 0020  DAC960P
 1012  Micronics Computers Inc
 1013  Cirrus Logic
 	0038  GD 7548
@@ -372,6 +373,7 @@
 	002d  Python
 	002e  ServeRAID controller
 	0036  Miami
+	003a  CPU to PCI Bridge
 	003e  16/4 Token ring UTP/STP controller
 		1014 003e  Token-Ring Adapter
 		1014 00cd  Token-Ring Adapter + Wake-On-LAN
@@ -379,16 +381,30 @@
 		1014 00cf  16/4 Token-Ring Adapter Special
 		1014 00e4  High-Speed 100/16/4 Token-Ring Adapter
 		1014 00e5  16/4 Token-Ring Adapter 2 + Wake-On-LAN
+	0045  SSA Adapter
 	0046  MPIC interrupt controller
 	0047  PCI to PCI Bridge
 	0048  PCI to PCI Bridge
+	004e  ATM Controller (14104e00)
+	004f  ATM Controller (14104f00)
+	0050  ATM Controller (14105000)
 	0053  25 MBit ATM Controller
 	0057  MPEG PCI Bridge
 	005c  i82557B 10/100
+	007c  ATM Controller (14107c00)
 	007d  3780IDSP [MWave]
+	0090  GXT 3000P
+		1014 008E  GXT-3000P
 	0095  20H2999 PCI Docking Bridge
+	00a5  ATM Controller (1410a500)
+	00a6  ATM 155MBPS MM Controller (1410a600)
 	00b7  256-bit Graphics Rasterizer [Fire GL1]
 		1902 00b8  Fire GL1
+	00be  ATM 622MBPS Controller (1410be00)
+	0142  Yotta Video Compositor Input
+		1014 0143 Yotta Input Controller (ytin)
+	0144  Yotta Video Compositor Output
+		1014 0145 Yotta Output Controller (ytout)
 	ffff  MPIC-2 interrupt controller
 1015  LSI Logic Corp of Canada
 1016  ICL Personal Systems
@@ -2488,7 +2504,7 @@
 	0458  LT WinModem
 	0459  LT WinModem
 	045a  LT WinModem
-	0480  Venus WinModem (V90, 56KFlex)
+	0480  Venus Modem (V90, 56KFlex)
 11c2  Sand Microelectronics
 11c3  NEC Corp
 11c4  Document Technologies, Inc
@@ -2657,7 +2673,7 @@
 		139c 0017  Raven
 		14af 0002  Maxi Gamer Phoenix
 		3030 3030  Skywell Magic TwinPower
-	0004  Voodoo Banshee
+	0004  Voodoo Banshee [Velocity 100]
 	0005  Voodoo 3
 		121a 0004  Voodoo3 AGP
 		121a 0030  Voodoo3 AGP
@@ -3006,6 +3022,7 @@
 12ad  Multidata GmbH
 12ae  Alteon Networks Inc.
 	0001  AceNIC Gigabit Ethernet
+		1410 0104  Gigabit Ethernet-SX PCI Adapter (14100401)
 12af  TDK USA Corp
 12b0  Jorge Scientific Corp
 12b1  GammaLink
@@ -4195,6 +4212,8 @@
 45fb  Baldor Electric Company
 4680  Umax Computer Corp
 4843  Hercules Computer Technology Inc
+4916  RedCreek Communications Inc
+	1960  RedCreek PCI adapter
 4943  Growth Networks
 4978  Axil Computer Inc
 4a14  NetVin

@@ -1,3 +1,37 @@
+2000-04-21  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 2.1.7.
+
+	* pciutils.spec: Added German description.
+
+	* lib/names.c (pci_lookup_name): Added a cheat for case that subsystem ID's
+	are the same as device ID and just output subsystem name according to
+	device name.
+
+	* lib/proc.c: Use UNUSED instead of __attribute__((unused)).
+
+	* lib/pci.h: Added the correct typedefs for AIX.
+
+	* lib/generic.c (pci_generic_scan_bus): Export.
+
+	* lib/configure: Detect AIX. Use "echo '...\c'" instead of
+	"echo -n" if the shell isn't bash.
+
+	* lspci.c: Avoid using alloca() if not compiled by GCC.
+	(insert_dev): Avoid returning a void value.
+
+	* Makefile: Choose which install utility to use according to
+	OS type. Also use `-o' instead of `-or' in find arguments.
+	Part of the AIX port.
+
+	* lib/aix-device.c: Added AIX low-level interface. Contributed
+	by Dave Johnson <ddj@brown.edu>, thanks a lot!
+
+	* pci.ids: Few new ID's.
+
+	* pciutils.h, lib/internal.h: Redefine __attribute__ and inline
+	when not compiled by GCC.
+
 2000-04-17  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 2.1.6.
