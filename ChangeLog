@@ -1,3 +1,20 @@
+2004-08-13  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_rom): Use the same logic for printing disabled
+	or unassigned ROM's as we do in show_bases() for the other BAR's.
+
+	* lib/generic.c (pci_generic_fill_info): Better reaction to
+	invalid 64-bit addresses. Also d->hdrtype should not include
+	bit 7, which caused mysterious errors on multi-function devices.
+
+	* lib/generic.c (pci_generic_fill_info): Fill in base addresses
+	even if the regions are known to be disabled. It is the client's
+	job to interpret them. (And it is not a trivial job if you want
+	to do it correctly, since you need to check I/O and memory enables
+	on all upstream bridges, too.) However, it could be interesting to
+	introduce functions for interpreting the addresses and even for
+	mapping the regions and doing I/O on them.
+
 2004-07-30  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c: HyperTransport improvements from Maciej.

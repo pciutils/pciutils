@@ -80,7 +80,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
   struct pci_access *a = d->access;
 
   if ((flags & (PCI_FILL_BASES | PCI_FILL_ROM_BASE)) && d->hdrtype < 0)
-    d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE);
+    d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
   if (flags & PCI_FILL_IDENT)
     {
       d->vendor_id = pci_read_word(d, PCI_VENDOR_ID);
@@ -106,41 +106,32 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	}
       if (cnt)
 	{
-	  u16 cmd = pci_read_word(d, PCI_COMMAND);
 	  for(i=0; i<cnt; i++)
 	    {
 	      u32 x = pci_read_long(d, PCI_BASE_ADDRESS_0 + i*4);
 	      if (!x || x == (u32) ~0)
 		continue;
-	      d->base_addr[i] = x;
-	      if (x & PCI_BASE_ADDRESS_SPACE_IO)
+	      if ((x & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
+		d->base_addr[i] = x;
+	      else
 		{
-		  if (!a->buscentric && !(cmd & PCI_COMMAND_IO))
-		    d->base_addr[i] = 0;
-		}
-	      else if (a->buscentric || (cmd & PCI_COMMAND_MEMORY))
-		{
-		  if ((x & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
+		  if ((x & PCI_BASE_ADDRESS_MEM_TYPE_MASK) != PCI_BASE_ADDRESS_MEM_TYPE_64)
+		    d->base_addr[i] = x;
+		  else if (i >= cnt-1)
+		    a->warning("%04x:%02x:%02x.%d: Invalid 64-bit address seen for BAR %d.", d->domain, d->bus, d->dev, d->func, i);
+		  else
 		    {
-		      if (i >= cnt-1)
-			a->warning("%04x:%02x:%02x.%d: Invalid 64-bit address seen.", d->domain, d->bus, d->dev, d->func);
-		      else
-			{
-			  u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
+		      u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
 #ifdef HAVE_64BIT_ADDRESS
-			  d->base_addr[i-1] |= ((pciaddr_t) y) << 32;
+		      d->base_addr[i-1] = x | (((pciaddr_t) y) << 32);
 #else
-			  if (y)
-			    {
-			      a->warning("%04x:%02x:%02x.%d 64-bit device address ignored.", d->domain, d->bus, d->dev, d->func);
-			      d->base_addr[i-1] = 0;
-			    }
+		      if (y)
+			a->warning("%04x:%02x:%02x.%d 64-bit device address ignored.", d->domain, d->bus, d->dev, d->func);
+		      else
+			d->base_addr[i-1] = x;
 #endif
-			}
 		    }
 		}
-	      else
-		d->base_addr[i] = 0;
 	    }
 	}
     }
@@ -159,9 +150,9 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	}
       if (reg)
 	{
-	  u32 a = pci_read_long(d, reg);
-	  if (a & PCI_ROM_ADDRESS_ENABLE)
-	    d->rom_base_addr = a;
+	  u32 u = pci_read_long(d, reg);
+	  if (u != 0xffffffff)
+	    d->rom_base_addr = u;
 	}
     }
   return flags & ~PCI_FILL_SIZES;

@@ -916,21 +916,33 @@ show_ht(struct device *d, int where, int cmd)
 }
 
 static void
-show_rom(struct device *d)
+show_rom(struct device *d, int reg)
 {
   struct pci_dev *p = d->dev;
   pciaddr_t rom = p->rom_base_addr;
   pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
+  u32 flg = get_conf_long(d, reg);
+  word cmd = get_conf_word(d, PCI_COMMAND);
 
-  if (!rom && !len)
+  if (!rom && !flg && !len)
     return;
-  printf("\tExpansion ROM at ");
+  putchar('\t');
+  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
+    {
+      printf("[virtual] ");
+      flg = rom;
+    }
+  printf("Expansion ROM at ");
   if (rom & PCI_ROM_ADDRESS_MASK)
     printf(PCIADDR_T_FMT, rom & PCI_ROM_ADDRESS_MASK);
+  else if (flg & PCI_ROM_ADDRESS_MASK)
+    printf("<ignored>");
   else
     printf("<unassigned>");
-  if (!(rom & PCI_ROM_ADDRESS_ENABLE))
+  if (!(flg & PCI_ROM_ADDRESS_ENABLE))
     printf(" [disabled]");
+  else if (!(cmd & PCI_COMMAND_MEMORY))
+    printf(" [disabled by cmd]");
   show_size(len);
   putchar('\n');
 }
@@ -1363,7 +1375,7 @@ static void
 show_htype0(struct device *d)
 {
   show_bases(d, 6);
-  show_rom(d);
+  show_rom(d, PCI_ROM_ADDRESS);
   show_caps(d);
 }
 
@@ -1451,7 +1463,7 @@ show_htype1(struct device *d)
 	     FLAG(sec_stat, PCI_STATUS_SIG_SYSTEM_ERROR),
 	     FLAG(sec_stat, PCI_STATUS_DETECTED_PARITY));
 
-  show_rom(d);
+  show_rom(d, PCI_ROM_ADDRESS1);
 
   if (verbose > 1)
     printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",

@@ -140,7 +140,7 @@ struct pci_dev {
   struct pci_methods *methods;
   byte *cache;				/* Cached config registers */
   int cache_len;
-  int hdrtype;				/* Cached header type, -1 if unknown */
+  int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
   void *aux;				/* Auxillary data */
 };
 
