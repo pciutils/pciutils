@@ -26,7 +26,7 @@ typedef u_int32_t u32;
 typedef unsigned long u64;
 #define PCI_U64_FMT "l"
 #else
-typedef unsigned long long u64
+typedef unsigned long long u64;
 #define PCI_U64_FMT "ll"
 #endif
 #endif
