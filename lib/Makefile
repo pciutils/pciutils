@@ -1,10 +1,10 @@
-# $Id: Makefile,v 1.1 1999/01/22 21:05:10 mj Exp $
+# $Id: Makefile,v 1.2 1999/01/24 21:35:35 mj Exp $
 # Makefile for The PCI Library
 # (c) 1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
 include config.mk
 
-OBJS=access.o generic.o dump.o names.o filter.o buffer.o
+OBJS=access.o generic.o dump.o names.o filter.o
 INCL=internal.h pci.h config.h
 
 ifdef HAVE_PM_LINUX_PROC

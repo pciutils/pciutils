@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.1 1999/01/22 21:05:34 mj Exp $
+ *	$Id: pci.h,v 1.2 1999/01/24 21:35:36 mj Exp $
  *
  *	The PCI Library
  *
@@ -100,6 +100,8 @@ struct pci_dev {
   /* Fields used internally: */
   struct pci_access *access;
   struct pci_methods *methods;
+  byte *cache;				/* Cached information */
+  int cache_len;
   int known_fields;			/* Set of info fields that is already known */
   int hdrtype;				/* Direct methods: header type */
   void *aux;				/* Auxillary data */
@@ -122,11 +124,7 @@ void pci_fill_info(struct pci_dev *, int flags); /* Fill in device information *
 #define PCI_FILL_ROM_BASE	8
 #define PCI_FILL_RESCAN		0x10000
 
-/*
- *	Buffered access
- */
-
-void pci_setup_buffer(struct pci_dev *, byte *buf);
+void pci_setup_cache(struct pci_dev *, byte *cache, int len);
 
 /*
  *	Filters

@@ -1,5 +1,5 @@
 /*
- *	$Id: access.c,v 1.1 1999/01/22 21:05:12 mj Exp $
+ *	$Id: access.c,v 1.2 1999/01/24 21:35:35 mj Exp $
  *
  *	The PCI Library -- User Access
  *
@@ -217,7 +217,9 @@ pci_read_data(struct pci_dev *d, void *buf, int pos, int len)
 {
   if (pos & (len-1))
     d->access->error("Unaligned read: pos=%02x, len=%d", pos, len);
-  if (!d->methods->read(d, pos, buf, len))
+  if (pos + len <= d->cache_len)
+    memcpy(buf, d->cache + pos, len);
+  else if (!d->methods->read(d, pos, buf, len))
     memset(buf, 0xff, len);
 }
 
@@ -256,6 +258,8 @@ pci_write_data(struct pci_dev *d, void *buf, int pos, int len)
 {
   if (pos & (len-1))
     d->access->error("Unaligned write: pos=%02x,len=%d", pos, len);
+  if (pos + len <= d->cache_len)
+    memcpy(d->cache + pos, buf, len);
   return d->methods->write(d, pos, buf, len);
 }
 
@@ -282,6 +286,11 @@ pci_write_long(struct pci_dev *d, int pos, u32 data)
 int
 pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
 {
+  if (pos < d->cache_len)
+    {
+      int l = (pos + len >= d->cache_len) ? (d->cache_len - pos) : len;
+      memcpy(d->cache + pos, buf, l);
+    }
   return d->methods->write(d, pos, buf, len);
 }
 
@@ -296,4 +305,11 @@ pci_fill_info(struct pci_dev *d, int flags)
   if (flags & ~d->known_fields)
     d->methods->fill_info(d, flags & ~d->known_fields);
   d->known_fields |= flags;
+}
+
+void
+pci_setup_cache(struct pci_dev *d, byte *cache, int len)
+{
+  d->cache = cache;
+  d->cache_len = len;
 }
