@@ -35,6 +35,15 @@ xmalloc(unsigned int howmuch)
   return p;
 }
 
+void *
+xrealloc(void *ptr, unsigned int howmuch)
+{
+  void *p = realloc(ptr, howmuch);
+  if (!p)
+    die("Unable to allocate %d bytes of memory", howmuch);
+  return p;
+}
+
 int
 parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 {

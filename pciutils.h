@@ -19,6 +19,7 @@
 
 void die(char *msg, ...) NONRET;
 void *xmalloc(unsigned int howmuch);
+void *xrealloc(void *ptr, unsigned int howmuch);
 int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 
 #ifdef HAVE_PM_LINUX_PROC

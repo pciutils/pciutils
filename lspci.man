@@ -47,6 +47,9 @@ as several PCI devices
 when you try to read undefined portions of the config space (this behavior probably
 doesn't violate the PCI standard, but it's at least very stupid).
 .TP
+.B -xxxx
+Show hexadecimal dump of the extended PCI configuration space.
+.TP
 .B -b
 Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
 PCI bus instead of as seen by the kernel.

@@ -695,7 +695,6 @@
 #define  PCI_EXP_DEVCAP_ATN_BUT	0x1000	/* Attention Button Present */
 #define  PCI_EXP_DEVCAP_ATN_IND	0x2000	/* Attention Indicator Present */
 #define  PCI_EXP_DEVCAP_PWR_IND	0x4000	/* Power Indicator Present */
-#define  PCI_EXP_DEVCAP_READRQ	0x38000	/* Max_Read_Request_Size */
 #define  PCI_EXP_DEVCAP_PWR_VAL	0x3fc0000 /* Slot Power Limit Value */
 #define  PCI_EXP_DEVCAP_PWR_SCL	0xc000000 /* Slot Power Limit Scale */
 #define PCI_EXP_DEVCTL		0x8	/* Device Control */
@@ -703,12 +702,12 @@
 #define  PCI_EXP_DEVCTL_NFERE	0x0002	/* Non-Fatal Error Reporting Enable */
 #define  PCI_EXP_DEVCTL_FERE	0x0004	/* Fatal Error Reporting Enable */
 #define  PCI_EXP_DEVCTL_URRE	0x0008	/* Unsupported Request Reporting En. */
-#define  PCI_EXP_DEVCTL_URS	0x0010	/* Unsupported Request Severity */
+#define  PCI_EXP_DEVCTL_RELAXED	0x0010	/* Enable Relaxed Ordering */
 #define  PCI_EXP_DEVCTL_PAYLOAD	0x00e0	/* Max_Payload_Size */
 #define  PCI_EXP_DEVCTL_EXT_TAG	0x0100	/* Extended Tag Field Enable */
 #define  PCI_EXP_DEVCTL_PHANTOM	0x0200	/* Phantom Functions Enable */
 #define  PCI_EXP_DEVCTL_AUX_PME	0x0400	/* Auxiliary Power PM Enable */
-#define  PCI_EXP_DEVCTL_STOP	0x0800	/* Complete Pending Transactions */
+#define  PCI_EXP_DEVCTL_NOSNOOP	0x0800	/* Enable No Snoop */
 #define  PCI_EXP_DEVCTL_READRQ	0x7000	/* Max_Read_Request_Size */
 #define PCI_EXP_DEVSTA		0xa	/* Device Status */
 #define  PCI_EXP_DEVSTA_CED	0x01	/* Correctable Error Detected */
@@ -718,12 +717,52 @@
 #define  PCI_EXP_DEVSTA_AUXPD	0x10	/* AUX Power Detected */
 #define  PCI_EXP_DEVSTA_TRPND	0x20	/* Transactions Pending */
 #define PCI_EXP_LNKCAP		0xc	/* Link Capabilities */
+#define  PCI_EXP_LNKCAP_SPEED	0x0000f	/* Maximum Link Speed */
+#define  PCI_EXP_LNKCAP_WIDTH	0x003f0	/* Maximum Link Width */
+#define  PCI_EXP_LNKCAP_ASPM	0x00c00	/* Active State Power Management */
+#define  PCI_EXP_LNKCAP_L0S	0x07000	/* L0s Acceptable Latency */
+#define  PCI_EXP_LNKCAP_L1	0x38000	/* L1 Acceptable Latency */
+#define  PCI_EXP_LNKCAP_PORT	0xff000000 /* Port Number */
 #define PCI_EXP_LNKCTL		0x10	/* Link Control */
+#define  PCI_EXP_LNKCTL_ASPM	0x0003	/* ASPM Control */
+#define  PCI_EXP_LNKCTL_RCB	0x0008	/* Read Completion Boundary */
+#define  PCI_EXP_LNKCTL_DISABLE	0x0010	/* Link Disable */
+#define  PCI_EXP_LNKCTL_RETRAIN	0x0020	/* Retrain Link */
+#define  PCI_EXP_LNKCTL_CLOCK	0x0040	/* Common Clock Configuration */
+#define  PCI_EXP_LNKCTL_XSYNCH	0x0080	/* Extended Synch */
 #define PCI_EXP_LNKSTA		0x12	/* Link Status */
+#define  PCI_EXP_LNKSTA_SPEED	0x000f	/* Negotiated Link Speed */
+#define  PCI_EXP_LNKSTA_WIDTH	0x03f0	/* Negotiated Link Width */
+#define  PCI_EXP_LNKSTA_TR_ERR	0x0400	/* Training Error */
+#define  PCI_EXP_LNKSTA_TRAIN	0x0800	/* Link Training */
+#define  PCI_EXP_LNKSTA_SL_CLK	0x1000	/* Slot Clock Configuration */
 #define PCI_EXP_SLTCAP		0x14	/* Slot Capabilities */
+#define  PCI_EXP_SLTCAP_ATNB	0x0001	/* Attention Button Present */
+#define  PCI_EXP_SLTCAP_PWRC	0x0002	/* Power Controller Present */
+#define  PCI_EXP_SLTCAP_MRL	0x0004	/* MRL Sensor Present */
+#define  PCI_EXP_SLTCAP_ATNI	0x0008	/* Attention Indicator Present */
+#define  PCI_EXP_SLTCAP_PWRI	0x0010	/* Power Indicator Present */
+#define  PCI_EXP_SLTCAP_HPS	0x0020	/* Hot-Plug Surprise */
+#define  PCI_EXP_SLTCAP_HPC	0x0040	/* Hot-Plug Capable */
+#define  PCI_EXP_SLTCAP_PWR_VAL	0x00007f80 /* Slot Power Limit Value */
+#define  PCI_EXP_SLTCAP_PWR_SCL	0x00018000 /* Slot Power Limit Scale */
+#define  PCI_EXP_SLTCAP_PSN	0xfff80000 /* Physical Slot Number */
 #define PCI_EXP_SLTCTL		0x18	/* Slot Control */
+#define  PCI_EXP_SLTCTL_ATNB	0x0001	/* Attention Button Pressed Enable */
+#define  PCI_EXP_SLTCTL_PWRF	0x0002	/* Power Fault Detected Enable */
+#define  PCI_EXP_SLTCTL_MRLS	0x0004	/* MRL Sensor Changed Enable */
+#define  PCI_EXP_SLTCTL_PRSD	0x0008	/* Presence Detect Changed Enable */
+#define  PCI_EXP_SLTCTL_CMDC	0x0010	/* Command Completed Interrupt Enable */
+#define  PCI_EXP_SLTCTL_HPIE	0x0020	/* Hot-Plug Interrupt Enable */
+#define  PCI_EXP_SLTCTL_ATNI	0x00C0	/* Attention Indicator Control */
+#define  PCI_EXP_SLTCTL_PWRI	0x0300	/* Power Indicator Control */
+#define  PCI_EXP_SLTCTL_PWRC	0x0400	/* Power Controller Control */
 #define PCI_EXP_SLTSTA		0x1a	/* Slot Status */
 #define PCI_EXP_RTCTL		0x1c	/* Root Control */
+#define  PCI_EXP_RTCTL_SECEE	0x1	/* System Error on Correctable Error */
+#define  PCI_EXP_RTCTL_SENFEE	0x1	/* System Error on Non-Fatal Error */
+#define  PCI_EXP_RTCTL_SEFEE	0x1	/* System Error on Fatal Error */
+#define  PCI_EXP_RTCTL_PMEIE	0x1	/* PME Interrupt Enable */
 #define PCI_EXP_RTSTA		0x20	/* Root Status */
 
 /* MSI-X */
