@@ -49,13 +49,13 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 {
   switch (i)
     {
-#ifdef HAVE_PM_LINUX_PROC
+#ifdef PCI_HAVE_PM_LINUX_PROC
     case 'P':
       pacc->method_params[PCI_ACCESS_PROC_BUS_PCI] = optarg;
       pacc->method = PCI_ACCESS_PROC_BUS_PCI;
       break;
 #endif
-#ifdef HAVE_PM_INTEL_CONF
+#ifdef PCI_HAVE_PM_INTEL_CONF
     case 'H':
       if (!strcmp(optarg, "1"))
 	pacc->method = PCI_ACCESS_I386_TYPE1;
@@ -65,7 +65,7 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 	die("Unknown hardware configuration type %s", optarg);
       break;
 #endif
-#ifdef HAVE_PM_DUMP
+#ifdef PCI_HAVE_PM_DUMP
     case 'F':
       pacc->method_params[PCI_ACCESS_DUMP] = optarg;
       pacc->method = PCI_ACCESS_DUMP;

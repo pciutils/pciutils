@@ -14,7 +14,7 @@ MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; 
 INSTALL=install
 DIRINSTALL=install -d
 PCILIB=lib/libpci.a
-PCIINC=lib/config.h lib/header.h lib/pci.h
+PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
 
 ifeq ($(shell uname),NetBSD)
 PCILIB=libpciutils.a

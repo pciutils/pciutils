@@ -122,7 +122,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 		  else
 		    {
 		      u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
-#ifdef HAVE_64BIT_ADDRESS
+#ifdef PCI_HAVE_64BIT_ADDRESS
 		      d->base_addr[i-1] = x | (((pciaddr_t) y) << 32);
 #else
 		      if (y)

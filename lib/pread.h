@@ -37,7 +37,7 @@ static _syscall5(int, pread, unsigned int, fd, void *, buf, size_t, size, u32, w
 static _syscall5(int, pwrite, unsigned int, fd, void *, buf, size_t, size, u32, where_lo, u32, where_hi);
 static int do_read(struct pci_dev *d UNUSED, int fd, void *buf, size_t size, int where) { return pread(fd, buf, size, where, 0); }
 static int do_write(struct pci_dev *d UNUSED, int fd, void *buf, size_t size, int where) { return pwrite(fd, buf, size, where, 0); }
-#define HAVE_DO_READ
+#define PCI_HAVE_DO_READ
 
 #else
 /* In all other cases we use lseek/read/write instead to be safe */
@@ -57,10 +57,10 @@ static int do_write(struct pci_dev *d UNUSED, int fd, void *buf, size_t size, in
 	}
 make_rw_glue(read)
 make_rw_glue(write)
-#define HAVE_DO_READ
+#define PCI_HAVE_DO_READ
 #endif
 
-#ifndef HAVE_DO_READ
+#ifndef PCI_HAVE_DO_READ
 #define do_read(d,f,b,l,p) pread(f,b,l,p)
 #define do_write(d,f,b,l,p) pwrite(f,b,l,p)
 #endif

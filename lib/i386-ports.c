@@ -10,13 +10,13 @@
 
 #include "internal.h"
 
-#if defined(OS_LINUX)
+#if defined(PCI_OS_LINUX)
 #include "i386-io-linux.h"
-#elif defined(OS_GNU)
+#elif defined(PCI_OS_GNU)
 #include "i386-io-hurd.h"
-#elif defined(OS_SUNOS)
+#elif defined(PCI_OS_SUNOS)
 #include "i386-io-sunos.h"
-#elif defined(OS_WINDOWS)
+#elif defined(PCI_OS_WINDOWS)
 #include "i386-io-windows.h"
 #else
 #error Do not know how to access I/O ports on this OS.

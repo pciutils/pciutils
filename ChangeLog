@@ -1,5 +1,28 @@
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
+	* lib/types.h: If PCI_HAVE_Uxx_TYPES is defined, libpci doesn't define
+	its own u8, u16, u32, byte and word types and uses what the user
+	has supplied instead. With this change, all namespace clashes should
+	be gone.
+
+	* Makefile, lib/Makefile: Updated dependencies.
+
+	* pciutils.h: Include lib/sysdep.h and move NONRET et al. there.
+
+	* lib/sysdep.h: No need to include <sys/types.h> on FreeBSD, because
+	it is included unconditionally in lib/types.h.
+
+	* Moved system-dependent stuff from lib/internal.h to lib/sysdep.h,
+	which is also used by the utilities. Also moved type declarations
+	from lib/pci.h to lib/types.h.
+
+	* All files: Prepend a "PCI_" prefix in front of all configuration
+	defines to avoid namespace clashes. CAVEAT: If there is any libpci
+	application using the (undocumented) defines, it has to be updated.
+
+	* lib/Makefile: Killed HAVE_OWN_HEADER_H, since we stopped sharing
+	headers with the kernel a couple of years ago.
+
 	* lib/sysfs.c (sysfs_get_resources): We have 7 resources, not 6.
 
 	* lspci.c (show_rom): Use the same logic for printing disabled

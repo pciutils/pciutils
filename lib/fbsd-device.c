@@ -29,7 +29,7 @@
 static void
 fbsd_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_FBSD_DEVICE] = PATH_FBSD_DEVICE;
+  a->method_params[PCI_ACCESS_FBSD_DEVICE] = PCI_PATH_FBSD_DEVICE;
 }
 
 static int

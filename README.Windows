@@ -4,14 +4,14 @@ However, you need to configure the package manually:
 
 lib/config.mk:
 
-ARCH_I386=1
-HAVE_PM_INTEL_CONF=1 
-OS_WINDOWS=1 
+PCI_ARCH_I386=1
+PCI_HAVE_PM_INTEL_CONF=1 
+PCI_OS_WINDOWS=1 
 
 lib/config.h:
 
-#define ARCH_I386
-#define OS_WINDOWS
-#define HAVE_PM_INTEL_CONF
-#define PATH_PCI_IDS "pci.ids"
+#define PCI_ARCH_I386
+#define PCI_OS_WINDOWS
+#define PCI_HAVE_PM_INTEL_CONF
+#define PCI_PATH_IDS "pci.ids"
 #define PCILIB_VERSION "2.1.99-test5"

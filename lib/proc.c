@@ -21,7 +21,7 @@
 static void
 proc_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_PROC_BUS_PCI] = PATH_PROC_BUS_PCI;
+  a->method_params[PCI_ACCESS_PROC_BUS_PCI] = PCI_PATH_PROC_BUS_PCI;
 }
 
 static int

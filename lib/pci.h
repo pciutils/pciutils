@@ -11,53 +11,7 @@
 
 #include "config.h"
 #include "header.h"
-
-/*
- *	Types and format strings
- */
-
-#include <sys/types.h>
-
-#ifdef OS_WINDOWS
-typedef unsigned char byte;
-typedef char u8;
-typedef unsigned short word;
-typedef short u16;
-typedef unsigned long u32;
-#else
-typedef u_int8_t byte;
-typedef u_int8_t u8;
-typedef u_int16_t word;
-typedef u_int16_t u16;
-typedef u_int32_t u32;
-#endif
-
-#ifdef HAVE_64BIT_ADDRESS
-#include <limits.h>
-#if ULONG_MAX > 0xffffffff
-typedef unsigned long u64;
-#define PCIADDR_T_FMT "%016lx"
-#define PCIADDR_PORT_FMT "%04lx"
-#else
-typedef unsigned long long u64;
-#define PCIADDR_T_FMT "%016llx"
-#define PCIADDR_PORT_FMT "%04llx"
-#endif
-typedef u64 pciaddr_t;
-#else
-typedef u32 pciaddr_t;
-#define PCIADDR_T_FMT "%08x"
-#define PCIADDR_PORT_FMT "%04x"
-#endif
-
-#ifdef ARCH_SPARC64
-/* On sparc64 Linux the kernel reports remapped port addresses and IRQ numbers */
-#undef PCIADDR_PORT_FMT
-#define PCIADDR_PORT_FMT PCIADDR_T_FMT
-#define PCIIRQ_FMT "%08x"
-#else
-#define PCIIRQ_FMT "%d"
-#endif
+#include "types.h"
 
 /*
  *	PCI Access Structure

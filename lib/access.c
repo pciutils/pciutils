@@ -15,39 +15,39 @@
 
 static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
   NULL,
-#ifdef HAVE_PM_LINUX_SYSFS
+#ifdef PCI_HAVE_PM_LINUX_SYSFS
   &pm_linux_sysfs,
 #else
   NULL,
 #endif
-#ifdef HAVE_PM_LINUX_PROC
+#ifdef PCI_HAVE_PM_LINUX_PROC
   &pm_linux_proc,
 #else
   NULL,
 #endif
-#ifdef HAVE_PM_INTEL_CONF
+#ifdef PCI_HAVE_PM_INTEL_CONF
   &pm_intel_conf1,
   &pm_intel_conf2,
 #else
   NULL,
   NULL,
 #endif
-#ifdef HAVE_PM_FBSD_DEVICE
+#ifdef PCI_HAVE_PM_FBSD_DEVICE
   &pm_fbsd_device,
 #else
   NULL,
 #endif
-#ifdef HAVE_PM_AIX_DEVICE
+#ifdef PCI_HAVE_PM_AIX_DEVICE
   &pm_aix_device,
 #else
   NULL,
 #endif
-#ifdef HAVE_PM_NBSD_LIBPCI
+#ifdef PCI_HAVE_PM_NBSD_LIBPCI
   &pm_nbsd_libpci,
 #else
   NULL,
 #endif
-#ifdef HAVE_PM_DUMP
+#ifdef PCI_HAVE_PM_DUMP
   &pm_dump,
 #else
   NULL,
@@ -61,7 +61,7 @@ pci_alloc(void)
   int i;
 
   bzero(a, sizeof(*a));
-  a->id_file_name = PATH_PCI_IDS;
+  a->id_file_name = PCI_PATH_IDS;
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);

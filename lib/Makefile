@@ -4,31 +4,31 @@
 include config.mk
 
 OBJS=access.o generic.o dump.o names.o filter.o
-INCL=internal.h pci.h config.h
+INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
 
-ifdef HAVE_PM_LINUX_SYSFS
+ifdef PCI_HAVE_PM_LINUX_SYSFS
 OBJS += sysfs.o
 endif
 
-ifdef HAVE_PM_LINUX_PROC
+ifdef PCI_HAVE_PM_LINUX_PROC
 OBJS += proc.o
 endif
 
-ifdef HAVE_PM_INTEL_CONF
+ifdef PCI_HAVE_PM_INTEL_CONF
 OBJS += i386-ports.o
 endif
 
-ifdef HAVE_PM_DUMP
+ifdef PCI_HAVE_PM_DUMP
 OBJS += dump.o
 endif
 
-ifdef HAVE_PM_SYSCALLS
+ifdef PCI_HAVE_PM_SYSCALLS
 OBJS += syscalls.o
 endif
 
-ifdef HAVE_PM_FBSD_DEVICE
+ifdef PCI_HAVE_PM_FBSD_DEVICE
 OBJS += fbsd-device.o
 CFLAGS += -I/usr/src/sys
 ifdef FREEBSD_SYS
@@ -36,17 +36,13 @@ CFLAGS += -I${FREEBSD_SYS}
 endif
 endif
 
-ifdef HAVE_PM_AIX_DEVICE
+ifdef PCI_HAVE_PM_AIX_DEVICE
 OBJS += aix-device.o
 endif
 
-ifdef HAVE_PM_NBSD_LIBPCI
+ifdef PCI_HAVE_PM_NBSD_LIBPCI
 OBJS += nbsd-libpci.o
 PCILIB=libpciutils.a
-endif
-
-ifdef HAVE_OWN_HEADER_H
-INCL += header.h
 endif
 
 all: $(PCILIB)

@@ -25,7 +25,7 @@
 static void
 sysfs_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_SYS_BUS_PCI] = PATH_SYS_BUS_PCI;
+  a->method_params[PCI_ACCESS_SYS_BUS_PCI] = PCI_PATH_SYS_BUS_PCI;
 }
 
 static inline char *

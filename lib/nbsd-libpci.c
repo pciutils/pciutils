@@ -25,7 +25,7 @@
 static void
 nbsd_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_NBSD_LIBPCI] = PATH_NBSD_DEVICE;
+  a->method_params[PCI_ACCESS_NBSD_LIBPCI] = PCI_PATH_NBSD_DEVICE;
 }
 
 static int
