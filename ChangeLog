@@ -1,5 +1,20 @@
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
+	* README.Windows: Updated.
+
+	* maint/release: Substitute version number in win32/config.h.
+
+	* win32/config.h: Added.
+
+	* lib/sysdep.h (bzero, strcasecmp): are macros on Windows.
+
+	* compat/getopt.[ch]: Added copies of getopt.[ch] from the GNU
+	C library for use on systems where the default libraries lack
+	proper getopt. Currently used by the Windows port.
+
+	* lib/sysdep.h, lib/types.h: Updates of the Windows port from
+	Alexander Stock.
+
 	* lib/types.h: If PCI_HAVE_Uxx_TYPES is defined, libpci doesn't define
 	its own u8, u16, u32, byte and word types and uses what the user
 	has supplied instead. With this change, all namespace clashes should

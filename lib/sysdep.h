@@ -15,6 +15,11 @@
 #define inline
 #endif
 
+#ifdef PCI_OS_WINDOWS
+#define bzero(x,y) memset(x,0,y)
+#define strcasecmp strcmpi
+#endif
+
 #ifdef PCI_HAVE_LINUX_BYTEORDER_H
 
 #include <asm/byteorder.h>
@@ -42,7 +47,15 @@
 #endif
 
 #ifdef PCI_OS_WINDOWS
-#include <sys/param.h>
+#ifdef __MINGW32__
+  #include <sys/param.h>
+#else
+  #include <io.h>
+  #define BIG_ENDIAN 4321
+  #define LITTLE_ENDIAN	1234
+  #define BYTE_ORDER LITTLE_ENDIAN
+  #define snprintf _snprintf
+#endif
 #endif
 
 #if BYTE_ORDER == BIG_ENDIAN

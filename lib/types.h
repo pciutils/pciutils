@@ -11,18 +11,17 @@
 #ifndef PCI_HAVE_Uxx_TYPES
 
 #ifdef PCI_OS_WINDOWS
-typedef unsigned char byte;
-typedef char u8;
-typedef unsigned short word;
-typedef short u16;
-typedef unsigned long u32;
+typedef unsigned __int8 u8;
+typedef unsigned __int16 u16;
+typedef unsigned __int32 u32;
 #else
-typedef u_int8_t byte;
 typedef u_int8_t u8;
-typedef u_int16_t word;
 typedef u_int16_t u16;
 typedef u_int32_t u32;
 #endif
+
+typedef u8 byte;
+typedef u16 word;
 
 #ifdef PCI_HAVE_64BIT_ADDRESS
 #include <limits.h>

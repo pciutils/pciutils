@@ -9,6 +9,10 @@
 #include "lib/pci.h"
 #include "lib/sysdep.h"
 
+#ifdef PCI_OS_WINDOWS
+#include "compat/getopt.h"
+#endif
+
 #define PCIUTILS_VERSION PCILIB_VERSION
 
 void die(char *msg, ...) NONRET;

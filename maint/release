@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # A simple script for making releases of the pciutils
-# (c) 2003 Martin Mares <mj@ucw.cz>
+# (c) 2003--2004 Martin Mares <mj@ucw.cz>
 
 use strict;
 use warnings;
@@ -30,6 +30,7 @@ $r->InitDist("maint/dist");
 my $reldir = $r->GenPackage;
 $r->GenFile("README");
 $r->GenFile("pciutils.lsm");
+$r->GenFile("win32/config.h");
 $r->Dispatch;
 if ($r->{"do_upload"}) {
 	print "Uploading pci.ids to Jabberwock\n";
