@@ -1,5 +1,8 @@
 Thu Mar  9 13:11:39 2000  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lib/example.c: Added a simple example of how to use
+	the library.
+
 	* lspci.man, setpci.man: Revealed --version. Well spotted
 	by Adam Sulmicki.
 
