@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.25 1999/10/30 09:25:09 mj Exp $
+# $Id: Makefile,v 1.26 1999/12/04 12:55:11 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -6,10 +6,10 @@ OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
 
-VERSION=2.1
+VERSION=2.1.1
 SUFFIX=
 #SUFFIX=-alpha
-DATE=1999-10-30
+DATE=1999-12-04
 
 ifeq ($(shell uname),FreeBSD)
 ROOT=/usr/local
