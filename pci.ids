@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.31 1999/07/09 00:20:56 ralf Exp $
+#	$Id: pci.ids,v 1.32 1999/07/20 11:29:41 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -935,7 +935,7 @@
 10cd  Advanced System Products, Inc
 	1100  ASC1100
 	1200  ASC1200 [(abp940) Fast SCSI-II]
-	1300  ABP940-U
+	1300  ABP940-U / ABP960-U
 	2300  ABP940-UW
 10ce  Radius
 10cf  Citicorp TTI
@@ -1303,9 +1303,13 @@
 	0017  AccelePort C/X
 	001A  DataFirePRIme E1 (1-port)
 	001B  AccelePort C/X (IBM)
+	001D  DataFire RAS T1/E1/PRI
+	0023  AccelePort RAS
+	0024  DataFire RAS B4 ST/U
 	0026  AccelePort 4r 920
 	0027  AccelePort Xr 920
 	0034  AccelePort 2r 920
+	0035  DataFire DSP T1/E1/PRI cPCI
 	6001  Avanstar
 1150  Thinking Machines Corp
 1151  JAE Electronics Inc.
@@ -1493,12 +1497,13 @@
 11bf  Astrodesign, Inc.
 11c0  Hewlett Packard
 11c1  Lucent Microelectronics
-	0440  LT WinModem 56k Data+Fax+Dsvd
-	0441  LT WinModem 56k Data+Fax
-	0442  LT WinModem 56k
-	0448  LT WinModem 56k
-	0449  LT WinModem 56k
-	044A  LT WinModem 56k
+	0440  L56xMF WinModem
+	0441  Toshiba Internal 56K WinModem
+	0442  WinModem 56k
+	0448  WinModem 56k
+	0449  WinModem 56k
+	044A  F-1156IV WinModem (V90, 56KFlex)
+	0480  Venus WinModem (V90, 56KFlex)
 11c2  Sand Microelectronics
 11c4  Document Technologies, Inc
 11c5  Shiva Corporation
@@ -1973,8 +1978,25 @@
 131d  Sysmic, Inc.
 131e  Xinex Networks Inc
 131f  Siig Inc
-	1020  CyberParallel
-	1021  CyberParallel
+	1010  Duet 1S(16550)+1P
+	1011  Duet 1S(16650)+1P
+	1012  Duet 1S(16850)+1P
+	1020  CyberParallel (1-port)
+	1021  CyberParallel (2-port)
+	1034  Trio 2S(16550)+1P
+	1035  Trio 2S(16650)+1P
+	1036  Trio 2S(16850)+1P
+	2010  Duet 1S(16550)+1P
+	2011  Duet 1S(16650)+1P
+	2012  Duet 1S(16850)+1P
+	2020  CyberParallel (1-port)
+	2021  CyberParallel (2-port)
+	2040  Trio 1S(16550)+2P
+	2041  Trio 1S(16650)+2P
+	2042  Trio 1S(16850)+2P
+	2060  Trio 2S(16550)+1P
+	2061  Trio 2S(16650)+1P
+	2062  Trio 2S(16850)+1P
 1320  Crypto AG
 1321  Arcobel Graphics BV
 1322  MTT Co., Ltd
@@ -2201,6 +2223,9 @@
 1405  Excalibur Systems Inc
 1406  Oce' Printing Systems GmbH
 1407  Lava Computer mfg Inc
+	8000  Parallel port controller
+	8001  Dual parallel port controller A
+	8002  Dual parallel port controller B
 1408  Aloka Co. Ltd
 1409  Timedia Technology Co Ltd
 140a  DSP Research Inc

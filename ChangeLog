@@ -1,3 +1,12 @@
+Tue Jul 20 13:25:09 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Some more IDs.
+
+Mon Jul 19 14:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Added IDs of parallel port controller cards as sent
+	by Tim Waugh <tim@cyberelk.demon.co.uk>.
+
 Wed Jul  7 00:55:48 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/proc.c (proc_scan): HAVE_LONG_ADDRESS instead of HAVE_64BIT_ADDRESS.
