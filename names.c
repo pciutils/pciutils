@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.5 1998/06/09 19:16:45 mj Exp $
+ *	$Id: names.c,v 1.6 1998/07/17 08:57:16 mj Exp $
  *
  *	Linux PCI Utilities -- Device ID to Name Translation
  *
@@ -26,50 +26,54 @@ static int name_list_loaded;
 
 struct nl_entry {
   struct nl_entry *next;
-  int id1, id2;
+  word id1, id2;
+  int cat;
   byte *name;
 };
 
-#define ID1_VENDOR -1
-#define ID1_CLASS -2
-#define ID1_SUBCLASS -3
-#define ID1_ERROR -4
+#define NL_VENDOR 0
+#define NL_DEVICE 1
+#define NL_CLASS 2
+#define NL_SUBCLASS 3
+#define NL_SUBSYSTEM_VENDOR 4
+#define NL_SUBSYSTEM_DEVICE 5
 
 #define HASH_SIZE 1024
 
 static struct nl_entry *nl_hash[HASH_SIZE];
 
-static inline unsigned int nl_calc_hash(int id1, int id2)
+static inline unsigned int nl_calc_hash(int cat, int id1, int id2)
 {
   unsigned int h;
 
-  h = id1 ^ id2;
-  h ^= (h >> 6);
+  h = id1 ^ id2 ^ (cat << 5);
+  h += (h >> 6);
   return h & (HASH_SIZE-1);
 }
 
-static struct nl_entry *nl_lookup(int id1, int id2)
+static struct nl_entry *nl_lookup(int cat, int id1, int id2)
 {
-  unsigned int h = nl_calc_hash(id1, id2);
+  unsigned int h = nl_calc_hash(cat, id1, id2);
   struct nl_entry *n = nl_hash[h];
 
-  while (n && (n->id1 != id1 || n->id2 != id2))
+  while (n && (n->id1 != id1 || n->id2 != id2 || n->cat != cat))
     n = n->next;
   return n;
 }
 
-static int nl_add(int id1, int id2, byte *text)
+static int nl_add(int cat, int id1, int id2, byte *text)
 {
-  unsigned int h = nl_calc_hash(id1, id2);
+  unsigned int h = nl_calc_hash(cat, id1, id2);
   struct nl_entry *n = nl_hash[h];
 
-  while (n && (n->id1 != id1 || n->id2 != id2))
+  while (n && (n->id1 != id1 || n->id2 != id2 || n->cat != cat))
     n = n->next;
   if (n)
     return 1;
   n = xmalloc(sizeof(struct nl_entry));
   n->id1 = id1;
   n->id2 = id2;
+  n->cat = cat;
   n->name = text;
   n->next = nl_hash[h];
   nl_hash[h] = n;
@@ -89,9 +93,8 @@ parse_name_list(void)
   byte *p = name_list;
   byte *q, *r;
   int lino = 0;
-  int id1 = ID1_ERROR;
-  int id2 = 0;
-  int i, j;
+  unsigned int id1=0, id2=0;
+  int cat, last_cat = -1;
 
   while (*p)
     {
@@ -120,45 +123,52 @@ parse_name_list(void)
       r = q;
       while (*q == ' ')
 	q++;
-      if (strlen(q) < 5 || q[4] != ' ')
-	goto parserr;
       if (r == q)
 	{
 	  if (q[0] == 'C' && q[1] == ' ')
 	    {
-	      if (sscanf(q+2, "%x", &j) != 1)
+	      if (strlen(q+2) < 3 ||
+		  q[4] != ' ' ||
+		  sscanf(q+2, "%x", &id1) != 1)
 		goto parserr;
-	      i = ID1_CLASS;
+	      cat = last_cat = NL_CLASS;
+	    }
+	  else if (q[0] == 'S' && q[1] == ' ')
+	    {
+	      if (strlen(q+2) < 5 ||
+		  q[6] != ' ' ||
+		  sscanf(q+2, "%x", &id1) != 1)
+		goto parserr;
+	      cat = last_cat = NL_SUBSYSTEM_VENDOR;
+	      q += 2;
 	    }
 	  else
 	    {
-	      if (sscanf(q, "%x", &j) != 1)
+	      if (strlen(q) < 5 ||
+		  q[4] != ' ' ||
+		  sscanf(q, "%x", &id1) != 1)
 		goto parserr;
-	      i = ID1_VENDOR;
+	      cat = last_cat = NL_VENDOR;
 	    }
-	  id1 = i;
-	  id2 = j;
+	  id2 = 0;
 	}
       else
 	{
-	  if (sscanf(q, "%x", &j) != 1)
+	  if (sscanf(q, "%x", &id2) != 1)
 	    goto parserr;
-	  if (id1 == ID1_ERROR)
+	  if (last_cat < 0)
 	    goto parserr;
-	  if (id1 == ID1_CLASS)
-	    {
-	      i = ID1_SUBCLASS;
-	      j |= (id2 << 8);
-	    }
+	  if (last_cat == NL_CLASS)
+	    cat = NL_SUBCLASS;
 	  else
-	    i = id2;
+	    cat = last_cat+1;
 	}
       q += 4;
       while (*q == ' ')
 	q++;
       if (!*q)
 	goto parserr;
-      if (nl_add(i, j, q))
+      if (nl_add(cat, id1, id2, q))
 	{
 	  fprintf(stderr, "%s, line %d: duplicate entry\n", pci_ids, lino);
 	  exit(1);
@@ -195,7 +205,7 @@ load_name_list(void)
 }
 
 char *
-lookup_vendor(word i)
+do_lookup_vendor(int cat, word i)
 {
   static char vendbuf[6];
 
@@ -205,7 +215,7 @@ lookup_vendor(word i)
     {
       struct nl_entry *e;
 
-      e = nl_lookup(ID1_VENDOR, i);
+      e = nl_lookup(cat, i, 0);
       if (e)
 	return e->name;
     }
@@ -214,7 +224,7 @@ lookup_vendor(word i)
 }
 
 char *
-lookup_device(word v, word i)
+do_lookup_device(int cat, word v, word i)
 {
   static char devbuf[6];
 
@@ -224,7 +234,7 @@ lookup_device(word v, word i)
     {
       struct nl_entry *e;
 
-      e = nl_lookup(v, i);
+      e = nl_lookup(cat, v, i);
       if (e)
 	return e->name;
     }
@@ -233,7 +243,7 @@ lookup_device(word v, word i)
 }
 
 char *
-lookup_device_full(word v, word i)
+do_lookup_device_full(int cat, word v, word i)
 {
   static char fullbuf[256];
 
@@ -243,8 +253,8 @@ lookup_device_full(word v, word i)
     {
       struct nl_entry *e, *e2;
 
-      e = nl_lookup(ID1_VENDOR, v);
-      e2 = nl_lookup(v, i);
+      e = nl_lookup(cat, v, 0);
+      e2 = nl_lookup(cat+1, v, i);
       if (!e)
 	sprintf(fullbuf, "Unknown device %04x:%04x", v, i);
       else if (!e2)
@@ -258,6 +268,42 @@ lookup_device_full(word v, word i)
 }
 
 char *
+lookup_vendor(word i)
+{
+  return do_lookup_vendor(NL_VENDOR, i);
+}
+
+char *
+lookup_subsys_vendor(word i)
+{
+  return do_lookup_vendor(NL_SUBSYSTEM_VENDOR, i);
+}
+
+char *
+lookup_device(word i, word v)
+{
+  return do_lookup_device(NL_DEVICE, v, i);
+}
+
+char *
+lookup_subsys_device(word v, word i)
+{
+  return do_lookup_device(NL_SUBSYSTEM_DEVICE, v, i);
+}
+
+char *
+lookup_device_full(word v, word i)
+{
+  return do_lookup_device_full(NL_VENDOR, v, i);
+}
+
+char *
+lookup_subsys_device_full(word v, word i)
+{
+  return do_lookup_device_full(NL_SUBSYSTEM_VENDOR, v, i);
+}
+
+char *
 lookup_class(word c)
 {
   static char classbuf[80];
@@ -268,10 +314,10 @@ lookup_class(word c)
     {
       struct nl_entry *e;
 
-      e = nl_lookup(ID1_SUBCLASS, c);
+      e = nl_lookup(NL_SUBCLASS, c >> 8, c & 0xff);
       if (e)
 	return e->name;
-      e = nl_lookup(ID1_CLASS, c);
+      e = nl_lookup(NL_CLASS, c, 0);
       if (e)
 	sprintf(classbuf, "%s [%04x]", e->name, c);
       else

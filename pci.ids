@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.10 1998/06/08 07:53:25 mj Exp $
+#	$Id: pci.ids,v 1.11 1998/07/17 08:57:18 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -1832,3 +1832,4 @@ C 0C  Serial bus controller
 	0002  SSA
 	0003  USB Controller
 	0004  Fiber Channel
+

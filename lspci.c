@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.13 1998/07/15 20:37:12 mj Exp $
+ *	$Id: lspci.c,v 1.14 1998/07/17 08:57:14 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -520,10 +520,11 @@ show_verbose(struct device *d)
   else
     irq = d->kernel_irq;
 
+  if (verbose && subsys_v && subsys_v != 0xffff)
+    printf("\tSubsystem: %s\n", lookup_subsys_device_full(subsys_v, subsys_d));
+
   if (verbose > 1)
     {
-      if (subsys_v)
-	printf("\tSubsystem ID: %04x:%04x\n", subsys_v, subsys_d);
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c\n",
 	     (cmd & PCI_COMMAND_IO) ? '+' : '-',
 	     (cmd & PCI_COMMAND_MEMORY) ? '+' : '-',
@@ -634,6 +635,19 @@ static void
 show_machine(struct device *d)
 {
   int c;
+  word sv_id=0, sd_id=0;
+
+  switch (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f)
+    {
+    case PCI_HEADER_TYPE_NORMAL:
+      sv_id = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
+      sd_id = get_conf_word(d, PCI_SUBSYSTEM_ID);
+      break;
+    case PCI_HEADER_TYPE_CARDBUS:
+      sv_id = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+      sd_id = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+      break;
+    }
 
   if (verbose)
     {
@@ -641,6 +655,11 @@ show_machine(struct device *d)
       printf("Class:\t%s\n", lookup_class(get_conf_word(d, PCI_CLASS_DEVICE)));
       printf("Vendor:\t%s\n", lookup_vendor(d->vendid));
       printf("Device:\t%s\n", lookup_device(d->vendid, d->devid));
+      if (sv_id && sv_id != 0xffff)
+	{
+	  printf("SVendor:\t%s\n", lookup_subsys_vendor(sv_id));
+	  printf("SDevice:\t%s\n", lookup_subsys_device(sv_id, sd_id));
+	}
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf("Rev:\t%02x\n", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
@@ -657,6 +676,10 @@ show_machine(struct device *d)
 	printf(" -r%02x", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
 	printf(" -p%02x", c);
+      if (sv_id && sv_id != 0xffff)
+	printf(" \"%s\" \"%s\"", lookup_subsys_vendor(sv_id), lookup_subsys_device(sv_id, sd_id));
+      else
+	printf(" \"\" \"\"");
       putchar('\n');
     }
 }

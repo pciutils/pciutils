@@ -1,3 +1,12 @@
+Fri Jul 17 10:43:30 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_verbose): Print subsystem ID using the new resolver.
+	(show_machine): Print subsystem ID.
+
+	* names.c: New name resolution engine supporting subsystem IDs.
+
+	* Released as version 1.07.
+
 Wed Jul 15 15:37:21 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_htype2 etc.): Displaying of CardBus headers.

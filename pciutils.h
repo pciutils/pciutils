@@ -1,5 +1,5 @@
 /*
- *	$Id: pciutils.h,v 1.7 1998/07/15 20:37:15 mj Exp $
+ *	$Id: pciutils.h,v 1.8 1998/07/17 08:57:20 mj Exp $
  *
  *	Linux PCI Utilities -- Declarations
  *
@@ -40,6 +40,9 @@ char *lookup_vendor(word);
 char *lookup_device(word, word);
 char *lookup_device_full(word, word);
 char *lookup_class(word);
+char *lookup_subsys_vendor(word);
+char *lookup_subsys_device(word, word);
+char *lookup_subsys_device_full(word, word);
 
 /* filter.c */
 
