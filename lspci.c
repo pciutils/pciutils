@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.28 1999/08/20 08:30:44 mj Exp $
+ *	$Id: lspci.c,v 1.29 1999/09/22 08:00:53 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -536,6 +536,7 @@ show_htype1(struct device *d)
   u32 pref_limit = get_conf_word(d, PCI_PREF_MEMORY_LIMIT);
   u32 pref_type = pref_base & PCI_PREF_RANGE_TYPE_MASK;
   word brc = get_conf_word(d, PCI_BRIDGE_CONTROL);
+  int verb = verbose > 2;
 
   show_bases(d, 2);
   printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
@@ -556,35 +557,39 @@ show_htype1(struct device *d)
 	  io_base |= (get_conf_word(d, PCI_IO_BASE_UPPER16) << 16);
 	  io_limit |= (get_conf_word(d, PCI_IO_LIMIT_UPPER16) << 16);
 	}
-      if (io_base)
+      if (io_base <= io_limit || verb)
 	printf("\tI/O behind bridge: %08x-%08x\n", io_base, io_limit+0xfff);
     }
 
   if (mem_type != (mem_limit & PCI_MEMORY_RANGE_TYPE_MASK) ||
       mem_type)
     printf("\t!!! Unknown memory range types %x/%x\n", mem_base, mem_limit);
-  else if (mem_base)
+  else
     {
       mem_base = (mem_base & PCI_MEMORY_RANGE_MASK) << 16;
       mem_limit = (mem_limit & PCI_MEMORY_RANGE_MASK) << 16;
-      printf("\tMemory behind bridge: %08x-%08x\n", mem_base, mem_limit + 0xfffff);
+      if (mem_base <= mem_limit || verb)
+	printf("\tMemory behind bridge: %08x-%08x\n", mem_base, mem_limit + 0xfffff);
     }
 
   if (pref_type != (pref_limit & PCI_PREF_RANGE_TYPE_MASK) ||
       (pref_type != PCI_PREF_RANGE_TYPE_32 && pref_type != PCI_PREF_RANGE_TYPE_64))
     printf("\t!!! Unknown prefetchable memory range types %x/%x\n", pref_base, pref_limit);
-  else if (pref_base)
+  else
     {
       pref_base = (pref_base & PCI_PREF_RANGE_MASK) << 16;
       pref_limit = (pref_limit & PCI_PREF_RANGE_MASK) << 16;
-      if (pref_type == PCI_PREF_RANGE_TYPE_32)
-	printf("\tPrefetchable memory behind bridge: %08x-%08x\n", pref_base, pref_limit + 0xfffff);
-      else
-	printf("\tPrefetchable memory behind bridge: %08x%08x-%08x%08x\n",
-	       get_conf_long(d, PCI_PREF_BASE_UPPER32),
-	       pref_base,
-	       get_conf_long(d, PCI_PREF_LIMIT_UPPER32),
-	       pref_limit);
+      if (pref_base <= pref_limit || verb)
+	{
+	  if (pref_type == PCI_PREF_RANGE_TYPE_32)
+	    printf("\tPrefetchable memory behind bridge: %08x-%08x\n", pref_base, pref_limit + 0xfffff);
+	  else
+	    printf("\tPrefetchable memory behind bridge: %08x%08x-%08x%08x\n",
+		   get_conf_long(d, PCI_PREF_BASE_UPPER32),
+		   pref_base,
+		   get_conf_long(d, PCI_PREF_LIMIT_UPPER32),
+		   pref_limit);
+	}
     }
 
   if (get_conf_word(d, PCI_SEC_STATUS) & PCI_STATUS_SIG_SYSTEM_ERROR)
@@ -612,6 +617,7 @@ show_htype2(struct device *d)
   word cmd = get_conf_word(d, PCI_COMMAND);
   word brc = get_conf_word(d, PCI_CB_BRIDGE_CONTROL);
   word exca = get_conf_word(d, PCI_CB_LEGACY_MODE_BASE);
+  int verb = verbose > 2;
 
   show_bases(d, 1);
   printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
@@ -624,7 +630,7 @@ show_htype2(struct device *d)
       int p = 8*i;
       u32 base = get_conf_long(d, PCI_CB_MEMORY_BASE_0 + p);
       u32 limit = get_conf_long(d, PCI_CB_MEMORY_LIMIT_0 + p);
-      if (limit > base)
+      if (limit > base || verb)
 	printf("Memory window %d: %08x-%08x%s%s\n", i, base, limit,
 	       (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]",
 	       (brc & (PCI_CB_BRIDGE_CTL_PREFETCH_MEM0 << i)) ? " (prefetchable)" : "");
@@ -640,11 +646,10 @@ show_htype2(struct device *d)
 	  limit &= 0xffff;
 	}
       base &= PCI_CB_IO_RANGE_MASK;
-      if (!base)
-	continue;
       limit = (limit & PCI_CB_IO_RANGE_MASK) + 3;
-      printf("I/O window %d: %08x-%08x%s\n", i, base, limit,
-	     (cmd & PCI_COMMAND_IO) ? "" : " [disabled]");
+      if (base <= limit || verb)
+	printf("\tI/O window %d: %08x-%08x%s\n", i, base, limit,
+	       (cmd & PCI_COMMAND_IO) ? "" : " [disabled]");
     }
 
   if (get_conf_word(d, PCI_CB_SEC_STATUS) & PCI_STATUS_SIG_SYSTEM_ERROR)
@@ -714,7 +719,7 @@ show_verbose(struct device *d)
       return;
     }
 
-  if (verbose && subsys_v && subsys_v != 0xffff)
+  if (subsys_v && subsys_v != 0xffff)
     printf("\tSubsystem: %s\n",
 	   pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
 			   PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,

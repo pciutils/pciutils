@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.36 1999/09/14 07:33:37 mj Exp $
+#	$Id: pci.ids,v 1.37 1999/09/22 08:00:55 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -1959,7 +1959,41 @@
 1305  Netphone, Inc
 1306  Duet Technologies
 1307  Computer Boards
-	0001  DAS1602/16
+	0001  PCI-DAS1602/16
+	000C  PCI-PDISO8
+	000D  PCI-PDISO16
+	000B  PCI-DIO48H
+	000F  PCI-DAS1200
+	0010  PCI-DAS1602/12
+	0014  PCI-DIO24H
+	0015  PCI-DIO24H/CTR3
+	0016  PCI-DIO48H/CTR15
+	0017  PCI-DIO96H
+	0018  PCI-CTR05
+	0019  PCI-DAS1200/JR
+	001A  PCI-DAS1001
+	001B  PCI-DAS1002
+	001C  PCI-DAS1602JR/16
+	001D  PCI-DAS6402/16
+	001E  PCI-DAS6402/12
+	001F  PCI-DAS16/M1
+	0020  PCI-DDA02/12
+	0021  PCI-DDA04/12
+	0022  PCI-DDA08/12
+	0023  PCI-DDA02/16
+	0024  PCI-DDA04/16
+	0025  PCI-DDA08/16
+	0026  PCI-DAC04/12-HS
+	0027  PCI-DAC04/16-HS
+	0028  PCI-DIO24
+	0029  PCI-DAS08
+	002C  PCI-INT32
+	0033  PCI-DUAL-AC5
+	0034  PCI-DAS-TC
+	0035  PCI-DAS64/M1/16
+	0036  PCI-DAS64/M2/16
+	0037  PCI-DAS64/M3/16
+	004C  PCI-DAS1000
 1308  Jato Technologies Inc.
 	0001  NetCelerator Adapter
 1309  AB Semiconductor Ltd
@@ -2235,9 +2269,9 @@
 1405  Excalibur Systems Inc
 1406  Oce' Printing Systems GmbH
 1407  Lava Computer mfg Inc
-	8000  Parallel port controller
-	8001  Dual parallel port controller A
-	8002  Dual parallel port controller B
+	8000  Lava Parallel
+	8002  Lava Dual Parallel port A
+	8003  Lava Dual Parallel port B
 1408  Aloka Co. Ltd
 1409  Timedia Technology Co Ltd
 140a  DSP Research Inc

@@ -1,3 +1,14 @@
+Wed Sep 22 09:45:24 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: New ID's. As usually.
+
+	* lspci.c (show_htype1, show_htype2): Don't show `closed' bridge windows
+	unless we're vvvery verbose.
+
+Mon Sep 20 11:22:54 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_htype2): Don't forget a TAB before the "I/O window" line.
+
 Tue Sep 14 09:31:01 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* pci.ids: New ID's. Again.
