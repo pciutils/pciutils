@@ -1,5 +1,7 @@
 2002-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lib/nbsd-libpci.c: Cleaned up and hopefully made it endian safe.
+
 	* lib/generic.c (pci_generic_scan_bus): Added work-around for devices with
 	discontiguous numbering of functions. This is already present in the Linux
 	kernel for several years, but I forgot to update pciutils as well.

@@ -4,6 +4,7 @@
  *
  *	Copyright (c) 1999 Jari Kirma <kirma@cs.hut.fi>
  *      Copyright (c) 2002 Quentin Garnier <cube@cubidou.net>
+ *	Copyright (c) 2002 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -48,9 +49,7 @@ nbsd_init(struct pci_access *a)
 
   a->fd = open(name, O_RDWR, 0);
   if (a->fd < 0)
-    {
-      a->error("nbsd_init: %s open failed", name);
-    }
+    a->error("nbsd_init: %s open failed", name);
 }
 
 static void
@@ -63,26 +62,27 @@ static int
 nbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   pcireg_t val;
+  int shift;
 
   if (!(len == 1 || len == 2 || len == 4))
-    {
-      return pci_generic_block_read(d, pos, buf, len);
-    }
+    return pci_generic_block_read(d, pos, buf, len);
 
+  shift = 8*(pos % 4);
+  pos &= ~3;
 	
   if (pcibus_conf_read(d->access->fd, d->bus, d->dev, d->func, pos, &val) < 0)
     d->access->error("nbsd_read: pci_bus_conf_read() failed");
-  
+
   switch (len)
     {
     case 1:
-      buf[0] = (u8) ((val>>16) & 0xff);
+      *buf = val >> shift;
       break;
     case 2:
-      ((u16 *) buf)[0] = (u16) val;
+      *(u16*)buf = cpu_to_le16(val >> shift);
       break;
     case 4:
-      ((u32 *) buf)[0] = (u32) val;
+      *(u32*)buf = cpu_to_le32(val);
       break;
     }
   return 1;
@@ -91,23 +91,36 @@ nbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 static int
 nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  pcireg_t val;
+  pcireg_t val = 0;
+  int shift;
 
   if (!(len == 1 || len == 2 || len == 4))
+    return pci_generic_block_write(d, pos, buf, len);
+
+  /*
+   *  BEWARE: NetBSD seems to support only 32-bit access, so we have
+   *  to emulate byte and word writes by read-modify-write, possibly
+   *  causing troubles.
+   */
+
+  shift = 8*(pos % 4);
+  pos &= 3;
+  if (len != 4)
     {
-      return pci_generic_block_write(d, pos, buf, len);
+      if (pcibus_conf_read(d->access->fd, d->bus, d->dev, d->func, pos, &val) < 0)
+	d->access->error("nbsd_write: pci_bus_conf_read() failed");
     }
 
   switch (len)
     {
     case 1:
-      val = buf[0];
+      val = (val & ~(0xff << shift)) | buf[0];
       break;
     case 2:
-      val = ((u16 *) buf)[0];
+      val = (val & ~(0xffff << shift)) | le16_to_cpu(*(u16*)buf);
       break;
     case 4:
-      val = ((u32 *) buf)[0];
+      val = le32_to_cpu(*(u32*)buf);
       break;
     }
   
