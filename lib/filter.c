@@ -1,9 +1,9 @@
 /*
- *	$Id: filter.c,v 1.1 1999/01/22 21:05:22 mj Exp $
+ *	$Id: filter.c,v 1.2 2002/03/24 12:14:21 mj Exp $
  *
  *	Linux PCI Library -- Device Filtering
  *
- *	Copyright (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1998--2002 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -37,7 +37,7 @@ pci_filter_parse_slot(struct pci_filter *f, char *str)
       if (str[0] && strcmp(str, "*"))
 	{
 	  long int x = strtol(str, &e, 16);
-	  if ((e && *e) || (x < 0 || x >= 0xff))
+	  if ((e && *e) || (x < 0 || x > 0xff))
 	    return "Invalid bus number";
 	  f->bus = x;
 	}
@@ -47,14 +47,14 @@ pci_filter_parse_slot(struct pci_filter *f, char *str)
   if (mid[0] && strcmp(mid, "*"))
     {
       long int x = strtol(mid, &e, 16);
-      if ((e && *e) || (x < 0 || x >= 0x1f))
+      if ((e && *e) || (x < 0 || x > 0x1f))
 	return "Invalid slot number";
       f->slot = x;
     }
   if (dot && dot[0] && strcmp(dot, "*"))
     {
       long int x = strtol(dot, &e, 16);
-      if ((e && *e) || (x < 0 || x >= 7))
+      if ((e && *e) || (x < 0 || x > 7))
 	return "Invalid function number";
       f->func = x;
     }
