@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.4 1999/07/07 11:23:11 mj Exp $
+ *	$Id: pci.h,v 1.5 1999/07/20 12:13:40 mj Exp $
  *
  *	The PCI Library
  *
@@ -76,6 +76,7 @@ struct pci_access {
   int fd;				/* proc: fd */
   int fd_rw;				/* proc: fd opened read-write */
   struct pci_dev *cached_dev;		/* proc: device the fd is for */
+  int fd_pos;				/* proc: current position */
 };
 
 /* Initialize PCI access */

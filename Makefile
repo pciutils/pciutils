@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.18 1999/07/07 11:23:03 mj Exp $
+# $Id: Makefile,v 1.19 1999/07/20 12:13:39 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -9,10 +9,10 @@ CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
 ROOT=/
 PREFIX=/usr
 
-VERSION=2.1-pre4
+VERSION=2.1-pre5
 SUFFIX=
 #SUFFIX=-alpha
-DATE=99-05-19
+DATE=99-07-20
 
 export
 

@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.4 1999/07/07 11:23:12 mj Exp $
+ *	$Id: proc.c,v 1.5 1999/07/20 12:13:42 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -19,40 +19,60 @@
 
 #include "internal.h"
 
-#include <asm/unistd.h>
-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 1
-#include <syscall-list.h>
-#endif
-
 /*
- * As libc doesn't support pread/pwrite yet, we have to call them directly
- * or use lseek/read/write instead.
+ *  We'd like to use pread/pwrite for configuration space accesses, but
+ *  unfortunately it isn't simple at all since all libc's until glibc 2.1
+ *  don't define it.
  */
-#if !(defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ > 0)
 
-#if defined(__GLIBC__) && !(defined(__powerpc__) && __GLIBC__ == 2 && __GLIBC_MINOR__ == 0)
+#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ > 0
+/* glibc 2.1 or newer -> pread/pwrite supported automatically */
+
+#elif defined(i386) && defined(__GLIBC__)
+/* glibc 2.0 on i386 -> call syscalls directly */
+#include <asm/unistd.h>
+#include <syscall-list.h>
 #ifndef SYS_pread
 #define SYS_pread 180
 #endif
-static int
-pread(unsigned int fd, void *buf, size_t size, loff_t where)
-{
-  return syscall(SYS_pread, fd, buf, size, where);
-}
-
+static int pread(unsigned int fd, void *buf, size_t size, loff_t where)
+{ return syscall(SYS_pread, fd, buf, size, where); }
 #ifndef SYS_pwrite
 #define SYS_pwrite 181
 #endif
-static int
-pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
-{
-  return syscall(SYS_pwrite, fd, buf, size, where);
-}
-#else
+static int pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
+{ return syscall(SYS_pwrite, fd, buf, size, where); }
+
+#elif defined(i386)
+/* old libc on i386 -> call syscalls directly the old way */
+#include <asm/unistd.h>
 static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
 static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
+
+#else
+/* In all other cases we use lseek/read/write instead to be safe */
+#define make_rw_glue(op) \
+	static int do_##op(struct pci_dev *d, int fd, void *buf, size_t size, loff_t where)	\
+	{											\
+	  struct pci_access *a = d->access;							\
+	  int r;										\
+	  if (a->fd_pos != where && lseek(fd, where, SEEK_SET) < 0)				\
+	    return -1;										\
+	  r = op(fd, buf, size);								\
+	  if (r < 0)										\
+	    a->fd_pos = -1;									\
+	  else											\
+	    a->fd_pos = where + r;								\
+	  return r;										\
+	}
+make_rw_glue(read)
+make_rw_glue(write)
+#define HAVE_DO_READ
 #endif
 
+#ifndef HAVE_DO_READ
+#define do_read(d,f,b,l,p) pread(f,b,l,p)
+#define do_write(d,f,b,l,p) pwrite(f,b,l,p)
 #endif
 
 static void
@@ -170,6 +190,7 @@ proc_setup(struct pci_dev *d, int rw)
       if (a->fd < 0)
 	a->warning("Cannot open %s", buf);
       a->cached_dev = d;
+      a->fd_pos = 0;
     }
   return a->fd;
 }
@@ -182,7 +203,7 @@ proc_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = pread(fd, buf, len, pos);
+  res = do_read(d, fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("proc_read: read failed: %s", strerror(errno));
@@ -204,7 +225,7 @@ proc_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = pwrite(fd, buf, len, pos);
+  res = do_write(d, fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("proc_write: write failed: %s", strerror(errno));

@@ -1,5 +1,11 @@
 Tue Jul 20 13:25:09 1999  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lib/proc.c: Rewrote the pread/pwrite things once again. Use pread
+	and pwrite only when we are certain it's safe (i.e., glibc 2.1
+	on all architectures or any libc on a i386 where we really know
+	how to use syscalls directly). In all other cases, emulate it
+	with lseek/read/write.
+
 	* pci.ids: Some more IDs.
 
 Mon Jul 19 14:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
