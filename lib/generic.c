@@ -1,5 +1,5 @@
 /*
- *	$Id: generic.c,v 1.1 1999/01/22 21:05:24 mj Exp $
+ *	$Id: generic.c,v 1.2 1999/01/25 22:10:45 geert Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
@@ -59,7 +59,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	      pci_generic_scan_bus(a, busmap, pci_read_byte(t, PCI_SECONDARY_BUS));
 	      break;
 	    default:
-	      a->debug("Device %02x:%02x.%d has unknown header type %02x.\n", d->bus, d->dev, d->func);
+	      a->debug("Device %02x:%02x.%d has unknown header type %02x.\n", d->bus, d->dev, d->func, ht);
 	    }
 	  if (!multi)
 	    break;
