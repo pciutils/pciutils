@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.37 2000/05/01 21:34:49 mj Exp $
+ *	$Id: lspci.c,v 1.38 2000/05/20 14:36:02 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -743,11 +743,7 @@ show_verbose(struct device *d)
     {
     case PCI_HEADER_TYPE_NORMAL:
       if (class == PCI_CLASS_BRIDGE_PCI)
-	{
-	badhdr:
-	  printf("\t!!! Header type %02x doesn't match class code %04x\n", htype, class);
-	  return;
-	}
+	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       max_lat = get_conf_byte(d, PCI_MAX_LAT);
       min_gnt = get_conf_byte(d, PCI_MIN_GNT);
       subsys_v = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
@@ -755,13 +751,13 @@ show_verbose(struct device *d)
       break;
     case PCI_HEADER_TYPE_BRIDGE:
       if (class != PCI_CLASS_BRIDGE_PCI)
-	goto badhdr;
+	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       irq = int_pin = min_gnt = max_lat = 0;
       subsys_v = subsys_d = 0;
       break;
     case PCI_HEADER_TYPE_CARDBUS:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
-	goto badhdr;
+	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       min_gnt = max_lat = 0;
       subsys_v = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
       subsys_d = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
@@ -806,12 +802,18 @@ show_verbose(struct device *d)
 	     FLAG(status, PCI_STATUS_DETECTED_PARITY));
       if (cmd & PCI_COMMAND_MASTER)
 	{
-	  printf("\tLatency: ");
-	  if (min_gnt)
-	    printf("%d min, ", min_gnt);
-	  if (max_lat)
-	    printf("%d max, ", max_lat);
-	  printf("%d set", latency);
+	  printf("\tLatency: %d", latency);
+	  if (min_gnt || max_lat)
+	    {
+	      printf(" (");
+	      if (min_gnt)
+		printf("%dns min", min_gnt*250);
+	      if (min_gnt && max_lat)
+		printf(", ");
+	      if (max_lat)
+		printf("%dns max", max_lat*250);
+	      putchar(')');
+	    }
 	  if (cache_line)
 	    printf(", cache line size %02x", cache_line);
 	  putchar('\n');
