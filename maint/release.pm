@@ -19,6 +19,8 @@ sub new($$) {
 			'\.(lsm|spec)$' => 'ps',
 			'(^|/)README$' => 's'
 			],
+		"directories" => [
+			],
 		"conditions" => {
 			},
 		"DATE" => `date '+%Y-%m-%d' | tr -d '\n'`,
@@ -182,6 +184,10 @@ sub GenPackage($) {
 		$s->CopyFile($f, $dir, $action);
 	}
 
+	foreach my $d (@{$s->{"directories"}}) {
+		`mkdir -p $dir/$d`; die if $?;
+	}
+
 	if (-f "$dir/Makefile") {
 		print "Cleaning up\n";
 		`cd $dir && make distclean >&2`; die if $?;
@@ -245,7 +251,8 @@ sub MakePatch($) {
 	} elsif (defined $s->{"OLDVERSION"}) {
 		$oldver = $s->{"OLDVERSION"};
 	} else {
-		die "MakePatch: Don't know which is the previous version";
+		print "WARNING: No previous version known. No patch generated.\n";
+		return;
 	}
 	my $pkg0 = $s->{"PACKAGE"} . "-" . $oldver;
 
