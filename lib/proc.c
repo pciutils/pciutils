@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.5 1999/07/20 12:13:42 mj Exp $
+ *	$Id: proc.c,v 1.6 1999/08/31 05:58:07 ecd Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -115,7 +115,7 @@ static void
 proc_scan(struct pci_access *a)
 {
   FILE *f;
-  char buf[256];
+  char buf[512];
 
   if (snprintf(buf, sizeof(buf), "%s/devices", a->method_params[PCI_ACCESS_PROC_BUS_PCI]) == sizeof(buf))
     a->error("File name too long");
