@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.17 1999/01/24 21:36:18 mj Exp $
+#	$Id: pci.ids,v 1.18 1999/01/26 15:00:03 jj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -121,6 +121,7 @@
 	0021  DECchip 21052
 	0022  DECchip 21150
 	0024  DECchip 21152
+	0025  DECchip 21153
 1012  Micronics Computers Inc
 1013  Cirrus Logic
 	0038  GD 7548
