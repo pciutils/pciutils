@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.48 2000/01/20 21:12:52 mj Exp $
+#	$Id: pci.ids,v 1.49 2000/01/20 21:24:51 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -358,10 +358,14 @@
 	2040  79c974
 	7006  AMD-751 [Irongate] System Controller
 	7007  AMD-751 [Irongate] AGP Bridge
-	7408  AMD-756 [Irongate] ISA Bridge
-	7409  AMD-756 [Irongate] IDE
-	740b  AMD-756 [Irongate] ACPI
-	740c  AMD-756 [Irongate] USB
+	7400  AMD-755 [Cobra] ISA
+	7401  AMD-755 [Cobra] IDE
+	7403  AMD-755 [Cobra] ACPI
+	7404  AMD-755 [Cobra] USB
+	7408  AMD-756 [Viper] ISA
+	7409  AMD-756 [Viper] IDE
+	740b  AMD-756 [Viper] ACPI
+	740c  AMD-756 [Viper] USB
 1023  Trident Microsystems
 	0194  82C194
 	2000  4DWave DX
@@ -832,6 +836,7 @@
 	1240  ISP1240
 	2020  ISP2020A
 	2100  ISP2100
+	2200  ISP2200
 1078  Cyrix Corporation
 	0000  5510 [Grappa]
 	0001  PCI Master
