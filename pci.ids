@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.24 1999/05/09 19:08:00 mj Exp $
+#	$Id: pci.ids,v 1.25 1999/05/10 22:10:02 cort Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -125,6 +125,7 @@
 	0022  DECchip 21150
 	0024  DECchip 21152
 	0025  DECchip 21153
+	0026  DECchip 21154
 1012  Micronics Computers Inc
 1013  Cirrus Logic
 	0038  GD 7548
@@ -339,11 +340,22 @@
 1054  Hitachi, Ltd
 1055  EFAR Microsystems
 1056  ICL
+# Motorola made a mistake and used this value, please duplicate Moto
+# entries here -- Cort
+1507  Motorola Computer Group
+	0001  MPC105 [Eagle]
+	0002  MPC106 [Grackle]
+	4801  Raven
+	4802  Falcon
+	4803  Hawk
+	4806  CPX8216
 1057  Motorola Computer Group
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
 	4801  Raven
+	4802  Falcon
 	4803  Hawk
+	4806  CPX8216
 1058  Electronics & Telecommunications RSH
 1059  Teknor Industrial Computers Inc
 105a  Promise Technology, Inc.
