@@ -2,8 +2,10 @@
 
 	* setpci.c (main): Better error messages.
 
-	* setpci.c (ex_op): The demo mode was never documented to disable reads,
-	only writes, so conform with the definition.
+	* setpci.c (ex_op): The demo mode should disable only writing, not reading.
+
+	* setpci.man: The documentation was inconsistent on what should -D do.
+	Document the new behaviour.
 
 	* pciutils.h, common.c, setpci.c: Introduced a NONRET macro encapsulating
 	the GCC specific __attribute__((noreturn)) and killed the hack with

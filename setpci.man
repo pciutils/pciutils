@@ -31,7 +31,7 @@ where it's uncertain whether the device in question is present in the machine
 or not.
 .TP
 .B -D
-`Demo mode' -- simulate configuration space accesses instead of really doing them.
+`Demo mode' -- don't write anything to the configuration registers.
 It's useful to try
 .B setpci -vD
 to see what your complex sequence of
