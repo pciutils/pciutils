@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.60 2000/05/01 19:53:05 mj Exp $
+#	$Id: pci.ids,v 1.61 2000/05/20 14:34:32 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -405,6 +405,7 @@
 		1014 0143 Yotta Input Controller (ytin)
 	0144  Yotta Video Compositor Output
 		1014 0145 Yotta Output Controller (ytout)
+	0156  405GP PLB to PCI Bridge
 	ffff  MPIC-2 interrupt controller
 1015  LSI Logic Corp of Canada
 1016  ICL Personal Systems
@@ -1675,6 +1676,7 @@
 	0010  Mutara V08 [NV2]
 	0020  Riva TnT 128 [NV04]
 		1043 0200  V3400 TNT
+		1048 0c18  Erazor II SGRAM
 		1092 0550  Viper V550
 		1092 0552  Viper V550
 		1092 4804  Viper V550 
@@ -4492,25 +4494,25 @@
 	1a21  82840 840 (Carmel) Chipset Host Bridge (Hub A)
 	1a23  82840 840 (Carmel) Chipset AGP Bridge
 	1a24  82840 840 (Carmel) Chipset PCI Bridge (Hub B)
-	2410  82801AA 82810 Chipset ISA Bridge (LPC)
-	2411  82801AA 82810 Chipset IDE
-	2412  82801AA 82810 Chipset USB
-	2413  82801AA 82810 Chipset SMBus
-	2415  82801AA 82810 AC'97 Audio
+	2410  82801AA ISA Bridge (LPC)
+	2411  82801AA IDE
+	2412  82801AA USB
+	2413  82801AA SMBus
+	2415  82801AA AC'97 Audio
 		11d4 0040  SoundMAX Integrated Digital Audio
 		11d4 0048  SoundMAX Integrated Digital Audio
 		11d4 5340  SoundMAX Integrated Digital Audio
-	2416  82801AA 82810 AC'97 Modem
-	2418  82801AA 82810 PCI Bridge
-	2420  82801AB 82810 Chipset ISA Bridge (LPC)
-	2421  82801AB 82810 Chipset IDE
-	2422  82801AB 82810 Chipset USB
-	2423  82801AB 82810 Chipset SMBus
-	2425  82801AB 82810 AC'97 Audio
+	2416  82801AA AC'97 Modem
+	2418  82801AA PCI Bridge
+	2420  82801AB Chipset ISA Bridge (LPC)
+	2421  82801AB Chipset IDE
+	2422  82801AB Chipset USB
+	2423  82801AB Chipset SMBus
+	2425  82801AB AC'97 Audio
 		11d4 0040  SoundMAX Integrated Digital Audio
 		11d4 0048  SoundMAX Integrated Digital Audio
-	2426  82801AB 82810 AC'97 Modem
-	2428  82801AB 82810 PCI Bridge
+	2426  82801AB AC'97 Modem
+	2428  82801AB PCI Bridge
 	2500  82820 820 (Camino) Chipset Host Bridge (MCH)
 		1043 801c  P3C-2000 system chipset
 	2501  82820 820 (Camino) Chipset Host Bridge (MCH)
