@@ -1,3 +1,19 @@
+Mon Jun 28 18:37:51 1999  Dave Jones    <dave@powertweak.com>
+
+	* Makefile:
+	  Added `uninstall' target - removes all traces of pciutils.
+	* pci.ids:
+	  - Lots of cleanups in the ATI, S3, Adaptec vendors.
+	  - Changed Compaq QVision 1280/p definitions, as it's not possible
+	    to determine the revision from the device ID.
+	  - Same for the Tseng ET4000.
+	    The id's said I had a rev C, when it was actually a rev B.
+	  - Removed some unnecessary strings
+	    `PCI'. Unless it's an AGP card, it should be obvious that it's PCI.
+	    `Ethernet card'. This should be determined from config space.
+	  - Lots of other new vendors & devices
+	  - Other additional small cleanups.
+
 Mon Jun 21 22:11:10 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/names.c (pci_lookup_name): When device ID lookup

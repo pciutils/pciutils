@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 1999/05/19 12:01:26 mj Exp $
+# $Id: Makefile,v 1.17 1999/07/01 21:33:29 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -45,6 +45,11 @@ install: all
 	install -m 644 lspci.8 setpci.8 $(PREFIX)/man/man8
 	# Remove relics from old versions
 	rm -f $(ROOT)/etc/pci.ids
+
+uninstall: all
+	rm -f $(ROOT)/sbin/lspci $(ROOT)/sbin/setpci
+	rm -f $(PREFIX)/pci.ids
+	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
 
 release:
 	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new
