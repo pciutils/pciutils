@@ -1,3 +1,9 @@
+2002-03-26  Martin Mares  <mj@ucw.cz>
+
+	* Makefile: When the currently installed pci.ids file is newer than
+	the version to be installed, don't overwrite it. Suggested by
+	Jean Delvare <khali@linux-fr.org>.
+
 2002-03-24  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c (show_pcix_bridge): Added PCI-X capability display.
@@ -17,6 +23,8 @@
 	First reported by Marc Boucher <marc@mbsi.ca>.
 
 2001-11-04  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.1.9.
 
 	* pci.ids: Synced with the PCI ID Repository at SourceForge
 	(http://pciids.sourceforge.net/).

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.39 2002/03/24 12:35:39 mj Exp $
+# $Id: Makefile,v 1.40 2002/03/26 21:49:40 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
@@ -57,12 +57,16 @@ clean:
 	rm -rf dist
 
 install: all
-	# -c is ignored on Linux, but required on FreeBSD
+# -c is ignored on Linux, but required on FreeBSD
 	$(DIRINSTALL) -m 755 $(ROOT)/sbin $(PREFIX)/share $(MANDIR)/man8
 	$(INSTALL) -c -m 755 -s lspci setpci $(ROOT)/sbin
-	$(INSTALL) -c -m 644 pci.ids $(PREFIX)/share
+	if [ ! -f $(PREFIX)/share/pci.ids -o pci.ids -nt $(PREFIX)/share/pci.ids ] ; then \
+		$(INSTALL) -c -m 644 pci.ids $(PREFIX)/share ; \
+	elif [ -f $(PREFIX)/share/pci.ids ] ; then \
+		echo "$(PREFIX)/share/pci.ids is same or newer than the version to be installed, skipping." ; \
+	fi
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 $(MANDIR)/man8
-	# Remove relics from old versions
+# Remove relics from old versions
 	rm -f $(ROOT)/etc/pci.ids
 
 uninstall: all
