@@ -112,11 +112,15 @@ scan_devices(void)
 static int
 check_root(void)
 {
+#ifdef OS_WINDOWS
+  return 1;
+#else
   static int is_root = -1;
 
   if (is_root < 0)
     is_root = !geteuid();
   return is_root;
+#endif
 }
 
 static int

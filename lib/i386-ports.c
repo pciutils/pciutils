@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Direct Configuration access via i386 Ports
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -14,8 +14,10 @@
 #include "i386-io-linux.h"
 #elif defined(OS_GNU)
 #include "i386-io-hurd.h"
-#elif defined(OS_SunOS)
+#elif defined(OS_SUNOS)
 #include "i386-io-sunos.h"
+#elif defined(OS_WINDOWS)
+#include "i386-io-windows.h"
 #else
 #error Do not know how to access I/O ports on this OS.
 #endif

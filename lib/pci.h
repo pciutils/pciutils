@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -18,11 +18,19 @@
 
 #include <sys/types.h>
 
+#ifdef OS_WINDOWS
+typedef unsigned char byte;
+typedef char u8;
+typedef unsigned short word;
+typedef short u16;
+typedef unsigned long u32;
+#else
 typedef u_int8_t byte;
 typedef u_int8_t u8;
 typedef u_int16_t word;
 typedef u_int16_t u16;
 typedef u_int32_t u32;
+#endif
 
 #ifdef HAVE_64BIT_ADDRESS
 #include <limits.h>

@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Internal Include File
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #endif
 
-#ifdef OS_SunOS
+#ifdef OS_SUNOS
 #include <sys/byteorder.h>
 #define BIG_ENDIAN 4321
 #ifdef _LITTLE_ENDIAN
@@ -43,6 +43,10 @@
 #else
 #define BYTE_ORDER 4321
 #endif
+#endif
+
+#ifdef OS_WINDOWS
+#include <sys/param.h>
 #endif
 
 #if BYTE_ORDER == BIG_ENDIAN
