@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.22 1999/04/18 19:04:16 mj Exp $
+#	$Id: pci.ids,v 1.23 1999/04/26 19:41:48 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -299,6 +299,7 @@
 1046  IPC Corporation, Ltd.
 1047  Genoa Systems Corp
 1048  Elsa AG
+	1000  QuickStep 1000pro
 1049  Fountain Technologies, Inc.
 104a  SGS Thomson Microelectronics
 	0008  STG 2000X
@@ -335,6 +336,7 @@
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
 	4801  Raven
+	4803  Hawk
 1058  Electronics & Telecommunications RSH
 1059  Teknor Industrial Computers Inc
 105a  Promise Technology, Inc.
@@ -635,7 +637,6 @@
 	5026  IMS5026/27/28
 	8849  8849
 	9128  IMS9129
-# FIXME: This should probably be ID 80e1
 10e1  Tekram Technology Co.,Ltd.
 	690c  690c
 	dc29  DC290
