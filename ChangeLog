@@ -1,3 +1,14 @@
+Mon Jan 24 20:04:11 2000  Andreas Jaeger  <aj@suse.de>
+
+	* lib/i386-ports.c: Include <asm/io.h> only on systems without
+	glibc.
+
+Mon Jan 24 11:24:43 2000  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile: Modified to work with the Linux FHS brain-damaged idea
+	of putting man pages to /usr/share/man. Now we choose either /usr/man
+	or /usr/share/man depending on which one exists.
+
 Sun Jan 23 10:52:34 2000  Martin Mares  <mj@albireo.ucw.cz>
 
 	* pci.ids: Synced with Linux 2.3.40.
