@@ -1,5 +1,7 @@
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
+	* lib/sysfs.c (sysfs_get_resources): We have 7 resources, not 6.
+
 	* lspci.c (show_rom): Use the same logic for printing disabled
 	or unassigned ROM's as we do in show_bases() for the other BAR's.
 

@@ -105,7 +105,7 @@ sysfs_get_resources(struct pci_dev *d)
   file = fopen(namebuf, "r");
   if (!file)
     a->error("Cannot open %s: %s", namebuf, strerror(errno));
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 7; i++)
     {
       unsigned long long start, end, size;
       if (!fgets(buf, sizeof(buf), file))
@@ -122,7 +122,7 @@ sysfs_get_resources(struct pci_dev *d)
 	size = end - start + 1;
       else
 	size = 0;
-      if (i < 7)
+      if (i < 6)
 	{
 	  d->base_addr[i] = start;
 	  d->size[i] = size;
