@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.50 2003/01/04 12:43:31 mj Exp $
+# $Id: Makefile,v 1.51 2003/01/04 12:43:59 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
@@ -54,7 +54,7 @@ update-pciids: update-pciids.sh
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
-	rm -f update-ids lspci setpci lib/config.* *.8
+	rm -f update-ids lspci setpci lib/config.* *.8 pci.ids.*
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
