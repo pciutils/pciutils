@@ -1,0 +1,27 @@
+.TH update-pciids 8 "@TODAY@" "@VERSION@" "Linux PCI Utilities"
+.IX update-pciids
+
+.SH NAME
+update-pciids \- download new version of the PCI ID list
+
+.SH SYNOPSIS
+.B update-pciids
+
+.SH DESCRIPTION
+.B update-pciids
+fetches the current version of the pci.ids file from the primary distribution
+site and installs it.
+
+This utility requires either wget or lynx to be installed. If gzip or bzip2
+are available, it automatically downloads the compressed version of the list.
+
+.SH FILES
+.TP
+.B /usr/share/pci.ids
+Here we install the new list.
+
+.SH SEE ALSO
+.BR lspci (8), setpci (8)
+
+.SH AUTHOR
+The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

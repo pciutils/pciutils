@@ -26,6 +26,8 @@ The utilities include:  (See manual pages for more details)
     CAUTION: There is a couple of dangerous points and caveats, please read
     the manual page first!
 
+  - update-pciids: download the current version of the pci.ids file.
+
 
 2. Compiling and (un)installing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,8 +48,7 @@ than I release new versions of this package.
 
 If you are missing names for any of your devices or you just want to stay
 on the bleeding edge, download the most recent pci.ids file from
-http://pciids.sf.net/. You can try "make update-ids" to accomplish that
-automatically (requires wget and bzip2).
+http://pciids.sf.net/ (e.g., by running the update-ids utility).
 
 If your devices still appear as unknown, please send us their ID's and
 names, the detailed instructions for submissions are listed on the

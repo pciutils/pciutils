@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.48 2003/01/04 11:33:25 mj Exp $
+# $Id: Makefile,v 1.49 2003/01/04 12:27:51 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
@@ -39,7 +39,7 @@ DISTTMP=/tmp/pciutils-dist
 
 export
 
-all: lib lspci setpci lspci.8 setpci.8 pci.ids
+all: lib lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 pci.ids
 
 lib: lib/config.h
 	$(MAKE) -C lib all
@@ -54,6 +54,9 @@ lspci.o: lspci.c pciutils.h
 setpci.o: setpci.c pciutils.h
 common.o: common.c pciutils.h
 
+update-pciids: update-pciids.sh
+	sed <$< >$@ "s@^DEST=.*@DEST=$(PREFIX)/share/pci.ids@"
+
 %.8: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)$(SUFFIX)/"
 
@@ -66,12 +69,13 @@ install: all
 # -c is ignored on Linux, but required on FreeBSD
 	$(DIRINSTALL) -m 755 $(ROOT)/sbin $(PREFIX)/share $(MANDIR)/man8
 	$(INSTALL) -c -m 755 -s lspci setpci $(ROOT)/sbin
+	$(INSTALL) -c -m 755 -s update-pciids $(PREFIX)/sbin
 	if [ ! -f $(PREFIX)/share/pci.ids -o pci.ids -nt $(PREFIX)/share/pci.ids ] ; then \
 		$(INSTALL) -c -m 644 pci.ids $(PREFIX)/share ; \
 	elif [ -f $(PREFIX)/share/pci.ids ] ; then \
 		echo "$(PREFIX)/share/pci.ids is same or newer than the version to be installed, skipping." ; \
 	fi
-	$(INSTALL) -c -m 644 lspci.8 setpci.8 $(MANDIR)/man8
+	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(MANDIR)/man8
 # Remove relics from old versions
 	rm -f $(ROOT)/etc/pci.ids
 
@@ -80,16 +84,11 @@ uninstall: all
 	rm -f $(PREFIX)/share/pci.ids
 	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
 
-update-ids:
-	if [ -f pci.ids.orig ] ; then mv pci.ids pci.ids.orig ; fi
-	wget http://pciids.sf.net/pci.ids.bz2
-	bzip2 -d pci.ids.bz2
-
 get-ids:
 	cp ~/tree/pciids/pci.ids pci.ids
 
 pci.ids:
-	@ [ -f pci.ids ] || echo >&2 "The pci.ids file is no longer part of the CVS. Please do make update-ids to download them." && false
+	@ [ -f pci.ids ] || echo >&2 "The pci.ids file is no longer part of the CVS. Please do run update-ids.sh to download them." && false
 
 release:
 	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new

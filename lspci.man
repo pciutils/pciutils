@@ -146,7 +146,7 @@ kernels. Contains per-bus subdirectories with per-card config space files and a
 file containing a list of all PCI devices.
 
 .SH SEE ALSO
-.BR setpci (8)
+.BR setpci (8), update-pciids (8)
 
 .SH AUTHOR
 The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

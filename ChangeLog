@@ -1,6 +1,8 @@
 2003-01-04  Martin Mares  <mj@ucw.cz>
 
-	* Releasing as 2.1.11.
+	* Released as 2.1.11.
+
+	* Added the update-ids utility.
 
 	* lib: Removed partially implemented "syscall" access method which will
 	probably never be needed.
