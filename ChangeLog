@@ -1,5 +1,8 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (main): The error message for `lspci -s' incorrectly mentioned
+	a `-f' switch. Reported by Steve Finney <Steve.Finney@SpirentCom.COM>.
+
 	* lib/generic.c: Removed memory leak in pci_generic_bus_scan().
 	Reported by Gary Parnes <gary_parnes@terago.com>.
 

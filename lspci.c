@@ -1517,7 +1517,7 @@ main(int argc, char **argv)
 	break;
       case 's':
 	if (msg = pci_filter_parse_slot(&filter, optarg))
-	  die("-f: %s", msg);
+	  die("-s: %s", msg);
 	break;
       case 'd':
 	if (msg = pci_filter_parse_id(&filter, optarg))
