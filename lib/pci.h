@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.11 2002/12/26 20:24:32 mj Exp $
+ *	$Id: pci.h,v 1.12 2003/01/04 11:04:39 mj Exp $
  *
  *	The PCI Library
  *
@@ -71,16 +71,18 @@ typedef unsigned long pciaddr_t;
 struct pci_methods;
 struct nl_entry;
 
-#define PCI_ACCESS_AUTO			0	/* Autodetection (params: none) */
-#define PCI_ACCESS_PROC_BUS_PCI		1	/* Linux /proc/bus/pci (params: path) */
-#define PCI_ACCESS_SYSCALLS		2	/* pciconfig_read() syscalls (params: none) */
-#define PCI_ACCESS_I386_TYPE1		3	/* i386 ports, type 1 (params: none) */
-#define PCI_ACCESS_I386_TYPE2		4	/* i386 ports, type 2 (params: none) */
-#define PCI_ACCESS_FBSD_DEVICE		5	/* FreeBSD /dev/pci (params: path) */
-#define PCI_ACCESS_AIX_DEVICE		6	/* /dev/pci0, /dev/bus0, etc. */
-#define PCI_ACCESS_NBSD_LIBPCI		7
-#define PCI_ACCESS_DUMP			8	/* Dump file (params: filename) */
-#define PCI_ACCESS_MAX			9
+enum pci_access_type {
+  /* Known access methods, remember to update access.c as well */
+  PCI_ACCESS_AUTO,			/* Autodetection (params: none) */
+  PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci (params: path) */
+  PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 (params: none) */
+  PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 (params: none) */
+  PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci (params: path) */
+  PCI_ACCESS_AIX_DEVICE,		/* /dev/pci0, /dev/bus0, etc. */
+  PCI_ACCESS_NBSD_LIBPCI,		/* NetBSD libpci */
+  PCI_ACCESS_DUMP,			/* Dump file (params: filename) */
+  PCI_ACCESS_MAX
+};
 
 struct pci_access {
   /* Options you can change: */

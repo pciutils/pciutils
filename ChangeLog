@@ -1,3 +1,8 @@
+2003-01-04  Martin Mares  <mj@ucw.cz>
+
+	* lib: Removed partially implemented "syscall" access method which will
+	probably never be needed.
+
 2002-12-27  Martin Mares  <mj@ucw.cz>
 
 	* lib/nbsd-libpci.c: Cleaned up and hopefully made it endian safe.
