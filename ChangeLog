@@ -1,3 +1,17 @@
+Thu Jan 28 20:54:16 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 1.99.4.
+
+	* lspci.c: Capability list parser now recognizes both AGP
+	registers and PCI Power Management registers (the latter
+	is mainly guesswork based on DEC/Intel 21153 bridge specs
+	since I don't have the PCI Power Management document).
+
+	* lspci.c: Replaced numerous occurences of (x & flag) ? '+' : '-'
+	by FLAG macro.
+
+	* lspci.c: Added bridge checks to bus mapping code.
+
 Wed Jan 27 14:59:16 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c: Implemented bus mapping mode (-M).
@@ -14,7 +28,6 @@ Mon Jan 25 23:46:13 1999  Martin Mares  <mj@albireo.ucw.cz>
 	don't check PCI_COMMAND for I/O and memory enables.
 
 Mon Jan 25 21:28:49 1999  Martin Mares  <mj@albireo.ucw.cz>
-
 
 	* Makefile: Added target `release' which substitutes new version
 	number to .spec, .lsm and README. Also rewrote target `dist'.

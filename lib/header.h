@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.1 1999/01/24 21:48:12 mj Exp $
+ *	$Id: header.h,v 1.2 1999/01/28 20:16:53 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -177,10 +177,55 @@
 
 /* Capability lists */
 #define PCI_CAP_LIST_ID		0	/* Capability ID */
-#define  PCI_CAP_ID_AGP		0x02
+#define  PCI_CAP_ID_PM		0x01	/* Power Management */
+#define  PCI_CAP_ID_AGP		0x02	/* Accelerated Graphics Port */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
-#define PCI_CAP_LIST_REVISION	2	/* Revision of this capability (BCD) */
-/* 3 reserved */
+#define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
+#define PCI_CAP_SIZEOF		4
+
+/* Power Management Registers */
+
+#define  PCI_PM_CAP_VER_MASK	0x0007	/* Version */
+#define  PCI_PM_CAP_PME_CLOCK	0x0008	/* PME clock required */
+#define  PCI_PM_CAP_AUX_POWER	0x0010	/* Auxilliary power support */
+#define  PCI_PM_CAP_DSI		0x0020	/* Device specific initialization */
+#define  PCI_PM_CAP_D1		0x0200	/* D1 power state support */
+#define  PCI_PM_CAP_D2		0x0400	/* D2 power state support */
+#define  PCI_PM_CAP_PME		0x0800	/* PME pin supported */
+#define PCI_PM_CTRL		4	/* PM control and status register */
+#define  PCI_PM_CTRL_STATE_MASK	0x0003	/* Current power state (D0 to D3) */
+#define  PCI_PM_CTRL_PME_ENABLE	0x0100	/* PME pin enable */
+#define  PCI_PM_CTRL_DATA_SEL_MASK	0x1e00	/* Data select (??) */
+#define  PCI_PM_CTRL_DATA_SCALE_MASK	0x6000	/* Data scale (??) */
+#define  PCI_PM_CTRL_PME_STATUS	0x8000	/* PME pin status */
+#define PCI_PM_PPB_EXTENSIONS	6	/* PPB support extensions (??) */
+#define  PCI_PM_PPB_B2_B3	0x40	/* Stop clock when in D3hot (??) */
+#define  PCI_PM_BPCC_ENABLE	0x80	/* Bus power/clock control enable (??) */
+#define PCI_PM_DATA_REGISTER	7	/* (??) */
+#define PCI_PM_SIZEOF		8
+
+/* AGP registers */
+
+#define PCI_AGP_VERSION		2	/* BCD version number */
+#define PCI_AGP_RFU		3	/* Rest of capability flags */
+#define PCI_AGP_STATUS		4	/* Status register */
+#define  PCI_AGP_STATUS_RQ_MASK	0xff000000	/* Maximum number of requests - 1 */
+#define  PCI_AGP_STATUS_SBA	0x0200	/* Sideband addressing supported */
+#define  PCI_AGP_STATUS_64BIT	0x0020	/* 64-bit addressing supported */
+#define  PCI_AGP_STATUS_FW	0x0010	/* FW transfers supported */
+#define  PCI_AGP_STATUS_RATE4	0x0004	/* 4x transfer rate supported */
+#define  PCI_AGP_STATUS_RATE2	0x0002	/* 2x transfer rate supported */
+#define  PCI_AGP_STATUS_RATE1	0x0001	/* 1x transfer rate supported */
+#define PCI_AGP_COMMAND		8	/* Control register */
+#define  PCI_AGP_COMMAND_RQ_MASK 0xff000000  /* Master: Maximum number of requests */
+#define  PCI_AGP_COMMAND_SBA	0x0200	/* Sideband addressing enabled */
+#define  PCI_AGP_COMMAND_AGP	0x0100	/* Allow processing of AGP transactions */
+#define  PCI_AGP_COMMAND_64BIT	0x0020 	/* Allow processing of 64-bit addresses */
+#define  PCI_AGP_COMMAND_FW	0x0010 	/* Force FW transfers */
+#define  PCI_AGP_COMMAND_RATE4	0x0004	/* Use 4x rate */
+#define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 4x rate */
+#define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 4x rate */
+#define PCI_AGP_SIZEOF		12
 
 /*
  * The PCI interface treats multi-function devices as independent

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.21 1999/01/27 14:52:55 mj Exp $
+ *	$Id: lspci.c,v 1.22 1999/01/28 20:16:46 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -207,6 +207,8 @@ sort_them(void)
 
 /* Normal output */
 
+#define FLAG(x,y) ((x & y) ? '+' : '-')
+
 static void
 show_terse(struct device *d)
 {
@@ -318,6 +320,61 @@ show_bases(struct device *d, int cnt)
 }
 
 static void
+show_pm(struct device *d, int where, int cap)
+{
+  int t;
+
+  printf("Power Management version %d\n", cap & PCI_PM_CAP_VER_MASK);
+  if (verbose < 2)
+    return;
+  printf("\t\tFlags: PMEClk%c AuxPwr%c DSI%c D1%c D2%c PME%c\n",
+	 FLAG(cap, PCI_PM_CAP_PME_CLOCK),
+	 FLAG(cap, PCI_PM_CAP_AUX_POWER),
+	 FLAG(cap, PCI_PM_CAP_DSI),
+	 FLAG(cap, PCI_PM_CAP_D1),
+	 FLAG(cap, PCI_PM_CAP_D2),
+	 FLAG(cap, PCI_PM_CAP_PME));
+  config_fetch(d, where + PCI_PM_CTRL, PCI_PM_SIZEOF - PCI_PM_CTRL);
+  t = get_conf_word(d, where + PCI_PM_CTRL);
+  printf("\t\tStatus: D%d PME-Enable%c DSel=%x DScale=%x PME%c\n",
+	 t & PCI_PM_CTRL_STATE_MASK,
+	 FLAG(t, PCI_PM_CTRL_PME_ENABLE),
+	 (t & PCI_PM_CTRL_DATA_SEL_MASK) >> 9,
+	 (t & PCI_PM_CTRL_DATA_SCALE_MASK) >> 13,
+	 FLAG(t, PCI_PM_CTRL_PME_STATUS));
+}
+
+static void
+show_agp(struct device *d, int where, int cap)
+{
+  u32 t;
+
+  t = cap & 0xff;
+  printf("AGP version %x.%x\n", cap/16, cap%16);
+  if (verbose < 2)
+    return;
+  config_fetch(d, where + PCI_AGP_STATUS, PCI_AGP_SIZEOF - PCI_AGP_STATUS);
+  t = get_conf_long(d, where + PCI_AGP_STATUS);
+  printf("\t\tStatus: RQ=%d SBA%c 64bit%c FW%c Rate=%s%s%s\n",
+	 (t & PCI_AGP_STATUS_RQ_MASK) >> 24U,
+	 FLAG(t, PCI_AGP_STATUS_SBA),
+	 FLAG(t, PCI_AGP_STATUS_64BIT),
+	 FLAG(t, PCI_AGP_STATUS_FW),
+	 (t & PCI_AGP_STATUS_RATE4) ? "4" : "",
+	 (t & PCI_AGP_STATUS_RATE2) ? "2" : "",
+	 (t & PCI_AGP_STATUS_RATE1) ? "1" : "");
+  printf("\t\tCommand: RQ=%d SBA%c AGP%c 64bit%c FW%c Rate=%s%s%s\n",
+	 (t & PCI_AGP_COMMAND_RQ_MASK) >> 24U,
+	 FLAG(t, PCI_AGP_COMMAND_SBA),
+	 FLAG(t, PCI_AGP_COMMAND_AGP),
+	 FLAG(t, PCI_AGP_COMMAND_64BIT),
+	 FLAG(t, PCI_AGP_COMMAND_FW),
+	 (t & PCI_AGP_COMMAND_RATE4) ? "4" : "",
+	 (t & PCI_AGP_COMMAND_RATE2) ? "2" : "",
+	 (t & PCI_AGP_COMMAND_RATE1) ? "1" : "");
+}
+
+static void
 show_htype0(struct device *d)
 {
   unsigned long rom = d->dev->rom_base_addr;
@@ -331,30 +388,33 @@ show_htype0(struct device *d)
       int where = get_conf_byte(d, PCI_CAPABILITY_LIST);
       while (where)
 	{
-	  int id, next, ver;
+	  int id, next, cap;
 	  printf("\tCapabilities: ");
 	  if (!config_fetch(d, where, 4))
 	    {
 	      puts("<available only to root>");
 	      break;
 	    }
-	  id = get_conf_byte(d, where);
-	  next = get_conf_byte(d, where+1);
-	  ver = get_conf_byte(d, where+2);
+	  id = get_conf_byte(d, where + PCI_CAP_LIST_ID);
+	  next = get_conf_byte(d, where + PCI_CAP_LIST_NEXT);
+	  cap = get_conf_word(d, where + PCI_CAP_FLAGS);
+	  printf("[%02x] ", where);
 	  if (id == 0xff)
 	    {
-	      printf("<chain broken at %02x>\n", where);
+	      printf("<chain broken>\n");
 	      break;
 	    }
 	  switch (id)
 	    {
-	    case 2:
-	      printf("AGP");
+	    case PCI_CAP_ID_PM:
+	      show_pm(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_AGP:
+	      show_agp(d, where, cap);
 	      break;
 	    default:
-	      printf("C%02x", id);
+	      printf("#%02x [%04x]", id, cap);
 	    }
-	  printf(" version %x.%x at %02x\n", ver/16, ver%16, where);
 	  where = next;
 	}
     }
@@ -435,13 +495,13 @@ show_htype1(struct device *d)
 
   if (verbose > 1)
     printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",
-	   (brc & PCI_BRIDGE_CTL_PARITY) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_SERR) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_NO_ISA) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_VGA) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_MASTER_ABORT) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_BUS_RESET) ? '+' : '-',
-	   (brc & PCI_BRIDGE_CTL_FAST_BACK) ? '+' : '-');
+	   FLAG(brc, PCI_BRIDGE_CTL_PARITY),
+	   FLAG(brc, PCI_BRIDGE_CTL_SERR),
+	   FLAG(brc, PCI_BRIDGE_CTL_NO_ISA),
+	   FLAG(brc, PCI_BRIDGE_CTL_VGA),
+	   FLAG(brc, PCI_BRIDGE_CTL_MASTER_ABORT),
+	   FLAG(brc, PCI_BRIDGE_CTL_BUS_RESET),
+	   FLAG(brc, PCI_BRIDGE_CTL_FAST_BACK));
 }
 
 static void
@@ -490,14 +550,14 @@ show_htype2(struct device *d)
     printf("\tSecondary status: SERR\n");
   if (verbose > 1)
     printf("\tBridgeCtl: Parity%c SERR%c ISA%c VGA%c MAbort%c >Reset%c 16bInt%c PostWrite%c\n",
-	   (brc & PCI_CB_BRIDGE_CTL_PARITY) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_SERR) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_ISA) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_VGA) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_MASTER_ABORT) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_CB_RESET) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_16BIT_INT) ? '+' : '-',
-	   (brc & PCI_CB_BRIDGE_CTL_POST_WRITES) ? '+' : '-');
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_PARITY),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_SERR),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_ISA),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_VGA),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_MASTER_ABORT),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_CB_RESET),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_16BIT_INT),
+	   FLAG(brc, PCI_CB_BRIDGE_CTL_POST_WRITES));
   if (exca)
     printf("\t16-bit legacy interface ports at %04x\n", exca);
 }
@@ -562,30 +622,30 @@ show_verbose(struct device *d)
   if (verbose > 1)
     {
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c\n",
-	     (cmd & PCI_COMMAND_IO) ? '+' : '-',
-	     (cmd & PCI_COMMAND_MEMORY) ? '+' : '-',
-	     (cmd & PCI_COMMAND_MASTER) ? '+' : '-',
-	     (cmd & PCI_COMMAND_SPECIAL) ? '+' : '-',
-	     (cmd & PCI_COMMAND_INVALIDATE) ? '+' : '-',
-	     (cmd & PCI_COMMAND_VGA_PALETTE) ? '+' : '-',
-	     (cmd & PCI_COMMAND_PARITY) ? '+' : '-',
-	     (cmd & PCI_COMMAND_WAIT) ? '+' : '-',
-	     (cmd & PCI_COMMAND_SERR) ? '+' : '-',
-	     (cmd & PCI_COMMAND_FAST_BACK) ? '+' : '-');
+	     FLAG(cmd, PCI_COMMAND_IO),
+	     FLAG(cmd, PCI_COMMAND_MEMORY),
+	     FLAG(cmd, PCI_COMMAND_MASTER),
+	     FLAG(cmd, PCI_COMMAND_SPECIAL),
+	     FLAG(cmd, PCI_COMMAND_INVALIDATE),
+	     FLAG(cmd, PCI_COMMAND_VGA_PALETTE),
+	     FLAG(cmd, PCI_COMMAND_PARITY),
+	     FLAG(cmd, PCI_COMMAND_WAIT),
+	     FLAG(cmd, PCI_COMMAND_SERR),
+	     FLAG(cmd, PCI_COMMAND_FAST_BACK));
       printf("\tStatus: Cap%c 66Mhz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
-	     (status & PCI_STATUS_CAP_LIST) ? '+' : '-',
-	     (status & PCI_STATUS_66MHZ) ? '+' : '-',
-	     (status & PCI_STATUS_UDF) ? '+' : '-',
-	     (status & PCI_STATUS_FAST_BACK) ? '+' : '-',
-	     (status & PCI_STATUS_PARITY) ? '+' : '-',
+	     FLAG(status, PCI_STATUS_CAP_LIST),
+	     FLAG(status, PCI_STATUS_66MHZ),
+	     FLAG(status, PCI_STATUS_UDF),
+	     FLAG(status, PCI_STATUS_FAST_BACK),
+	     FLAG(status, PCI_STATUS_PARITY),
 	     ((status & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_SLOW) ? "slow" :
 	     ((status & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_MEDIUM) ? "medium" :
 	     ((status & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_FAST) ? "fast" : "??",
-	     (status & PCI_STATUS_SIG_TARGET_ABORT) ? '+' : '-',
-	     (status & PCI_STATUS_REC_TARGET_ABORT) ? '+' : '-',
-	     (status & PCI_STATUS_REC_MASTER_ABORT) ? '+' : '-',
-	     (status & PCI_STATUS_SIG_SYSTEM_ERROR) ? '+' : '-',
-	     (status & PCI_STATUS_DETECTED_PARITY) ? '+' : '-');
+	     FLAG(status, PCI_STATUS_SIG_TARGET_ABORT),
+	     FLAG(status, PCI_STATUS_REC_TARGET_ABORT),
+	     FLAG(status, PCI_STATUS_REC_MASTER_ABORT),
+	     FLAG(status, PCI_STATUS_SIG_SYSTEM_ERROR),
+	     FLAG(status, PCI_STATUS_DETECTED_PARITY));
       if (cmd & PCI_COMMAND_MASTER)
 	{
 	  printf("\tLatency: ");
@@ -998,13 +1058,13 @@ show_forest(void)
 
 struct bus_bridge {
   struct bus_bridge *next;
-  byte first, last;
+  byte this, dev, func, first, last, bug;
 };
 
 struct bus_info {
   byte exists;
-  byte covered;
-  struct bus_bridge *bridges;
+  byte guestbook;
+  struct bus_bridge *bridges, *via;
 };
 
 static struct bus_info *bus_info;
@@ -1014,15 +1074,17 @@ map_bridge(struct bus_info *bi, struct device *d, int np, int ns, int nl)
 {
   struct bus_bridge *b = xmalloc(sizeof(struct bus_bridge));
   struct pci_dev *p = d->dev;
-  int prim = get_conf_byte(d, np);
 
   b->next = bi->bridges;
   bi->bridges = b;
+  b->this = get_conf_byte(d, np);
+  b->dev = p->dev;
+  b->func = p->func;
   b->first = get_conf_byte(d, ns);
   b->last = get_conf_byte(d, nl);
   printf("## %02x.%02x:%d is a bridge from %02x to %02x-%02x\n",
-	 p->bus, p->dev, p->func, prim, b->first, b->last);
-  if (prim != p->bus)
+	 p->bus, p->dev, p->func, b->this, b->first, b->last);
+  if (b->this != p->bus)
     printf("!!! Bridge points to invalid primary bus.\n");
   if (b->first > b->last)
     {
@@ -1077,6 +1139,68 @@ do_map_bus(int bus)
 }
 
 static void
+do_map_bridges(int bus, int min, int max)
+{
+  struct bus_info *bi = bus_info + bus;
+  struct bus_bridge *b;
+
+  bi->guestbook = 1;
+  for(b=bi->bridges; b; b=b->next)
+    {
+      if (bus_info[b->first].guestbook)
+	b->bug = 1;
+      else if (b->first < min || b->last > max)
+	b->bug = 2;
+      else
+	{
+	  bus_info[b->first].via = b;
+	  do_map_bridges(b->first, b->first, b->last);
+	}
+    }
+}
+
+static void
+map_bridges(void)
+{
+  int i;
+
+  printf("\nSummary of buses:\n\n");
+  for(i=0; i<256; i++)
+    if (bus_info[i].exists && !bus_info[i].guestbook)
+      do_map_bridges(i, 0, 255);
+  for(i=0; i<256; i++)
+    {
+      struct bus_info *bi = bus_info + i;
+      struct bus_bridge *b = bi->via;
+
+      if (bi->exists)
+	{
+	  printf("%02x: ", i);
+	  if (b)
+	    printf("Entered via %02x:%02x.%d\n", b->this, b->dev, b->func);
+	  else if (!i)
+	    printf("Primary host bus\n");
+	  else
+	    printf("Secondary host bus (?)\n");
+	}
+      for(b=bi->bridges; b; b=b->next)
+	{
+	  printf("\t%02x.%d Bridge to %02x-%02x", b->dev, b->func, b->first, b->last);
+	  switch (b->bug)
+	    {
+	    case 1:
+	      printf(" <overlap bug>");
+	      break;
+	    case 2:
+	      printf(" <crossing bug>");
+	      break;
+	    }
+	  putchar('\n');
+	}
+    }
+}
+
+static void
 map_the_bus(void)
 {
   if (pacc->method == PCI_ACCESS_PROC_BUS_PCI ||
@@ -1094,6 +1218,7 @@ map_the_bus(void)
       for(bus=0; bus<256; bus++)
 	do_map_bus(bus);
     }
+  map_bridges();
 }
 
 /* Main */
