@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.7 1998/10/23 10:15:20 mj Exp $
+ *	$Id: setpci.c,v 1.8 1998/10/24 13:39:20 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -19,7 +19,7 @@
 #include <asm/byteorder.h>
 
 #include <asm/unistd.h>
-#if defined(__GLIBC__) && (__GLIBC_MAJOR__ <= 2 || __GLIBC_MINOR__ < 1)
+#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 1
 #include <syscall-list.h>
 #endif
 
