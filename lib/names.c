@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.1 1999/01/22 21:05:33 mj Exp $
+ *	$Id: names.c,v 1.2 1999/06/21 20:17:19 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
@@ -254,7 +254,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
       if (n = nl_lookup(a, num, NL_DEVICE, arg1, arg2))
 	return n->name;
       else
-	res = snprintf(buf, size, "%04x", arg1);
+	res = snprintf(buf, size, "%04x", arg2);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE:
       res = compound_name(a, num, buf, size, NL_VENDOR, arg1, arg2);
@@ -269,7 +269,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
       if (n = nl_lookup(a, num, NL_SUBSYSTEM_DEVICE, arg1, arg2))
 	return n->name;
       else
-	res = snprintf(buf, size, "%04x", arg1);
+	res = snprintf(buf, size, "%04x", arg2);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       res = compound_name(a, num, buf, size, NL_SUBSYSTEM_VENDOR, arg1, arg2);

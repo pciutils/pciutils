@@ -1,3 +1,10 @@
+Mon Jun 21 22:11:10 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lib/names.c (pci_lookup_name): When device ID lookup
+	fails, return hexadecimal device ID instead of vendor ID.
+	Well spotted by Axel Bodemann <Axel.Bodemann@ruhr-uni-bochum.de>,
+	I've just extended the fix to subsystem ID's.
+
 Thu Jun 17 19:48:21 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_agp): Bug fix from Petr Vandrovec
