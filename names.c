@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.4 1998/06/08 07:56:20 mj Exp $
+ *	$Id: names.c,v 1.5 1998/06/09 19:16:45 mj Exp $
  *
  *	Linux PCI Utilities -- Device ID to Name Translation
  *
@@ -87,7 +87,7 @@ static void
 parse_name_list(void)
 {
   byte *p = name_list;
-  byte *q, *r, *s;
+  byte *q, *r;
   int lino = 0;
   int id1 = ID1_ERROR;
   int id2 = 0;
