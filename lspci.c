@@ -572,7 +572,8 @@ show_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(cmd, PCI_HT_PRI_CMD_MH),
 	 FLAG(cmd, PCI_HT_PRI_CMD_DD),
 	 FLAG(cmd, PCI_HT_PRI_CMD_DUL));
-  config_fetch(d, where + PCI_HT_PRI_LCTR0, PCI_HT_PRI_SIZEOF - PCI_HT_PRI_LCTR0);
+  if (!config_fetch(d, where + PCI_HT_PRI_LCTR0, PCI_HT_PRI_SIZEOF - PCI_HT_PRI_LCTR0))
+    return;
   lctr0 = get_conf_word(d, where + PCI_HT_PRI_LCTR0);
   printf("\t\tLink Control 0: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n",
 	 FLAG(lctr0, PCI_HT_LCTR_CFLE),
@@ -716,7 +717,8 @@ show_ht_sec(struct device *d, int where, int cmd)
 	 FLAG(cmd, PCI_HT_SEC_CMD_AS),
 	 FLAG(cmd, PCI_HT_SEC_CMD_HIECE),
 	 FLAG(cmd, PCI_HT_SEC_CMD_DUL));
-  config_fetch(d, where + PCI_HT_SEC_LCTR, PCI_HT_SEC_SIZEOF - PCI_HT_SEC_LCTR);
+  if (!config_fetch(d, where + PCI_HT_SEC_LCTR, PCI_HT_SEC_SIZEOF - PCI_HT_SEC_LCTR))
+    return;
   lctr = get_conf_word(d, where + PCI_HT_SEC_LCTR);
   printf("\t\tLink Control: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n",
 	 FLAG(lctr, PCI_HT_LCTR_CFLE),
@@ -907,6 +909,101 @@ show_msi(struct device *d, int where, int cap)
   printf("%08x  Data: %04x\n", t, w);
 }
 
+static void show_vendor(void)
+{
+  printf("Vendor Specific Information\n");
+}
+
+static void show_debug(void)
+{
+  printf("Debug port\n");
+}
+
+static float power_limit(int value, int scale)
+{
+  float scales[4] = { 1.0, 0.1, 0.01, 0.001 };
+  return value * scales[scale];
+}
+
+static void
+show_express(struct device *d, int where, int cap)
+{
+  u32 t;
+  u16 w;
+  int type = (cap & PCI_EXP_FLAGS_TYPE) >> 4;
+
+  printf("Express ");
+  switch (type)
+    {
+    case PCI_EXP_TYPE_ENDPOINT:
+      printf("Endpoint");
+      break;
+    case PCI_EXP_TYPE_LEG_END:
+      printf("Legacy Endpoint");
+      break;
+    case PCI_EXP_TYPE_ROOT_PORT:
+      printf("Root Port (Slot%c)", FLAG(cap, PCI_EXP_FLAGS_SLOT));
+      break;
+    case PCI_EXP_TYPE_UPSTREAM:
+      printf("Upstream Port");
+      break;
+    case PCI_EXP_TYPE_DOWNSTREAM:
+      printf("Downstream Port (Slot%c)", FLAG(cap, PCI_EXP_FLAGS_SLOT));
+      break;
+    case PCI_EXP_TYPE_PCI_BRIDGE:
+      printf("PCI Bridge");
+      break;
+    default:
+      printf("Unknown type");
+  }
+  printf(" IRQ %d\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
+  if (verbose < 2)
+    return;
+
+  t = get_conf_long(d, where + PCI_EXP_DEVCAP);
+  printf("\t\tMaxPayloadSizeSupported %d\n", 128 << (t & PCI_EXP_DEVCAP_PAYLOAD));
+  printf("\t\tPhantomFunctions %d\n", 1 << ((t & PCI_EXP_DEVCAP_PHANTOM) >> 3));
+  printf("\t\tExtendedTags%c\n", FLAG(t, PCI_EXP_DEVCAP_EXT_TAG));
+  printf("\t\tL0sLatency <%dns\n", 64 << ((t & PCI_EXP_DEVCAP_L0S) >> 6));
+  printf("\t\tL1Latency <%dus\n", 1 << ((t & PCI_EXP_DEVCAP_L1) >> 9));
+  if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END))
+    printf("\t\tAtnBtn%c AtnInd%c PwrInd%c\n", FLAG(t, PCI_EXP_DEVCAP_ATN_BUT),
+	FLAG(t, PCI_EXP_DEVCAP_ATN_IND), FLAG(t, PCI_EXP_DEVCAP_PWR_IND));
+  if (type == PCI_EXP_TYPE_ROOT_PORT)
+    printf("\t\tMaxReadRequestSizeSupported %d\n", 128 << ((t & PCI_EXP_DEVCAP_READRQ) >> 15));
+  if (type == PCI_EXP_TYPE_UPSTREAM)
+    printf("\t\tSlotPowerLimit %f\n",
+	power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18,
+		    (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26));
+
+  w = get_conf_word(d, where + PCI_EXP_DEVCTL);
+  printf("\t\tError Reporting: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
+	FLAG(w, PCI_EXP_DEVCTL_CERE), 
+	FLAG(w, PCI_EXP_DEVCTL_NFERE), 
+	FLAG(w, PCI_EXP_DEVCTL_FERE), 
+	FLAG(w, PCI_EXP_DEVCTL_URRE));
+}
+
+static void
+show_msix(struct device *d, int where, int cap)
+{
+  u32 off;
+
+  printf("MSI-X: Enable%c Mask%c TabSize=%d\n",
+	 FLAG(cap, PCI_MSIX_ENABLE),
+	 FLAG(cap, PCI_MSIX_MASK),
+	 (cap & PCI_MSIX_TABSIZE) + 1);
+  if (verbose < 2 || !config_fetch(d, where + PCI_MSIX_TABLE, 8))
+    return;
+
+  off = get_conf_long(d, where + PCI_MSIX_TABLE);
+  printf("\t\tVector table: BAR=%d offset=%08x\n",
+	 off & PCI_MSIX_BIR, off & ~PCI_MSIX_BIR);
+  off = get_conf_long(d, where + PCI_MSIX_PBA);
+  printf("\t\tPBA: BAR=%d offset=%08x\n",
+	 off & PCI_MSIX_BIR, off & ~PCI_MSIX_BIR);
+}
+
 static void
 show_slotid(int cap)
 {
@@ -965,6 +1062,18 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_HT:
 	      show_ht(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_VNDR:
+	      show_vendor();
+	      break;
+	    case PCI_CAP_ID_DBG:
+	      show_debug();
+	      break;
+	    case PCI_CAP_ID_EXP:
+	      show_express(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_MSIX:
+	      show_msix(d, where, cap);
 	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);

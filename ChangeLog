@@ -1,5 +1,19 @@
 2004-06-27  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (show_msix), lib/header.h: Added dumping of MSI-X cap.
+	Patch by Roland Dreier <roland@topspin.com>, cleaned up by me.
+
+	* lspci.c (show_pcix_nobridge, show_pcix_bridge): Handle config_fetch()
+	failures.
+
+	* lib/header.h: Added PCI Express extended capabilities. Again by Matthew.
+
+	* lspci.c (show_express): Added dumping of PCI Express cap.
+	Patch by Matthew Wilcox.
+
+	* lib/header.h: Added a list of PCI 3.0 capabilities and also details
+	on PCI Express caps. Patch by Matthew Wilcox <willy@debian.org>.
+
 	* lspci.c (check_root): Gone. No explicit checks for root are needed,
 	report correct errors reported by the libpci instead.
 

@@ -185,9 +185,22 @@
 #define  PCI_CAP_ID_CHSWP	0x06	/* CompactPCI HotSwap */
 #define  PCI_CAP_ID_PCIX        0x07    /* PCI-X */
 #define  PCI_CAP_ID_HT          0x08    /* HyperTransport */
+#define  PCI_CAP_ID_VNDR	0x09	/* Vendor specific */
+#define  PCI_CAP_ID_DBG		0x0A	/* Debug port */
+#define  PCI_CAP_ID_CCRC	0x0B	/* CompactPCI Central Resource Control */
+#define  PCI_CAP_ID_AGP3	0x0E	/* AGP 8x */
+#define  PCI_CAP_ID_EXP		0x10	/* PCI Express */
+#define  PCI_CAP_ID_MSIX	0x11	/* MSI-X */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
+
+/* Capabilities residing in the PCI Express extended configuration space */
+
+#define PCI_EXT_CAP_ID_AER	0x01	/* Advanced Error Reporting */
+#define PCI_EXT_CAP_ID_VC	0x02	/* Virtual Channel */
+#define PCI_EXT_CAP_ID_DSN	0x03	/* Device Serial Number */
+#define PCI_EXT_CAP_ID_PB	0x04	/* Power Budgeting */
 
 /* Power Management Registers */
 
@@ -660,6 +673,66 @@
 #define PCI_HT_RM_CNT0		8	/* Retry Count 0 Register */
 #define PCI_HT_RM_CNT1		10	/* Retry Count 1 Register */
 #define PCI_HT_RM_SIZEOF	12
+
+/* PCI Express */
+#define PCI_EXP_FLAGS		0x2	/* Capabilities register */
+#define PCI_EXP_FLAGS_VERS	0x000f	/* Capability version */
+#define PCI_EXP_FLAGS_TYPE	0x00f0	/* Device/Port type */
+#define  PCI_EXP_TYPE_ENDPOINT	0x0	/* Express Endpoint */
+#define  PCI_EXP_TYPE_LEG_END	0x1	/* Legacy Endpoint */
+#define  PCI_EXP_TYPE_ROOT_PORT 0x4	/* Root Port */
+#define  PCI_EXP_TYPE_UPSTREAM	0x5	/* Upstream Port */
+#define  PCI_EXP_TYPE_DOWNSTREAM 0x6	/* Downstream Port */
+#define  PCI_EXP_TYPE_PCI_BRIDGE 0x7	/* PCI/PCI-X Bridge */
+#define PCI_EXP_FLAGS_SLOT	0x0100	/* Slot implemented */
+#define PCI_EXP_FLAGS_IRQ	0x3e00	/* Interrupt message number */
+#define PCI_EXP_DEVCAP		0x4	/* Device capabilities */
+#define  PCI_EXP_DEVCAP_PAYLOAD	0x07	/* Max_Payload_Size */
+#define  PCI_EXP_DEVCAP_PHANTOM	0x18	/* Phantom functions */
+#define  PCI_EXP_DEVCAP_EXT_TAG	0x20	/* Extended tags */
+#define  PCI_EXP_DEVCAP_L0S	0x1c0	/* L0s Acceptable Latency */
+#define  PCI_EXP_DEVCAP_L1	0xe00	/* L1 Acceptable Latency */
+#define  PCI_EXP_DEVCAP_ATN_BUT	0x1000	/* Attention Button Present */
+#define  PCI_EXP_DEVCAP_ATN_IND	0x2000	/* Attention Indicator Present */
+#define  PCI_EXP_DEVCAP_PWR_IND	0x4000	/* Power Indicator Present */
+#define  PCI_EXP_DEVCAP_READRQ	0x38000	/* Max_Read_Request_Size */
+#define  PCI_EXP_DEVCAP_PWR_VAL	0x3fc0000 /* Slot Power Limit Value */
+#define  PCI_EXP_DEVCAP_PWR_SCL	0xc000000 /* Slot Power Limit Scale */
+#define PCI_EXP_DEVCTL		0x8	/* Device Control */
+#define  PCI_EXP_DEVCTL_CERE	0x0001	/* Correctable Error Reporting En. */
+#define  PCI_EXP_DEVCTL_NFERE	0x0002	/* Non-Fatal Error Reporting Enable */
+#define  PCI_EXP_DEVCTL_FERE	0x0004	/* Fatal Error Reporting Enable */
+#define  PCI_EXP_DEVCTL_URRE	0x0008	/* Unsupported Request Reporting En. */
+#define  PCI_EXP_DEVCTL_URS	0x0010	/* Unsupported Request Severity */
+#define  PCI_EXP_DEVCTL_PAYLOAD	0x00e0	/* Max_Payload_Size */
+#define  PCI_EXP_DEVCTL_EXT_TAG	0x0100	/* Extended Tag Field Enable */
+#define  PCI_EXP_DEVCTL_PHANTOM	0x0200	/* Phantom Functions Enable */
+#define  PCI_EXP_DEVCTL_AUX_PME	0x0400	/* Auxiliary Power PM Enable */
+#define  PCI_EXP_DEVCTL_STOP	0x0800	/* Complete Pending Transactions */
+#define  PCI_EXP_DEVCTL_READRQ	0x7000	/* Max_Read_Request_Size */
+#define PCI_EXP_DEVSTA		0xa	/* Device Status */
+#define  PCI_EXP_DEVSTA_CED	0x01	/* Correctable Error Detected */
+#define  PCI_EXP_DEVSTA_NFED	0x02	/* Non-Fatal Error Detected */
+#define  PCI_EXP_DEVSTA_FED	0x04	/* Fatal Error Detected */
+#define  PCI_EXP_DEVSTA_URD	0x08	/* Unsupported Request Detected */
+#define  PCI_EXP_DEVSTA_AUXPD	0x10	/* AUX Power Detected */
+#define  PCI_EXP_DEVSTA_TRPND	0x20	/* Transactions Pending */
+#define PCI_EXP_LNKCAP		0xc	/* Link Capabilities */
+#define PCI_EXP_LNKCTL		0x10	/* Link Control */
+#define PCI_EXP_LNKSTA		0x12	/* Link Status */
+#define PCI_EXP_SLTCAP		0x14	/* Slot Capabilities */
+#define PCI_EXP_SLTCTL		0x18	/* Slot Control */
+#define PCI_EXP_SLTSTA		0x1a	/* Slot Status */
+#define PCI_EXP_RTCTL		0x1c	/* Root Control */
+#define PCI_EXP_RTSTA		0x20	/* Root Status */
+
+/* MSI-X */
+#define  PCI_MSIX_ENABLE	0x8000
+#define  PCI_MSIX_MASK		0x4000
+#define  PCI_MSIX_TABSIZE	0x03ff
+#define PCI_MSIX_TABLE		4
+#define PCI_MSIX_PBA		8
+#define  PCI_MSIX_BIR		0x7
 
 /*
  * The PCI interface treats multi-function devices as independent
