@@ -1,5 +1,5 @@
 /*
- *	$Id: access.c,v 1.8 2002/03/30 15:39:25 mj Exp $
+ *	$Id: access.c,v 1.9 2002/12/26 19:28:33 mj Exp $
  *
  *	The PCI Library -- User Access
  *
@@ -41,6 +41,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #endif
 #ifdef HAVE_PM_AIX_DEVICE
   &pm_aix_device,
+#else
+  NULL,
+#endif
+#ifdef HAVE_PM_NBSD_LIBPCI
+  &pm_nbsd_libpci,
 #else
   NULL,
 #endif

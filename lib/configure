@@ -69,8 +69,14 @@ case $sys in
 		echo >>$c '#define HAVE_PM_AIX_DEVICE'
 		ok=1
 		;;
+	NetBSD)
+		echo_n " nbsd-libpci"
+		echo >>$c '#define HAVE_PM_NBSD_LIBPCI'
+		echo >>$c '#define PATH_NBSD_DEVICE "/dev/pci0"'
+		ok=1
+		;;
         *)
-		echo " The PCI library currently supports only Linux, AIX and FreeBSD"
+		echo " The PCI library currently supports only Linux, AIX, FreeBSD and NetBSD"
 		exit 1
 		;;
 esac

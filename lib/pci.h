@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.9 2002/03/30 15:39:25 mj Exp $
+ *	$Id: pci.h,v 1.10 2002/12/26 19:28:33 mj Exp $
  *
  *	The PCI Library
  *
@@ -43,6 +43,16 @@ typedef u_int16_t u16;
 typedef u_int32_t u32;
 #endif
 
+#ifdef OS_NETBSD
+#include <sys/types.h>
+
+typedef u_int8_t byte;
+typedef u_int8_t u8;
+typedef u_int16_t word;
+typedef u_int16_t u16;
+typedef u_int32_t u32;
+#endif
+
 #ifdef OS_AIX
 #include <sys/param.h>
 
@@ -73,8 +83,9 @@ struct nl_entry;
 #define PCI_ACCESS_I386_TYPE2		4	/* i386 ports, type 2 (params: none) */
 #define PCI_ACCESS_FBSD_DEVICE		5	/* FreeBSD /dev/pci (params: path) */
 #define PCI_ACCESS_AIX_DEVICE		6	/* /dev/pci0, /dev/bus0, etc. */
-#define PCI_ACCESS_DUMP			7	/* Dump file (params: filename) */
-#define PCI_ACCESS_MAX			8
+#define PCI_ACCESS_NBSD_LIBPCI		7
+#define PCI_ACCESS_DUMP			8	/* Dump file (params: filename) */
+#define PCI_ACCESS_MAX			9
 
 struct pci_access {
   /* Options you can change: */

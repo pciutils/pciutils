@@ -1,3 +1,8 @@
+2002-12-26  Martin Mares  <mj@ucw.cz>
+
+	* Added preliminary version of NetBSD support by Quentin Garnier
+	<netbsd@quatriemek.com>.
+
 2002-04-06  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c: Mention "-xxx" in the help.
@@ -729,4 +734,3 @@ Tue Feb  3 20:56:00 1998  Martin Mares  <mj@albireo.ucw.cz>
 	(show_htype2): Stub routine.
 	(scan_config): Write sensible error message if the kernel denies reading of
 	upper part of the PCI config space.
-

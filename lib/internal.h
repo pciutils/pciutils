@@ -1,5 +1,5 @@
 /*
- *	$Id: internal.h,v 1.6 2002/03/30 15:39:25 mj Exp $
+ *	$Id: internal.h,v 1.7 2002/12/26 19:28:33 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
@@ -91,4 +91,4 @@ struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
-  pm_syscalls, pm_fbsd_device, pm_aix_device, pm_dump;
+  pm_syscalls, pm_fbsd_device, pm_aix_device, pm_nbsd_libpci, pm_dump;

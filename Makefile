@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.42 2002/03/30 15:42:16 mj Exp $
+# $Id: Makefile,v 1.43 2002/12/26 19:28:33 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
@@ -6,16 +6,21 @@ OPT=-O2 -fomit-frame-pointer
 #OPT=-O2 -g
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes
 
-VERSION=2.1.10
-#SUFFIX=-pre2
-#SUFFIX=-alpha
-DATE=2002-03-30
+VERSION=2.1.11
+SUFFIX=-pre1
+DATE=2002-12-26
 
 INSTALL=install
 DIRINSTALL=install -d
+PCILIB=libpci.a
 ifeq ($(shell uname),FreeBSD)
 ROOT=/usr/local
 PREFIX=/usr/local
+else
+ifeq ($(shell uname),NetBSD)
+ROOT=$(PREFIX)
+PCILIB=libpciutils.a
+LDFLAGS+=-lpci
 else
 ifeq ($(shell uname),AIX)
 ROOT=/usr/local
@@ -26,6 +31,7 @@ DIRINSTALL=mkdir -p
 else
 ROOT=/
 PREFIX=/usr
+endif
 endif
 endif
 MANDIR=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
