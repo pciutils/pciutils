@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.58 2000/04/29 12:56:22 mj Exp $
+#	$Id: pci.ids,v 1.59 2000/05/01 19:48:59 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -1454,15 +1454,22 @@
 	3390  Token Link Velocity
 	3590  3c359 TokenLink Velocity XL
 		10b7 3590  TokenLink Velocity XL Adapter
+	4500  3c450 Cyclone/unknown
+	5055  3c555 Laptop Hurricane
 	5057  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus PC Card
 	5157  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5b57  3C575 Megahertz 10/100 LAN Cardbus PC Card
+	5257  3CCFE575CT Cyclone CardBus
 	5900  3c590 10BaseT [Vortex]
+	5920  3c592 EISA 10mbps Demon/Vortex
 	5950  3c595 100BaseTX [Vortex]
 	5951  3c595 100BaseT4 [Vortex]
 	5952  3c595 100Base-MII [Vortex]
-	7646  SOHO100 [Office Connect Fast Etherlink]
+	5970  3c597 EISA Fast Demon/Vortex
+	6560  3CCFE656 Cyclone CardBus
+	6562  3CCFEM656 Cyclone CardBus
+	7646  3cSOHO100-TX Hurricane
 	8811  Token ring
 	9000  3c900 10BaseT [Boomerang]
 	9001  3c900 Combo [Boomerang]
@@ -3974,6 +3981,25 @@
 156f  M-Systems Flash Disk Pioneers Ltd
 1570  Lecroy Corp
 1571  Contemporary Controls
+	a001  CCSI PCI20-485 ARCnet
+	a002  CCSI PCI20-485D ARCnet
+	a003  CCSI PCI20-485X ARCnet
+	a004  CCSI PCI20-CXB ARCnet
+	a005  CCSI PCI20-CXS ARCnet
+	a006  CCSI PCI20-FOG-SMA ARCnet
+	a007  CCSI PCI20-FOG-ST ARCnet
+	a008  CCSI PCI20-TB5 ARCnet
+	a009  CCSI PCI20-5-485 5Mbit ARCnet
+	a00a  CCSI PCI20-5-485D 5Mbit ARCnet
+	a00b  CCSI PCI20-5-485X 5Mbit ARCnet
+	a00c  CCSI PCI20-5-FOG-ST 5Mbit ARCnet
+	a00d  CCSI PCI20-5-FOG-SMA 5Mbit ARCnet
+	a201  CCSI PCI22-485 10Mbit ARCnet
+	a202  CCSI PCI22-485D 10Mbit ARCnet
+	a203  CCSI PCI22-485X 10Mbit ARCnet
+	a204  CCSI PCI22-CHB 10Mbit ARCnet
+	a205  CCSI PCI22-FOG_ST 10Mbit ARCnet
+	a206  CCSI PCI22-THB 10Mbit ARCnet
 1572  Otis Elevator Company
 1573  Lattice - Vantis
 1574  Fairchild Semiconductor
@@ -4740,6 +4766,7 @@ C 02  Network controller
 	01  Token ring network controller
 	02  FDDI network controller
 	03  ATM network controller
+	04  ISDN controller
 	80  Network controller
 C 03  Display controller
 	00  VGA compatible controller
@@ -4771,6 +4798,10 @@ C 06  Bridge
 	08  RACEway bridge
 		00  Transparent mode
 		01  Endpoint mode
+	09  Semi-transparent PCI-to-PCI bridge
+		40  Primary bus towards host CPU
+		80  Secondary bus towards host CPU
+	0a  InfiniBand to PCI host bridge
 	80  Bridge
 C 07  Communication controller
 	00  Serial controller
@@ -4848,6 +4879,7 @@ C 0c  Serial bus controller
 		Fe  USB Device
 	04  Fiber Channel
 	05  SMBus
+	06  InfiniBand
 C 0d  Wireless controller
 	00  IRDA controller
 	01  Consumer IR controller
@@ -4862,8 +4894,10 @@ C 0f  Satellite communications controller
 	04  Satellite data communication controller
 C 10  Encryption controller
 	00  Network and computing encryption device
-	01  Entertainment encryption device
+	10  Entertainment encryption device
 	80  Encryption controller
 C 11  Signal processing controller
 	00  DPIO module
+	01  Performance counters
+	10  Communication synchronizer
 	80  Signal processing controller

@@ -1,3 +1,9 @@
+2000-05-01  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Updated Contemporary Control ARCnet card entries.
+
+	* pci.ids: Synchronized class list with latest PCI SIG documents.
+
 2000-04-29  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/names.c (pci_lookup_name): Fixed the cheat.
