@@ -1,5 +1,7 @@
 Tue Jun  9 22:53:59 1998  Martin Mares  <mj@albireo.ucw.cz>
 
+	* Released as 1.06.
+
 	* names.c (parse_name_list): Killed an unused variable.
 
 	* setpci.c (pread, pwrite): Define SYS_(pread|pwrite) as __NR_\1
