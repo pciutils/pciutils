@@ -1,3 +1,8 @@
+2004-07-11  Martin Mares  <mj@ucw.cz>
+
+	* lib/sysfs.c (sysfs_get_resources): Arguments now correspond
+	to the format string. [Patch by Bill Nottingham]
+
 2004-07-05  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test7.

@@ -115,7 +115,7 @@ sysfs_get_resources(struct pci_dev *d)
       if (start != (unsigned long long)(pciaddr_t) start ||
 	  end != (unsigned long long)(pciaddr_t) end)
 	{
-	  a->warning("Resource %d in %s has a 64-bit address, ignoring", namebuf);
+	  a->warning("Resource %d in %s has a 64-bit address, ignoring", i, namebuf);
 	  start = end = 0;
 	}
       if (start)
