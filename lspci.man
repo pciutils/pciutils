@@ -94,6 +94,11 @@ unfortunately these happen to exist), it's available only to root. Also using
 -M on PCI access methods which don't directly touch the hardware has no
 sense since the results are (modulo bugs in lspci) identical to normal listing
 modes.
+.TP
+.B --version
+Shows 
+.I lspci
+version. This option should be used standalone.
 
 .SH PCILIB OPTIONS
 The PCI utilities use PCILIB (a portable library providing platform-independent

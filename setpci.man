@@ -42,6 +42,12 @@ It's useful to try
 to see what your complex sequence of
 .B setpci
 operations does before you actually execute it.
+.TP
+.B --version
+Shows
+.I setpci
+version. This option should be used standalone.
+
 
 .SH DEVICE SELECTION
 .PP

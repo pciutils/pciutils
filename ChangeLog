@@ -1,5 +1,8 @@
 Thu Mar  9 13:11:39 2000  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lspci.man, setpci.man: Revealed --version. Well spotted
+	by Adam Sulmicki.
+
 	* pci.ids: Added lots of new ID's and synced with 2.3.50.
 
 Tue Feb 15 00:16:21 2000  Martin Mares  <mj@albireo.ucw.cz>
