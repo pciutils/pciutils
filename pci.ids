@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.23 1999/04/26 19:41:48 mj Exp $
+#	$Id: pci.ids,v 1.24 1999/05/09 19:08:00 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -142,6 +142,8 @@
 	1200  GD 7542 [Nordic]
 	1202  GD 7543 [Viking]
 	1204  GD 7541 [Nordic Light]
+	6001  CS 4610
+	6003  CS 4614
 1014  IBM
 	000a  Fire Coral
 	0018  TR
@@ -180,9 +182,12 @@
 1021  OKI Electric Industry Co. Ltd.
 1022  Advanced Micro Devices
 	2000  79c970 [PCnet LANCE]
+	2001  79c978 [HomePNA]
 	2020  53c974 [PCscsi]
 	2040  79c974
 1023  Trident Microsystems
+	2000  4DWave DX
+	2001  4DWave NX
 	9320  TGUI 9320
 	9397  Cyber9397
 	9420  TGUI 9420
@@ -209,16 +214,18 @@
 	0000  HYDRA
 	0010  ASPEN
 102b  Matrox Graphics, Inc.
-	0518  2085PX [Atlas MGA-2]
+	0010  MGA-I [Impression]
+	0518  MGA-II [Athena]
 	0519  MGA 2064W [Millennium]
 	051a  MGA 1064SG [Mystique]
 	051b  MGA 2164W [Millennium II]
+	051e  MGA 1064SG AGP [Mystique AGP]
 	051f  MGA 2164W AGP [Millennium II AGP]
 	0520  MGA G200 PCI
-	0521  MGA G200 AGP [Millennium G200 AGP]
+	0521  MGA G200 AGP [Millennium AGP]
 	0d10  MGA Ultima/Impression
-	1000  MGA G100 [Millennium multi monitor]
-	1001  MGA G100 [Millennium AGP]
+	1000  MGA G100 [Productiva]
+	1001  MGA G100 [Productiva AGP]
 102c  Chips and Technologies
 	00b8  64310
 	00d8  65545
@@ -391,7 +398,10 @@
 	0002  Grand Central I/O
 	0003  Control Video
 	0004  PlanB Video-In
+	0007  O'Hare I/O
 	000e  Hydra Mac I/O
+	0010  Heathrow Mac I/O
+	0017  Paddington Mac I/O
 106c  Hyundai Electronics America
 106d  Sequent Computer Systems
 106e  DFI, Inc
@@ -401,6 +411,9 @@
 1072  GIT Co Ltd
 1073  Yamaha Corporation
 	0002  YGV615 [RPA3 3D-Graphics Controller]
+	0003  YMF-740
+	0004  YMF-724
+	000D  YMF-724F
 1074  NexGen Microsystems
 	4e78  82c501
 1075  Advanced Integrations Research
@@ -921,7 +934,9 @@
 	0601  601
 	060a  ToPIC95
 	060f  ToPIC97
-	0701  Lucent DSP1645 [Mars]
+	0701  FIR Port
+# This is apparently incorrect. Does anyone know the correct ID?
+#	0701  Lucent DSP1645 [Mars]
 117b  L G Electronics, Inc.
 117c  Atto Technology
 117d  Becton & Dickinson
@@ -1152,6 +1167,8 @@
 122b  LG Industrial Systems Co., Ltd
 122c  Sican GmbH
 122d  Aztech System Ltd
+	1206  368DSP
+	50dc  3328
 122e  Xyratex
 122f  Andrew Corporation
 1230  Fishcamp Engineering
@@ -1177,6 +1194,7 @@
 1243  Delphax
 1244  AVM Audiovisuelles MKTG & Computer System GmbH
 	0700  B1 ISDN
+	0a00  A1 ISDN [Fritz]
 1245  A.P.D., S.A.
 1246  Dipix Technologies, Inc.
 1247  Xylon Research, Inc.
@@ -1369,6 +1387,7 @@
 12ea  Zuken
 12eb  Aureal Semiconductor
 	0001  Vortex 1
+	0002  Vortex 2
 12ec  3A International, Inc.
 12ed  Optivision Inc.
 12ee  Orange Micro
@@ -1622,6 +1641,7 @@
 13f4  Troika Design Inc
 13f5  Kansai Electric Co. Ltd
 13f6  C-Media Electronics Inc
+	0100  CMI8338
 13f7  Wildfire Communications
 13f8  Ad Lib Multimedia Inc
 13f9  NTT Advanced Technology Corp.
@@ -1762,6 +1782,7 @@
 	0010  WDOG1 [PCI-Watchdog 1]
 	0011  PWDOG2 [Watchdog2/PCI]
 8086  Intel Corporation
+	0039  21145
 	0482  82375EB
 	0483  82424ZX [Saturn]
 	0484  82378IB [SIO ISA Bridge]
