@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.29 1999/09/22 08:00:53 mj Exp $
+ *	$Id: lspci.c,v 1.30 1999/10/09 13:26:02 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -234,14 +234,22 @@ show_terse(struct device *d)
 	 p->func,
 	 pci_lookup_name(pacc, classbuf, sizeof(classbuf),
 			 PCI_LOOKUP_CLASS,
-			 get_conf_word(d, PCI_CLASS_DEVICE), 0),
+			 get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
 	 pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-			 p->vendor_id, p->device_id));
+			 p->vendor_id, p->device_id, 0, 0));
   if (c = get_conf_byte(d, PCI_REVISION_ID))
     printf(" (rev %02x)", c);
   if (verbose && (c = get_conf_byte(d, PCI_CLASS_PROG)))
-    printf(" (prog-if %02x)", c);
+    {
+      char *x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
+				PCI_LOOKUP_PROGIF,
+				get_conf_word(d, PCI_CLASS_DEVICE), c, 0, 0);
+      printf(" (prog-if %02x", c);
+      if (x)
+	printf(" [%s]", x);
+      putchar(')');
+    }
   putchar('\n');
 }
 
@@ -723,7 +731,7 @@ show_verbose(struct device *d)
     printf("\tSubsystem: %s\n",
 	   pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
 			   PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-			   subsys_v, subsys_d));
+			   p->vendor_id, p->device_id, subsys_v, subsys_d));
 
   if (verbose > 1)
     {
@@ -855,17 +863,17 @@ show_machine(struct device *d)
     {
       printf("Device:\t%02x:%02x.%x\n", p->bus, p->dev, p->func);
       printf("Class:\t%s\n",
-	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE), 0));
+	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0));
       printf("Vendor:\t%s\n",
-	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
+	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, 0, 0));
       printf("Device:\t%s\n",
-	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id));
+	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, 0, 0));
       if (sv_id && sv_id != 0xffff)
 	{
 	  printf("SVendor:\t%s\n",
-		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id, sd_id));
+		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, sv_id, sd_id));
 	  printf("SDevice:\t%s\n",
-		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, sv_id, sd_id));
+		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
 	}
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf("Rev:\t%02x\n", c);
@@ -877,19 +885,19 @@ show_machine(struct device *d)
       printf("%02x:%02x.%x ", p->bus, p->dev, p->func);
       printf("\"%s\" \"%s\" \"%s\"",
 	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS,
-			     get_conf_word(d, PCI_CLASS_DEVICE), 0),
+			     get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR,
-			     p->vendor_id, p->device_id),
+			     p->vendor_id, p->device_id, 0, 0),
 	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE,
-			     p->vendor_id, p->device_id));
+			     p->vendor_id, p->device_id, 0, 0));
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf(" -r%02x", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
 	printf(" -p%02x", c);
       if (sv_id && sv_id != 0xffff)
 	printf(" \"%s\" \"%s\"",
-	       pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id, sd_id),
-	       pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, sv_id, sd_id));
+	       pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, sv_id, sd_id),
+	       pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
       else
 	printf(" \"\" \"\"");
       putchar('\n');
@@ -1094,7 +1102,7 @@ show_tree_dev(struct device *d, byte *line, byte *p)
     p += sprintf(p, "  %s",
 		 pci_lookup_name(pacc, namebuf, sizeof(namebuf),
 				 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-				 q->vendor_id, q->device_id));
+				 q->vendor_id, q->device_id, 0, 0));
   print_it(line, p);
 }
 

@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.6 1999/07/20 14:01:35 mj Exp $
+ *	$Id: pci.h,v 1.7 1999/10/09 13:26:14 mj Exp $
  *
  *	The PCI Library
  *
@@ -170,13 +170,14 @@ int pci_filter_match(struct pci_filter *, struct pci_dev *);
  *	Device names
  */
 
-char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, u32 arg2);
+char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 void pci_free_name_list(struct pci_access *a);
 
 #define PCI_LOOKUP_VENDOR 1
 #define PCI_LOOKUP_DEVICE 2
 #define PCI_LOOKUP_CLASS 4
 #define PCI_LOOKUP_SUBSYSTEM 8
+#define PCI_LOOKUP_PROGIF 16
 #define PCI_LOOKUP_NUMERIC 0x10000
 
 #endif

@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.2 1999/06/21 20:17:19 mj Exp $
+ *	$Id: names.c,v 1.3 1999/10/09 13:26:12 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
@@ -20,55 +20,57 @@
 
 struct nl_entry {
   struct nl_entry *next;
-  word id1, id2;
+  word id1, id2, id3, id4;
   int cat;
   byte *name;
 };
 
 #define NL_VENDOR 0
 #define NL_DEVICE 1
-#define NL_CLASS 2
-#define NL_SUBCLASS 3
-#define NL_SUBSYSTEM_VENDOR 4
-#define NL_SUBSYSTEM_DEVICE 5
+#define NL_SUBSYSTEM 2
+#define NL_CLASS 3
+#define NL_SUBCLASS 4
+#define NL_PROGIF 5
 
 #define HASH_SIZE 1024
 
-static inline unsigned int nl_calc_hash(int cat, int id1, int id2)
+static inline unsigned int nl_calc_hash(int cat, int id1, int id2, int id3, int id4)
 {
   unsigned int h;
 
-  h = id1 ^ id2 ^ (cat << 5);
+  h = id1 ^ id2 ^ id3 ^ id4 ^ (cat << 5);
   h += (h >> 6);
   return h & (HASH_SIZE-1);
 }
 
-static struct nl_entry *nl_lookup(struct pci_access *a, int num, int cat, int id1, int id2)
+static struct nl_entry *nl_lookup(struct pci_access *a, int num, int cat, int id1, int id2, int id3, int id4)
 {
   unsigned int h;
   struct nl_entry *n;
 
   if (num)
     return NULL;
-  h = nl_calc_hash(cat, id1, id2);
+  h = nl_calc_hash(cat, id1, id2, id3, id4);
   n = a->nl_hash[h];
-  while (n && (n->id1 != id1 || n->id2 != id2 || n->cat != cat))
+  while (n && (n->id1 != id1 || n->id2 != id2 || n->id3 != id3 || n->id4 != id4 || n->cat != cat))
     n = n->next;
   return n;
 }
 
-static int nl_add(struct pci_access *a, int cat, int id1, int id2, byte *text)
+static int nl_add(struct pci_access *a, int cat, int id1, int id2, int id3, int id4, byte *text)
 {
-  unsigned int h = nl_calc_hash(cat, id1, id2);
+  unsigned int h = nl_calc_hash(cat, id1, id2, id3, id4);
   struct nl_entry *n = a->nl_hash[h];
 
-  while (n && (n->id1 != id1 || n->id2 != id2 || n->cat != cat))
+  while (n && (n->id1 != id1 || n->id2 != id2 || n->id3 != id3 || n->id4 != id4 || n->cat != cat))
     n = n->next;
   if (n)
     return 1;
   n = pci_malloc(a, sizeof(struct nl_entry));
   n->id1 = id1;
   n->id2 = id2;
+  n->id3 = id3;
+  n->id4 = id4;
   n->cat = cat;
   n->name = text;
   n->next = a->nl_hash[h];
@@ -88,8 +90,8 @@ parse_name_list(struct pci_access *a)
   byte *p = a->nl_list;
   byte *q, *r;
   int lino = 0;
-  unsigned int id1=0, id2=0;
-  int cat, last_cat = -1;
+  unsigned int id1=0, id2=0, id3=0, id4=0;
+  int cat = -1;
 
   while (*p)
     {
@@ -104,8 +106,6 @@ parse_name_list(struct pci_access *a)
 		p++;
 	      break;
 	    }
-	  if (*p == '\t')
-	    *p = ' ';
 	  p++;
 	}
       if (*p == '\n')
@@ -116,9 +116,9 @@ parse_name_list(struct pci_access *a)
       while (r > q && r[-1] == ' ')
 	*--r = 0;
       r = q;
-      while (*q == ' ')
+      while (*q == '\t')
 	q++;
-      if (r == q)
+      if (q == r)
 	{
 	  if (q[0] == 'C' && q[1] == ' ')
 	    {
@@ -126,16 +126,7 @@ parse_name_list(struct pci_access *a)
 		  q[4] != ' ' ||
 		  sscanf(q+2, "%x", &id1) != 1)
 		goto parserr;
-	      cat = last_cat = NL_CLASS;
-	    }
-	  else if (q[0] == 'S' && q[1] == ' ')
-	    {
-	      if (strlen(q+2) < 5 ||
-		  q[6] != ' ' ||
-		  sscanf(q+2, "%x", &id1) != 1)
-		goto parserr;
-	      cat = last_cat = NL_SUBSYSTEM_VENDOR;
-	      q += 2;
+	      cat = NL_CLASS;
 	    }
 	  else
 	    {
@@ -143,27 +134,64 @@ parse_name_list(struct pci_access *a)
 		  q[4] != ' ' ||
 		  sscanf(q, "%x", &id1) != 1)
 		goto parserr;
-	      cat = last_cat = NL_VENDOR;
+	      cat = NL_VENDOR;
 	    }
-	  id2 = 0;
+	  id2 = id3 = id4 = 0;
+	  q += 4;
 	}
-      else
-	{
-	  if (sscanf(q, "%x", &id2) != 1)
-	    goto parserr;
-	  if (last_cat < 0)
-	    goto parserr;
-	  if (last_cat == NL_CLASS)
+      else if (q == r+1) 
+	switch (cat)
+	  {
+	  case NL_VENDOR:
+	  case NL_DEVICE:
+	  case NL_SUBSYSTEM:
+	    if (sscanf(q, "%x", &id2) != 1 || q[4] != ' ')
+	      goto parserr;
+	    q += 5;
+	    cat = NL_DEVICE;
+	    id3 = id4 = 0;
+	    break;
+	  case NL_CLASS:
+	  case NL_SUBCLASS:
+	  case NL_PROGIF:
+	    if (sscanf(q, "%x", &id2) != 1 || q[2] != ' ')
+	      goto parserr;
+	    q += 3;
 	    cat = NL_SUBCLASS;
-	  else
-	    cat = last_cat+1;
-	}
-      q += 4;
+	    id3 = id4 = 0;
+	    break;
+	  default:
+	    goto parserr;
+	  }
+      else if (q == r+2)
+	switch (cat)
+	  {
+	  case NL_DEVICE:
+	  case NL_SUBSYSTEM:
+	    if (sscanf(q, "%x%x", &id3, &id4) != 2 || q[9] != ' ')
+	      goto parserr;
+	    q += 10;
+	    cat = NL_SUBSYSTEM;
+	    break;
+	  case NL_CLASS:
+	  case NL_SUBCLASS:
+	  case NL_PROGIF:
+	    if (sscanf(q, "%x", &id3) != 1 || q[2] != ' ')
+	      goto parserr;
+	    q += 3;
+	    cat = NL_PROGIF;
+	    id4 = 0;
+	    break;
+	  default:
+	    goto parserr;
+	  }
+      else
+	goto parserr;
       while (*q == ' ')
 	q++;
       if (!*q)
 	goto parserr;
-      if (nl_add(a, cat, id1, id2, q))
+      if (nl_add(a, cat, id1, id2, id3, id4, q))
 	a->error("%s, line %d: duplicate entry", a->id_file_name, lino);
     }
   return;
@@ -205,28 +233,8 @@ pci_free_name_list(struct pci_access *a)
   a->nl_hash = NULL;
 }
 
-static int
-compound_name(struct pci_access *a, int num, char *buf, int size, int cat, int v, int i)
-{
-  if (!num)
-    {
-      struct nl_entry *e, *e2;
-
-      e = nl_lookup(a, 0, cat, v, 0);
-      e2 = nl_lookup(a, 0, cat+1, v, i);
-      if (!e)
-	return snprintf(buf, size, "Unknown device %04x:%04x", v, i);
-      else if (!e2)
-	return snprintf(buf, size, "%s: Unknown device %04x", e->name, i);
-      else
-	return snprintf(buf, size, "%s %s", e->name, e2->name);
-    }
-  else
-    return snprintf(buf, size, "%04x:%04x", v, i);
-}
-
 char *
-pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, u32 arg2)
+pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
   int num = a->numeric_ids;
   int res;
@@ -245,43 +253,88 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
   switch (flags)
     {
     case PCI_LOOKUP_VENDOR:
-      if (n = nl_lookup(a, num, NL_VENDOR, arg1, 0))
+      if (n = nl_lookup(a, num, NL_VENDOR, arg1, 0, 0, 0))
 	return n->name;
       else
 	res = snprintf(buf, size, "%04x", arg1);
       break;
     case PCI_LOOKUP_DEVICE:
-      if (n = nl_lookup(a, num, NL_DEVICE, arg1, arg2))
+      if (n = nl_lookup(a, num, NL_DEVICE, arg1, arg2, 0, 0))
 	return n->name;
       else
 	res = snprintf(buf, size, "%04x", arg2);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE:
-      res = compound_name(a, num, buf, size, NL_VENDOR, arg1, arg2);
+      if (!num)
+	{
+	  struct nl_entry *e, *e2;
+	  e = nl_lookup(a, 0, NL_VENDOR, arg1, 0, 0, 0);
+	  e2 = nl_lookup(a, 0, NL_DEVICE, arg1, arg2, 0, 0);
+	  if (!e)
+	    res = snprintf(buf, size, "Unknown device %04x:%04x", arg1, arg2);
+	  else if (!e2)
+	    res = snprintf(buf, size, "%s: Unknown device %04x", e->name, arg2);
+	  else
+	    res = snprintf(buf, size, "%s %s", e->name, e2->name);
+	}
+      else
+	res = snprintf(buf, size, "%04x:%04x", arg1, arg2);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_SUBSYSTEM:
-      if (n = nl_lookup(a, num, NL_SUBSYSTEM_VENDOR, arg1, 0))
+      if (n = nl_lookup(a, num, NL_VENDOR, arg3, 0, 0, 0))
 	return n->name;
       else
 	res = snprintf(buf, size, "%04x", arg1);
       break;
     case PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
-      if (n = nl_lookup(a, num, NL_SUBSYSTEM_DEVICE, arg1, arg2))
+      if (n = nl_lookup(a, num, NL_SUBSYSTEM, arg1, arg2, arg3, arg4))
 	return n->name;
       else
 	res = snprintf(buf, size, "%04x", arg2);
       break;
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
-      res = compound_name(a, num, buf, size, NL_SUBSYSTEM_VENDOR, arg1, arg2);
+      if (!num)
+	{
+	  struct nl_entry *e, *e2;
+	  e = nl_lookup(a, 0, NL_VENDOR, arg3, 0, 0, 0);
+	  e2 = nl_lookup(a, 0, NL_SUBSYSTEM, arg1, arg2, arg3, arg4);
+	  if (!e)
+	    res = snprintf(buf, size, "Unknown device %04x:%04x", arg1, arg2);
+	  else if (!e2)
+	    res = snprintf(buf, size, "%s: Unknown device %04x", e->name, arg2);
+	  else
+	    res = snprintf(buf, size, "%s %s", e->name, e2->name);
+	}
+      else
+	res = snprintf(buf, size, "%04x:%04x", arg3, arg4);
       break;
     case PCI_LOOKUP_CLASS:
-      if (n = nl_lookup(a, num, NL_SUBCLASS, arg1 >> 8, arg1 & 0xff))
+      if (n = nl_lookup(a, num, NL_SUBCLASS, arg1 >> 8, arg1 & 0xff, 0, 0))
 	return n->name;
-      else if (n = nl_lookup(a, num, NL_CLASS, arg1, 0))
+      else if (n = nl_lookup(a, num, NL_CLASS, arg1, 0, 0, 0))
 	res = snprintf(buf, size, "%s [%04x]", n->name, arg1);
       else
 	res = snprintf(buf, size, "Class %04x", arg1);
       break;
+    case PCI_LOOKUP_PROGIF:
+      if (n = nl_lookup(a, num, NL_PROGIF, arg1 >> 8, arg1 & 0xff, arg2, 0))
+	return n->name;
+      if (arg1 == 0x0101)
+	{
+	  /* IDE controllers have complex prog-if semantics */
+	  if (arg2 & 0x70)
+	    return NULL;
+	  res = snprintf(buf, size, "%s%s%s%s%s",
+			 (arg2 & 0x80) ? "Master " : "",
+			 (arg2 & 0x08) ? "SecP " : "",
+			 (arg2 & 0x04) ? "SecO " : "",
+			 (arg2 & 0x02) ? "PriP " : "",
+			 (arg2 & 0x01) ? "PriO " : "");
+	  if (res)
+	    buf[--res] = 0;
+	  break;
+	}
+      return NULL;
     default:
       return "<pci_lookup_name: invalid request>";
     }

@@ -4,10 +4,15 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.37 1999/09/22 08:00:55 mj Exp $
+#	$Id: pci.ids,v 1.38 1999/10/09 13:26:05 mj Exp $
 #
 
-# Vendors and devices. Please keep sorted.
+# Vendors, devices and subsystems. Please keep sorted.
+
+# Syntax:
+# vendor  vendor_name
+#	device  device_name				<-- single tab
+#		subvendor subdevice  subsystem_name	<-- two tabs
 
 0000  Gammagraphx, Inc.
 001a  Ascend Communications, Inc.
@@ -72,7 +77,6 @@
 	4354  215CT [Mach64 CT]
 	4358  210888CX [Mach64 CX]
 	4554  210888ET [Mach64 ET]
-	4654  Mach64 VT
 	4742  3D Rage Pro AGP 1X/2X
 	4744  3D Rage Pro AGP 1X
 	4747  3D Rage Pro
@@ -102,42 +106,40 @@
 	4c52  3D Rage P/M Mobility
 	4c53  3D Rage L Mobility
 	4c54  264LT [Mach64 LT]
-	5041  Rage 128 Pro
-	5042  Rage 128 Pro AGP 2x
-	5043  Rage 128 Pro AGP 4x
-	5044  Rage 128 Pro
-	5045  Rage 128 Pro AGP 2x
-	5046  Rage 128 Pro AGP 4x
-	5047  Rage 128 Pro
-	5048  Rage 128 Pro AGP 2x
-	5049  Rage 128 Pro AGP 4x
-	504a  Rage 128 Pro
-	504b  Rage 128 Pro AGP 2x
-	504c  Rage 128 Pro AGP 4x
-	504d  Rage 128 Pro
-	504e  Rage 128 Pro AGP 2x
-	504f  Rage 128 Pro AGP 4x
-	5050  Rage 128 Pro
-	5051  Rage 128 Pro AGP 2x
-	5052  Rage 128 Pro AGP 4x
-	5053  Rage 128 Pro
-	5054  Rage 128 Pro AGP 2x
-	5055  Rage 128 Pro AGP 4x
-	5056  Rage 128 Pro
-	5057  Rage 128 Pro AGP 2x
-	5058  Rage 128 Pro AGP 4x
-	5245  Rage 128 GL
-	5246  Rage 128 GL AGP 1x/2x
-	524b  Rage 128 VR
-	524c  Rage 128 VR AGP 1x/2x
-	5345  Rage 128 4x
-	5346  Rage 128 4x AGP 2x
-	5347  Rage 128 4x AGP 4x
-	5348  Rage 128 4x
-	534b  Rage 128 4x
-	534c  Rage 128 4x AGP 2x
-	534d  Rage 128 4x AGP 4x
-	534e  Rage 128 4x
+	5041  Rage 128 PA
+	5042  Rage 128 PB
+	5043  Rage 128 PC
+	5044  Rage 128 PD
+	5045  Rage 128 PE
+	5046  Rage 128 PF
+	5047  Rage 128 PG
+	5048  Rage 128 PH
+	5049  Rage 128 PI
+	504A  Rage 128 PJ
+	504B  Rage 128 PK
+	504C  Rage 128 PL
+	504D  Rage 128 PM
+	504E  Rage 128 PN
+	504F  Rage 128 PO
+	5050  Rage 128 PP
+	5051  Rage 128 PQ
+	5052  Rage 128 PR
+	5053  Rage 128 PS
+	5054  Rage 128 PT
+	5055  Rage 128 PU
+	5056  Rage 128 PV
+	5057  Rage 128 PW
+	5058  Rage 128 PX
+	5245  Rage 128 RE
+	5246  Rage 128 RF
+	524b  Rage 128 RK
+	524c  Rage 128 RL
+	5345  Rage 128 SE
+	5346  Rage 128 SF
+	5347  Rage 128 SG
+	534B  Rage 128 SK
+	534C  Rage 128 SL
+	534D  Rage 128 SM
 	5354  Mach64 ST
 	5654  264VT [Mach64 VT]
 	5655  264VT3 [Mach64 VT3]
@@ -489,7 +491,8 @@
 1046  IPC Corporation, Ltd.
 1047  Genoa Systems Corp
 1048  Elsa AG
-	1000  QuickStep 1000pro
+	1000  QuickStep 1000
+	3000  QuickStep 3000
 1049  Fountain Technologies, Inc.
 104a  SGS Thomson Microelectronics
 	0008  STG 2000X
@@ -551,6 +554,7 @@
 1507  Motorola Computer Group
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
+	0100  MC145575 [HFC-PCI]
 	0431  KTI829c 100VG
 	4801  Raven
 	4802  Falcon
@@ -559,6 +563,7 @@
 1057  Motorola Computer Group
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
+	0100  MC145575 [HFC-PCI]
 	0431  KTI829c 100VG
 	4801  Raven
 	4802  Falcon
@@ -818,6 +823,7 @@
 	b106  DB87144
 10b4  STB Systems Inc
 	1b1d  Velocity 128 3D
+		10b4 237e  Velocity 4400
 10b5  PLX Technology, Inc.
 	0001  i960 PCI bus interface
 	1076  VScom 800 8 port serial adaptor
@@ -826,8 +832,10 @@
 	9050  PCI <-> IOBus Bridge
 	9060  9060
 	906d  9060SD
+		125c 0640  Aries 16000P
 	906e  9060ES
 	9080  9080
+		10b5 9080  9080 [real subsystem ID not set]
 10b6  Madge Networks
 	0001  Smart 16/4 Ringnode
 	0002  Smart 16/4 BM Mk2 Ringnode
@@ -970,6 +978,7 @@
 	0008  NV1 EDGE 3D
 	0009  NV1 EDGE 3D
 	0020  Riva TNT 128
+		1102 1015  Graphics Blaster CT6710
 	0028  Riva TNT2
 	0029  Riva TNT2 Ultra
 	002c  Vanta
@@ -1514,7 +1523,9 @@
 11c6  Dainippon Screen Mfg. Co. Ltd
 11c7  D.C.M. Data Systems
 11c8  Dolphin Interconnect Solutions AS
-	0658  PSB
+	0658  PSB32 SCI-Adapter D31x
+	d665  PSB64 SCI-Adapter D32x
+	d667  PSB66 SCI-Adapter D33x
 11c9  Magma
 	0010  16-line serial port w/- DMA
 	0011  4-line serial port w/- DMA
@@ -1735,7 +1746,6 @@
 125a  ABB Power Systems
 125b  Asix Electronics Corporation
 125c  Aurora Technologies, Inc.
-	0640  Aries 16000P
 125d  ESS Technology
 	0000  ES336H PCI Fax Modem (Early Model)
 	1948  Solo?
@@ -2011,6 +2021,8 @@
 1317  Bridgecom, Inc
 1318  Packet Engines Inc.
 1319  Fortemedia, Inc
+	0801  Xwave QS3000A [FM801]
+	0802  Xwave QS3000A [FM801 game port]
 131a  Finisar Corp.
 131c  Nippon Electro-Sensory Devices Corp
 131d  Sysmic, Inc.
@@ -2152,6 +2164,7 @@
 1395  Ambicom Inc
 1396  Cipher Systems Inc
 1397  Cologne Chip Designs GmbH
+	2bd0  PCI ISDN network controller
 1398  Clarion co. Ltd
 1399  Rios systems Co Ltd
 139a  Alacritech Inc
@@ -2504,6 +2517,7 @@
 14ef  CARRY Computer ENG. CO Ltd
 14f0  CANON RESEACH CENTRE FRANCE
 14f1  CONEXANT
+	2013  HSP MicroModem 56K
 14f2  MOBILITY Electronics
 14f3  BROADLOGIC
 14f4  TOKYO Electronic Industry CO Ltd
@@ -2613,7 +2627,7 @@
 155b  PROTAC INTERNATIONAL Corp
 1668  Action Tec Electronics Inc
 1a08  Sierra semiconductor
-    0000  SC15064
+	0000  SC15064
 1b13  Jaton Corp
 1c1c  Symphony
 	0001  82C101
@@ -2758,6 +2772,7 @@
 6409  Logitec Corp.
 6666  Decision Computer International Co.
 	0001  PCCOM4
+	0002  PCCOM8
 7604  O.N. Electronic Co Ltd.
 7bde  MIDAC Corporation
 8008  Quancom Electronic GmbH
@@ -2968,88 +2983,152 @@ fffe  VMWare Inc
 ffff  Illegal Vendor ID
 
 
-# List of known device classes and subclasses
+# List of known device classes, subclasses and programming interfaces
+
+# Syntax:
+# C class  class_name
+#	subclass  subclass_name			<-- single tab
+#		prog-if  prog-if_name		<-- two tabs
 
 C 00  Unclassified device
-	0000  Non-VGA unclassified device
-	0001  VGA compatible unclassified device
+	00  Non-VGA unclassified device
+	01  VGA compatible unclassified device
 C 01  Mass storage controller
-	0000  SCSI storage controller
-	0001  IDE interface
-	0002  Floppy disk controller
-	0003  IPI bus controller
-	0004  RAID bus controller
-	0080  Unknown mass storage controller
+	00  SCSI storage controller
+	01  IDE interface
+	02  Floppy disk controller
+	03  IPI bus controller
+	04  RAID bus controller
+	80  Unknown mass storage controller
 C 02  Network controller
-	0000  Ethernet controller
-	0001  Token ring network controller
-	0002  FDDI network controller
-	0003  ATM network controller
-	0080  Network controller
+	00  Ethernet controller
+	01  Token ring network controller
+	02  FDDI network controller
+	03  ATM network controller
+	80  Network controller
 C 03  Display controller
-	0000  VGA compatible controller
-	0001  XGA compatible controller
-	0080  Display controller
+	00  VGA compatible controller
+		00  VGA
+		01  8514
+	01  XGA compatible controller
+	02  3D controller
+	80  Display controller
 C 04  Multimedia controller
-	0000  Multimedia video controller
-	0001  Multimedia audio controller
-	0080  Multimedia controller
+	00  Multimedia video controller
+	01  Multimedia audio controller
+	02  Computer telephony device
+	80  Multimedia controller
 C 05  Memory controller
-	0000  RAM memory
-	0001  FLASH memory
-	0080  Memory
+	00  RAM memory
+	01  FLASH memory
+	80  Memory controller
 C 06  Bridge
-	0000  Host bridge
-	0001  ISA bridge
-	0002  EISA bridge
-	0003  MicroChannel bridge
-	0004  PCI bridge
-	0005  PCMCIA bridge
-	0006  NuBus bridge
-	0007  CardBus bridge
-	0080  Bridge
+	00  Host bridge
+	01  ISA bridge
+	02  EISA bridge
+	03  MicroChannel bridge
+	04  PCI bridge
+		00  Normal decode
+		01  Subtractive decode
+	05  PCMCIA bridge
+	06  NuBus bridge
+	07  CardBus bridge
+	08  RACEway bridge
+		00  Transparent mode
+		01  Endpoint mode
+	80  Bridge
 C 07  Communication controller
-	0000  Serial controller
-	0001  Parallel controller
-	0080  Communication controller
+	00  Serial controller
+		00  8250
+		01  16450
+		02  16550
+		03  16650
+		04  16750
+		05  16850
+		06  16950
+	01  Parallel controller
+		00  SPP
+		01  BiDir
+		02  ECP
+		03  IEEE1284
+		FE  IEEE1284 Target
+	02  Multiport serial controller
+	03  Modem
+		00  Generic
+		01  Hayes/16450
+		02  Hayes/16550
+		03  Hayes/16650
+		04  Hayes/16750
+	80  Communication controller
 C 08  Generic system peripheral
-	0000  PIC
-	0001  DMA controller
-	0002  Timer
-	0003  RTC
-	0080  System peripheral
+	00  PIC
+		00  8259
+		01  ISA PIC
+		02  EISA PIC
+		10  IO-APIC
+		20  IO(X)-APIC
+	01  DMA controller
+		00  8237
+		01  ISA DMA
+		02  EISA DMA
+	02  Timer
+		00  8254
+		01  ISA Timer
+		02  EISA Timers
+	03  RTC
+		00  Generic
+		01  ISA RTC
+	04  PCI Hot-plug controller
+	80  System peripheral
 C 09  Input device controller
-	0000  Keyboard controller
-	0001  Digitizer Pen
-	0002  Mouse controller
-	0080  Input device controller
+	00  Keyboard controller
+	01  Digitizer Pen
+	02  Mouse controller
+	03  Scanner controller
+	04  Gameport controller
+		00  Generic
+		10  Extended
+	80  Input device controller
 C 0A  Docking station
-	0000  Generic Docking Station
-	0080  Docking Station
+	00  Generic Docking Station
+	80  Docking Station
 C 0B  Processor
-	0000  386
-	0001  486
-	0002  Pentium
-	0010  Alpha
-	0020  Power PC
-	0040  Co-processor
+	00  386
+	01  486
+	02  Pentium
+	10  Alpha
+	20  Power PC
+	30  MIPS
+	40  Co-processor
 C 0C  Serial bus controller
-	0000  FireWire (IEEE 1394)
-	0001  ACCESS Bus
-	0002  SSA
-	0003  USB Controller
-	0004  Fiber Channel
+	00  FireWire (IEEE 1394)
+		00  Generic
+		10  OHCI
+	01  ACCESS Bus
+	02  SSA
+	03  USB Controller
+		00  UHCI
+		10  OHCI
+		80  Unspecified
+		FE  USB Device
+	04  Fiber Channel
+	05  SMBus
+C 0D  Wireless controller
+	00  IRDA controller
+	01  Consumer IR controller
+	10  RF controller
+	80  Wireless controller
 C 0E  Intelligent controller
-	0000  I2O
-
-S 1092 Diamond Multimedia
-	8760  Fireport 40 Dual SCSI Host Adapter
-	4820  Viper V550 Graphics Accelerator
-S 10b4  STB Systems Inc
-	273e  Velocity 4400
-S 10b5	PLX Technology, Inc.
-	9080  9080 [real subsystem ID not set]
-S 1102  Creative Labs
-	1015  Graphics Blaster CT6710
-S 125c  Aurora Technologies, Inc.
-	0640  Aries 16000P
+	00  I2O
+C 0F  Satellite communications controller
+	00  Satellite TV controller
+	01  Satellite audio communication controller
+	03  Satellite voice communication controller
+	04  Satellite data communication controller
+C 10  Encryption controller
+	00  Network and computing encryption device
+	01  Entertainment encryption device
+	80  Encryption controller
+C 11  Signal processing controller
+	00  DPIO module
+	80  Signal processing controller

@@ -1,3 +1,15 @@
+Sat Oct  9 14:32:28 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* setpci.man: Better example.
+
+	* lspci.c: Resolve prog-if names.
+
+	* lib/names.c: Adapted to new pci.ids syntax.
+
+	* pci.ids: Reorganized the pci.ids file. Subsystems are listed
+	under devices, classes can optionally contain prog-if information.
+	New ID's, as usually.
+
 Wed Sep 22 09:45:24 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* pci.ids: New ID's. As usually.
