@@ -14,7 +14,8 @@ SHAREDIR=$(PREFIX)/share
 MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
 INSTALL=install
 DIRINSTALL=install -d
-PCILIB=libpci.a
+PCILIB=lib/libpci.a
+PCIINC=lib/config.h lib/header.h lib/pci.h
 
 ifeq ($(shell uname),NetBSD)
 PCILIB=libpciutils.a
@@ -29,20 +30,20 @@ endif
 
 export
 
-all: lib lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 pci.ids
+all: $(PCILIB) lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 pci.ids
 
-lib: lib/config.h
+$(PCILIB): $(PCIINC)
 	$(MAKE) -C lib all
 
 lib/config.h:
 	cd lib && ./configure $(SHAREDIR) $(VERSION)
 
-lspci: lspci.o common.o lib/$(PCILIB)
-setpci: setpci.o common.o lib/$(PCILIB)
+lspci: lspci.o common.o $(PCILIB)
+setpci: setpci.o common.o $(PCILIB)
 
-lspci.o: lspci.c pciutils.h
-setpci.o: setpci.c pciutils.h
-common.o: common.c pciutils.h
+lspci.o: lspci.c pciutils.h $(PCIINC)
+setpci.o: setpci.c pciutils.h $(PCIINC)
+common.o: common.c pciutils.h $(PCIINC)
 
 update-pciids: update-pciids.sh
 	sed <$< >$@ "s@^DEST=.*@DEST=$(SHAREDIR)/pci.ids@"

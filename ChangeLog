@@ -1,5 +1,9 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* Makefile: Added missing dependencies. Parallel builds work now.
+	Problem reported by Andreas Haumer <andreas@xss.co.at>, but I chose
+	a different fix.
+
 	* Makefile (MANDIR): Use `:=' instead of `=' to avoid executing the shell
 	command every time $(MANDIR) is referenced.
 
