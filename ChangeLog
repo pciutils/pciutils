@@ -1,3 +1,10 @@
+Sat Oct 30 11:06:35 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as version 2.1.
+
+	* pci.ids: Synced to devlist.h in 2.3.24 kernel. Merged in
+	lots of contributed entries.
+
 Thu Oct 14 10:40:12 1999  Dave Jones    <dave@powertweak.com>
 
 	* pci.ids: Added lots of subsystem definitions.

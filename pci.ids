@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.40 1999/10/28 17:44:51 mj Exp $
+#	$Id: pci.ids,v 1.41 1999/10/30 09:25:10 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -906,7 +906,15 @@
 	88f1  Stealth 64
 	9999  DMD-I0928-1 "Monster sound" sound chip
 1093  National Instruments
-	c801  PCI_GPIB
+	0160  PCI-DIO-96
+	0162  PCI-MIO-16XE-50
+	1170  PCI-MIO-16XE-10
+	1180  PCI-MIO-16E-1
+	1190  PCI-MIO-16E-4
+	1330  PCI-6031E
+	1350  PCI-6071E
+	2a60  PCI-6023E
+	c801  PCI-GPIB
 1094  First International Computers [FIC]
 1095  CMD Technology Inc
 	0640  PCI0640
@@ -1315,7 +1323,7 @@
 	0597  VT82C597 [Apollo VP3]
 	0598  VT82C598 [Apollo MVP3]
 	0680  VT82C680 [Apollo P6]
-	0686  VT82C686 [Appolo Super]
+	0686  VT82C686 [Apollo Super]
 	0691  VT82C691 [Apollo PRO]
 	0693  VT82C693 [Apollo Pro Plus]
 	0926  VT82C926 [Amazon]
@@ -1380,6 +1388,13 @@
 1114  Atmel Corporation
 1115  3D Labs
 1116  Data Translation
+	0022  DT3001
+	0023  DT3002
+	0024  DT3003
+	0028  DT3003-PGL
+	0025  DT3004
+	0026  DT3005
+	0027  DT3001-PGL
 1117  Datacube, Inc
 	9500  Max-1C SVGA card
 	9501  Max-1C image processing
@@ -2668,6 +2683,7 @@
 	8000  Lava Parallel
 	8002  Lava Dual Parallel port A
 	8003  Lava Dual Parallel port B
+	8800  BOCA Research IOPPAR
 1408  Aloka Co. Ltd
 1409  Timedia Technology Co Ltd
 140a  DSP Research Inc
