@@ -42,5 +42,10 @@ the Linux PCI support will be probably discussed there, too.
    You also might want to look at the pciutils web page containing release
 notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.html .
 
+   There also exists a utility called PowerTweak which is able to fine tune
+parameters of many chipsets much better than the Bridge Optimization code
+in Linux kernel (to be removed soon). See http://linux.powertweak.com/
+for more information.
+
 					Have fun
 							Martin
