@@ -1,5 +1,5 @@
 /*
- *	Linux PCI Library -- Device Filtering
+ *	The PCI Library -- Device Filtering
  *
  *	Copyright (c) 1998--2003 Martin Mares <mj@ucw.cz>
  *

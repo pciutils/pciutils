@@ -1,4 +1,4 @@
-.TH update-pciids 8 "@TODAY@" "@VERSION@" "Linux PCI Utilities"
+.TH update-pciids 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
 .IX update-pciids
 
 .SH NAME
@@ -24,4 +24,4 @@ Here we install the new list.
 .BR lspci (8), setpci (8)
 
 .SH AUTHOR
-The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.
+The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

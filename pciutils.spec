@@ -5,7 +5,7 @@ Source:		ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/%{name}-%{version}.tar.gz
 Copyright:	GNU GPL
 Buildroot: 	/tmp/%{name}-%{version}-root
 ExclusiveOS: 	Linux
-Summary: 	Linux PCI Utilities
+Summary: 	The PCI Utilities
 Summary(pl): 	Narzêdzia do manipulacji ustawieniami urz±dzeñ PCI
 Group: 		Utilities/System
 

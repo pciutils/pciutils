@@ -1,5 +1,5 @@
 /*
- *	Linux PCI Utilities -- List All PCI Devices
+ *	The PCI Utilities -- List All PCI Devices
  *
  *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *

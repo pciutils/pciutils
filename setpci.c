@@ -1,5 +1,5 @@
 /*
- *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
+ *	The PCI Utilities -- Manipulate PCI Configuration Registers
  *
  *	Copyright (c) 1998--2003 Martin Mares <mj@ucw.cz>
  *

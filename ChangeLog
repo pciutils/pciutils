@@ -1,5 +1,10 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* Removed last few references to the "Linux PCI Utilities", the
+	package is pretty cross-platform now :)
+
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
 	* Released as 2.1.99-test2.
 
 	* README, pciutils.lsm, pciutils.spec: Use @VERSION@ to make the

@@ -1,5 +1,5 @@
 /*
- *	Linux PCI Utilities -- Common Functions
+ *	The PCI Utilities -- Common Functions
  *
  *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *

@@ -1,4 +1,4 @@
-.TH setpci 8 "@TODAY@" "@VERSION@" "Linux PCI Utilities"
+.TH setpci 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
 .IX setpci
 .SH NAME
 setpci \- configure PCI devices
@@ -209,4 +209,4 @@ bit 3 off and bit 2 on in the byte register 41; sets byte register
 .BR lspci (8)
 
 .SH AUTHOR
-The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.
+The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

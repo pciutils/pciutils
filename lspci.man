@@ -1,4 +1,4 @@
-.TH lspci 8 "@TODAY@" "@VERSION@" "Linux PCI Utilities"
+.TH lspci 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
 .IX lspci
 .SH NAME
 lspci \- list all PCI devices
@@ -141,4 +141,4 @@ file containing a list of all PCI devices.
 .BR setpci (8), update-pciids (8)
 
 .SH AUTHOR
-The Linux PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.
+The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

@@ -1,5 +1,5 @@
 /*
- *	Linux PCI Utilities -- Declarations
+ *	The PCI Utilities -- Declarations
  *
  *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *

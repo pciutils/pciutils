@@ -1,4 +1,4 @@
-# Makefile for Linux PCI Utilities
+# Makefile for The PCI Utilities
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
 OPT=-O2 -fomit-frame-pointer

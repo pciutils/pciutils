@@ -1,5 +1,5 @@
 Begin3
-Title:          Linux PCI Utilities
+Title:          The PCI Utilities
 Version:        @VERSION@
 Entered-date:   @LSMDATE@
 Description:    This package contains various utilities for inspecting and
