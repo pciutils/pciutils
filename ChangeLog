@@ -1,5 +1,11 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lib/proc.c (proc_scan): When reading the header type, don't
+	forget to clear the topmost bit indicating that the device has
+	multiple functions. Grabbed from Debian patches.
+
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
 	Updated the FreeBSD port. Thanks to Samy Al Bahra <samy@kerneled.com>
 	for the patches:
 
