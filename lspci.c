@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.15 1998/09/09 07:38:54 mj Exp $
+ *	$Id: lspci.c,v 1.16 1998/10/19 13:36:19 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -34,7 +34,7 @@ Usage: lspci [<switches>]\n\
 -v\t\tBe verbose\n\
 -n\t\tShow numeric ID's\n\
 -b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
--x\t\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
+-x\t\tShow hex-dump of config space\n\
 -s [[<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\
@@ -137,7 +137,7 @@ scan_config(void)
   struct device *d;
   char name[64];
   int fd, res;
-  int how_much = (show_hex > 1) ? 256 : 64;
+  int how_much = (show_hex > 2) ? 256 : 64;
 
   for(d=first_dev; d; d=d->next)
     {
@@ -638,7 +638,7 @@ static void
 show_hex_dump(struct device *d)
 {
   int i;
-  int limit = (show_hex > 1) ? 256 : 64;
+  int limit = (show_hex > 2) ? 256 : 64;
 
   for(i=0; i<limit; i++)
     {
