@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.43 2002/12/26 19:28:33 mj Exp $
+# $Id: Makefile,v 1.44 2002/12/27 19:02:20 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
@@ -47,12 +47,12 @@ lib: lib/config.h
 lib/config.h:
 	cd lib && ./configure $(PREFIX) $(VERSION)
 
-lspci: lspci.o common.o lib/libpci.a
-setpci: setpci.o common.o lib/libpci.a
+lspci: lspci.o common.o lib/$(PCILIB)
+setpci: setpci.o common.o lib/$(PCILIB)
 
-lspci.o: lspci.c pciutils.h lib/libpci.a
-setpci.o: setpci.c pciutils.h lib/libpci.a
-common.o: common.c pciutils.h lib/libpci.a
+lspci.o: lspci.c pciutils.h
+setpci.o: setpci.c pciutils.h
+common.o: common.c pciutils.h
 
 %.8: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)$(SUFFIX)/"
