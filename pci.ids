@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.44 1999/12/11 22:38:43 mj Exp $
+#	$Id: pci.ids,v 1.45 1999/12/21 09:16:24 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -778,7 +778,8 @@
 	0002  PT80C524 [Nile]
 	0005  National PC87550 System Controller
 	8002  PT80C524 [Nile]
-1067  Mitsubishi Electronics
+1067  Mitsubishi Electric
+	1002  VG500 [VolumePro Volume Rendering Accelerator]
 1068  Diversified Technology
 1069  Mylex Corporation
 	0001  DAC960P
@@ -3349,7 +3350,16 @@
 	2411  82801 82810 Chipset IDE
 	2412  82801 82810 Chipset USB
 	2413  82801 82810 Chipset SMBus
+	2415  82801 82810 AC'97 Audio
+	2416  82801 82810 AC'97 Modem
 	2418  82801 82810 PCI Bridge
+	2420  82801AB 82810 Chipset ISA Bridge (LPC)
+	2421  82801AB 82810 Chipset IDE
+	2422  82801AB 82810 Chipset USB
+	2423  82801AB 82810 Chipset SMBus
+	2425  82801AB 82810 AC'97 Audio
+	2426  82801AB 82810 AC'97 Modem
+	2428  82801AB 82810 PCI Bridge
 	5200  EtherExpress PRO/100
 	5201  EtherExpress PRO/100
 	7000  82371SB PIIX3 ISA [Natoma/Triton II]
