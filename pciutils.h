@@ -1,7 +1,7 @@
 /*
  *	Linux PCI Utilities -- Declarations
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -11,11 +11,13 @@
 #define PCIUTILS_VERSION PCILIB_VERSION
 
 #if !defined(__GNUC__)
-#define __attribute__(x)
+#define NONRET
 #define inline
+#else
+#define NONRET __attribute__((noreturn))
 #endif
 
-void __attribute__((noreturn)) die(char *msg, ...);
+void die(char *msg, ...) NONRET;
 void *xmalloc(unsigned int howmuch);
 int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 

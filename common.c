@@ -1,7 +1,7 @@
 /*
  *	Linux PCI Utilities -- Common Functions
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -14,7 +14,7 @@
 
 #include "pciutils.h"
 
-void __attribute__((noreturn))
+void NONRET
 die(char *msg, ...)
 {
   va_list args;

@@ -1,5 +1,9 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* pciutils.h, common.c, setpci.c: Introduced a NONRET macro encapsulating
+	the GCC specific __attribute__((noreturn)) and killed the hack with
+	redefining __attribute__ on non-GCC compilers.
+
 	* Makefile: Added missing dependencies. Parallel builds work now.
 	Problem reported by Andreas Haumer <andreas@xss.co.at>, but I chose
 	a different fix.

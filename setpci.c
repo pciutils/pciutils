@@ -249,9 +249,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x00, 0, NULL }
 };
 
-static void usage(void) __attribute__((noreturn));
-
-static void
+static void NONRET
 usage(void)
 {
   fprintf(stderr,
