@@ -1,5 +1,27 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c: Devices in domains different from 0 have their slot number
+	printed as "<domain>:<bus>:<slot>.<func>".
+
+	* lib/filter.c: Slot filters understand domains.
+
+	* lib/generic.c: Mention the domain in slot numbers in all error messages.
+
+	* lib/internal.h: The #ifdef for Linux <asm/byteorder.h> was wrong.
+
+	* lib/access.c (pci_get_dev): Added support for domains.
+
+	* lib/sysfs.c (sysfs_scan): Read vendor and device ID from the config
+	registers (or to be precise, leave it for the generic parts of the pcilib
+	to do so) instead of reading them from the sysfs. It's faster this way.
+
+	* lspci.c (show_pcix): Don't touch pci_dev->hdrtype, it's an internal
+	variable. Better read it from the config registers (it's cached anyway).
+
+	* lib/sysfs.c (sysfs_scan), lib/proc.c (proc_scan): Don't read the hdrtype.
+	  lib/generic.c (pci_generic_fill_info): If hdrtype is -1 (unset), read it.
+	  Saves lots of unnecessary file accesses.
+
 	* lib/pci.h (PCIADDR_PORT_FMT): Use %llx instead of %Lx, because the latter
 	is not supported by all C libraries.
 

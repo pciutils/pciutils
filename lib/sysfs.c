@@ -39,7 +39,7 @@ sysfs_detect(struct pci_access *a)
 {
   if (access(sysfs_name(a), R_OK))
     {
-      a->debug("Cannot open %s", sysfs_name(a));
+      a->debug("...cannot open %s", sysfs_name(a));
       return 0;
     }
   a->debug("...using %s", sysfs_name(a));
@@ -165,14 +165,22 @@ static void sysfs_scan(struct pci_access *a)
       d->bus = bus;
       d->dev = dev;
       d->func = func;
-      d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
       if (!a->buscentric)
 	{
 	  sysfs_get_resources(d);
+	  d->irq = sysfs_get_value(d, "irq");
+	  d->known_fields = PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES;
+#if 0
+	  /*
+	   *  We prefer reading these from the config registers, it's faster.
+	   *  However, it would be possible and maybe even useful to hack the kernel
+	   *  to believe that some device has a different ID. If you do it, just
+	   *  enable this piece of code.  --mj
+	   */
 	  d->vendor_id = sysfs_get_value(d, "vendor");
 	  d->device_id = sysfs_get_value(d, "device");
-	  d->irq = sysfs_get_value(d, "irq");
-	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES;
+	  d->known_fields |= PCI_FILL_IDENT;
+#endif
 	}
       pci_link_dev(a, d);
     }

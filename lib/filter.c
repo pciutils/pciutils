@@ -14,27 +14,42 @@
 void
 pci_filter_init(struct pci_access *a UNUSED, struct pci_filter *f)
 {
-  f->bus = f->slot = f->func = -1;
+  f->domain = f->bus = f->slot = f->func = -1;
   f->vendor = f->device = -1;
 }
 
-/* Slot filter syntax: [[bus]:][slot][.[func]] */
+/* Slot filter syntax: [[[domain]:][bus]:][slot][.[func]] */
 
 char *
 pci_filter_parse_slot(struct pci_filter *f, char *str)
 {
-  char *colon = strchr(str, ':');
+  char *colon = strrchr(str, ':');
   char *dot = strchr((colon ? colon + 1 : str), '.');
   char *mid = str;
-  char *e;
+  char *e, *bus, *colon2;
 
   if (colon)
     {
       *colon++ = 0;
       mid = colon;
-      if (str[0] && strcmp(str, "*"))
+      colon2 = strchr(str, ':');
+      if (colon2)
 	{
-	  long int x = strtol(str, &e, 16);
+	  *colon2++ = 0;
+	  bus = colon2;
+	  if (str[0] && strcmp(str, "*"))
+	    {
+	      long int x = strtol(bus, &e, 16);
+	      if ((e && *e) || (x < 0 || x > 0xffff))
+		return "Invalid domain number";
+	      f->domain = x;
+	    }
+	}
+      else
+	bus = str;
+      if (bus[0] && strcmp(bus, "*"))
+	{
+	  long int x = strtol(bus, &e, 16);
 	  if ((e && *e) || (x < 0 || x > 0xff))
 	    return "Invalid bus number";
 	  f->bus = x;
@@ -92,7 +107,8 @@ pci_filter_parse_id(struct pci_filter *f, char *str)
 int
 pci_filter_match(struct pci_filter *f, struct pci_dev *d)
 {
-  if ((f->bus >= 0 && f->bus != d->bus) ||
+  if ((f->domain >= 0 && f->domain != d->domain) ||
+      (f->bus >= 0 && f->bus != d->bus) ||
       (f->slot >= 0 && f->slot != d->dev) ||
       (f->func >= 0 && f->func != d->func))
     return 0;

@@ -34,7 +34,7 @@ Usage: lspci [<switches>]\n\
 -b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
 -x\t\tShow hex-dump of the standard portion of config space\n\
 -xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n\
--s [[<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
+-s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\
 -m\t\tProduce machine-readable output\n\
@@ -160,6 +160,10 @@ compare_them(const void *A, const void *B)
   const struct pci_dev *a = (*(const struct device **)A)->dev;
   const struct pci_dev *b = (*(const struct device **)B)->dev;
 
+  if (a->domain < b->domain)
+    return -1;
+  if (a->domain > b->domain)
+    return 1;
   if (a->bus < b->bus)
     return -1;
   if (a->bus > b->bus)
@@ -205,16 +209,24 @@ sort_them(void)
 #define FLAG(x,y) ((x & y) ? '+' : '-')
 
 static void
+show_slot_name(struct device *d)
+{
+  struct pci_dev *p = d->dev;
+
+  if (p->domain)
+    printf("%04x:", p->domain);
+  printf("%02x:%02x.%d", p->bus, p->dev, p->func);
+}
+
+static void
 show_terse(struct device *d)
 {
   int c;
   struct pci_dev *p = d->dev;
   byte classbuf[128], devbuf[128];
 
-  printf("%02x:%02x.%x %s: %s",
-	 p->bus,
-	 p->dev,
-	 p->func,
+  show_slot_name(d);
+  printf(" %s: %s",
 	 pci_lookup_name(pacc, classbuf, sizeof(classbuf),
 			 PCI_LOOKUP_CLASS,
 			 get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
@@ -531,7 +543,7 @@ show_pcix_bridge(struct device *d, int where)
 static void
 show_pcix(struct device *d, int where)
 {
-  switch (d->dev->hdrtype)
+  switch (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f)
     {
     case PCI_HEADER_TYPE_NORMAL:
       show_pcix_nobridge(d, where);
@@ -996,7 +1008,9 @@ show_machine(struct device *d)
 
   if (verbose)
     {
-      printf("Device:\t%02x:%02x.%x\n", p->bus, p->dev, p->func);
+      printf("Device:\t");
+      show_slot_name(d);
+      putchar('\n');
       printf("Class:\t%s\n",
 	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0));
       printf("Vendor:\t%s\n",
@@ -1017,8 +1031,8 @@ show_machine(struct device *d)
     }
   else
     {
-      printf("%02x:%02x.%x ", p->bus, p->dev, p->func);
-      printf("\"%s\" \"%s\" \"%s\"",
+      show_slot_name(d);
+      printf(" \"%s\" \"%s\" \"%s\"",
 	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS,
 			     get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR,
@@ -1362,7 +1376,7 @@ do_map_bus(int bus)
 	for(func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
-	      struct pci_dev *p = pci_get_dev(pacc, bus, dev, func);
+	      struct pci_dev *p = pci_get_dev(pacc, 0, bus, dev, func);
 	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
 	      if (vendor && vendor != 0xffff)
 		{

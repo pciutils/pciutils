@@ -97,7 +97,6 @@ proc_scan(struct pci_access *a)
       d->func = PCI_FUNC(dfn & 0xff);
       d->vendor_id = vend >> 16U;
       d->device_id = vend & 0xffff;
-      d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
       known = PCI_FILL_IDENT;
       if (!a->buscentric)
 	{

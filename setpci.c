@@ -261,7 +261,7 @@ usage(char *msg, ...)
 -v\t\tBe verbose\n\
 -D\t\tList changes, don't commit them\n"
 GENERIC_HELP
-"<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n"
+"<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t|\t-d [<vendor>]:[<device>]\n"
 "<reg>:\t\t<number>[.(B|W|L)]\n"
 "     |\t\t<name>\n"

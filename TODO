@@ -6,5 +6,7 @@
 - names.c: rewrite
 
 - support for domains:
-	- pci_get_dev
-	- filters
+	- filters: doc and helps
+	- reading of dumps
+	- tree view
+	- map mode

@@ -106,7 +106,7 @@ void pci_cleanup(struct pci_access *);
 
 /* Scanning of devices */
 void pci_scan_bus(struct pci_access *acc);
-struct pci_dev *pci_get_dev(struct pci_access *acc, int bus, int dev, int func); /* Raw access to specified device */
+struct pci_dev *pci_get_dev(struct pci_access *acc, int domain, int bus, int dev, int func); /* Raw access to specified device */
 void pci_free_dev(struct pci_dev *);
 
 /*
@@ -115,9 +115,8 @@ void pci_free_dev(struct pci_dev *);
 
 struct pci_dev {
   struct pci_dev *next;			/* Next device in the chain */
-  word domain;				/* PCI domain (host bridge) */
-  byte bus;				/* Bus inside domain */
-  byte dev, func;			/* Device and function */
+  u16 domain;				/* PCI domain (host bridge) */
+  byte bus, dev, func;			/* Bus inside domain, device and function */
 
   /* These fields are set by pci_fill_info() */
   int known_fields;			/* Set of info fields already known */
@@ -131,9 +130,9 @@ struct pci_dev {
   /* Fields used internally: */
   struct pci_access *access;
   struct pci_methods *methods;
-  byte *cache;				/* Cached information */
+  byte *cache;				/* Cached config registers */
   int cache_len;
-  int hdrtype;				/* Direct methods: header type */
+  int hdrtype;				/* Cached header type, -1 if unknown */
   void *aux;				/* Auxillary data */
 };
 
@@ -165,7 +164,7 @@ void pci_setup_cache(struct pci_dev *, byte *cache, int len);
  */
 
 struct pci_filter {
-  int bus, slot, func;			/* -1 = ANY */
+  int domain, bus, slot, func;			/* -1 = ANY */
   int vendor, device;
 };
 

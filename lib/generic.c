@@ -58,7 +58,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	      pci_generic_scan_bus(a, busmap, pci_read_byte(t, PCI_SECONDARY_BUS));
 	      break;
 	    default:
-	      a->debug("Device %02x:%02x.%d has unknown header type %02x.\n", d->bus, d->dev, d->func, ht);
+	      a->debug("Device %04x:%02x:%02x.%d has unknown header type %02x.\n", d->domain, d->bus, d->dev, d->func, ht);
 	    }
 	}
     }
@@ -79,6 +79,8 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 {
   struct pci_access *a = d->access;
 
+  if ((flags & (PCI_FILL_BASES | PCI_FILL_ROM_BASE)) && d->hdrtype < 0)
+    d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE);
   if (flags & PCI_FILL_IDENT)
     {
       d->vendor_id = pci_read_word(d, PCI_VENDOR_ID);
@@ -121,7 +123,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 		  if ((x & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
 		    {
 		      if (i >= cnt-1)
-			a->warning("%02x:%02x.%d: Invalid 64-bit address seen.", d->bus, d->dev, d->func);
+			a->warning("%04x:%02x:%02x.%d: Invalid 64-bit address seen.", d->domain, d->bus, d->dev, d->func);
 		      else
 			{
 			  u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
@@ -130,7 +132,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 #else
 			  if (y)
 			    {
-			      a->warning("%02x:%02x.%d 64-bit device address ignored.", d->bus, d->dev, d->func);
+			      a->warning("%04x:%02x:%02x.%d 64-bit device address ignored.", d->domain, d->bus, d->dev, d->func);
 			      d->base_addr[i-1] = 0;
 			    }
 #endif

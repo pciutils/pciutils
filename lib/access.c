@@ -194,6 +194,7 @@ pci_alloc_dev(struct pci_access *a)
   bzero(d, sizeof(*d));
   d->access = a;
   d->methods = a->methods;
+  d->hdrtype = -1;
   if (d->methods->init_dev)
     d->methods->init_dev(d);
   return d;
@@ -209,10 +210,11 @@ pci_link_dev(struct pci_access *a, struct pci_dev *d)
 }
 
 struct pci_dev *
-pci_get_dev(struct pci_access *a, int bus, int dev, int func)
+pci_get_dev(struct pci_access *a, int domain, int bus, int dev, int func)
 {
   struct pci_dev *d = pci_alloc_dev(a);
 
+  d->domain = domain;
   d->bus = bus;
   d->dev = dev;
   d->func = func;

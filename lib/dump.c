@@ -44,7 +44,7 @@ dump_init(struct pci_access *a)
       if (len >= 8 && buf[2] == ':' && buf[5] == '.' && buf[7] == ' ' &&
 	  sscanf(buf, "%x:%x.%d ", &bn, &dn, &fn) == 3)
 	{
-	  dev = pci_get_dev(a, bn, dn, fn);
+	  dev = pci_get_dev(a, 0, bn, dn, fn);
 	  dev->aux = pci_malloc(a, 256);
 	  memset(dev->aux, 0xff, 256);
 	  pci_link_dev(a, dev);

@@ -15,7 +15,7 @@
 #define inline
 #endif
 
-#ifdef HAVE_PM_LINUX_BYTEORDER_H
+#ifdef HAVE_LINUX_BYTEORDER_H
 
 #include <asm/byteorder.h>
 #define cpu_to_le16 __cpu_to_le16
