@@ -1,3 +1,9 @@
+2002-12-27  Martin Mares  <mj@ucw.cz>
+
+	* lib/generic.c (pci_generic_scan_bus): Added work-around for devices with
+	discontiguous numbering of functions. This is already present in the Linux
+	kernel for several years, but I forgot to update pciutils as well.
+
 2002-12-26  Martin Mares  <mj@ucw.cz>
 
 	* lib/header.h, lspci.c: Dump AGP3 flags and speeds.

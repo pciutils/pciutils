@@ -1,5 +1,5 @@
 /*
- *	$Id: generic.c,v 1.7 2002/03/30 15:39:25 mj Exp $
+ *	$Id: generic.c,v 1.8 2002/12/27 19:01:51 mj Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
@@ -30,13 +30,13 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
     {
       t->dev = dev;
       multi = 0;
-      for(t->func=0; t->func<8; t->func++)
+      for(t->func=0; !t->func || multi && t->func<8; t->func++)
 	{
 	  u32 vd = pci_read_long(t, PCI_VENDOR_ID);
 	  struct pci_dev *d;
 
 	  if (!vd || vd == 0xffffffff)
-	    break;
+	    continue;
 	  ht = pci_read_byte(t, PCI_HEADER_TYPE);
 	  if (!t->func)
 	    multi = ht & 0x80;
@@ -61,8 +61,6 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	    default:
 	      a->debug("Device %02x:%02x.%d has unknown header type %02x.\n", d->bus, d->dev, d->func, ht);
 	    }
-	  if (!multi)
-	    break;
 	}
     }
 }
