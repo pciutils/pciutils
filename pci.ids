@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.54 2000/04/17 15:59:16 mj Exp $
+#	$Id: pci.ids,v 1.55 2000/04/17 16:07:37 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -926,8 +926,8 @@
 1054  Hitachi, Ltd
 1055  EFAR Microsystems
 1056  ICL
-# Motorola made a mistake and used this value, please duplicate Moto
-# entries here -- Cort
+# Motorola made a mistake and used 1507 instead of 1057 in some chips.
+# Please look at the 1507 entry as well when updating this.
 1057  Motorola
 	0001  MPC105 [Eagle]
 	0002  MPC106 [Grackle]
@@ -4696,6 +4696,7 @@ feda  Epigram Inc
 fffe  VMWare Inc
 	0710  Virtual SVGA
 ffff  Illegal Vendor ID
+
 
 # List of known device classes, subclasses and programming interfaces
 
