@@ -3,12 +3,11 @@
 # (c) 1998--2003 Martin Mares <mj@ucw.cz>
 
 OPT=-O2 -fomit-frame-pointer
-#OPT=-O2 -g
-CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes
+CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.1.11
-#SUFFIX=-pre2
-DATE=2003-01-04
+VERSION=2.1.12
+SUFFIX=-pre1
+DATE=2003-12-26
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
