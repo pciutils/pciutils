@@ -1,10 +1,21 @@
 2002-03-30  Martin Mares  <mj@ucw.cz>
 
+	* Removed pci.ids from the CVS as they are now maintained separately.
+	They are still included in the tarball, but if you are building	pciutils
+	from CVS sources or you want to get a newer ID file than the one distributed,
+	just use "make update-ids" to download the most recent snapshot from
+	pciids.sf.net.
+
+	* Makefile, README: Updated accordingly.
+
+	* Makefile: Added a couple of maintenance targets.
+
+	* maint/*: Maintainer's utilities now reside here (present only in CVS,
+	not in the tarball).
+
 	* lib/names.c (parse_name_list): End-of-line comments are no longer
 	supported. Hashes are now perfectly valid in all names and they start
 	a comment only at the start of the line.
-
-	* pci.ids: Synchronized with the PCI ID database.
 
 2002-03-26  Martin Mares  <mj@ucw.cz>
 

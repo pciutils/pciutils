@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.40 2002/03/26 21:49:40 mj Exp $
+# $Id: Makefile,v 1.41 2002/03/30 15:34:22 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
@@ -33,7 +33,7 @@ DISTTMP=/tmp/pciutils-dist
 
 export
 
-all: lib lspci setpci lspci.8 setpci.8
+all: lib lspci setpci lspci.8 setpci.8 pci.ids
 
 lib: lib/config.h
 	$(MAKE) -C lib all
@@ -74,6 +74,17 @@ uninstall: all
 	rm -f $(PREFIX)/share/pci.ids
 	rm -f $(PREFIX)/man/man8/lspci.8 $(PREFIX)/man/man8/setpci.8
 
+update-ids:
+	if [ ! -f pci.ids.orig ] ; then mv pci.ids pci.ids.orig ; fi
+	wget http://pciids.sf.net/pci.ids.bz2
+	bzip2 -d pci.ids.bz2
+
+get-ids:
+	cp ~/tree/pciids/pci.ids pci.ids
+
+pci.ids:
+	@ [ -f pci.ids ] || echo >&2 "The pci.ids file is no longer part of the CVS. Please do make update-ids to download them." && false
+
 release:
 	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/;s/^\\(Entered-date:[ 	]*\\)[0-9]*/\\1`date -d$(DATE) '+%y%m%d'`/;s/\\(pciutils-\\)[0-9.]*/\\1$(VERSION)\\./" <pciutils.lsm >pciutils.lsm.new
 	sed "s/^\\(Version:[ 	]*\\)[0-9.]*/\\1$(VERSION)/" <pciutils.spec >pciutils.spec.new
@@ -84,16 +95,16 @@ release:
 
 REL=pciutils-$(VERSION)$(SUFFIX)
 
-dist: clean
+dist: clean pci.ids
 	rm -rf $(DISTTMP)
 	mkdir $(DISTTMP)
 	cp -a . $(DISTTMP)/$(REL)
-	rm -rf `find $(DISTTMP)/$(REL) -name CVS -o -name tmp`
+	rm -rf `find $(DISTTMP)/$(REL) -name CVS -o -name tmp -o -name maint`
 	[ -f $(DISTTMP)/$(REL)/lib/header.h ] || cp /usr/src/linux/include/linux/pci.h dist/$(REL)/lib/header.h
 	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
 	rm -rf $(DISTTMP)
 
 upload: dist
-	tmp/upload $(REL)
+	maint/upload $(REL)
 
-.PHONY: all lib clean install dist man release
+.PHONY: all lib clean install uninstall dist man release upload update-ids get-ids
