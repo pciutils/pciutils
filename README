@@ -1,0 +1,4 @@
+This is an experimental version of the Linux PCI Utilities package.
+Maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+
+pci.ids should be copied to /etc if you want textual PCI ID's.
