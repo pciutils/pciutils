@@ -32,8 +32,8 @@ typedef unsigned long u64;
 #define PCIADDR_PORT_FMT "%04lx"
 #else
 typedef unsigned long long u64;
-#define PCIADDR_T_FMT "%016Lx"
-#define PCIADDR_PORT_FMT "%04Lx"
+#define PCIADDR_T_FMT "%016llx"
+#define PCIADDR_PORT_FMT "%04llx"
 #endif
 typedef u64 pciaddr_t;
 #else
@@ -61,6 +61,7 @@ struct nl_entry;
 enum pci_access_type {
   /* Known access methods, remember to update access.c as well */
   PCI_ACCESS_AUTO,			/* Autodetection (params: none) */
+  PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci (params: path) */
   PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci (params: path) */
   PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 (params: none) */
   PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 (params: none) */
@@ -114,7 +115,8 @@ void pci_free_dev(struct pci_dev *);
 
 struct pci_dev {
   struct pci_dev *next;			/* Next device in the chain */
-  word bus;				/* Higher byte can select host bridges */
+  word domain;				/* PCI domain (host bridge) */
+  byte bus;				/* Bus inside domain */
   byte dev, func;			/* Device and function */
 
   /* These fields are set by pci_fill_info() */

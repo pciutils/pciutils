@@ -1,5 +1,24 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* lib/pci.h (PCIADDR_PORT_FMT): Use %llx instead of %Lx, because the latter
+	is not supported by all C libraries.
+
+	* Makefile: Always enter the lib directory (remember that we don't have
+	full dependecies for the library in the top-level Makefile; hmmm, another
+	thing to rewrite some day).
+
+	* lib/sysfs.c: Added Linux sysfs access method based on the patch
+	written by Matthew Wilcox <willy@fc.hp.com>.
+
+	* lib/proc.c: Renamed the access method name from "/proc/bus/pci" to "Linux-proc".
+
+	* lib/pread.h: The hacks to support pread on various versions
+	of Linux libc moved there.
+
+	* lib/proc.c (proc_setup): The return value of snprintf() varies
+	between glibc versions, so we need to check both for a negative
+	values and for too large values.
+
 	* Removed last few references to the "Linux PCI Utilities", the
 	package is pretty cross-platform now :)
 

@@ -33,10 +33,12 @@ echo_n "Looking for access methods..."
 case $sys in
 	Linux)
 		case $rel in
-			2.[1-9]*|[3-9]*)	echo_n " proc"
+			2.[1-9]*|[3-9]*)	echo_n "sysfs proc"
+						echo >>$c '#define HAVE_PM_LINUX_SYSFS'
 						echo >>$c '#define HAVE_PM_LINUX_PROC'
 						echo >>$c '#define HAVE_LINUX_BYTEORDER_H'
 						echo >>$c '#define PATH_PROC_BUS_PCI "/proc/bus/pci"'
+						echo >>$c '#define PATH_SYS_BUS_PCI "/sys/bus/pci"'
 						ok=1
 						;;
 		esac

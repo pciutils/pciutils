@@ -2,3 +2,9 @@
   "available only to root" things in the man page.
 
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".
+
+- names.c: rewrite
+
+- support for domains:
+	- pci_get_dev
+	- filters

@@ -15,6 +15,11 @@
 
 static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
   NULL,
+#ifdef HAVE_PM_LINUX_SYSFS
+  &pm_linux_sysfs,
+#else
+  NULL,
+#endif
 #ifdef HAVE_PM_LINUX_PROC
   &pm_linux_proc,
 #else

@@ -31,8 +31,10 @@ export
 
 all: $(PCILIB) lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 pci.ids
 
-$(PCILIB): $(PCIINC)
+$(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
+
+force:
 
 lib/config.h:
 	cd lib && ./configure $(SHAREDIR) $(VERSION)
@@ -73,4 +75,4 @@ uninstall: all
 get-ids:
 	cp ~/tree/pciids/pci.ids pci.ids
 
-.PHONY: all clean distclean install uninstall get-ids
+.PHONY: all clean distclean install uninstall get-ids force

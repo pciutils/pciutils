@@ -8,6 +8,10 @@ INCL=internal.h pci.h config.h
 
 PCILIB=libpci.a
 
+ifdef HAVE_PM_LINUX_SYSFS
+OBJS += sysfs.o
+endif
+
 ifdef HAVE_PM_LINUX_PROC
 OBJS += proc.o
 endif
@@ -53,8 +57,9 @@ $(PCILIB): $(OBJS)
 	ranlib $@
 
 access.o: access.c $(INCL)
-i386-ports.o: i386-ports.c $(INCL)
-proc.o: proc.c $(INCL)
+i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h
+proc.o: proc.c $(INCL) pread.h
+sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
 syscalls.o: syscalls.c $(INCL)
 fbsd-device.o: fbsd-device.c $(INCL)
