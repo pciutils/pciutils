@@ -1,3 +1,7 @@
+2000-08-25  Martin Mares  <mj@albireo.ucw.cz>
+
+	* pci.ids: Updated ID's, synced with kernel 2.4.0-test7.
+
 2000-06-13  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Makefile (uninstall): Fixed.

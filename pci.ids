@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.66 2000/08/09 10:28:18 mj Exp $
+#	$Id: pci.ids,v 1.67 2000/08/25 12:17:00 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -631,6 +631,7 @@
 		0e11 b16f  Matrox MGA-G400 AGP
 		102b 0328  Millennium G400 16Mb SDRAM
 		102b 0338  Millennium G400 16Mb SDRAM
+		102b 0378  Millennium G400 32Mb SDRAM
 		102b 19d8  Millennium G400 16Mb SGRAM
 		102b 19f8  Millennium G400 32Mb SGRAM
 		102b 2159  Millennium G400 Dual Head 16Mb
@@ -986,6 +987,7 @@
 1058  Electronics & Telecommunications RSH
 1059  Teknor Industrial Computers Inc
 105a  Promise Technology, Inc.
+	0d30  20265
 	4d30  20267
 	4d33  20246
 	4d38  20262
@@ -1476,6 +1478,7 @@
 		10b7 3590  TokenLink Velocity XL Adapter
 	4500  3c450 Cyclone/unknown
 	5055  3c555 Laptop Hurricane
+	6055  3c556 Laptop Hurricane
 	5057  3c575 [Megahertz] 10/100 LAN CardBus
 		10b7 5a57  3C575 Megahertz 10/100 LAN Cardbus PC Card
 	5157  3c575 [Megahertz] 10/100 LAN CardBus
@@ -1793,6 +1796,7 @@
 	9128  IMS9129 [Twin turbo 128]
 10e1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040
+		10e1 0391  DC-315U SCSI-3 Host Adapter
 	690c  DC-690c
 	dc29  DC-290
 10e2  Aptix Corporation
@@ -1919,35 +1923,38 @@
 1105  Sigma Designs, Inc.
 	8300  REALmagic Hollywood Plus DVD Decoder
 1106  VIA Technologies, Inc.
+	0305  VT8363/8365 [KT133/KM133]
 	0391  VT8371 [KX133]
-	0501  VT8501
+	0501  VT8501 [Apollo MVP4]
 	0505  VT82C505
 	0561  VT82C561
-	0571  VT82C586 IDE [Apollo]
+	0571  Bus Master IDE
 	0576  VT82C576 3V [Apollo Master]
 	0585  VT82C585VP [Apollo VP1/VPX]
 	0586  VT82C586/A/B PCI-to-ISA [Apollo VP]
 		1106 0000  MVP3 ISA Bridge
 	0595  VT82C595 [Apollo VP2]
-	0596  VT82C596 ISA [Apollo PRO]
+	0596  VT82C596 ISA [Mobile South]
 		1106 0000  VT82C596/A/B PCI to ISA Bridge
 		1458 0596  VT82C596/A/B PCI to ISA Bridge
 	0597  VT82C597 [Apollo VP3]
 	0598  VT82C598 [Apollo MVP3]
-	0601  VT8601
+	0601  VT8601 [Apollo ProMedia]
+	0605  VT8605 [ProSavage PM133]
 	0680  VT82C680 [Apollo P6]
-	0686  VT82C686 [Apollo Super]
+	0686  VT82C686 [Apollo Super South]
 		1106 0000  VT82C686/A PCI to ISA Bridge
 		1106 0686  VT82C686/A PCI to ISA Bridge
-	0691  VT82C691 [Apollo PRO]
+	0691  VT82C693A/694x [Apollo PRO133x]
 		1458 0691  VT82C691 Apollo Pro System Controller
+	0698  VT82C693A [Apollo Pro133 AGP]
 	0693  VT82C693 [Apollo Pro Plus]
 	0926  VT82C926 [Amazon]
 	1000  VT82C570MV
 	1106  VT82C570MV
 	1571  VT82C416MV
 	1595  VT82C595/97 [Apollo VP2/97]
-	3038  VT82C586B USB
+	3038  UHCI USB
 		1234 0925  MVP3 USB Controller
 	3040  VT82C586B ACPI
 	3043  VT86C100A [Rhine 10/100]
@@ -1955,19 +1962,31 @@
 		1106 0100  VT86C100A Fast Ethernet Adapter
 		1186 1400  DFE-530TX
 	3044  OHCI Compliant IEEE 1394 Host Controller
+	3050  VT82C596 Power Management
+	3051  VT82C596 Power Management
 	3057  VT82C686 [Apollo Super ACPI]
-	3058  VT82C686 [Apollo Super AC97/Audio]
+	3058  AC97 Audio Controller
 		1462 3091  MS-6309 Onboard Audio
-	3068  VT82C686 [Apollo Super AC97/Modem]
+	3059  AC97 Audio Controller
+	3065  Ethernet Controller
+	3068  AC97 Modem Controller
+	3074  VT8233 PCI to ISA Bridge
+	3091  VT8633 [Apollo Pro266]
+	3099  VT8367 [KT266]
 	5030  VT82C596 ACPI [Apollo PRO]
 	6100  VT85C100A [Rhine II]
 	8231  VT8231 [PCI-to-ISA Bridge]
-	8391  VT8371 [PCI-PCI Bridge]
-	8501  VT8501
+	8235  VT8235 Power Management
+	8305  VT8363/8365 [KT133/KM133 AGP]
+	8391  VT8371 [KX133 AGP] 
+	8501  VT8501 [Apollo MVP4 AGP]
 	8596  VT82C596 [Apollo PRO AGP]
 	8597  VT82C597 [Apollo VP3 AGP]
-	8598  VT82C598 [Apollo MVP3 AGP]
-	8601  VT8601
+	8598  VT82C598/694x [Apollo MVP3/Pro133x AGP]
+	8601  VT8601 [Apollo ProMedia AGP]
+	8605  VT8605 [PM133 AGP]
+	b091  VT8633 [Apollo Pro266 AGP]
+	b099  VT8367 [KT266 AGP]
 	8691  VT82C691 [Apollo Pro]
 1107  Stratus Computers
 	0576  VIA VT82C570MV [Apollo] (Wrong vendor ID!)
@@ -4436,6 +4455,8 @@
 5455  Technische University Berlin
 	4458  S5933
 5519  Cnet Technologies, Inc.
+5544  Dunord Technologies
+	0001  I-30xx Scanner Interface
 5555  Genroco, Inc
 	0003  TURBOstor HFP-832 [HiPPI NIC]
 5700  Netpower
@@ -4635,7 +4656,12 @@
 	84c4  450KX/GX [Orion] - 82454KX/GX PCI bridge
 	84c5  450KX/GX [Orion] - 82453KX/GX Memory controller
 	84ca  450NX - 82451NX Memory & I/O Controller
-	84cb  450NX - 82454NX PCI Expander Bridge
+	84cb  450NX - 82454NX/84460GX PCI Expander Bridge
+	84e0  460GX - 84460GX System Address Controller (SAC)
+	84e1  460GX - 84460GX System Data Controller (SDC)
+	84e2  460GX - 84460GX AGP Bridge (GXB)
+	84e3  460GX - 84460GX Memory Address Controller (MAC)
+	84e4  460GX - 84460GX Memory Data Controller (MDC)
 	ffff  450NX/GX [Orion] - 82453KX/GX Memory controller [BUG]
 8800  Trigem Computer Inc.
 	2008  Video assistent component
