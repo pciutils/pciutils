@@ -1,3 +1,17 @@
+Sun Feb 15 10:12:25 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_machine): Added non-verbose mode of machine-readable
+	dump.
+
+	* pci.ids: Updates from Jens Maurer.
+
+	* Released as version 1.02.
+
+Thu Feb 12 16:53:28 1998  Martin Mares  <mj@lomikel.karlin.mff.cuni.cz>
+
+	* lspci.c: Added a "-m" switch for dumping machine-readable
+	configuration data (requested by Bjoern Kriews <bkr@cut.de>).
+
 Mon Feb  9 13:17:43 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Makefile, pciutils.h: Include local pci.h instead of <linux/pci.h>

@@ -1,4 +1,4 @@
-.TH lspci 8 "9 February 98" "pciutils-1.01" "Linux PCI Utilities"
+.TH lspci 8 "15 February 98" "pciutils-1.02" "Linux PCI Utilities"
 .IX lspci
 .SH NAME
 lspci \- list all PCI devices
@@ -83,6 +83,10 @@ as PCI ID database instead of /etc/pci.ids.
 Use
 .B <dir>
 as directory containing PCI bus information instead of /proc/bus/pci.
+.TP
+.B -m
+Dump PCI device data in machine readable form (both normal and verbose format supported)
+for easy parsing by scripts.
 
 .SH FILES
 .TP

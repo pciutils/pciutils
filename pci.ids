@@ -1,10 +1,10 @@
 #
 #	List of PCI ID's
 #
-#	Maintained by Jens Maurer <jmaurer@cck.uni-kl.de>
+#	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.4 1998/02/08 12:47:07 ecd Exp $
+#	$Id: pci.ids,v 1.5 1998/02/15 09:30:40 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -100,6 +100,7 @@
 	0016  DGLPB [OPPO]
 	0019  DECchip 21142/43
 	0021  DECchip 21052
+	0022  DECchip 21150
 	0024  DECchip 21152
 1012  Micronics Computers Inc
 1013  Cirrus Logic
@@ -125,7 +126,9 @@
 	001d  82G2675
 	0020  MCA
 	0022  IBM27-82351
+	002e  ServeRAID controller
 	0036  Miami
+	007d  MPEG2
 1015  LSI Logic Corp of Canada
 1016  ICL Personal Systems
 1017  SPEA Software AG
@@ -153,6 +156,7 @@
 	2040  79c974
 1023  Trident Microsystems
 	9320  TGUI 9320
+	9397  Cyber9397
 	9420  TGUI 9420
 	9430  TGUI 9430
 	9440  TGUI 9440
@@ -207,6 +211,7 @@
 	0001  SG86C201
 	0002  SG86C202
 	0008  85C503
+	0200  5598
 	0204  82C204
 	0205  SG86C205
 	0406  85C501/2
@@ -238,7 +243,7 @@
 	3020  Samurai_IDE
 1043  Asustek Computer, Inc.
 1044  Distributed Processing Technology
-	a400  PM2124A [SmartCache/Raid]
+	a400  SmartCache/Raid III or IV
 1045  OPTi Inc.
 	c178  92C178
 	c557  82C557 [Viper-M]
@@ -271,6 +276,7 @@
 	ac12  PCI1130
 	ac13  PCI1031
 	ac15  PCI1131
+	ac16  PCI-1250
 104d  Sony Corporation
 104e  Oak Technology, Inc
 	0107  OTI107
@@ -422,6 +428,7 @@
 109e  Brooktree Corporation
 	0350  Bt848
 	0351  Bt849A
+	8474  Bt8474
 109f  Trigem Computer Inc.
 10a0  Meidensha Corporation
 10a1  Juko Electronics Ind. Co. Ltd
@@ -616,13 +623,15 @@
 	0585  VT82C585VP [Apollo VP1/VPX]
 	0586  VT82C586 ISA [Apollo VP]
 	0595  VT82C595 [Apollo VP2]
+	0597  VT82C597 [Apollo VP3]
 	0926  VT82C926 [Amazon]
 	1000  82C570MV
 	1106  82C570MV
 	1571  VT 82C416MV
 	1595  VT82C595/97 [Apollo VP2/97]
-	3038  82C586_2 [VT82C586B USB]
-	3040  82C586_3 [VT82C586B ACPI]
+	3038  VT82C586B USB
+	3040  VT82C586B ACPI
+	8597  VT82C597 [Apollo VP3 AGP]
 1107  Stratus Computers
 1108  Proteon, Inc.
 	0100  p1690plus_AA
@@ -718,6 +727,7 @@
 113a  FWB Inc
 113b  Network Computing Devices
 113c  Cyclone Microsystems, Inc.
+	0001  PCI-SDK [PCI i960 Evaluation Platform]
 	0911  PCI-911 [PCI-based i960Jx Intelligent I/O Controller]
 	0912  PCI-912 [i960CF-based Intelligent I/O Controller]
 	0913  PCI-913
@@ -798,6 +808,8 @@
 1179  Toshiba America Info Systems
 	0601  601
 	060a  ToPIC95
+	060f  ToPIC97
+	0701  Lucent DSP1645 [Mars]
 117b  L G Electronics, Inc.
 117c  Atto Technology
 117d  Becton & Dickinson
@@ -880,7 +892,8 @@
 11be  International Microcircuits Inc
 11bf  Astrodesign, Inc.
 11c0  Hewlett Packard
-11c1  AT&T Microelectronics
+11c1  Lucent Microelectronics
+	0440  L56xMF
 11c2  Sand Microelectronics
 11c4  Document Technologies, Inc
 11c5  Shiva Corporation

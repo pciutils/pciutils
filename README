@@ -1,4 +1,4 @@
-This package contains the Linux PCI Utilities, version 1.01.
+This package contains the Linux PCI Utilities, version 1.02.
 
 Copyright (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -32,3 +32,5 @@ TODO:
 
 	- Full displaying of CardBus bridge configuration. (Has anyone seen
 	  full specs of the CardBus bridge / header type 2?)
+
+	- Subsystem vendor and device ID?

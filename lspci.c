@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.7 1998/02/09 12:32:54 mj Exp $
+ *	$Id: lspci.c,v 1.8 1998/02/15 09:30:39 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -27,9 +27,10 @@ static int func_filter = -1;
 static int vend_filter = -1;
 static int dev_filter = -1;
 static int show_tree;			/* Show bus tree */
+static int machine_readable;		/* Generate machine-readable output */
 static char *pci_dir = PROC_BUS_PCI;
 
-static char options[] = "nvbxB:S:F:V:D:ti:p:";
+static char options[] = "nvbxB:S:F:V:D:ti:p:m";
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -40,6 +41,7 @@ Usage: lspci [<switches>]\n\
 -x\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
 -B <bus>, -S <slot>, -F <func>, -V <vendor>, -D <device>  Show only selected devices\n\
 -t\tShow bus tree\n\
+-m\tProduce machine-readable output\n\
 -i <file>\tUse specified ID database instead of " ETC_PCI_IDS "\n\
 -p <dir>\tUse specified bus directory instead of " PROC_BUS_PCI "\n\
 ";
@@ -594,13 +596,46 @@ show_hex_dump(struct device *d)
 }
 
 static void
+show_machine(struct device *d)
+{
+  int c;
+
+  if (verbose)
+    {
+      printf("Device:\t%02x:%02x.%x\n", d->bus, PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+      printf("Class:\t%s\n", lookup_class(get_conf_word(d, PCI_CLASS_DEVICE)));
+      printf("Vendor:\t%s\n", lookup_vendor(d->vendid));
+      printf("Device:\t%s\n", lookup_device(d->vendid, d->devid));
+      if (c = get_conf_byte(d, PCI_REVISION_ID))
+	printf("Rev:\t%02x\n", c);
+      if (c = get_conf_byte(d, PCI_CLASS_PROG))
+	printf("ProgIf:\t%02x\n", c);
+    }
+  else
+    {
+      printf("%02x:%02x.%x ", d->bus, PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+      printf("\"%s\" \"%s\" \"%s\"",
+	     lookup_class(get_conf_word(d, PCI_CLASS_DEVICE)),
+	     lookup_vendor(d->vendid),
+	     lookup_device(d->vendid, d->devid));
+      if (c = get_conf_byte(d, PCI_REVISION_ID))
+	printf(" -r%02x", c);
+      if (c = get_conf_byte(d, PCI_CLASS_PROG))
+	printf(" -p%02x", c);
+      putchar('\n');
+    }
+}
+
+static void
 show(void)
 {
   struct device *d;
 
   for(d=first_dev; d; d=d->next)
     {
-      if (verbose)
+      if (machine_readable)
+	show_machine(d);
+      else if (verbose)
 	show_verbose(d);
       else
 	show_terse(d);
@@ -875,6 +910,9 @@ main(int argc, char **argv)
 	break;
       case 'p':
 	pci_dir = optarg;
+	break;
+      case 'm':
+	machine_readable++;
 	break;
       default:
       bad:
