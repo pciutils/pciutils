@@ -14,6 +14,8 @@
 	to use update-ids) and we don't try to remove /etc/pci.ids (a long time
 	has passed since the last version which used it).
 
+	* Makefile: Paths to pci.ids in man pages automatically get the right path.
+
 	* Added the update-ids utility.
 
 	* lib: Removed partially implemented "syscall" access method which will

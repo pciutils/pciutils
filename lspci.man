@@ -136,7 +136,7 @@ Increase debug level of the library. (All systems)
 
 .SH FILES
 .TP
-.B /usr/share/pci.ids
+.B @SHAREDIR@/pci.ids
 A list of all known PCI ID's (vendors, devices, classes and subclasses).
 .TP
 .B /proc/bus/pci
