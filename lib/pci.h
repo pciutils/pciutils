@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.2 1999/01/24 21:35:36 mj Exp $
+ *	$Id: pci.h,v 1.3 1999/02/28 20:23:11 mj Exp $
  *
  *	The PCI Library
  *
@@ -30,6 +30,12 @@ typedef __u8 u8;
 typedef __u16 word;
 typedef __u16 u16;
 typedef __u32 u32;
+
+#ifdef HAVE_64BIT_ADDRESS
+typedef unsigned long long pciaddr_t;
+#else
+typedef unsigned long pciaddr_t;
+#endif
 
 /*
  *	PCI Access Structure
@@ -94,8 +100,8 @@ struct pci_dev {
   /* These fields are set by pci_fill_info() */
   word vendor_id, device_id;		/* Identity of the device */
   int irq;				/* IRQ number */
-  unsigned long base_addr[6];		/* Base addresses */
-  unsigned long rom_base_addr;		/* Expansion ROM base address */
+  pciaddr_t base_addr[6];		/* Base addresses */
+  pciaddr_t rom_base_addr;		/* Expansion ROM base address */
 
   /* Fields used internally: */
   struct pci_access *access;
@@ -106,6 +112,9 @@ struct pci_dev {
   int hdrtype;				/* Direct methods: header type */
   void *aux;				/* Auxillary data */
 };
+
+#define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
+#define PCI_ADDR_MEM_MASK (~(pciaddr_t) 0xf)
 
 byte pci_read_byte(struct pci_dev *, int pos); /* Access to configuration space */
 word pci_read_word(struct pci_dev *, int pos);

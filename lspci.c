@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.22 1999/01/28 20:16:46 mj Exp $
+ *	$Id: lspci.c,v 1.23 1999/02/28 20:23:07 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -56,10 +56,10 @@ static struct pci_access *pacc;
 #define IRQ_FORMAT "%d"
 #endif
 
-#ifdef HAVE_64BIT_LONG_INT
-#define LONG_FORMAT "%016lx"
+#ifdef HAVE_64BIT_ADDRESS
+#define ADDR_FORMAT "%016Lx"
 #else
-#define LONG_FORMAT "%08lx"
+#define ADDR_FORMAT "%08lx"
 #endif
 
 /* Our view of the PCI bus */
@@ -242,9 +242,8 @@ show_bases(struct device *d, int cnt)
 
   for(i=0; i<cnt; i++)
     {
-      unsigned long pos;
-      unsigned int flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-      pos = p->base_addr[i];
+      pciaddr_t pos = p->base_addr[i];
+      u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
       if (flg == 0xffffffff)
 	flg = 0;
       if (!pos && !flg)
@@ -274,7 +273,7 @@ show_bases(struct device *d, int cnt)
       else
 	{
 	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
-	  unsigned long a = pos & PCI_BASE_ADDRESS_MEM_MASK;
+	  pciaddr_t a = pos & PCI_ADDR_MEM_MASK;
 	  int done = 0;
 	  u32 z = 0;
 
@@ -303,7 +302,7 @@ show_bases(struct device *d, int cnt)
 	  if (!done)
 	    {
 	      if (a)
-		printf(LONG_FORMAT, a);
+		printf(ADDR_FORMAT, a);
 	      else
 		printf(((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
 	    }
@@ -1106,13 +1105,16 @@ do_map_bus(int bus)
   for(dev = 0; dev < 32; dev++)
     if (filter.slot < 0 || filter.slot == dev)
       {
-	for(func = 0; func < 8; func++)
+	int func_limit = 1;
+	for(func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
 	      struct pci_dev *p = pci_get_dev(pacc, bus, dev, func);
 	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
 	      if (vendor && vendor != 0xffff)
 		{
+		  if (!func && (pci_read_byte(p, PCI_HEADER_TYPE) & 0x80))
+		    func_limit = 8;
 		  if (verbose)
 		    printf("Discovered device %02x:%02x.%d\n", bus, dev, func);
 		  bi->exists = 1;

@@ -1,5 +1,5 @@
 /*
- *	$Id: generic.c,v 1.3 1999/01/27 14:53:03 mj Exp $
+ *	$Id: generic.c,v 1.4 1999/02/28 20:23:10 mj Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
@@ -127,8 +127,8 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 		      else
 			{
 			  u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
-#ifdef HAVE_64BIT_LONG_INT
-			  d->base_addr[i-1] |= ((unsigned long) y) << 32;
+#ifdef HAVE_64BIT_ADDRESS
+			  d->base_addr[i-1] |= ((pciaddr_t) y) << 32;
 #else
 			  if (y)
 			    {

@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.18 1999/01/26 15:00:03 jj Exp $
+#	$Id: pci.ids,v 1.19 1999/02/28 20:23:08 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -210,7 +210,7 @@
 	051b  MGA 2164W [Millennium II]
 	051f  MGA 2164W AGP [Millennium II AGP]
 	0520  MGA G200 PCI
-	0521  MGA G200-SD AGP [Millennium G200 SDRAM AGP]
+	0521  MGA G200 AGP [Millennium G200 AGP]
 	0d10  MGA Ultima/Impression
 	1000  MGA G100 [multi monitor]
 	1001  MGA G100 AGP
@@ -501,6 +501,7 @@
 10b4  STB Systems Inc
 10b5  PLX Technology, Inc.
 	9036  9036
+	9050  PCI <-> IOBus Bridge
 	9060  9060
 	906e  9060ES
 	9080  9080
@@ -609,6 +610,7 @@
 10de  Nvidia Corporation
 	0008  NV1
 	0009  DAC64
+	0020  Riva TNT
 10df  Emulex Corporation
 10e0  Integrated Micro Solutions Inc.
 	5026  IMS5026/27/28
@@ -1443,6 +1445,7 @@
 1387  Systran Corp
 1388  Hitachi Information Technology Co Ltd
 1389  Applicom International
+	0001  PCI1500PFB [Intelligent fieldbus adaptor]
 138a  Fusion Micromedia Corp
 138b  Tokimec Inc
 138c  Silicon Reality
@@ -1864,3 +1867,5 @@ C 0C  Serial bus controller
 	0003  USB Controller
 	0004  Fiber Channel
 
+S 10b4  STB Systems Inc
+	273e  Velocity 4400

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 1999/01/28 20:16:42 mj Exp $
+# $Id: Makefile,v 1.14 1999/02/28 20:23:05 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -39,9 +39,9 @@ clean:
 	rm -rf dist
 
 install: all
-	install -o root -g root -m 755 -s lspci setpci $(ROOT)/sbin
-	install -o root -g root -m 644 pci.ids $(PREFIX)/share
-	install -o root -g root -m 644 lspci.8 setpci.8 $(PREFIX)/man/man8
+	install -m 755 -s lspci setpci $(ROOT)/sbin
+	install -m 644 pci.ids $(PREFIX)/share
+	install -m 644 lspci.8 setpci.8 $(PREFIX)/man/man8
 	# Remove relics from old versions
 	rm -f $(ROOT)/etc/pci.ids
 

@@ -1,3 +1,25 @@
+Sun Feb 28 22:26:21 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (do_map_bus): Don't dump functions 1--7 if not flagged
+	as a multi-function device, because several single-function devices
+	don't decode the function bits at all.
+
+Sun Feb 14 23:48:22 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Makefile (install): Don't use "-o root -g root" for installation
+	since it breaks on machines where programs are not installed by root.
+	Reported by Richard Gooch <rgooch@atnf.csiro.au>
+
+Tue Feb  9 15:54:39 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_bases): Use new address masking macros and pciaddr_t.
+
+	* lib/pci.h: Using pciaddr_t for bus addresses, which are 32-bit
+	or 64-bit depending on CPU.
+
+	* lib/pci.h (PCI_ADDR_MEM_MASK): Added macros for address masks
+	according to bus address width.
+
 Thu Jan 28 20:54:16 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 1.99.4.

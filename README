@@ -34,6 +34,8 @@ bus in Linux:
 
    See manual pages for more details.
 
+   To compile the package, just run "make". To install it, "make install".
+
    You need kernel 2.1.82 or newer to use all functions of this package.
 For older kernels, only direct hardware access is supported and you must
 be root to use it.
