@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.50 2000/01/23 05:57:06 mj Exp $
+#	$Id: pci.ids,v 1.51 2000/02/14 19:32:56 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -1030,6 +1030,8 @@
 	1077  VScom 400 4 port serial adaptor
 	9036  9036
 	9050  PCI <-> IOBus Bridge
+		d84d 4055  EX-4055 4 port serial adapter
+		d84d 4065  EX-4065 8 port serial adapter
 	9060  9060
 	906d  9060SD
 		125c 0640  Aries 16000P
@@ -1278,14 +1280,14 @@
 	0101  3GA
 	8111  Twist3 Frame Grabber
 10ec  Realtek Semiconductor Co., Ltd.
-	8029  RT8029(AS)
+	8029  RTL-8029(AS)
 		10b8 2011  EZ-Card
 		10ec 8029  RT8029(AS)
 		1113 1208  EN1208
 		1186 0300  DE-528
 		1259 2400  AT-2400
-	8129  RT8129
-	8139  RT8139
+	8129  RTL-8129
+	8139  RTL-8139
 		1025 8920  ALN-325
 		1025 8921  ALN-325
 		10bd 0320  EP-320X-R
@@ -1303,6 +1305,7 @@
 		2646 0001  EtheRx
 		8e2e 7000  KF-230TX
 		8e2e 7100  KF-230TX/2
+		a0a0 0007  ALN-325C
 10ed  Ascii Corporation
 	7310  V7310
 10ee  Xilinx, Inc.
@@ -1328,6 +1331,7 @@
 10ff  NCube
 1100  Jazz Multimedia
 1101  Initio Corporation
+	1060  INI-A100U2W
 	9100  INI-9100/9100W
 	9400  INI-940
 	9401  INI-950
@@ -2738,6 +2742,7 @@
 	0100  CM8338A
 	0101  CM8338B
 	0111  CM8738
+	0211  CM8738
 13f7  Wildfire Communications
 13f8  Ad Lib Multimedia Inc
 13f9  NTT Advanced Technology Corp.
@@ -2972,6 +2977,16 @@
 14da  National Aerospace Laboratories
 14db  AFAVLAB Technology Inc
 14dc  Amplicon Liveline Ltd
+	0000  PCI230
+	0001  PCI242
+	0002  PCI244
+	0003  PCI247
+	0004  PCI248
+	0005  PCI249
+	0006  PCI260
+	0007  PCI224
+	0008  PCI234
+	0009  PCI236
 14dd  Boulder Design Labs Inc
 14de  Applied Integration Corporation
 14df  ASIC Communications Corp
@@ -3112,6 +3127,7 @@
 1d44  DPT
 	a400  PM2x24/PM3224
 1de1  Tekram Technology Co.,Ltd.
+	0391  TRM-S1040
 	2020  DC-390
 	690c  690c
 	dc29  DC290
@@ -3567,6 +3583,7 @@ c0fe  Motion Engineering, Inc.
 cafe  Chrysalis-ITS
 cccc  Catapult Communications
 d4d4  Dy4 Systems Inc
+d84d  Exsys
 e000  Winbond
 	e000  W89C940
 e159  Tiger Jet Network Inc.

@@ -1,3 +1,15 @@
+Tue Feb 15 00:16:21 2000  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Released as 2.1.5.
+
+	* pciutils.spec: Updated spec file from Andreas Jaeger. Now using
+	%{_mandir} to find the right location to install manual pages to.
+
+	* pci.ids: New ID's.
+
+	* setpci.c (main): Don't crash when `-s' or `-d' is given with
+	no argument.
+
 Mon Jan 24 20:04:11 2000  Andreas Jaeger  <aj@suse.de>
 
 	* lib/i386-ports.c: Include <asm/io.h> only on systems without
