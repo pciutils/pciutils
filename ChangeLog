@@ -1,3 +1,11 @@
+Mon Apr 19 15:21:08 1999  Jakub Jelinek  <jj@ultra.linux.cz>
+
+	* lspci.c: Display I/O addresses correctly on sparc64.
+	* lib/header.h: Ditto.
+
+	* lib/configure: On sparc set HAVE_64BIT* as well, we want
+	a binary which works on both 32bit and 64bit SPARCs.
+
 Sun Apr 18 21:14:58 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c, lib/proc.c: Alpha compilation fixes from Matthew Jacob

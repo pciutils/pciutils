@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.24 1999/04/18 19:07:16 mj Exp $
+ *	$Id: lspci.c,v 1.25 1999/04/26 19:45:57 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -60,6 +60,14 @@ static struct pci_access *pacc;
 #define ADDR_FORMAT "%016Lx"
 #else
 #define ADDR_FORMAT "%08lx"
+#endif
+
+#ifdef ARCH_SPARC64
+#define IO_FORMAT "%016Lx"
+#elif defined(HAVE_64BIT_ADDRESS)
+#define IO_FORMAT "%04Lx"
+#else
+#define IO_FORMAT "%04lx"
 #endif
 
 /* Our view of the PCI bus */
@@ -259,10 +267,10 @@ show_bases(struct device *d, int cnt)
 	}
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
 	{
-	  unsigned long a = pos & PCI_BASE_ADDRESS_IO_MASK;
+	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
 	  printf("I/O ports at ");
 	  if (a)
-	    printf("%04lx", a);
+	    printf(IO_FORMAT, a);
 	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
 	    printf("<ignored>");
 	  else
