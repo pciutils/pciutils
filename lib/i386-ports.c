@@ -1,5 +1,5 @@
 /*
- *	$Id: i386-ports.c,v 1.1 1999/01/22 21:05:26 mj Exp $
+ *	$Id: i386-ports.c,v 1.2 2000/01/24 15:36:09 mj Exp $
  *
  *	The PCI Library -- Direct Configuration access via i386 Ports
  *
@@ -8,11 +8,12 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#include <asm/io.h>
 #include <unistd.h>
 
 #ifdef __GLIBC__
 #include <sys/io.h>
+#else
+#include <asm/io.h>
 #endif
 
 #include "internal.h"
