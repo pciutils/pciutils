@@ -1,3 +1,8 @@
+Thu Aug  5 17:45:42 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_size): Don't show size if it's zero (usually
+	due to bus-centric mode being enabled).
+
 Tue Jul 20 13:25:09 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lib/pci.h: Types are OS dependent.

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.27 1999/07/07 11:23:04 mj Exp $
+ *	$Id: lspci.c,v 1.28 1999/08/20 08:30:44 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -248,6 +248,8 @@ show_terse(struct device *d)
 static void
 show_size(pciaddr_t x)
 {
+  if (!x)
+    return;
   printf(" [size=");
   if (x < 1024)
     printf("%d", (int) x);
@@ -342,8 +344,7 @@ show_bases(struct device *d, int cnt)
 	  if (!(cmd & PCI_COMMAND_MEMORY))
 	    printf(" [disabled]");
 	}
-      if (len)
-	show_size(len);
+      show_size(len);
       putchar('\n');
     }
 }
