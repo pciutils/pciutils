@@ -1,3 +1,13 @@
+Tue Jun  9 22:53:59 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* names.c (parse_name_list): Killed an unused variable.
+
+	* setpci.c (pread, pwrite): Define SYS_(pread|pwrite) as __NR_\1
+	if they are not defined by glibc (needed for glibc built on older
+	kernels). Ugly.
+
+	* setpci.c (exec_op): Fixed error messages. Thanks, Steve!
+
 Mon Jun  8 10:59:22 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 1.05.

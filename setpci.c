@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.3 1998/06/08 07:57:54 mj Exp $
+ *	$Id: setpci.c,v 1.4 1998/06/09 19:22:05 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -66,12 +66,18 @@ xmalloc(unsigned int howmuch)
  * or use lseek/read/write instead.
  */
 #ifdef __GLIBC__
+#ifndef SYS_pread
+#define SYS_pread __NR_pread
+#endif
 static int
 pread(unsigned int fd, void *buf, size_t size, loff_t where)
 {
   return syscall(SYS_pread, fd, buf, size, where);
 }
 
+#ifndef SYS_pwrite
+#define SYS_pwrite __NR_pwrite
+#endif
 static int
 pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
 {
@@ -180,7 +186,7 @@ exec_op(struct op *op, struct device *dev)
 	  }
 	if (i != (int) op->width)
 	  {
-	    fprintf(stderr, "Error writing to %02x:%02x.%d: %m", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
+	    fprintf(stderr, "Error writing to %02x:%02x.%d: %m\n", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
 	    exit(1);
 	  }
       }
@@ -207,7 +213,7 @@ exec_op(struct op *op, struct device *dev)
 	    }
 	  if (i != (int) op->width)
 	    {
-	      fprintf(stderr, "Error reading from %02x:%02x.%d: %m", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
+	      fprintf(stderr, "Error reading from %02x:%02x.%d: %m\n", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
 	      exit(1);
 	    }
 	  printf(m, x);
