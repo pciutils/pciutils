@@ -468,7 +468,7 @@ show_pcix_nobridge(struct device *d, int where)
 	 FLAG(command, PCI_PCIX_COMMAND_ERO),
 	 ((command & PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT) >> 2U),
 	 ((command & PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS) >> 4U));
-  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, DC=%s, DMMRBC=%u, DMOST=%u, DMCRS=%u, RSCEM%c",
+  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, DC=%s, DMMRBC=%u, DMOST=%u, DMCRS=%u, RSCEM%c\n",
 	 ((status >> 8) & 0xffU), // bus
 	 ((status >> 3) & 0x1fU), // dev
 	 (status & PCI_PCIX_STATUS_FUNCTION), // function
@@ -904,7 +904,7 @@ show_verbose(struct device *d)
 	      putchar(')');
 	    }
 	  if (cache_line)
-	    printf(", cache line size %02x", cache_line);
+	    printf(", Cache Line Size %02x", cache_line);
 	  putchar('\n');
 	}
       if (int_pin || irq)

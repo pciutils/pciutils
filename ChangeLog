@@ -1,8 +1,14 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	Merged bug fixes from Debian patches:
+
+	* lspci.c (show_verbose): "Cache Line Size" should be capitalized.
+
+	* lspci.c (show_pcix_nobridge): Added a missing newline.
+
 	* lib/proc.c (proc_scan): When reading the header type, don't
 	forget to clear the topmost bit indicating that the device has
-	multiple functions. Grabbed from Debian patches.
+	multiple functions.
 
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
