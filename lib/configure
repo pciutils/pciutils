@@ -69,8 +69,13 @@ case $sys in
 		echo >>$c '#define PATH_NBSD_DEVICE "/dev/pci0"'
 		ok=1
 		;;
+    	GNU)
+		echo_n " intel-conf"
+		echo >>$c '#define HAVE_PM_INTEL_CONF'
+		ok=1
+		;;
         *)
-		echo " The PCI library currently supports only Linux, AIX, FreeBSD and NetBSD"
+		echo " Unfortunately, your OS is not supported by the PCI Library"
 		exit 1
 		;;
 esac

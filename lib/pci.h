@@ -24,6 +24,7 @@ typedef __u8 u8;
 typedef __u16 word;
 typedef __u16 u16;
 typedef __u32 u32;
+
 #endif
 
 #ifdef OS_FREEBSD
@@ -48,6 +49,16 @@ typedef u_int32_t u32;
 
 #ifdef OS_AIX
 #include <sys/param.h>
+
+typedef u_int8_t byte;
+typedef u_int8_t u8;
+typedef u_int16_t word;
+typedef u_int16_t u16;
+typedef u_int32_t u32;
+#endif
+
+#ifdef OS_GNU
+#include <sys/types.h>
 
 typedef u_int8_t byte;
 typedef u_int8_t u8;

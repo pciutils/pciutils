@@ -16,6 +16,7 @@
 
 #include "internal.h"
 
+#ifdef OS_LINUX
 static int intel_iopl_set = -1;
 
 static int
@@ -25,6 +26,30 @@ intel_setup_io(void)
     intel_iopl_set = (iopl(3) < 0) ? 0 : 1;
   return intel_iopl_set;
 }
+
+static inline void
+intel_cleanup_io(void)
+{
+  if (intel_iopl_set > 0)
+    iopl(3);
+  intel_iopl_set = -1;
+}
+#endif
+
+#ifdef OS_GNU
+/* The GNU Hurd doesn't have an iopl() call */
+
+static inline int
+intel_setup_io(void)
+{
+  return 1;
+}
+
+static inline int
+intel_cleanup_io(void)
+{
+}
+#endif
 
 static void
 conf12_init(struct pci_access *a)
@@ -36,8 +61,7 @@ conf12_init(struct pci_access *a)
 static void
 conf12_cleanup(struct pci_access *a UNUSED)
 {
-  iopl(3);
-  intel_iopl_set = -1;
+  intel_cleanup_io();
 }
 
 /*

@@ -1,3 +1,12 @@
+2003-12-26  Marco Gerards  <metgerards@student.han.nl>
+
+	Added support for the GNU Hurd (cleaned up by Martin Mares):
+
+	* lib/configure [GNU]: Use the i386 ports for configuration access.
+	* lib/i386-ports.c: Don't call iopl() on the Hurd.
+	* lib/pci.h [OS_GNU]: Include <sys/types.h> and use it for defining
+	u8 to u32.
+
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c (show_pcix_bridge, show_pcix_nobridge): Don't forget to call
