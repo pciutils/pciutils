@@ -35,13 +35,6 @@ int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 #define GENOPT_INTEL
 #define GENHELP_INTEL
 #endif
-#ifdef HAVE_PM_SYSCALLS
-#define GENOPT_SYSCALLS "S"
-#define GENHELP_SYSCALLS "-S\t\tUse direct hardware access via syscalls\n"
-#else
-#define GENOPT_SYSCALLS
-#define GENHELP_SYSCALLS
-#endif
 #ifdef HAVE_PM_DUMP
 #define GENOPT_DUMP "F:"
 #define GENHELP_DUMP "-F <file>\tRead configuration data from given file\n"
@@ -50,6 +43,6 @@ int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 #define GENHELP_DUMP
 #endif
 
-#define GENERIC_OPTIONS "G" GENOPT_PROC GENOPT_INTEL GENOPT_SYSCALLS GENOPT_DUMP
-#define GENERIC_HELP GENHELP_PROC GENHELP_INTEL GENHELP_SYSCALLS GENHELP_DUMP \
+#define GENERIC_OPTIONS "G" GENOPT_PROC GENOPT_INTEL GENOPT_DUMP
+#define GENERIC_HELP GENHELP_PROC GENHELP_INTEL GENHELP_DUMP \
 	"-G\t\tEnable PCI access debugging\n"

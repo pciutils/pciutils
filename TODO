@@ -1,5 +1,3 @@
-- lib: "syscall" access method
-
 - lspci: don't die when non-root tries to dump cardbus data
 
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".

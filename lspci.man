@@ -117,9 +117,6 @@ Use direct hardware access via Intel configuration mechanism 2. Warning: This me
 is able to address only first 16 devices on any bus and it seems to be very
 unrealiable in many cases. (i386 and compatible only)
 .TP
-.B -S
-Use PCI access syscalls. (Linux on Alpha and UltraSparc only)
-.TP
 .B -F <file>
 Extract all information from given file containing output of lspci -x. This is very
 useful for analysis of user-supplied bug reports, because you can display the

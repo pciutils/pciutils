@@ -1,5 +1,9 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	* pciutils.h, common.c, lspci.man, setpci.man, lib/internal.h:
+	Remove shadows of the syscall access method which was never
+	implemented.
+
 	* update-pciids.sh: Try to preserve permissions of the old file
 	if chmod supports --reference. Should close Debian Bug #223740.
 

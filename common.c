@@ -56,11 +56,6 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 	die("Unknown hardware configuration type %s", optarg);
       break;
 #endif
-#ifdef HAVE_PM_SYSCALLS
-    case 'S':
-      pacc->method = PCI_ACCESS_SYSCALLS;
-      break;
-#endif
 #ifdef HAVE_PM_DUMP
     case 'F':
       pacc->method_params[PCI_ACCESS_DUMP] = optarg;
