@@ -35,7 +35,7 @@ make install PREFIX=$RPM_BUILD_ROOT/usr ROOT=$RPM_BUILD_ROOT/ \
 %files
 %defattr(0644, root, root, 0755)
 %attr(0644, root, man) %{_mandir}/man8/*
-%attr(0711, root, root) /sbin/*
+%attr(0711, root, root) /usr/sbin/*
 %config /usr/share/pci.ids
 %doc README ChangeLog pciutils.lsm
 

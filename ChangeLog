@@ -1,3 +1,8 @@
+2004-08-19  Martin Mares  <mj@ucw.cz>
+
+	* pciutils.spec (%attr): Setting attributes for /sbin/* is an anachronism,
+	because pciutils by default install to /usr/sbin. Update.
+
 2004-08-13  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test8.
