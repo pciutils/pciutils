@@ -1,9 +1,9 @@
 /*
- *	$Id: names.c,v 1.2 1997/12/27 18:38:30 mj Exp $
+ *	$Id: names.c,v 1.3 1998/01/27 11:50:10 mj Exp $
  *
  *	Linux PCI Utilities -- Device ID to Name Translation
  *
- *	Copyright (c) 1997 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997, 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -19,6 +19,8 @@
 #include "pciutils.h"
 
 int show_numeric_ids;
+
+char *pci_ids = ETC_PCI_IDS;
 
 static byte *name_list;
 static int name_list_loaded;
@@ -78,7 +80,7 @@ static int nl_add(int id1, int id2, byte *text)
 static void
 err_name_list(char *msg)
 {
-  fprintf(stderr, ETC_PCI_IDS ": %s: %m\n", msg);
+  fprintf(stderr, "%s: %s: %m\n", pci_ids, msg);
   exit(1);
 }
 
@@ -159,14 +161,14 @@ parse_name_list(void)
 	goto parserr;
       if (nl_add(i, j, q))
 	{
-	  fprintf(stderr, ETC_PCI_IDS ", line %d: duplicate entry\n", lino);
+	  fprintf(stderr, "%s, line %d: duplicate entry\n", pci_ids, lino);
 	  exit(1);
 	}
     }
   return;
 
 parserr:
-  fprintf(stderr, ETC_PCI_IDS ", line %d: parse error\n", lino);
+  fprintf(stderr, "%s, line %d: parse error\n", pci_ids, lino);
   exit(1);
 }
 
@@ -176,7 +178,7 @@ load_name_list(void)
   int fd;
   struct stat st;
 
-  fd = open(ETC_PCI_IDS, O_RDONLY);
+  fd = open(pci_ids, O_RDONLY);
   if (fd < 0)
     {
       show_numeric_ids = 1;

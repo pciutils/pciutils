@@ -1,9 +1,9 @@
 /*
- *	$Id: lspci.c,v 1.4 1998/01/01 19:36:23 mj Exp $
+ *	$Id: lspci.c,v 1.5 1998/01/27 11:50:08 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997, 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -28,8 +28,9 @@ static int func_filter = -1;
 static int vend_filter = -1;
 static int dev_filter = -1;
 static int show_tree;			/* Show bus tree */
+static char *pci_dir = PROC_BUS_PCI;
 
-static char options[] = "nvbxB:S:F:V:D:t";
+static char options[] = "nvbxB:S:F:V:D:ti:p:";
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -40,6 +41,8 @@ Usage: lspci [<switches>]\n\
 -x\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
 -B <bus>, -S <slot>, -F <func>, -V <vendor>, -D <device>  Show only selected devices\n\
 -t\tShow bus tree\n\
+-i <file>\tUse specified ID database instead of " ETC_PCI_IDS "\n\
+-p <dir>\tUse specified bus directory instead of " PROC_BUS_PCI "\n\
 ";
 
 /* Format strings used for IRQ numbers */
@@ -96,10 +99,12 @@ scan_dev_list(void)
 {
   FILE *f;
   byte line[256];
+  byte name[256];
 
-  if (! (f = fopen(PROC_BUS_PCI "/devices", "r")))
+  sprintf(name, "%s/devices", pci_dir);
+  if (! (f = fopen(name, "r")))
     {
-      perror("Unable to open " PROC_BUS_PCI "/devices");
+      perror(name);
       exit(1);
     }
   while (fgets(line, sizeof(line), f))
@@ -134,8 +139,8 @@ scan_dev_list(void)
 static inline void
 make_proc_pci_name(struct device *d, char *p)
 {
-  sprintf(p, PROC_BUS_PCI "/%02x/%02x.%x",
-	  d->bus, PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+  sprintf(p, "%s/%02x/%02x.%x",
+	  pci_dir, d->bus, PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
 }
 
 static void
@@ -745,6 +750,8 @@ show_tree_dev(struct device *d, byte *line, byte *p)
         show_tree_bridge(b, line, p);
         return;
       }
+  if (verbose)
+    p += sprintf(p, "  %s", lookup_device_full(d->vendid, d->devid));
   print_it(line, p);
 }
 
@@ -849,6 +856,12 @@ main(int argc, char **argv)
 	break;
       case 't':
 	show_tree++;
+	break;
+      case 'i':
+	pci_ids = optarg;
+	break;
+      case 'p':
+	pci_dir = optarg;
 	break;
       default:
       bad:
