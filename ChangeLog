@@ -1,5 +1,7 @@
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
+	* setpci.c (main): Better error messages.
+
 	* pciutils.h, common.c, setpci.c: Introduced a NONRET macro encapsulating
 	the GCC specific __attribute__((noreturn)) and killed the hack with
 	redefining __attribute__ on non-GCC compilers.

@@ -176,8 +176,8 @@ scan_ops(struct op *op)
 }
 
 struct reg_name {
-  int offset;
-  int width;
+  unsigned int offset;
+  unsigned int width;
   const char *name;
 };
 
@@ -250,8 +250,16 @@ static const struct reg_name pci_reg_names[] = {
 };
 
 static void NONRET
-usage(void)
+usage(char *msg, ...)
 {
+  va_list args;
+  va_start(args, msg);
+  if (msg)
+    {
+      fprintf(stderr, "setpci: ");
+      vfprintf(stderr, msg, args);
+      fprintf(stderr, "\n\n");
+    }
   fprintf(stderr,
 "Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n\
 -f\t\tDon't complain if there's nothing to do\n\
@@ -324,18 +332,18 @@ main(int argc, char **argv)
 			argc--; argv++;
 		      }
 		    else
-		      usage();
+		      usage(NULL);
 		    c = "";
 		  }
 		else
 		  arg = NULL;
 		if (!parse_generic_option(*e, pacc, arg))
-		  usage();
+		  usage(NULL);
 	      }
 	    else
 	      {
 		if (c != d)
-		  usage();
+		  usage(NULL);
 		goto next;
 	      }
 	  }
@@ -359,7 +367,7 @@ next:
       if (*c == '-')
 	{
 	  if (!c[1] || !strchr("sd", c[1]))
-	    usage();
+	    usage(NULL);
 	  if (c[2])
 	    d = (c[2] == '=') ? c+3 : c+2;
 	  else if (argc > 1)
@@ -369,7 +377,7 @@ next:
 	      d = argv[0];
 	    }
 	  else
-	    usage();
+	    usage(NULL);
 	  if (state != STATE_GOT_FILTER)
 	    {
 	      pci_filter_init(pacc, &filter);
@@ -386,11 +394,11 @@ next:
 		die("-d: %s", d);
 	      break;
 	    default:
-	      usage();
+	      usage(NULL);
 	    }
 	}
       else if (state == STATE_INIT)
-	usage();
+	usage(NULL);
       else
 	{
 	  if (state == STATE_GOT_FILTER)
@@ -404,7 +412,7 @@ next:
 	    {
 	      *d++ = 0;
 	      if (!*d)
-		usage();
+		usage("Missing value");
 	      for(e=d, n=1; *e; e++)
 		if (*e == ',')
 		  n++;
@@ -422,7 +430,7 @@ next:
 	    {
 	      *e++ = 0;
 	      if (e[1])
-		usage();
+		usage("Missing width");
 	      switch (*e & 0xdf)
 		{
 		case 'B':
@@ -432,7 +440,7 @@ next:
 		case 'L':
 		  op->width = 4; break;
 		default:
-		  usage();
+		  usage("Invalid width \"%s\"", *e);
 		}
 	    }
 	  else
@@ -444,8 +452,10 @@ next:
 	      for(r = pci_reg_names; r->name; r++)
 		if (!strcasecmp(r->name, c))
 		  break;
-	      if (!r->name || e)
-		usage();
+	      if (!r->name)
+		usage("Unknown register \"%s\"", c);
+	      if (e && op->width != r->width)
+		usage("Explicit width doesn't correspond with the named register \"%s\"", c);
 	      ll = r->offset;
 	      op->width = r->width;
 	    }
@@ -462,31 +472,24 @@ next:
 		*e++ = 0;
 	      ll = strtoul(d, &f, 16);
 	      lim = max_values[op->width];
-	      if (f && *f && (*f != ':') ||
-		  (ll > lim && ll < ~0UL - lim))
-		{
-		  fprintf(stderr, "bad value \"%s\"\n\n", d);
-		  usage();
-		}
+	      if (f && *f && *f != ':')
+		usage("Invalid value \"%s\"", d);
+	      if (ll > lim && ll < ~0UL - lim)
+		usage("Value \"%s\" is out of range", d);
+	      op->values[i].value = ll;
 	      if (f && *f == ':')
 		{
-		  op->values[i].value = ll;
 		  d = ++f;
 		  ll = strtoul(d, &f, 16);
-		  if (f && *f ||
-		      (ll > lim && ll < ~0UL - lim))
-		    {
-		      fprintf(stderr, "bad value:mask pair \"%s\"\n\n", d);
-		      usage();
-		    }
+		  if (f && *f)
+		    usage("Invalid mask \"%s\"", d);
+		  if (ll > lim && ll < ~0UL - lim)
+		    usage("Mask \"%s\" is out of range", d);
 		  op->values[i].mask = ll;
-		  op->values[i].value &= op->values[i].mask;
+		  op->values[i].value &= ll;
 		}
 	      else
-		{
-		  op->values[i].value = ll;
-		  op->values[i].mask = ~0U;
-		}
+		op->values[i].mask = ~0U;
 	      d = e;
 	    }
 	  *last_op = op;
@@ -497,7 +500,7 @@ next:
       argv++;
     }
   if (state == STATE_INIT)
-    usage();
+    usage("No operation specified");
 
   scan_ops(first_op);
   execute(first_op);
