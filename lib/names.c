@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.4 1999/12/11 22:38:55 mj Exp $
+ *	$Id: names.c,v 1.5 2000/04/21 11:58:48 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
@@ -289,6 +289,8 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
     case PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       if (n = nl_lookup(a, num, NL_SUBSYSTEM, arg1, arg2, arg3, arg4))
 	return n->name;
+      else if (arg1 == arg3 && arg2 == arg4 && (n = nl_lookup(a, num, NL_DEVICE, arg1, arg2, 0, 0)))
+	return n->name;
       else
 	res = snprintf(buf, size, "%04x", arg2);
       break;
@@ -298,6 +300,9 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
 	  struct nl_entry *e, *e2;
 	  e = nl_lookup(a, 0, NL_VENDOR, arg3, 0, 0, 0);
 	  e2 = nl_lookup(a, 0, NL_SUBSYSTEM, arg1, arg2, arg3, arg4);
+	  if (!e2 && arg1 == arg2 && arg3 == arg4)
+	    /* Cheat for vendors blindly setting subsystem ID same as device ID */
+	    e2 = nl_lookup(a, 0, NL_DEVICE, arg1, arg2, 0, 0);
 	  if (!e)
 	    res = snprintf(buf, size, "Unknown device %04x:%04x", arg3, arg4);
 	  else if (!e2)
