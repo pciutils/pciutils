@@ -124,24 +124,19 @@ exec_op(struct op *op, struct pci_dev *dev)
     {
       if (verbose)
 	printf(" = ");
-      if (!demo_mode)
+      switch (width)
 	{
-	  switch (width)
-	    {
-	    case 1:
-	      x = pci_read_byte(dev, addr);
-	      break;
-	    case 2:
-	      x = pci_read_word(dev, addr);
-	      break;
-	    default:
-	      x = pci_read_long(dev, addr);
-	      break;
-	    }
-	  printf(formats[width], x);
+	case 1:
+	  x = pci_read_byte(dev, addr);
+	  break;
+	case 2:
+	  x = pci_read_word(dev, addr);
+	  break;
+	default:
+	  x = pci_read_long(dev, addr);
+	  break;
 	}
-      else
-	putchar('?');
+      printf(formats[width], x);
       putchar('\n');
     }
 }

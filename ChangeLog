@@ -2,6 +2,9 @@
 
 	* setpci.c (main): Better error messages.
 
+	* setpci.c (ex_op): The demo mode was never documented to disable reads,
+	only writes, so conform with the definition.
+
 	* pciutils.h, common.c, setpci.c: Introduced a NONRET macro encapsulating
 	the GCC specific __attribute__((noreturn)) and killed the hack with
 	redefining __attribute__ on non-GCC compilers.
