@@ -1,3 +1,8 @@
+2004-05-28  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c: Decode all bits of the secondary status word in type 1 headers.
+	Thanks to Maciej W. Rozycki <macro@ds2.pg.gda.pl> for the patch.
+
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test3.

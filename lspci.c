@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -688,6 +688,7 @@ show_htype1(struct device *d)
   u32 pref_base = get_conf_word(d, PCI_PREF_MEMORY_BASE);
   u32 pref_limit = get_conf_word(d, PCI_PREF_MEMORY_LIMIT);
   u32 pref_type = pref_base & PCI_PREF_RANGE_TYPE_MASK;
+  word sec_stat = get_conf_word(d, PCI_SEC_STATUS);
   word brc = get_conf_word(d, PCI_BRIDGE_CONTROL);
   int verb = verbose > 2;
 
@@ -745,8 +746,19 @@ show_htype1(struct device *d)
 	}
     }
 
-  if (get_conf_word(d, PCI_SEC_STATUS) & PCI_STATUS_SIG_SYSTEM_ERROR)
-    printf("\tSecondary status: SERR\n");
+  if (verbose > 1)
+    printf("\tSecondary status: 66Mhz%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+	     FLAG(sec_stat, PCI_STATUS_66MHZ),
+	     FLAG(sec_stat, PCI_STATUS_FAST_BACK),
+	     FLAG(sec_stat, PCI_STATUS_PARITY),
+	     ((sec_stat & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_SLOW) ? "slow" :
+	     ((sec_stat & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_MEDIUM) ? "medium" :
+	     ((sec_stat & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_FAST) ? "fast" : "??",
+	     FLAG(sec_stat, PCI_STATUS_SIG_TARGET_ABORT),
+	     FLAG(sec_stat, PCI_STATUS_REC_TARGET_ABORT),
+	     FLAG(sec_stat, PCI_STATUS_REC_MASTER_ABORT),
+	     FLAG(sec_stat, PCI_STATUS_SIG_SYSTEM_ERROR),
+	     FLAG(sec_stat, PCI_STATUS_DETECTED_PARITY));
 
   show_rom(d);
 

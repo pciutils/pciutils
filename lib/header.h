@@ -109,7 +109,7 @@
 #define  PCI_IO_RANGE_TYPE_16	0x00
 #define  PCI_IO_RANGE_TYPE_32	0x01
 #define  PCI_IO_RANGE_MASK	~0x0f
-#define PCI_SEC_STATUS		0x1e	/* Secondary status register, only bit 14 used */
+#define PCI_SEC_STATUS		0x1e	/* Secondary status register */
 #define PCI_MEMORY_BASE		0x20	/* Memory range behind */
 #define PCI_MEMORY_LIMIT	0x22
 #define  PCI_MEMORY_RANGE_TYPE_MASK 0x0f
