@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.1 1998/03/31 21:02:20 mj Exp $
+ *	$Id: setpci.c,v 1.2 1998/04/19 11:02:29 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -13,17 +13,21 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <asm/unistd.h>
+#include <asm/byteorder.h>
 
 #include "pciutils.h"
 
 static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
+static int demo_mode;			/* Only show */
 
 struct device {
   struct device *next;
   byte bus, devfn, mark;
   word vendid, devid;
-  int fd;
+  int fd, need_write;
 };
 
 static struct device *first_dev;
@@ -50,6 +54,13 @@ xmalloc(unsigned int howmuch)
     }
   return p;
 }
+
+/*
+ * As libc doesn't support pread/pwrite yet, we have to call them directly
+ * or use lseek/read/write instead.
+ */
+static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
+static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
 
 static void
 scan_devices(void)
@@ -103,25 +114,88 @@ exec_op(struct op *op, struct device *dev)
 {
   char *mm[] = { NULL, "%02x", "%04x", NULL, "%08x" };
   char *m = mm[op->width];
+  unsigned int x;
+  int i;
+  __u32 x32;
+  __u16 x16;
+  __u8 x8;
 
-  if (dev->fd < 0)
+  if (!demo_mode && dev->fd < 0)
     {
       char name[64];
       sprintf(name, PROC_BUS_PCI "/%02x/%02x.%x", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
-      dev->fd = open(name, O_RDWR ????
+      if ((dev->fd = open(name, dev->need_write ? O_RDWR : O_RDONLY)) < 0)
+	{
+	  perror(name);
+	  exit(1);
+	}
     }
 
   if (verbose)
-    printf("%02x.%02x:%x.%c ", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn),
-	   "?BW?L"[op->width]);
-  if (op->num_values > 0)
-    {
-    }
+    printf("%02x:%02x.%x:%02x", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn), op->addr);
+  if (op->num_values >= 0)
+    for(i=0; i<op->num_values; i++)
+      {
+	if (verbose)
+	  {
+	    putchar(' ');
+	    printf(m, op->values[i]);
+	  }
+	if (demo_mode)
+	  continue;
+	switch (op->width)
+	  {
+	  case 1:
+	    x8 = op->values[i];
+	    i = pwrite(dev->fd, &x8, 1, op->addr);
+	    break;
+	  case 2:
+	    x16 = __cpu_to_le16(op->values[i]);
+	    i = pwrite(dev->fd, &x16, 2, op->addr);
+	    break;
+	  default:
+	    x32 = __cpu_to_le32(op->values[i]);
+	    i = pwrite(dev->fd, &x32, 4, op->addr);
+	    break;
+	  }
+	if (i != (int) op->width)
+	  {
+	    fprintf(stderr, "Error writing to %02x:%02x.%d: %m", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
+	    exit(1);
+	  }
+      }
   else
     {
       if (verbose)
-	printf("= ");
+	printf(" = ");
+      if (!demo_mode)
+	{
+	  switch (op->width)
+	    {
+	    case 1:
+	      i = pread(dev->fd, &x8, 1, op->addr);
+	      x = x8;
+	      break;
+	    case 2:
+	      i = pread(dev->fd, &x16, 2, op->addr);
+	      x = __le16_to_cpu(x16);
+	      break;
+	    default:
+	      i = pread(dev->fd, &x32, 4, op->addr);
+	      x = __le32_to_cpu(x32);
+	      break;
+	    }
+	  if (i != (int) op->width)
+	    {
+	      fprintf(stderr, "Error reading from %02x:%02x.%d: %m", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
+	      exit(1);
+	    }
+	  printf(m, x);
+	}
+      else
+	putchar('?');
     }
+  putchar('\n');
 }
 
 static void
@@ -142,17 +216,112 @@ execute(struct op *op)
     }
 }
 
+static void
+scan_ops(struct op *op)
+{
+  struct device **pdev, *dev;
+
+  while (op)
+    {
+      if (op->num_values >= 0)
+	{
+	  pdev = op->dev_vector;
+	  while (dev = *pdev++)
+	    dev->need_write = 1;
+	}
+      op = op->next;
+    }
+}
+
+struct reg_name {
+  int offset;
+  int width;
+  char *name;
+};
+
+static struct reg_name pci_reg_names[] = {
+  { 0x00, 2, "VENDOR_ID", },
+  { 0x02, 2, "DEVICE_ID", },
+  { 0x04, 2, "COMMAND", },
+  { 0x06, 2, "STATUS", },
+  { 0x08, 1, "REVISION", },
+  { 0x09, 1, "CLASS_PROG", },
+  { 0x0a, 2, "CLASS_DEVICE", },
+  { 0x0c, 1, "CACHE_LINE_SIZE", },
+  { 0x0d, 1, "LATENCY_TIMER", },
+  { 0x0e, 1, "HEADER_TYPE", },
+  { 0x0f, 1, "BIST", },
+  { 0x10, 4, "BASE_ADDRESS_0", },
+  { 0x14, 4, "BASE_ADDRESS_1", },
+  { 0x18, 4, "BASE_ADDRESS_2", },
+  { 0x1c, 4, "BASE_ADDRESS_3", },
+  { 0x20, 4, "BASE_ADDRESS_4", },
+  { 0x24, 4, "BASE_ADDRESS_5", },
+  { 0x28, 4, "CARDBUS_CIS", },
+  { 0x2c, 4, "SUBSYSTEM_VENDOR_ID", },
+  { 0x2e, 2, "SUBSYSTEM_ID", },
+  { 0x30, 4, "ROM_ADDRESS", },
+  { 0x3c, 1, "INTERRUPT_LINE", },
+  { 0x3d, 1, "INTERRUPT_PIN", },
+  { 0x3e, 1, "MIN_GNT", },
+  { 0x3f, 1, "MAX_LAT", },
+  { 0x18, 1, "PRIMARY_BUS", },
+  { 0x19, 1, "SECONDARY_BUS", },
+  { 0x1a, 1, "SUBORDINATE_BUS", },
+  { 0x1b, 1, "SEC_LATENCY_TIMER", },
+  { 0x1c, 1, "IO_BASE", },
+  { 0x1d, 1, "IO_LIMIT", },
+  { 0x1e, 2, "SEC_STATUS", },
+  { 0x20, 2, "MEMORY_BASE", },
+  { 0x22, 2, "MEMORY_LIMIT", },
+  { 0x24, 2, "PREF_MEMORY_BASE", },
+  { 0x26, 2, "PREF_MEMORY_LIMIT", },
+  { 0x28, 4, "PREF_BASE_UPPER32", },
+  { 0x2c, 4, "PREF_LIMIT_UPPER32", },
+  { 0x30, 2, "IO_BASE_UPPER16", },
+  { 0x32, 2, "IO_LIMIT_UPPER16", },
+  { 0x38, 4, "BRIDGE_ROM_ADDRESS", },
+  { 0x3e, 2, "BRIDGE_CONTROL", },
+  { 0x10, 4, "CB_CARDBUS_BASE", },
+  { 0x14, 2, "CB_CAPABILITIES", },
+  { 0x16, 2, "CB_SEC_STATUS", },
+  { 0x18, 1, "CB_BUS_NUMBER", },
+  { 0x19, 1, "CB_CARDBUS_NUMBER", },
+  { 0x1a, 1, "CB_SUBORDINATE_BUS", },
+  { 0x1b, 1, "CB_CARDBUS_LATENCY", },
+  { 0x1c, 4, "CB_MEMORY_BASE_0", },
+  { 0x20, 4, "CB_MEMORY_LIMIT_0", },
+  { 0x24, 4, "CB_MEMORY_BASE_1", },
+  { 0x28, 4, "CB_MEMORY_LIMIT_1", },
+  { 0x2c, 2, "CB_IO_BASE_0", },
+  { 0x2e, 2, "CB_IO_BASE_0_HI", },
+  { 0x30, 2, "CB_IO_LIMIT_0", },
+  { 0x32, 2, "CB_IO_LIMIT_0_HI", },
+  { 0x34, 2, "CB_IO_BASE_1", },
+  { 0x36, 2, "CB_IO_BASE_1_HI", },
+  { 0x38, 2, "CB_IO_LIMIT_1", },
+  { 0x3a, 2, "CB_IO_LIMIT_1_HI", },
+  { 0x40, 2, "CB_SUBSYSTEM_VENDOR_ID", },
+  { 0x42, 2, "CB_SUBSYSTEM_ID", },
+  { 0x44, 4, "CB_LEGACY_MODE_BASE", },
+  { 0x00, 0, NULL }
+};
+
 static void usage(void) __attribute__((noreturn));
 
 static void
 usage(void)
 {
   fprintf(stderr,
-"Usage: setpci [-f] [-v] (<device>+ <reg>[=<values>]*)*\n\
-<device>:  -s [[<bus>]:][<slot>][.[<func>]]\n\
-\t|  -d [<vendor>]:[<device>]\n\
-<reg>:     <number>[.(B|W|L)]\n\
-<values>:  <value>[,<value>...]\n\
+"Usage: setpci [-fvD] (<device>+ <reg>[=<values>]*)*\n\
+-f\t\tDon't complain if there's nothing to do\n\
+-v\t\tBe verbose\n\
+-D\t\tList changes, don't commit them\n\
+<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n\
+\t|\t-d [<vendor>]:[<device>]\n\
+<reg>:\t\t<number>[.(B|W|L)]\n\
+     |\t\t<name>\n\
+<values>:\t<value>[,<value>...]\n\
 ");
   exit(1);
 }
@@ -179,6 +348,10 @@ main(int argc, char **argv)
 	    break;
 	  case 'f':
 	    force++;
+	    c++;
+	    break;
+	  case 'D':
+	    demo_mode++;
 	    c++;
 	    break;
 	  case 0:
@@ -255,6 +428,8 @@ next:
 	  if (d)
 	    {
 	      *d++ = 0;
+	      if (!*d)
+		usage();
 	      for(e=d, n=1; *e; e++)
 		if (*e == ',')
 		  n++;
@@ -288,11 +463,28 @@ next:
 	  else
 	    op->width = 1;
 	  ll = strtol(c, &f, 16);
-	  if (ll > 0x100 || ll + op->width*n > 0x100)
+	  if (f && *f)
+	    {
+	      struct reg_name *r;
+	      for(r = pci_reg_names; r->name; r++)
+		if (!strcasecmp(r->name, c))
+		  break;
+	      if (!r->name || e)
+		usage();
+	      ll = r->offset;
+	      op->width = r->width;
+	    }
+	  if (ll > 0x100 || ll + op->width*((n < 0) ? 1 : n) > 0x100)
 	    {
 	      fprintf(stderr, "setpci: Register number out of range!\n");
 	      return 1;
 	    }
+	  if (ll & (op->width - 1))
+	    {
+	      fprintf(stderr, "setpci: Unaligned register address!\n");
+	      return 1;
+	    }
+	  op->addr = ll;
 	  for(i=0; i<n; i++)
 	    {
 	      e = strchr(d, ',');
@@ -316,6 +508,7 @@ next:
   if (state == STATE_INIT)
     usage();
 
+  scan_ops(first_op);
   execute(first_op);
 
   return 0;

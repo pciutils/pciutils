@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.10 1998/03/31 21:02:16 mj Exp $
+ *	$Id: lspci.c,v 1.11 1998/04/19 11:02:27 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -58,7 +58,7 @@ struct device {
   byte bus, devfn;
   word vendid, devid;
   unsigned int kernel_irq;
-  unsigned long kernel_base_addr[6];
+  unsigned long kernel_base_addr[6], kernel_rom_base_addr;
   byte config[256];
 };
 
@@ -98,7 +98,8 @@ scan_dev_list(void)
       struct device *d = xmalloc(sizeof(struct device));
       unsigned int dfn, vend;
 
-      sscanf(line, "%x %x %x %lx %lx %lx %lx %lx %lx",
+      bzero(d, sizeof(*d));
+      sscanf(line, "%x %x %x %lx %lx %lx %lx %lx %lx %lx",
 	     &dfn,
 	     &vend,
 	     &d->kernel_irq,
@@ -107,7 +108,8 @@ scan_dev_list(void)
 	     &d->kernel_base_addr[2],
 	     &d->kernel_base_addr[3],
 	     &d->kernel_base_addr[4],
-	     &d->kernel_base_addr[5]);
+	     &d->kernel_base_addr[5],
+	     &d->kernel_rom_base_addr);
       d->bus = dfn >> 8U;
       d->devfn = dfn & 0xff;
       d->vendid = vend >> 16U;
@@ -313,16 +315,13 @@ show_bases(struct device *d, int cnt)
 static void
 show_htype0(struct device *d)
 {
-  u32 rom = get_conf_long(d, PCI_ROM_ADDRESS);
+  unsigned long rom = buscentric_view ? get_conf_long(d, PCI_ROM_ADDRESS) : d->kernel_rom_base_addr;
 
   show_bases(d, 6);
 
   if (rom & 1)
-    {
-      word cmd = get_conf_word(d, PCI_COMMAND);
-      printf("\tExpansion ROM at %08x%s\n", rom & ~0xfff,
-	     (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]");
-    }
+    printf("\tExpansion ROM at %08lx%s\n", rom & PCI_ROM_ADDRESS_MASK,
+	   (rom & PCI_ROM_ADDRESS_ENABLE) ? "" : " [disabled]");
 }
 
 static void
@@ -337,7 +336,7 @@ show_htype1(struct device *d)
   u32 pref_base = get_conf_word(d, PCI_PREF_MEMORY_BASE);
   u32 pref_limit = get_conf_word(d, PCI_PREF_MEMORY_LIMIT);
   u32 pref_type = pref_base & PCI_PREF_RANGE_TYPE_MASK;
-  u32 rom = get_conf_long(d, PCI_ROM_ADDRESS1);
+  unsigned long rom = buscentric_view ? get_conf_long(d, PCI_ROM_ADDRESS) : d->kernel_rom_base_addr;
   word brc = get_conf_word(d, PCI_BRIDGE_CONTROL);
 
   show_bases(d, 2);
@@ -394,11 +393,8 @@ show_htype1(struct device *d)
     printf("\tSecondary status: SERR\n");
 
   if (rom & 1)
-    {
-      word cmd = get_conf_word(d, PCI_COMMAND);
-      printf("\tExpansion ROM at %08x%s\n", rom & ~0xfff,
-	     (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]");
-    }
+    printf("\tExpansion ROM at %08lx%s\n", rom & PCI_ROM_ADDRESS_MASK,
+	   (rom & PCI_ROM_ADDRESS_ENABLE) ? "" : " [disabled]");
 
   if (verbose > 1)
     printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",

@@ -1,3 +1,12 @@
+Sun Apr 19 11:14:25 1998  Martin Mares  <mj@albireo.ucw.cz>
+
+	* setpci.8: Written.
+
+	* setpci.c: Finished.
+
+	* lspci.c: Now able to fetch expansion ROM base from kernel device list
+	and print it if not in buscentric mode.
+
 Tue Mar 31 23:11:57 1998  Martin Mares  <mj@albireo.ucw.cz>
 
 	* setpci.c: Added.

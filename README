@@ -1,4 +1,4 @@
-This package contains the Linux PCI Utilities, version 1.02.
+This package contains the Linux PCI Utilities, version 1.03.
 
 Copyright (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
@@ -10,10 +10,16 @@ for details.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   The Linux PCI Utilities currently contain only one utility -- lspci,
-indented for displaying of detailed information about all PCI busses and
-devices in the system, replacing the original /proc/pci interface. See
-the manual page (lspci.8) for more details.
+   The Linux PCI Utilities contain various utilities for dealing with the PCI
+bus in Linux:
+
+	- lspci: displays detailed information about all PCI busses and devices
+	  in the system, replacing the original /proc/pci interface.
+
+	- setpci: allows to read from and write to PCI device configuration
+	  registers. For example, you can adjust the latency timers with it.
+
+   See manual pages for more details.
 
    If you have any bug reports or suggestions, send them to the author.
 

@@ -1,0 +1,161 @@
+.TH setpci 8 "19 April 98" "pciutils-1.03" "Linux PCI Utilities"
+.IX setpci
+.SH NAME
+lspci \- configure PCI devices
+.SH SYNOPSIS
+.B setpci
+.RB [ options ]
+.B devices
+.BR operations ...
+
+.SH DESCRIPTION
+.PP
+.B setpci
+is a utility for querying and configuring PCI devices. It requires Linux kernel 2.1.82
+or newer as it uses the /proc/bus/pci interface.
+.PP
+All numbers are entered in hexadecimal notation.
+
+.SH OPTIONS
+.TP
+.B -v
+Tells
+.I setpci
+to be verbose and display detailed information about configuration space accesses.
+.TP
+.B -f
+Tells
+.I lspci
+not to complain when there's nothing to do (when no devices are selected).
+This option is intended for use in widely-distributed configuration scripts
+where it's uncertain whether the device in question is present in the machine
+or not.
+.TP
+.B -D
+`Demo mode' -- simulate configuration space accesses instead of really doing them.
+It's useful to try
+.B setpci -vD
+to see what your complex sequence of
+.B setpci
+operations does before you actually execute it.
+
+.SH DEVICE SELECTION
+.PP
+Before each sequence of operations you need to select which devices you wish that
+operation to affect.
+.TP
+.B -s [[<bus>]:][<slot>][.[<func>]]
+Select devices in specified bus, slot and function. Each component of the device
+address can be omitted or set as "*" meaning "any value". All numbers are
+hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of device 0
+on any bus, "0.3" selects third function of device 0 on all busses and ".4" selects only
+fourth function of each device.
+.TP
+.B -d [<vendor>]:[<device>]
+Select devices with specified vendor and device ID. Both ID's are given in
+hexadecimal and may be omitted or given as "*" meaning "any value".
+
+.SH OPERATIONS
+.PP
+To query value of a configuration register, just name it (either by typing its name or
+by typing register address with optional
+.BR .B ,
+.B .W
+or
+.B .L
+suffix specifying register width as byte, word or longword).
+.PP
+To set a register, write
+.BR reg = values
+where
+.B reg
+is the same you would use to query the register and
+.B values
+is a comma-separated list of values you want to write starting with the given
+address.
+
+.SH REGISTER NAMES
+.PP
+.B setpci
+knows the following configuration register names. See PCI bus specs for their precise
+meaning or consult
+.B /usr/include/linux/pci.h
+for few comments.
+.PP
+.nf
+VENDOR_ID
+DEVICE_ID
+COMMAND
+STATUS
+REVISION
+CLASS_PROG
+CLASS_DEVICE
+CACHE_LINE_SIZE
+LATENCY_TIMER
+HEADER_TYPE
+BIST
+BASE_ADDRESS_0
+BASE_ADDRESS_1
+BASE_ADDRESS_2
+BASE_ADDRESS_3
+BASE_ADDRESS_4
+BASE_ADDRESS_5
+CARDBUS_CIS
+SUBSYSTEM_VENDOR_ID
+SUBSYSTEM_ID
+ROM_ADDRESS
+INTERRUPT_LINE
+INTERRUPT_PIN
+MIN_GNT
+MAX_LAT
+PRIMARY_BUS
+SECONDARY_BUS
+SUBORDINATE_BUS
+SEC_LATENCY_TIMER
+IO_BASE
+IO_LIMIT
+SEC_STATUS
+MEMORY_BASE
+MEMORY_LIMIT
+PREF_MEMORY_BASE
+PREF_MEMORY_LIMIT
+PREF_BASE_UPPER32
+PREF_LIMIT_UPPER32
+IO_BASE_UPPER16
+IO_LIMIT_UPPER16
+BRIDGE_ROM_ADDRESS
+BRIDGE_CONTROL
+CB_CARDBUS_BASE
+CB_CAPABILITIES
+CB_SEC_STATUS
+CB_BUS_NUMBER
+CB_CARDBUS_NUMBER
+CB_SUBORDINATE_BUS
+CB_CARDBUS_LATENCY
+CB_MEMORY_BASE_0
+CB_MEMORY_LIMIT_0
+CB_MEMORY_BASE_1
+CB_MEMORY_LIMIT_1
+CB_IO_BASE_0
+CB_IO_BASE_0_HI
+CB_IO_LIMIT_0
+CB_IO_LIMIT_0_HI
+CB_IO_BASE_1
+CB_IO_BASE_1_HI
+CB_IO_LIMIT_1
+CB_IO_LIMIT_1_HI
+CB_SUBSYSTEM_VENDOR_ID
+CB_SUBSYSTEM_ID
+CB_LEGACY_MODE_BASE
+
+.SH EXAMPLES
+.PP
+`setpci -d *:* latency_timer=40' sets the latency timer to 64 (40 hexadecimal).
+.PP
+`setpci -s 0 device_id vendor_id' lists ID's of devices in slot 0 in all busses.
+.PP
+`setpci -s 12:3.4 34.l=1,2,3' writes longword 1 to register 34, 2 to register 35
+and 3 to register 35 of device at bus 12, slot 3, function 4.
+
+.SH AUTHOR
+The Linux PCI Utilities are maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>.
