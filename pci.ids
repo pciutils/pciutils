@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.34 1999/08/03 21:34:03 mj Exp $
+#	$Id: pci.ids,v 1.35 1999/08/20 08:32:23 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -985,6 +985,7 @@
 	8853  IMS8853
 	9128  IMS9129 [Twin turbo 128]
 10e1  Tekram Technology Co.,Ltd.
+	0391  TRM-S1040
 	690c  DC-690c
 	dc29  DC-290
 10e2  Aptix Corporation
@@ -2404,6 +2405,7 @@
 14b5  Creamware GmBH
 14b6  Quantum Data Corp.
 14b7  PROXIM Inc
+	0001  Symphony 4110
 14b8  Techsoft Technology Co Ltd
 14b9  AIRONET Wireless Communications
 	0001  PC4800
