@@ -747,7 +747,7 @@ show_htype1(struct device *d)
     }
 
   if (verbose > 1)
-    printf("\tSecondary status: 66Mhz%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+    printf("\tSecondary status: 66Mhz%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c <SERR%c <PERR%c\n",
 	     FLAG(sec_stat, PCI_STATUS_66MHZ),
 	     FLAG(sec_stat, PCI_STATUS_FAST_BACK),
 	     FLAG(sec_stat, PCI_STATUS_PARITY),
