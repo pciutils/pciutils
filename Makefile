@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.45 2002/12/27 19:59:26 mj Exp $
+# $Id: Makefile,v 1.46 2002/12/27 20:00:14 mj Exp $
 # Makefile for Linux PCI Utilities
 # (c) 1998--2002 Martin Mares <mj@ucw.cz>
 
@@ -106,7 +106,6 @@ dist: clean pci.ids
 	mkdir $(DISTTMP)
 	cp -a . $(DISTTMP)/$(REL)
 	rm -rf `find $(DISTTMP)/$(REL) -name CVS -o -name tmp -o -name maint`
-	[ -f $(DISTTMP)/$(REL)/lib/header.h ] || cp /usr/src/linux/include/linux/pci.h dist/$(REL)/lib/header.h
 	cd $(DISTTMP) ; tar czvvf /tmp/$(REL).tar.gz $(REL)
 	rm -rf $(DISTTMP)
 
