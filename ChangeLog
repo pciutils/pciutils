@@ -1,3 +1,8 @@
+2001-11-04  Martin Mares  <mj@ucw.cz>
+
+	* pci.ids: Synced with the PCI ID Repository at SourceForge
+	(http://pciids.sourceforge.net/).
+
 2000-08-25  Martin Mares  <mj@albireo.ucw.cz>
 
 	* pci.ids: Updated ID's, synced with kernel 2.4.0-test7.
