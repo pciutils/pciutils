@@ -275,7 +275,11 @@ sub Upload($) {
 		print "<confirm> "; <STDIN>;
 		if ($url =~ m@^scp://([^/]+)(.*)@) {
 			$, = " ";
-			my $cmd = "scp @files $1:$2\n";
+			my $host = $1;
+			my $dir = $2;
+			$dir =~ s@^/~@~@;
+			$dir =~ s@^/\./@@;
+			my $cmd = "scp @files $host:$dir\n";
 			`$cmd`; die if $?;
 		} elsif ($url =~ m@ftp://([^/]+)(.*)@) {
 			my $host = $1;

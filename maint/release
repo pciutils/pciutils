@@ -33,6 +33,6 @@ $r->GenFile("pciutils.lsm");
 $r->Dispatch;
 if ($r->{"do_upload"}) {
 	print "Uploading pci.ids to Jabberwock\n";
-	`scp pci.ids pciids\@jabberwock.ucw.cz:05-pciutils.new`; die if $?;
+	`scp -C pci.ids pciids\@jabberwock.ucw.cz:05-pciutils.new`; die if $?;
 	`ssh pciids\@jabberwock.ucw.cz mv 05-pciutils.new origs/05-pciutils`; die if $?;
 }
