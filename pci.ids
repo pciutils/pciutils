@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.33 1999/07/20 14:01:21 mj Exp $
+#	$Id: pci.ids,v 1.34 1999/08/03 21:34:03 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -2051,7 +2051,12 @@
 135c  Quatech Inc
 135d  ABB Network Partner AB
 135e  Sealevel Systems Inc
-135f  I-Data International A-S
+	7101  Single Port PCI RS-232/422/485/530
+	7201  Dual Port PCI RS-232/422/485 Interface
+	7202  Dual Port PCI RS-232 Interface
+	7401  Four Port PCI RS-232 Interface
+	7402  Four Port PCI RS-422/485 Interface
+	7801  Eight Port PCI RS-232 Interface
 1360  Meinberg Funkuhren
 1361  Soliton Systems K.K.
 1362  Fujifacom Corporation
