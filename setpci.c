@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.8 1998/10/24 13:39:20 mj Exp $
+ *	$Id: setpci.c,v 1.9 1999/01/22 21:05:02 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -8,20 +8,11 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <fcntl.h>
+#include <stdarg.h>
 #include <unistd.h>
-#include <errno.h>
-#include <asm/byteorder.h>
-
-#include <asm/unistd.h>
-#if defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 1
-#include <syscall-list.h>
-#endif
 
 #include "pciutils.h"
 
@@ -29,18 +20,11 @@ static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
 static int demo_mode;			/* Only show */
 
-struct device {
-  struct device *next;
-  byte bus, devfn, mark;
-  word vendid, devid;
-  int fd, need_write;
-};
-
-static struct device *first_dev;
+static struct pci_access *pacc;
 
 struct op {
   struct op *next;
-  struct device **dev_vector;
+  struct pci_dev **dev_vector;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
   int num_values;			/* Number of values to write; <0=read */
@@ -49,120 +33,33 @@ struct op {
 
 static struct op *first_op, **last_op = &first_op;
 
-void *
-xmalloc(unsigned int howmuch)
-{
-  void *p = malloc(howmuch);
-  if (!p)
-    {
-      fprintf(stderr, "setpci: Unable to allocate %d bytes of memory\n", howmuch);
-      exit(1);
-    }
-  return p;
-}
-
-/*
- * As libc doesn't support pread/pwrite yet, we have to call them directly
- * or use lseek/read/write instead.
- */
-#if !(defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ > 0)
-
-#if defined(__GLIBC__) && !(defined(__powerpc__) && __GLIBC__ == 2 && __GLIBC_MINOR__ == 0)
-#ifndef SYS_pread
-#define SYS_pread __NR_pread
-#endif
-static int
-pread(unsigned int fd, void *buf, size_t size, loff_t where)
-{
-  return syscall(SYS_pread, fd, buf, size, where);
-}
-
-#ifndef SYS_pwrite
-#define SYS_pwrite __NR_pwrite
-#endif
-static int
-pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
-{
-  return syscall(SYS_pwrite, fd, buf, size, where);
-}
-#else
-static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
-static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
-#endif
-
-#endif
-
-static void
-scan_devices(void)
-{
-  struct device **last = &first_dev;
-  byte line[256];
-  FILE *f;
-
-  if (!(f = fopen(PROC_BUS_PCI "/devices", "r")))
-    {
-      perror(PROC_BUS_PCI "/devices");
-      exit(1);
-    }
-  while (fgets(line, sizeof(line), f))
-    {
-      struct device *d = xmalloc(sizeof(struct device));
-      unsigned int dfn, vend;
-
-      sscanf(line, "%x %x", &dfn, &vend);
-      d->bus = dfn >> 8U;
-      d->devfn = dfn & 0xff;
-      d->vendid = vend >> 16U;
-      d->devid = vend & 0xffff;
-      d->fd = -1;
-      *last = d;
-      last = &d->next;
-    }
-  fclose(f);
-  *last = NULL;
-}
-
-static struct device **
+static struct pci_dev **
 select_devices(struct pci_filter *filt)
 {
-  struct device *z, **a, **b;
+  struct pci_dev *z, **a, **b;
   int cnt = 1;
 
-  for(z=first_dev; z; z=z->next)
-    if (z->mark = filter_match(filt, z->bus, z->devfn, z->vendid, z->devid))
+  for(z=pacc->devices; z; z=z->next)
+    if (pci_filter_match(filt, z))
       cnt++;
   a = b = xmalloc(sizeof(struct device *) * cnt);
-  for(z=first_dev; z; z=z->next)
-    if (z->mark)
+  for(z=pacc->devices; z; z=z->next)
+    if (pci_filter_match(filt, z))
       *a++ = z;
   *a = NULL;
   return b;
 }
 
 static void
-exec_op(struct op *op, struct device *dev)
+exec_op(struct op *op, struct pci_dev *dev)
 {
   char *mm[] = { NULL, "%02x", "%04x", NULL, "%08x" };
   char *m = mm[op->width];
   unsigned int x;
   int i;
-  __u32 x32;
-  __u16 x16;
-  __u8 x8;
-
-  if (!demo_mode && dev->fd < 0)
-    {
-      char name[64];
-      sprintf(name, PROC_BUS_PCI "/%02x/%02x.%x", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
-      if ((dev->fd = open(name, dev->need_write ? O_RDWR : O_RDONLY)) < 0)
-	{
-	  perror(name);
-	  exit(1);
-	}
-    }
 
   if (verbose)
-    printf("%02x:%02x.%x:%02x", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn), op->addr);
+    printf("%02x:%02x.%x:%02x", dev->bus, dev->dev, dev->func, op->addr);
   if (op->num_values >= 0)
     for(i=0; i<op->num_values; i++)
       {
@@ -176,22 +73,14 @@ exec_op(struct op *op, struct device *dev)
 	switch (op->width)
 	  {
 	  case 1:
-	    x8 = op->values[i];
-	    i = pwrite(dev->fd, &x8, 1, op->addr);
+	    pci_write_byte(dev, op->addr, op->values[i]);
 	    break;
 	  case 2:
-	    x16 = __cpu_to_le16(op->values[i]);
-	    i = pwrite(dev->fd, &x16, 2, op->addr);
+	    pci_write_word(dev, op->addr, op->values[i]);
 	    break;
 	  default:
-	    x32 = __cpu_to_le32(op->values[i]);
-	    i = pwrite(dev->fd, &x32, 4, op->addr);
+	    pci_write_long(dev, op->addr, op->values[i]);
 	    break;
-	  }
-	if (i != (int) op->width)
-	  {
-	    fprintf(stderr, "Error writing to %02x:%02x.%d: %m\n", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
-	    exit(1);
 	  }
       }
   else
@@ -203,22 +92,14 @@ exec_op(struct op *op, struct device *dev)
 	  switch (op->width)
 	    {
 	    case 1:
-	      i = pread(dev->fd, &x8, 1, op->addr);
-	      x = x8;
+	      x = pci_read_byte(dev, op->addr);
 	      break;
 	    case 2:
-	      i = pread(dev->fd, &x16, 2, op->addr);
-	      x = __le16_to_cpu(x16);
+	      x = pci_read_word(dev, op->addr);
 	      break;
 	    default:
-	      i = pread(dev->fd, &x32, 4, op->addr);
-	      x = __le32_to_cpu(x32);
+	      x = pci_read_long(dev, op->addr);
 	      break;
-	    }
-	  if (i != (int) op->width)
-	    {
-	      fprintf(stderr, "Error reading from %02x:%02x.%d: %m\n", dev->bus, PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
-	      exit(1);
 	    }
 	  printf(m, x);
 	}
@@ -231,8 +112,8 @@ exec_op(struct op *op, struct device *dev)
 static void
 execute(struct op *op)
 {
-  struct device **vec = NULL;
-  struct device **pdev, *dev;
+  struct pci_dev **vec = NULL;
+  struct pci_dev **pdev, *dev;
   struct op *oops;
 
   while (op)
@@ -249,16 +130,10 @@ execute(struct op *op)
 static void
 scan_ops(struct op *op)
 {
-  struct device **pdev, *dev;
-
   while (op)
     {
       if (op->num_values >= 0)
-	{
-	  pdev = op->dev_vector;
-	  while (dev = *pdev++)
-	    dev->need_write = 1;
-	}
+	pacc->writeable = 1;
       op = op->next;
     }
 }
@@ -343,11 +218,12 @@ static void
 usage(void)
 {
   fprintf(stderr,
-"Usage: setpci [-fvD] (<device>+ <reg>[=<values>]*)*\n\
+"Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n\
 -f\t\tDon't complain if there's nothing to do\n\
 -v\t\tBe verbose\n\
--D\t\tList changes, don't commit them\n\
-<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n\
+-D\t\tList changes, don't commit them\n"
+GENERIC_HELP
+"<device>:\t-s [[<bus>]:][<slot>][.[<func>]]\n\
 \t|\t-d [<vendor>]:[<device>]\n\
 <reg>:\t\t<number>[.(B|W|L)]\n\
      |\t\t<name>\n\
@@ -361,7 +237,8 @@ main(int argc, char **argv)
 {
   enum { STATE_INIT, STATE_GOT_FILTER, STATE_GOT_OP } state = STATE_INIT;
   struct pci_filter filter;
-  struct device **selected_devices = NULL;
+  struct pci_dev **selected_devices = NULL;
+  char *opts = GENERIC_OPTIONS ;
 
   if (argc == 2 && !strcmp(argv[1], "--version"))
     {
@@ -370,10 +247,15 @@ main(int argc, char **argv)
     }
   argc--;
   argv++;
+
+  pacc = pci_alloc();
+  pacc->error = die;
+
   while (argc && argv[0][0] == '-')
     {
       char *c = argv[0]+1;
       char *d = c;
+      char *e;
       while (*c)
 	switch (*c)
 	  {
@@ -392,16 +274,42 @@ main(int argc, char **argv)
 	  case 0:
 	    break;
 	  default:
-	    if (c != d)
-	      usage();
-	    goto next;
+	    if (e = strchr(opts, *c))
+	      {
+		char *arg;
+		c++;
+		if (e[1] == ':')
+		  {
+		    if (*c)
+		      arg = c;
+		    else if (argc > 1)
+		      {
+			arg = argv[1];
+			argc--; argv++;
+		      }
+		    else
+		      usage();
+		    c = "";
+		  }
+		else
+		  arg = NULL;
+		if (!parse_generic_option(*e, pacc, arg))
+		  usage();
+	      }
+	    else
+	      {
+		if (c != d)
+		  usage();
+		goto next;
+	      }
 	  }
       argc--;
       argv++;
     }
 next:
 
-  scan_devices();
+  pci_init(pacc);
+  pci_scan_bus(pacc);
 
   while (argc)
     {
@@ -427,24 +335,18 @@ next:
 	    usage();
 	  if (state != STATE_GOT_FILTER)
 	    {
-	      filter_init(&filter);
+	      pci_filter_init(pacc, &filter);
 	      state = STATE_GOT_FILTER;
 	    }
 	  switch (c[1])
 	    {
 	    case 's':
-	      if (d = filter_parse_slot(&filter, d))
-		{
-		  fprintf(stderr, "setpci: -s: %s\n", d);
-		  return 1;
-		}
+	      if (d = pci_filter_parse_slot(&filter, d))
+		die("-s: %s", d);
 	      break;
 	    case 'd':
-	      if (d = filter_parse_id(&filter, d))
-		{
-		  fprintf(stderr, "setpci: -d: %s\n", d);
-		  return 1;
-		}
+	      if (d = pci_filter_parse_id(&filter, d))
+		die("-d: %s", d);
 	      break;
 	    default:
 	      usage();
@@ -510,15 +412,9 @@ next:
 	      op->width = r->width;
 	    }
 	  if (ll > 0x100 || ll + op->width*((n < 0) ? 1 : n) > 0x100)
-	    {
-	      fprintf(stderr, "setpci: Register number out of range!\n");
-	      return 1;
-	    }
+	    die("Register number out of range!");
 	  if (ll & (op->width - 1))
-	    {
-	      fprintf(stderr, "setpci: Unaligned register address!\n");
-	      return 1;
-	    }
+	    die("Unaligned register address!");
 	  op->addr = ll;
 	  for(i=0; i<n; i++)
 	    {

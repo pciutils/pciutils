@@ -1,28 +1,40 @@
-# $Id: Makefile,v 1.9 1998/11/22 08:56:00 mj Exp $
+# $Id: Makefile,v 1.10 1999/01/22 21:04:46 mj Exp $
 # Makefile for Linux PCI Utilities
-# (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+# (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
-ARCH=$(shell uname -m | sed -e 's/i.86/i386/' -e 's/sun4u/sparc64/' | tr 'a-z' 'A-Z')
-KERN_H=$(shell if [ ! -f pci.h ] ; then echo '-DKERNEL_PCI_H' ; fi)
 OPT=-O2 -fomit-frame-pointer
-CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wno-unused -Werror -DARCH_$(ARCH) $(KERN_H)
+#OPT=-O2 -g
+CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Werror
+
+VERSION=1.99.2-alpha
+DATE=22 January 1999
 
 ROOT=/
 PREFIX=/usr
 
-all: lspci setpci
+export
 
-lspci: lspci.o names.o filter.o
-setpci: setpci.o filter.o
+all: lib lspci setpci lspci.8 setpci.8
 
-lspci.o: lspci.c pciutils.h
-names.o: names.c pciutils.h
-filter.o: filter.c pciutils.h
-setpci.o: setpci.c pciutils.h
+lib: lib/config.h
+	$(MAKE) -C lib all
+
+lib/config.h:
+	cd lib && ./configure $(PREFIX) $(VERSION)
+
+lspci: lspci.o common.o lib/libpci.a
+setpci: setpci.o common.o lib/libpci.a
+
+lspci.o: lspci.c pciutils.h lib/libpci.a
+setpci.o: setpci.c pciutils.h lib/libpci.a
+common.o: common.c pciutils.h lib/libpci.a
+
+%.8: %.man
+	sed <$< >$@ "s/@TODAY@/$(DATE)/;s/@VERSION@/pciutils-$(VERSION)/"
 
 clean:
 	rm -f `find . -name "*~" -or -name "*.[oa]" -or -name "\#*\#" -or -name TAGS -or -name core`
-	rm -f lspci setpci pci.h
+	rm -f lspci setpci lib/config.* lib/header.h *.8
 
 install: all
 	install -o root -g root -m 755 -s lspci setpci $(ROOT)/sbin
@@ -32,6 +44,8 @@ install: all
 	rm -f $(ROOT)/etc/pci.ids
 
 dist: clean
-	cp /usr/src/linux/include/linux/pci.h .
+	cp /usr/src/linux/include/linux/pci.h lib/header.h
 	sh -c 'X=`pwd` ; X=`basename $$X` ; cd .. ; tar czvvf /tmp/$$X.tar.gz $$X --exclude CVS --exclude tmp'
-	rm -f pci.h
+	rm -f lib/header.h
+
+.PHONY: all lib clean install dist man

@@ -1,57 +1,50 @@
 /*
- *	$Id: pciutils.h,v 1.11 1999/01/19 21:24:42 mj Exp $
+ *	$Id: pciutils.h,v 1.12 1999/01/22 21:04:59 mj Exp $
  *
  *	Linux PCI Utilities -- Declarations
  *
- *	Copyright (c) 1997, 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#include <linux/types.h>
+#include "lib/pci.h"
 
-#ifdef KERNEL_PCI_H
-#include <linux/pci.h>
+#define PCIUTILS_VERSION PCILIB_VERSION
+
+void __attribute__((noreturn)) die(char *msg, ...);
+void *xmalloc(unsigned int howmuch);
+int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
+
+#ifdef HAVE_PM_LINUX_PROC
+#define GENOPT_PROC "P:"
+#define GENHELP_PROC "-P <dir>\tUse specified directory instead of " PATH_PROC_BUS_PCI "\n"
 #else
-#include "pci.h"
+#define GENOPT_PROC
+#define GENHELP_PROC
+#endif
+#ifdef HAVE_PM_INTEL_CONF
+#define GENOPT_INTEL "H:"
+#define GENHELP_INTEL "-H <mode>\tUse direct hardware access (<mode> = 1 or 2)\n"
+#else
+#define GENOPT_INTEL
+#define GENHELP_INTEL
+#endif
+#ifdef HAVE_PM_SYSCALLS
+#define GENOPT_SYSCALLS "S"
+#define GENHELP_SYSCALLS "-S\t\tUse direct hardware access via syscalls\n"
+#else
+#define GENOPT_SYSCALLS
+#define GENHELP_SYSCALLS
+#endif
+#ifdef HAVE_PM_DUMP
+#define GENOPT_DUMP "F:"
+#define GENHELP_DUMP "-F <file>\tRead configuration data from given file\n"
+#else
+#define GENOPT_DUMP
+#define GENHELP_DUMP
 #endif
 
-#define PCIUTILS_VERSION "1.10"
-
-#define PROC_BUS_PCI "/proc/bus/pci"
-#define ETC_PCI_IDS "/usr/share/pci.ids"
-
-/* Types */
-
-typedef __u8 byte;
-typedef __u16 word;
-typedef __u32 u32;
-
-/* lspci.c */
-
-void *xmalloc(unsigned int);
-
-/* names.c */
-
-extern int show_numeric_ids;
-extern char *pci_ids;
-
-char *lookup_vendor(word);
-char *lookup_device(word, word);
-char *lookup_device_full(word, word);
-char *lookup_class(word);
-char *lookup_subsys_vendor(word);
-char *lookup_subsys_device(word, word);
-char *lookup_subsys_device_full(word, word);
-
-/* filter.c */
-
-struct pci_filter {
-  int bus, slot, func;			/* -1 = ANY */
-  int vendor, device;
-};
-
-void filter_init(struct pci_filter *);
-char *filter_parse_slot(struct pci_filter *, char *);
-char *filter_parse_id(struct pci_filter *, char *);
-int filter_match(struct pci_filter *, byte bus, byte devfn, word vendid, word devid);
+#define GENERIC_OPTIONS "G" GENOPT_PROC GENOPT_INTEL GENOPT_SYSCALLS GENOPT_DUMP
+#define GENERIC_HELP GENHELP_PROC GENHELP_INTEL GENHELP_SYSCALLS GENHELP_DUMP \
+	"-G\t\tEnable PCI access debugging\n"

@@ -1,3 +1,64 @@
+Fri Jan 22 19:29:31 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Version string is now defined in top-level Makefile, exported
+	to the configure script and also substituted to man pages.
+
+	* lspci.c (show_bases): Rewrote displaying of 64-bit addresses.
+	(show_verbose): Rewrote interrupt display logic.
+
+	* lib/i386-ports.c: Include sys/io.h only on glibc systems.
+
+	* lib/configure: Rewrote detection of Linux versions. Now it
+	works on 2.0 kernels (only with direct/dump access, of course).
+
+	* lib/internal.h: New bytesex macros using <asm/byteorder.h>
+	whenever available.
+
+	* lib/proc.c (proc_read, proc_write): Distinguish between short
+	read/write and real errors.
+
+	* lspci.c (show_htype{0,1}): Always use d->dev->rom_base_addr since
+	libpci respects buscentric mode automatically.
+
+	* lspci.c (show_hex_dump): For CardBus bridges, print out 128
+	bytes of header (the whole standard part).
+
+	* common.c: pcilib options are now all uppercase. Also moved
+	PCI access debugging option here.
+
+	* Released as 1.99.2.
+
+Wed Jan 20 22:50:35 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* Wrote configure script and rewrote Makefiles.
+
+	* Removed few unused variables.
+
+Wed Jan 20 12:21:56 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* common.c: Moved several functions used in both setpci and lspci
+	here. This includes parsing of libpci-related options.
+
+	* More library tweaks.
+
+	* filter.c, names.c: Moved to library.
+
+	* setpci: Rewritten to use the library.
+
+	* Released as 1.99.1.
+
+Tue Jan 19 23:00:12 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (scan_devices): For cardbus bridges, read first 128
+	bytes of config space to get full standard header.
+
+	* Makefile (CFLAGS): Removed "-Wno-unused".
+
+	* Started the "New Generation" branch and introduced the
+	PCI library.
+	
+	* lspci: Rewritten to use the library.
+
 Tue Jan 19 22:24:08 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as version 1.10.

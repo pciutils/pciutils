@@ -1,21 +1,20 @@
 /*
- *	$Id: filter.c,v 1.2 1998/06/08 07:51:45 mj Exp $
+ *	$Id: filter.c,v 1.1 1999/01/22 21:05:22 mj Exp $
  *
- *	Linux PCI Utilities -- Device Filtering
+ *	Linux PCI Library -- Device Filtering
  *
- *	Copyright (c) 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1998--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "pciutils.h"
+#include "internal.h"
 
 void
-filter_init(struct pci_filter *f)
+pci_filter_init(struct pci_access * UNUSED a, struct pci_filter *f)
 {
   f->bus = f->slot = f->func = -1;
   f->vendor = f->device = -1;
@@ -24,7 +23,7 @@ filter_init(struct pci_filter *f)
 /* Slot filter syntax: [[bus]:][slot][.[func]] */
 
 char *
-filter_parse_slot(struct pci_filter *f, char *str)
+pci_filter_parse_slot(struct pci_filter *f, char *str)
 {
   char *colon = strchr(str, ':');
   char *dot = strchr((colon ? colon + 1 : str), '.');
@@ -65,7 +64,7 @@ filter_parse_slot(struct pci_filter *f, char *str)
 /* ID filter syntax: [vendor]:[device] */
 
 char *
-filter_parse_id(struct pci_filter *f, char *str)
+pci_filter_parse_id(struct pci_filter *f, char *str)
 {
   char *s, *e;
 
@@ -93,13 +92,18 @@ filter_parse_id(struct pci_filter *f, char *str)
 }
 
 int
-filter_match(struct pci_filter *f, byte bus, byte devfn, word vendid, word devid)
+pci_filter_match(struct pci_filter *f, struct pci_dev *d)
 {
-  if ((f->bus >= 0 && f->bus != bus) ||
-      (f->slot >= 0 && f->slot != PCI_SLOT(devfn)) ||
-      (f->func >= 0 && f->func != PCI_FUNC(devfn)) ||
-      (f->device >= 0 && f->device != devid) ||
-      (f->vendor >= 0 && f->vendor != vendid))
+  if ((f->bus >= 0 && f->bus != d->bus) ||
+      (f->slot >= 0 && f->slot != d->dev) ||
+      (f->func >= 0 && f->func != d->func))
     return 0;
+  if (f->device >= 0 || f->vendor >= 0)
+    {
+      pci_fill_info(d, PCI_FILL_IDENT);
+      if ((f->device >= 0 && f->device != d->device_id) ||
+	  (f->vendor >= 0 && f->vendor != d->vendor_id))
+	return 0;
+    }
   return 1;
 }
