@@ -1,5 +1,5 @@
 Name:		pciutils
-Version:	2.1.4
+Version:	2.1.5
 Release: 	1
 Source:		ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/%{name}-%{version}.tar.gz
 Copyright:	GNU GPL
@@ -28,15 +28,12 @@ make OPT="$RPM_OPT_FLAGS"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/{sbin,/usr/man/man8,/usr/share}
-
-install -s lspci setpci $RPM_BUILD_ROOT/sbin
-install lspci.8 setpci.8 $RPM_BUILD_ROOT/usr/man/man8
-install pci.ids $RPM_BUILD_ROOT/usr/share
+make install PREFIX=$RPM_BUILD_ROOT/usr ROOT=$RPM_BUILD_ROOT/ \
+     MANDIR=$RPM_BUILD_ROOT/%{_mandir}
 
 %files
 %defattr(0644, root, root, 0755)
-%attr(0644, root, man) /usr/man/man8/*
+%attr(0644, root, man) %{_mandir}/man8/*
 %attr(0711, root, root) /sbin/*
 %config /usr/share/pci.ids
 %doc README ChangeLog pciutils.lsm
