@@ -10,11 +10,6 @@ lspci \- list all PCI devices
 is a utility for displaying information about all PCI buses in the system and
 all devices connected to them.
 
-To make use of all the features of this program, you need to have Linux kernel
-2.1.82 or newer which supports the /proc/bus/pci interface. With older kernels,
-the PCI utilities have to use direct hardware access which is available
-only to root and it suffers from numerous race conditions and other problems.
-
 If you are going to report bugs in PCI device drivers or in
 .I lspci
 itself, please include output of "lspci -vvx".
@@ -110,7 +105,7 @@ it's supported in.
 
 .TP
 .B -P <dir>
-Use Linux 2.1 style configuration access to directory
+Force use of Linux /proc/bus/pci style configuration access, using
 .B <dir>
 instead of /proc/bus/pci. (Linux 2.1 or newer only)
 .TP

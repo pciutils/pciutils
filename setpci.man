@@ -13,11 +13,6 @@ setpci \- configure PCI devices
 .B setpci
 is a utility for querying and configuring PCI devices.
 
-To make use of all the features of this program, you need to have Linux kernel
-2.1.82 or newer which supports the /proc/bus/pci interface. With older kernels,
-the PCI utilities have to use direct hardware access which is available
-only to root and it suffers from numerous race conditions and other problems.
-
 All numbers are entered in hexadecimal notation.
 
 .SH OPTIONS
@@ -168,7 +163,7 @@ it's supported in.
 
 .TP
 .B -P <dir>
-Use Linux 2.1 style configuration access to directory
+Force use of Linux /proc/bus/pci style configuration access, using
 .B <dir>
 instead of /proc/bus/pci. (Linux 2.1 or newer only)
 .TP
