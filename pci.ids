@@ -4,7 +4,7 @@
 #	Maintained by Jens Maurer <linux-pcisupport@cck.uni-kl.de>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.7 1998/04/22 07:55:16 mj Exp $
+#	$Id: pci.ids,v 1.8 1998/05/13 21:03:20 ecd Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -477,6 +477,7 @@
 10b6  Madge Networks
 	0001  Smart
 	0002  Smart 16/4 BM Mk2 PCI Ringnode
+	1001  Collage 155 Server
 10b7  3Com Corporation
 	3390  Token Link Velocity
 	5900  3c590 10BaseT [Vortex]
