@@ -966,7 +966,7 @@
 #define  PCI_ATS_CAP_IQD(x)	((x) & 0x1f) /* Invalidate Queue Depth */
 #define PCI_ATS_CTRL		0x06	/* ATS Control Register */
 #define  PCI_ATS_CTRL_STU(x)	((x) & 0x1f) /* Smallest Translation Unit */
-#define  PCI_ATS_CTRL_ENABLE	0x80	/* ATS Enable */
+#define  PCI_ATS_CTRL_ENABLE	0x8000	/* ATS Enable */
 
 /* Single Root I/O Virtualization */
 #define PCI_IOV_CAP		0x04	/* SR-IOV Capability Register */
