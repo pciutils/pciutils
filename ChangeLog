@@ -1,3 +1,11 @@
+2002-03-30  Martin Mares  <mj@ucw.cz>
+
+	* lib/names.c (parse_name_list): End-of-line comments are no longer
+	supported. Hashes are now perfectly valid in all names and they start
+	a comment only at the start of the line.
+
+	* pci.ids: Synchronized with the PCI ID database.
+
 2002-03-26  Martin Mares  <mj@ucw.cz>
 
 	* README: Rewritten.

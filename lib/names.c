@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.7 2002/03/24 12:14:40 mj Exp $
+ *	$Id: names.c,v 1.8 2002/03/30 15:13:06 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
@@ -98,19 +98,10 @@ parse_name_list(struct pci_access *a)
       lino++;
       q = p;
       while (*p && *p != '\n')
-	{
-	  if (*p == '#')
-	    {
-	      *p++ = 0;
-	      while (*p && *p != '\n')
-		p++;
-	      break;
-	    }
-	  p++;
-	}
+	p++;
       if (*p == '\n')
 	*p++ = 0;
-      if (!*q)
+      if (!*q || *q == '#')
 	continue;
       r = p;
       while (r > q && r[-1] == ' ')
