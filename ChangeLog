@@ -1,5 +1,14 @@
 2003-12-27  Martin Mares  <mj@ucw.cz>
 
+	Updated the FreeBSD port. Thanks to Samy Al Bahra <samy@kerneled.com>
+	for the patches:
+
+	* lib/Makefile: Add ${FREEBSD_SYS} to the include path if it's defined.
+	* lib/fbsd-device.c: Select the right set of system includes according
+	to __FreeBSD_version.
+
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
 	Merged support for Solaris on i386 by Bill Moore <billm@eng.sun.com>
 	and cleaned up:
 

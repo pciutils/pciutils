@@ -27,6 +27,9 @@ endif
 ifdef HAVE_PM_FBSD_DEVICE
 OBJS += fbsd-device.o
 CFLAGS += -I/usr/src/sys
+ifdef FREEBSD_SYS
+CFLAGS += -I${FREEBSD_SYS}
+endif
 endif
 
 ifdef HAVE_PM_AIX_DEVICE
