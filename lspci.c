@@ -47,32 +47,6 @@ GENERIC_HELP
 
 static struct pci_access *pacc;
 
-/* Format strings used for IRQ numbers and memory addresses */
-
-#ifdef ARCH_SPARC64
-#define IRQ_FORMAT "%08x"
-#else
-#define IRQ_FORMAT "%d"
-#endif
-
-#ifdef HAVE_64BIT_ADDRESS
-#ifdef HAVE_LONG_ADDRESS
-#define ADDR_FORMAT "%016Lx"
-#else
-#define ADDR_FORMAT "%016lx"
-#endif
-#else
-#define ADDR_FORMAT "%08lx"
-#endif
-
-#ifdef ARCH_SPARC64
-#define IO_FORMAT "%016Lx"
-#elif defined(HAVE_LONG_ADDRESS)
-#define IO_FORMAT "%04Lx"
-#else
-#define IO_FORMAT "%04lx"
-#endif
-
 /*
  *  If we aren't being compiled by GCC, use malloc() instead of alloca().
  *  This increases our memory footprint, but only slightly since we don't
@@ -280,7 +254,7 @@ show_size(pciaddr_t x)
   else if (x < 0x80000000)
     printf("%dM", (int)(x / 1048576));
   else
-    printf(ADDR_FORMAT, x);
+    printf(PCIADDR_T_FMT, x);
   putchar(']');
 }
 
@@ -314,7 +288,7 @@ show_bases(struct device *d, int cnt)
 	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
 	  printf("I/O ports at ");
 	  if (a)
-	    printf(IO_FORMAT, a);
+	    printf(PCIADDR_PORT_FMT, a);
 	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
 	    printf("<ignored>");
 	  else
@@ -344,7 +318,7 @@ show_bases(struct device *d, int cnt)
 		  if (buscentric_view)
 		    {
 		      if (a || z)
-			printf("%08x" ADDR_FORMAT, z, a);
+			printf("%08x" PCIADDR_T_FMT, z, a);
 		      else
 			printf("<unassigned>");
 		      done = 1;
@@ -354,7 +328,7 @@ show_bases(struct device *d, int cnt)
 	  if (!done)
 	    {
 	      if (a)
-		printf(ADDR_FORMAT, a);
+		printf(PCIADDR_T_FMT, a);
 	      else
 		printf(((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
 	    }
@@ -579,7 +553,7 @@ show_rom(struct device *d)
     return;
   printf("\tExpansion ROM at ");
   if (rom & PCI_ROM_ADDRESS_MASK)
-    printf(ADDR_FORMAT, rom & PCI_ROM_ADDRESS_MASK);
+    printf(PCIADDR_T_FMT, rom & PCI_ROM_ADDRESS_MASK);
   else
     printf("<unassigned>");
   if (!(rom & PCI_ROM_ADDRESS_ENABLE))
@@ -934,7 +908,7 @@ show_verbose(struct device *d)
 	  putchar('\n');
 	}
       if (int_pin || irq)
-	printf("\tInterrupt: pin %c routed to IRQ " IRQ_FORMAT "\n",
+	printf("\tInterrupt: pin %c routed to IRQ " PCIIRQ_FMT "\n",
 	       (int_pin ? 'A' + int_pin - 1 : '?'), irq);
     }
   else
@@ -959,7 +933,7 @@ show_verbose(struct device *d)
       if (cmd & PCI_COMMAND_MASTER)
 	printf(", latency %d", latency);
       if (irq)
-	printf(", IRQ " IRQ_FORMAT, irq);
+	printf(", IRQ " PCIIRQ_FMT, irq);
       putchar('\n');
     }
 

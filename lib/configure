@@ -45,10 +45,8 @@ case $sys in
 						echo >>$c '#define HAVE_PM_INTEL_CONF'
 						ok=1
 						;;
-				alpha|ia64)	echo >>$c '#define HAVE_64BIT_ADDRESS'
-						;;
-				sparc|sparc64)	echo >>$c '#define HAVE_64BIT_ADDRESS'
-						echo >>$c '#define HAVE_LONG_ADDRESS'
+				alpha|ia64|sparc|sparc64)
+						echo >>$c '#define HAVE_64BIT_ADDRESS'
 						;;
 		esac
 		;;

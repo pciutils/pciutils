@@ -78,8 +78,8 @@
 #define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
 #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
 #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
-#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
-#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
+#define  PCI_BASE_ADDRESS_MEM_MASK	(~(pciaddr_t)0x0f)
+#define  PCI_BASE_ADDRESS_IO_MASK	(~(pciaddr_t)0x03)
 /* bit 1 is reserved if address_space = 1 */
 
 /* Header type 0 (normal devices) */
@@ -88,7 +88,7 @@
 #define PCI_SUBSYSTEM_ID	0x2e  
 #define PCI_ROM_ADDRESS		0x30	/* Bits 31..11 are address, 10..1 reserved */
 #define  PCI_ROM_ADDRESS_ENABLE	0x01
-#define PCI_ROM_ADDRESS_MASK	(~0x7ffUL)
+#define PCI_ROM_ADDRESS_MASK	(~(pciaddr_t)0x7ff)
 
 #define PCI_CAPABILITY_LIST	0x34	/* Offset of first capability list entry */
 

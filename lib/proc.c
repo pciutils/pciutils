@@ -128,12 +128,8 @@ proc_scan(struct pci_access *a)
       struct pci_dev *d = pci_alloc_dev(a);
       unsigned int dfn, vend, cnt, known;
 
-      cnt = sscanf(buf,
-#ifdef HAVE_LONG_ADDRESS
-	     "%x %x %x %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx",
-#else
-	     "%x %x %x %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx",
-#endif
+#define F " " PCIADDR_T_FMT
+      cnt = sscanf(buf, "%x %x %x" F F F F F F F F F F F F F F,
 	     &dfn,
 	     &vend,
 	     &d->irq,
@@ -151,6 +147,7 @@ proc_scan(struct pci_access *a)
 	     &d->size[4],
 	     &d->size[5],
 	     &d->rom_size);
+#undef F
       if (cnt != 9 && cnt != 10 && cnt != 17)
 	a->error("proc: parse error (read only %d items)", cnt);
       d->bus = dfn >> 8U;

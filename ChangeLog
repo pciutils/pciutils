@@ -1,3 +1,18 @@
+2003-12-26  Martin Mares  <mj@ucw.cz>
+
+	* lib/header.h (PCI_*_MASK): Cast to pciaddr_t explicitly.
+
+	* lib/pci.h: Types declared in <sys/types.h> should be usable on all
+	platforms we currently support, so kill the forest of #ifdef's and
+	use them in all cases.
+
+	* lib/pci.h: Use ULONG_MASK to decide whether we should use long
+	or long long to represent a 64-bit address. Killed HAVE_LONG_ADDRESS.
+	Define format strings for addresses, port numbers and IRQ numbers
+	directly in pci.h.
+
+	* lib/proc.c (proc_scan): Use PCIADDR_T_FMT for scanf'ing addresses.
+
 2003-12-26  Marco Gerards  <metgerards@student.han.nl>
 
 	Added support for the GNU Hurd (cleaned up by Martin Mares):

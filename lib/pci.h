@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2002 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -13,21 +13,9 @@
 #include "header.h"
 
 /*
- *	Types
+ *	Types and format strings
  */
 
-#ifdef OS_LINUX
-#include <linux/types.h>
-
-typedef __u8 byte;
-typedef __u8 u8;
-typedef __u16 word;
-typedef __u16 u16;
-typedef __u32 u32;
-
-#endif
-
-#ifdef OS_FREEBSD
 #include <sys/types.h>
 
 typedef u_int8_t byte;
@@ -35,42 +23,32 @@ typedef u_int8_t u8;
 typedef u_int16_t word;
 typedef u_int16_t u16;
 typedef u_int32_t u32;
-#endif
 
-#ifdef OS_NETBSD
-#include <sys/types.h>
-
-typedef u_int8_t byte;
-typedef u_int8_t u8;
-typedef u_int16_t word;
-typedef u_int16_t u16;
-typedef u_int32_t u32;
-#endif
-
-#ifdef OS_AIX
-#include <sys/param.h>
-
-typedef u_int8_t byte;
-typedef u_int8_t u8;
-typedef u_int16_t word;
-typedef u_int16_t u16;
-typedef u_int32_t u32;
-#endif
-
-#ifdef OS_GNU
-#include <sys/types.h>
-
-typedef u_int8_t byte;
-typedef u_int8_t u8;
-typedef u_int16_t word;
-typedef u_int16_t u16;
-typedef u_int32_t u32;
-#endif
-
-#ifdef HAVE_LONG_ADDRESS
-typedef unsigned long long pciaddr_t;
+#ifdef HAVE_64BIT_ADDRESS
+#include <limits.h>
+#if ULONG_MAX > 0xffffffff
+typedef unsigned long u64;
+#define PCIADDR_T_FMT "%016lx"
+#define PCIADDR_PORT_FMT "%04lx"
 #else
-typedef unsigned long pciaddr_t;
+typedef unsigned long long u64;
+#define PCIADDR_T_FMT "%016Lx"
+#define PCIADDR_PORT_FMT "%04Lx"
+#endif
+typedef u64 pciaddr_t;
+#else
+typedef u32 pciaddr_t;
+#define PCIADDR_T_FMT "%08x"
+#define PCIADDR_PORT_FMT "%04x"
+#endif
+
+#ifdef ARCH_SPARC64
+/* On sparc64 Linux the kernel reports remapped port addresses and IRQ numbers */
+#undef PCIADDR_PORT_FMT
+#define PCIADDR_PORT_FMT PCIADDR_T_FMT
+#define PCIIRQ_FMT "%08x"
+#else
+#define PCIIRQ_FMT "%d"
 #endif
 
 /*
