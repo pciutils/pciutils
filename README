@@ -4,9 +4,7 @@ Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
-(at your opinion) any newer version. This is the same distribution
-policy as for the Linux kernel itself -- see /usr/src/linux/COPYING
-for details.
+(at your opinion) any newer version. See http://www.gnu.org/ for details.
 
 
 1. What's that?
@@ -15,9 +13,9 @@ The PCI Utilities package contains a library for portable access to PCI bus
 configuration registers and several utilities based on this library.
 
 Currently, pciutils work on all versions of Linux and they also have somewhat
-experimental support for FreeBSD and AIX. It should be very easy to add support
-for other systems as well (volunteers wanted; if you want to try that, please
-send the patches to me, so that I can include them in the next version).
+experimental support for FreeBSD, NetBSD and AIX. It should be very easy to add
+support for other systems as well (volunteers wanted; if you want to try that,
+please send the patches to me, so that I can include them in the next version).
 
 The utilities include:  (See manual pages for more details)
 
