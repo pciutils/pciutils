@@ -1,5 +1,5 @@
 /*
- *	$Id: generic.c,v 1.4 1999/02/28 20:23:10 mj Exp $
+ *	$Id: generic.c,v 1.5 1999/07/07 11:23:09 mj Exp $
  *
  *	The PCI Library -- Generic Direct Access Functions
  *
@@ -76,7 +76,7 @@ pci_generic_scan(struct pci_access *a)
   pci_generic_scan_bus(a, busmap, 0);
 }
 
-void
+int
 pci_generic_fill_info(struct pci_dev *d, int flags)
 {
   struct pci_access *a = d->access;
@@ -164,6 +164,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	    d->rom_base_addr = a;
 	}
     }
+  return flags & ~PCI_FILL_SIZES;
 }
 
 static int

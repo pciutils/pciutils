@@ -1,5 +1,5 @@
 /*
- *	$Id: internal.h,v 1.1 1999/01/22 21:05:29 mj Exp $
+ *	$Id: internal.h,v 1.2 1999/07/07 11:23:10 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
@@ -55,7 +55,7 @@ struct pci_methods {
   void (*init)(struct pci_access *);
   void (*cleanup)(struct pci_access *);
   void (*scan)(struct pci_access *);
-  void (*fill_info)(struct pci_dev *, int flags);
+  int (*fill_info)(struct pci_dev *, int flags);
   int (*read)(struct pci_dev *, int pos, byte *buf, int len);
   int (*write)(struct pci_dev *, int pos, byte *buf, int len);
   void (*init_dev)(struct pci_dev *);
@@ -63,7 +63,7 @@ struct pci_methods {
 };
 
 void pci_generic_scan(struct pci_access *);
-void pci_generic_fill_info(struct pci_dev *, int flags);
+int pci_generic_fill_info(struct pci_dev *, int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
 int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 

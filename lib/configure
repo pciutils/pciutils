@@ -27,8 +27,13 @@ case $cpu in
 			echo >>$c '#define HAVE_PM_INTEL_CONF'
 			ok=1
 			;;
-	alpha|sparc|sparc64)
-			echo >>$c '#define HAVE_64BIT_ADDRESS'
+	alpha)		echo >>$c '#define HAVE_64BIT_ADDRESS'
+#			echo -n " syscalls"
+#			echo >>$c '#define HAVE_PM_SYSCALLS'
+#			ok=1
+			;;
+	sparc|sparc64)	echo >>$c '#define HAVE_64BIT_ADDRESS'
+			echo >>$c '#define HAVE_LONG_ADDRESS'
 #			echo -n " syscalls"
 #			echo >>$c '#define HAVE_PM_SYSCALLS'
 #			ok=1

@@ -1,5 +1,5 @@
 /*
- *	$Id: access.c,v 1.3 1999/01/27 14:53:02 mj Exp $
+ *	$Id: access.c,v 1.4 1999/07/07 11:23:08 mj Exp $
  *
  *	The PCI Library -- User Access
  *
@@ -295,7 +295,7 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->write(d, pos, buf, len);
 }
 
-void
+int
 pci_fill_info(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)
@@ -304,8 +304,8 @@ pci_fill_info(struct pci_dev *d, int flags)
       d->known_fields = 0;
     }
   if (flags & ~d->known_fields)
-    d->methods->fill_info(d, flags & ~d->known_fields);
-  d->known_fields |= flags;
+    d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
+  return d->known_fields;
 }
 
 void

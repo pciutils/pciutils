@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.28 1999/07/01 21:33:30 mj Exp $
+#	$Id: pci.ids,v 1.29 1999/07/07 11:23:05 mj Exp $
 #
 
 # Vendors and devices. Please keep sorted.
@@ -2966,11 +2966,12 @@ C 0C  Serial bus controller
 C 0E  Intelligent controller
 	0000  I2O
 
+S 1092 Diamond Multimedia
+	8760  Fireport 40 Dual SCSI Host Adapter
+	4820  Viper V550 Graphics Accelerator
 S 10b4  STB Systems Inc
 	273e  Velocity 4400
-
 S 1102  Creative Labs
 	1015  Graphics Blaster CT6710
-
 S 125c  Aurora Technologies, Inc.
 	0640  Aries 16000P

@@ -1,5 +1,5 @@
 /*
- *	$Id: proc.c,v 1.3 1999/06/17 17:51:11 mj Exp $
+ *	$Id: proc.c,v 1.4 1999/07/07 11:23:12 mj Exp $
  *
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
@@ -105,13 +105,13 @@ proc_scan(struct pci_access *a)
   while (fgets(buf, sizeof(buf)-1, f))
     {
       struct pci_dev *d = pci_alloc_dev(a);
-      unsigned int dfn, vend;
+      unsigned int dfn, vend, cnt, known;
 
-      sscanf(buf,
-#ifdef HAVE_64BIT_ADDRESS
-	     "%x %x %x %llx %llx %llx %llx %llx %llx %llx",
+      cnt = sscanf(buf,
+#ifdef HAVE_LONG_ADDRESS
+	     "%x %x %x %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx %llx",
 #else
-	     "%x %x %x %lx %lx %lx %lx %lx %lx %lx",
+	     "%x %x %x %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx %lx",
 #endif
 	     &dfn,
 	     &vend,
@@ -122,14 +122,31 @@ proc_scan(struct pci_access *a)
 	     &d->base_addr[3],
 	     &d->base_addr[4],
 	     &d->base_addr[5],
-	     &d->rom_base_addr);
+	     &d->rom_base_addr,
+	     &d->size[0],
+	     &d->size[1],
+	     &d->size[2],
+	     &d->size[3],
+	     &d->size[4],
+	     &d->size[5],
+	     &d->rom_size);
+      if (cnt != 9 && cnt != 10 && cnt != 17)
+	a->error("proc: parse error (read only %d items)", cnt);
       d->bus = dfn >> 8U;
       d->dev = PCI_SLOT(dfn & 0xff);
       d->func = PCI_FUNC(dfn & 0xff);
       d->vendor_id = vend >> 16U;
       d->device_id = vend & 0xffff;
-      d->known_fields = a->buscentric ? PCI_FILL_IDENT
-				      : (PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE);
+      known = PCI_FILL_IDENT;
+      if (!a->buscentric)
+	{
+	  known |= PCI_FILL_IRQ | PCI_FILL_BASES;
+	  if (cnt >= 10)
+	    known |= PCI_FILL_ROM_BASE;
+	  if (cnt >= 17)
+	    known |= PCI_FILL_SIZES;
+	}
+      d->known_fields = known;
       pci_link_dev(a, d);
     }
   fclose(f);

@@ -1,5 +1,5 @@
 /*
- *	$Id: header.h,v 1.3 1999/04/26 19:46:02 mj Exp $
+ *	$Id: header.h,v 1.4 1999/07/07 11:23:10 mj Exp $
  *
  *	The PCI Library -- PCI Header Structure (extracted from <linux/pci.h>)
  *
@@ -29,7 +29,7 @@
 #define PCI_STATUS		0x06	/* 16 bits */
 #define  PCI_STATUS_CAP_LIST	0x10	/* Support Capability List */
 #define  PCI_STATUS_66MHZ	0x20	/* Support 66 Mhz PCI 2.1 bus */
-#define  PCI_STATUS_UDF		0x40	/* Support User Definable Features */
+#define  PCI_STATUS_UDF		0x40	/* Support User Definable Features [obsolete] */
 #define  PCI_STATUS_FAST_BACK	0x80	/* Accept fast-back to back */
 #define  PCI_STATUS_PARITY	0x100	/* Detected parity error */
 #define  PCI_STATUS_DEVSEL_MASK	0x600	/* DEVSEL timing */
@@ -77,11 +77,11 @@
 #define  PCI_BASE_ADDRESS_SPACE_MEMORY 0x00
 #define  PCI_BASE_ADDRESS_MEM_TYPE_MASK 0x06
 #define  PCI_BASE_ADDRESS_MEM_TYPE_32	0x00	/* 32 bit address */
-#define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M */
+#define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
 #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
 #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
-#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fL)
-#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03L)
+#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
+#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
 /* bit 1 is reserved if address_space = 1 */
 
 /* Header type 0 (normal devices) */
@@ -126,7 +126,8 @@
 #define PCI_PREF_LIMIT_UPPER32	0x2c
 #define PCI_IO_BASE_UPPER16	0x30	/* Upper half of I/O addresses */
 #define PCI_IO_LIMIT_UPPER16	0x32
-/* 0x34-0x3b is reserved */
+/* 0x34 same as for htype 0 */
+/* 0x35-0x3b is reserved */
 #define PCI_ROM_ADDRESS1	0x38	/* Same as PCI_ROM_ADDRESS, but for htype 1 */
 /* 0x3c-0x3d are same as for htype 0 */
 #define PCI_BRIDGE_CONTROL	0x3e
@@ -176,9 +177,14 @@
 /* 0x48-0x7f reserved */
 
 /* Capability lists */
+
 #define PCI_CAP_LIST_ID		0	/* Capability ID */
 #define  PCI_CAP_ID_PM		0x01	/* Power Management */
 #define  PCI_CAP_ID_AGP		0x02	/* Accelerated Graphics Port */
+#define  PCI_CAP_ID_VPD		0x03	/* Vital Product Data */
+#define  PCI_CAP_ID_SLOTID	0x04	/* Slot Identification */
+#define  PCI_CAP_ID_MSI		0x05	/* Message Signalled Interrupts */
+#define  PCI_CAP_ID_CHSWP	0x06	/* CompactPCI HotSwap */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
@@ -226,6 +232,26 @@
 #define  PCI_AGP_COMMAND_RATE2	0x0002	/* Use 4x rate */
 #define  PCI_AGP_COMMAND_RATE1	0x0001	/* Use 4x rate */
 #define PCI_AGP_SIZEOF		12
+
+/* Slot Identification */
+
+#define PCI_SID_ESR		2	/* Expansion Slot Register */
+#define  PCI_SID_ESR_NSLOTS	0x1f	/* Number of expansion slots available */
+#define  PCI_SID_ESR_FIC	0x20	/* First In Chassis Flag */
+#define PCI_SID_CHASSIS_NR	3	/* Chassis Number */
+
+/* Message Signalled Interrupts registers */
+
+#define PCI_MSI_FLAGS		2	/* Various flags */
+#define  PCI_MSI_FLAGS_64BIT	0x80	/* 64-bit addresses allowed */
+#define  PCI_MSI_FLAGS_QSIZE	0x70	/* Message queue size configured */
+#define  PCI_MSI_FLAGS_QMASK	0x0e	/* Maximum queue size available */
+#define  PCI_MSI_FLAGS_ENABLE	0x01	/* MSI feature enabled */
+#define PCI_MSI_RFU		3	/* Rest of capability flags */
+#define PCI_MSI_ADDRESS_LO	4	/* Lower 32 bits */
+#define PCI_MSI_ADDRESS_HI	8	/* Upper 32 bits (if PCI_MSI_FLAGS_64BIT set) */
+#define PCI_MSI_DATA_32		8	/* 16 bits of data for 32-bit devices */
+#define PCI_MSI_DATA_64		12	/* 16 bits of data for 64-bit devices */
 
 /*
  * The PCI interface treats multi-function devices as independent

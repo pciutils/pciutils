@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.3 1999/02/28 20:23:11 mj Exp $
+ *	$Id: pci.h,v 1.4 1999/07/07 11:23:11 mj Exp $
  *
  *	The PCI Library
  *
@@ -31,7 +31,7 @@ typedef __u16 word;
 typedef __u16 u16;
 typedef __u32 u32;
 
-#ifdef HAVE_64BIT_ADDRESS
+#ifdef HAVE_LONG_ADDRESS
 typedef unsigned long long pciaddr_t;
 #else
 typedef unsigned long pciaddr_t;
@@ -98,17 +98,19 @@ struct pci_dev {
   byte dev, func;			/* Device and function */
 
   /* These fields are set by pci_fill_info() */
+  int known_fields;			/* Set of info fields already known */
   word vendor_id, device_id;		/* Identity of the device */
   int irq;				/* IRQ number */
   pciaddr_t base_addr[6];		/* Base addresses */
+  pciaddr_t size[6];			/* Region sizes */
   pciaddr_t rom_base_addr;		/* Expansion ROM base address */
+  pciaddr_t rom_size;			/* Expansion ROM size */
 
   /* Fields used internally: */
   struct pci_access *access;
   struct pci_methods *methods;
   byte *cache;				/* Cached information */
   int cache_len;
-  int known_fields;			/* Set of info fields that is already known */
   int hdrtype;				/* Direct methods: header type */
   void *aux;				/* Auxillary data */
 };
@@ -125,12 +127,13 @@ int pci_write_word(struct pci_dev *, int pos, word data);
 int pci_write_long(struct pci_dev *, int pos, u32 data);
 int pci_write_block(struct pci_dev *, int pos, byte *buf, int len);
 
-void pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
+int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
 
 #define PCI_FILL_IDENT		1
 #define PCI_FILL_IRQ		2
 #define PCI_FILL_BASES		4
 #define PCI_FILL_ROM_BASE	8
+#define PCI_FILL_SIZES		16
 #define PCI_FILL_RESCAN		0x10000
 
 void pci_setup_cache(struct pci_dev *, byte *cache, int len);

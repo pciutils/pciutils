@@ -1,3 +1,44 @@
+Wed Jul  7 00:55:48 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lib/proc.c (proc_scan): HAVE_LONG_ADDRESS instead of HAVE_64BIT_ADDRESS.
+
+	* lspci.c: ADDR_FORMAT now depends on both HAVE_64BIT_ADDRESS and
+	HAVE_LONG_ADDRESS.
+
+	* lib/configure: HAVE_64BIT_ADDRESS now doesn't imply that the addresses
+	are represented as long long. Introduced a new flag HAVE_LONG_ADDRESS
+	to indicate this. Both Sparc architectures now use both 64BIT_ADDRESS
+	and LONG_ADDRESS since they have 32-bit userland, but don't set LONG_ADDRESS
+	on Alpha.
+
+	* lspci.c (show_msi): Added dumping of the MSI capability.
+	(show_slotid): The same for SlotID capability.
+	(show_caps): Seperated capability dumping, because it should
+	be used for both htype0 and htype1. Even PCI 2.2 doesn't mention
+	layout of htype2, so I'm a bit unsure about it wrt capabilities
+	-- they at least have to live somewhere else since address 0x34
+	is already defined differently in htype2.
+
+	* lib/header.h (PCI_STATUS_UDF): Marked as obsolete (PCI 2.2).
+	(PCI_BASE_ADDRESS_MEM_TYPE_1M): Ditto.
+	(PCI_CAP_ID_*): Added some new capabilities defined in PCI 2.2.
+
+	* lspci.c (show_htype0): Mask out lowest 2 bits from all capability pointers
+	(required by the PCI 2.2 specs).
+
+Mon Jul  5 12:45:19 1999  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lspci.c (show_size): Added new function for dumping of region sizes.
+	(show_rom): Added. Now correctly dumps unassigned ROM addresses, disabled
+	ROMs et cetera.
+
+	* lib/pci.h (struct pci_dev): known_fields moved to the public part
+	of the structure.
+
+	* Added support for region sizes. Needs support in the kernel, because
+	sizes have to be scanned before drivers initialize yourself. pci_fill_info()
+	now returns a bitmask of what fields were really read.
+
 Mon Jun 28 18:37:51 1999  Dave Jones    <dave@powertweak.com>
 
 	* Makefile:

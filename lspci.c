@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.26 1999/06/17 17:51:45 mj Exp $
+ *	$Id: lspci.c,v 1.27 1999/07/07 11:23:04 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -57,7 +57,11 @@ static struct pci_access *pacc;
 #endif
 
 #ifdef HAVE_64BIT_ADDRESS
+#ifdef HAVE_LONG_ADDRESS
 #define ADDR_FORMAT "%016Lx"
+#else
+#define ADDR_FORMAT "%016lx"
+#endif
 #else
 #define ADDR_FORMAT "%08lx"
 #endif
@@ -103,7 +107,7 @@ scan_device(struct pci_dev *p)
     }
   d->config_cnt = how_much;
   pci_setup_cache(p, d->config, d->config_cnt);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
   return d;
 }
 
@@ -242,6 +246,21 @@ show_terse(struct device *d)
 }
 
 static void
+show_size(pciaddr_t x)
+{
+  printf(" [size=");
+  if (x < 1024)
+    printf("%d", (int) x);
+  else if (x < 1048576)
+    printf("%dK", (int)(x / 1024));
+  else if (x < 0x80000000)
+    printf("%dM", (int)(x / 1048576));
+  else
+    printf(ADDR_FORMAT, x);
+  putchar(']');
+}
+
+static void
 show_bases(struct device *d, int cnt)
 {
   struct pci_dev *p = d->dev;
@@ -251,10 +270,11 @@ show_bases(struct device *d, int cnt)
   for(i=0; i<cnt; i++)
     {
       pciaddr_t pos = p->base_addr[i];
+      pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
       u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
       if (flg == 0xffffffff)
 	flg = 0;
-      if (!pos && !flg)
+      if (!pos && !flg && !len)
 	continue;
       if (verbose > 1)
 	printf("\tRegion %d: ", i);
@@ -290,7 +310,7 @@ show_bases(struct device *d, int cnt)
 	    {
 	      if (i >= cnt - 1)
 		{
-		  printf("<invalid-64bit-slot>\n");
+		  printf("<invalid-64bit-slot>");
 		  done = 1;
 		}
 	      else
@@ -322,6 +342,8 @@ show_bases(struct device *d, int cnt)
 	  if (!(cmd & PCI_COMMAND_MEMORY))
 	    printf(" [disabled]");
 	}
+      if (len)
+	show_size(len);
       putchar('\n');
     }
 }
@@ -383,17 +405,72 @@ show_agp(struct device *d, int where, int cap)
 }
 
 static void
-show_htype0(struct device *d)
+show_rom(struct device *d)
 {
-  unsigned long rom = d->dev->rom_base_addr;
+  struct pci_dev *p = d->dev;
+  pciaddr_t rom = p->rom_base_addr;
+  pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
 
-  show_bases(d, 6);
-  if (rom & 1)
-    printf("\tExpansion ROM at %08lx%s\n", rom & PCI_ROM_ADDRESS_MASK,
-	   (rom & PCI_ROM_ADDRESS_ENABLE) ? "" : " [disabled]");
+  if (!rom && !len)
+    return;
+  printf("\tExpansion ROM at ");
+  if (rom & PCI_ROM_ADDRESS_MASK)
+    printf(ADDR_FORMAT, rom & PCI_ROM_ADDRESS_MASK);
+  else
+    printf("<unassigned>");
+  if (!(rom & PCI_ROM_ADDRESS_ENABLE))
+    printf(" [disabled]");
+  show_size(len);
+  putchar('\n');
+}
+
+static void
+show_msi(struct device *d, int where, int cap)
+{
+  int is64;
+  u32 t;
+  u16 w;
+
+  printf("Message Signalled Interrupts: 64bit%c Queue=%d/%d Enable%c\n",
+	 FLAG(cap, PCI_MSI_FLAGS_64BIT),
+	 (cap & PCI_MSI_FLAGS_QSIZE) >> 4,
+	 (cap & PCI_MSI_FLAGS_QMASK) >> 1,
+	 FLAG(cap, PCI_MSI_FLAGS_ENABLE));
+  if (verbose < 2)
+    return;
+  is64 = cap & PCI_MSI_FLAGS_64BIT;
+  config_fetch(d, where + PCI_MSI_ADDRESS_LO, (is64 ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32) + 2 - PCI_MSI_ADDRESS_LO);
+  printf("\t\tAddress: ");
+  if (is64)
+    {
+      t = get_conf_long(d, where + PCI_MSI_ADDRESS_HI);
+      w = get_conf_word(d, where + PCI_MSI_DATA_64);
+      printf("%08x", t);
+    }
+  else
+    w = get_conf_word(d, where + PCI_MSI_DATA_32);
+  t = get_conf_long(d, where + PCI_MSI_ADDRESS_LO);
+  printf("%08x  Data: %04x\n", t, w);
+}
+
+static void
+show_slotid(int cap)
+{
+  int esr = cap & 0xff;
+  int chs = cap >> 8;
+
+  printf("Slot ID: %d slots, First%c, chassis %02x\n",
+	 esr & PCI_SID_ESR_NSLOTS,
+	 FLAG(esr, PCI_SID_ESR_FIC),
+	 chs);
+}
+
+static void
+show_caps(struct device *d)
+{
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
-      int where = get_conf_byte(d, PCI_CAPABILITY_LIST);
+      int where = get_conf_byte(d, PCI_CAPABILITY_LIST) & ~3;
       while (where)
 	{
 	  int id, next, cap;
@@ -404,7 +481,7 @@ show_htype0(struct device *d)
 	      break;
 	    }
 	  id = get_conf_byte(d, where + PCI_CAP_LIST_ID);
-	  next = get_conf_byte(d, where + PCI_CAP_LIST_NEXT);
+	  next = get_conf_byte(d, where + PCI_CAP_LIST_NEXT) & ~3;
 	  cap = get_conf_word(d, where + PCI_CAP_FLAGS);
 	  printf("[%02x] ", where);
 	  if (id == 0xff)
@@ -420,8 +497,17 @@ show_htype0(struct device *d)
 	    case PCI_CAP_ID_AGP:
 	      show_agp(d, where, cap);
 	      break;
+	    case PCI_CAP_ID_VPD:
+	      printf("Vital Product Data\n");
+	      break;
+	    case PCI_CAP_ID_SLOTID:
+	      show_slotid(cap);
+	      break;
+	    case PCI_CAP_ID_MSI:
+	      show_msi(d, where, cap);
+	      break;
 	    default:
-	      printf("#%02x [%04x]", id, cap);
+	      printf("#%02x [%04x]\n", id, cap);
 	    }
 	  where = next;
 	}
@@ -429,9 +515,16 @@ show_htype0(struct device *d)
 }
 
 static void
+show_htype0(struct device *d)
+{
+  show_bases(d, 6);
+  show_rom(d);
+  show_caps(d);
+}
+
+static void
 show_htype1(struct device *d)
 {
-  struct pci_dev *p = d->dev;
   u32 io_base = get_conf_byte(d, PCI_IO_BASE);
   u32 io_limit = get_conf_byte(d, PCI_IO_LIMIT);
   u32 io_type = io_base & PCI_IO_RANGE_TYPE_MASK;
@@ -441,7 +534,6 @@ show_htype1(struct device *d)
   u32 pref_base = get_conf_word(d, PCI_PREF_MEMORY_BASE);
   u32 pref_limit = get_conf_word(d, PCI_PREF_MEMORY_LIMIT);
   u32 pref_type = pref_base & PCI_PREF_RANGE_TYPE_MASK;
-  unsigned long rom = p->rom_base_addr;
   word brc = get_conf_word(d, PCI_BRIDGE_CONTROL);
 
   show_bases(d, 2);
@@ -497,9 +589,7 @@ show_htype1(struct device *d)
   if (get_conf_word(d, PCI_SEC_STATUS) & PCI_STATUS_SIG_SYSTEM_ERROR)
     printf("\tSecondary status: SERR\n");
 
-  if (rom & 1)
-    printf("\tExpansion ROM at %08lx%s\n", rom & PCI_ROM_ADDRESS_MASK,
-	   (rom & PCI_ROM_ADDRESS_ENABLE) ? "" : " [disabled]");
+  show_rom(d);
 
   if (verbose > 1)
     printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",
@@ -510,6 +600,8 @@ show_htype1(struct device *d)
 	   FLAG(brc, PCI_BRIDGE_CTL_MASTER_ABORT),
 	   FLAG(brc, PCI_BRIDGE_CTL_BUS_RESET),
 	   FLAG(brc, PCI_BRIDGE_CTL_FAST_BACK));
+
+  show_caps(d);
 }
 
 static void
