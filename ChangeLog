@@ -1,3 +1,15 @@
+2003-12-27  Martin Mares  <mj@ucw.cz>
+
+	Merged support for Solaris on i386 by Bill Moore <billm@eng.sun.com>
+	and cleaned up:
+
+	* lib/configure: Recognize SunOS.
+	* lib/internal.h: Learn how to recognize byte order on SunOS.
+	* lib/i386-ports.c: Split OS-dependent I/O port access from i386-ports.c.
+	* lib/i386-io-linux.h: Linux specific part.
+	* lib/i386-io-hurd.h: GNU/Hurd specific part.
+	* lib/i386-io-sunos.h: SunOS specific part.
+
 2003-12-26  Martin Mares  <mj@ucw.cz>
 
 	* lib/header.h (PCI_*_MASK): Cast to pciaddr_t explicitly.

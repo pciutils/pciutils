@@ -8,47 +8,16 @@
 
 #include <unistd.h>
 
-#ifdef __GLIBC__
-#include <sys/io.h>
-#else
-#include <asm/io.h>
-#endif
-
 #include "internal.h"
 
-#ifdef OS_LINUX
-static int intel_iopl_set = -1;
-
-static int
-intel_setup_io(void)
-{
-  if (intel_iopl_set < 0)
-    intel_iopl_set = (iopl(3) < 0) ? 0 : 1;
-  return intel_iopl_set;
-}
-
-static inline void
-intel_cleanup_io(void)
-{
-  if (intel_iopl_set > 0)
-    iopl(3);
-  intel_iopl_set = -1;
-}
-#endif
-
-#ifdef OS_GNU
-/* The GNU Hurd doesn't have an iopl() call */
-
-static inline int
-intel_setup_io(void)
-{
-  return 1;
-}
-
-static inline int
-intel_cleanup_io(void)
-{
-}
+#if defined(OS_LINUX)
+#include "i386-io-linux.h"
+#elif defined(OS_GNU)
+#include "i386-io-hurd.h"
+#elif defined(OS_SunOS)
+#include "i386-io-sunos.h"
+#else
+#error Do not know how to access I/O ports on this OS.
 #endif
 
 static void

@@ -35,6 +35,16 @@
 #include <sys/types.h>
 #endif
 
+#ifdef OS_SunOS
+#include <sys/byteorder.h>
+#define BIG_ENDIAN 4321
+#ifdef _LITTLE_ENDIAN
+#define BYTE_ORDER 1234
+#else
+#define BYTE_ORDER 4321
+#endif
+#endif
+
 #if BYTE_ORDER == BIG_ENDIAN
 #define cpu_to_le16 swab16
 #define cpu_to_le32 swab32

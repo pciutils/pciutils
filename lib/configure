@@ -20,7 +20,7 @@ then
 	proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
 	cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
 else
-	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/'`
+	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
 fi
 echo " $sys/$cpu $rel"
 
@@ -50,6 +50,19 @@ case $sys in
 						;;
 		esac
 		;;
+	SunOS)
+		case $cpu in
+				i386)		echo_n " i386-ports"
+						echo >>$c "#define HAVE_PM_INTEL_CONF"
+						ok=1
+						;;
+				*)
+						echo " The PCI library is does not support Solaris for this architecture: $cpu"
+						exit 1
+						;;
+		esac
+		;;
+		
 	FreeBSD)
 		echo_n " fbsd-device"
 		echo >>$c '#define HAVE_PM_FBSD_DEVICE'
@@ -68,7 +81,7 @@ case $sys in
 		ok=1
 		;;
     	GNU)
-		echo_n " intel-conf"
+		echo_n " i386-ports"
 		echo >>$c '#define HAVE_PM_INTEL_CONF'
 		ok=1
 		;;
