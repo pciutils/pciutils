@@ -1,3 +1,11 @@
+2000-04-29  Martin Mares  <mj@albireo.ucw.cz>
+
+	* lib/names.c (pci_lookup_name): Fixed the cheat.
+
+	* lib/internal.h: Moved UNUSED/inline hacks above all other declarations.
+
+	* pci.ids: Various ID updates.
+
 2000-04-21  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Released as 2.1.7.

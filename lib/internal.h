@@ -1,14 +1,21 @@
 /*
- *	$Id: internal.h,v 1.4 2000/04/21 11:58:00 mj Exp $
+ *	$Id: internal.h,v 1.5 2000/04/29 12:56:23 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2000 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
 #include "pci.h"
+
+#ifdef __GNUC__
+#define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#define inline
+#endif
 
 #ifdef HAVE_PM_LINUX_BYTEORDER_H
 
@@ -85,10 +92,3 @@ int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
   pm_syscalls, pm_fbsd_device, pm_aix_device, pm_dump;
-
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#define inline
-#endif

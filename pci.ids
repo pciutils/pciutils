@@ -4,7 +4,7 @@
 #	Maintained by Martin Mares <pci-ids@ucw.cz>
 #	If you have any new entries, send them to the maintainer.
 #
-#	$Id: pci.ids,v 1.57 2000/04/21 12:00:12 mj Exp $
+#	$Id: pci.ids,v 1.58 2000/04/29 12:56:22 mj Exp $
 #
 
 # Vendors, devices and subsystems. Please keep sorted.
@@ -315,7 +315,7 @@
 	0046  DECchip 21554
 		9005 1364  Dell PowerEdge RAID Controller 2
 		9005 1365  Dell PowerEdge RAID Controller 2
-	1065  DECchip 21285
+	1065  StrongARM DC21285
 		1069 0020  DAC960P
 1012  Micronics Computers Inc
 1013  Cirrus Logic
@@ -1403,6 +1403,7 @@
 	1077  VScom 400 4 port serial adaptor
 	9036  9036
 	9050  PCI <-> IOBus Bridge
+		10b5 2273  SH-ARC SoHard ARCnet card
 		d84d 4006  EX-4006 1P
 		d84d 4008  EX-4008 1P EPP/ECP
 		d84d 4014  EX-4014 2P
@@ -1461,6 +1462,7 @@
 	5950  3c595 100BaseTX [Vortex]
 	5951  3c595 100BaseT4 [Vortex]
 	5952  3c595 100Base-MII [Vortex]
+	7646  SOHO100 [Office Connect Fast Etherlink]
 	8811  Token ring
 	9000  3c900 10BaseT [Boomerang]
 	9001  3c900 Combo [Boomerang]
@@ -2406,6 +2408,7 @@
 11ae  Aztech System Ltd
 11af  Avid Technology Inc.
 11b0  V3 Semiconductor Inc.
+	0002  V300PSC
 	0292  V292PBC [Am29030/40 Bridge]
 	0960  V96xPBC
 	c960  V96DPC
@@ -4137,8 +4140,6 @@
 1b13  Jaton Corp
 1c1c  Symphony
 	0001  82C101
-1d44  DPT
-	a400  PM2x24/PM3224
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040
 	2020  DC-390

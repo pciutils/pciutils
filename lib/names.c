@@ -1,9 +1,9 @@
 /*
- *	$Id: names.c,v 1.5 2000/04/21 11:58:48 mj Exp $
+ *	$Id: names.c,v 1.6 2000/04/29 12:56:23 mj Exp $
  *
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--1999 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+ *	Copyright (c) 1997--2000 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -300,7 +300,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
 	  struct nl_entry *e, *e2;
 	  e = nl_lookup(a, 0, NL_VENDOR, arg3, 0, 0, 0);
 	  e2 = nl_lookup(a, 0, NL_SUBSYSTEM, arg1, arg2, arg3, arg4);
-	  if (!e2 && arg1 == arg2 && arg3 == arg4)
+	  if (!e2 && arg1 == arg3 && arg2 == arg4)
 	    /* Cheat for vendors blindly setting subsystem ID same as device ID */
 	    e2 = nl_lookup(a, 0, NL_DEVICE, arg1, arg2, 0, 0);
 	  if (!e)
