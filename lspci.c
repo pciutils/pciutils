@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.11 1998/04/19 11:02:27 mj Exp $
+ *	$Id: lspci.c,v 1.12 1998/06/08 07:54:37 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -858,6 +858,11 @@ main(int argc, char **argv)
   int i;
   char *msg;
 
+  if (argc == 2 && !strcmp(argv[1], "--version"))
+    {
+      puts("lspci version " PCIUTILS_VERSION);
+      return 0;
+    }
   filter_init(&filter);
   while ((i = getopt(argc, argv, options)) != -1)
     switch (i)
