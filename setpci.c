@@ -1,5 +1,5 @@
 /*
- *	$Id: setpci.c,v 1.5 1998/09/02 18:47:42 mj Exp $
+ *	$Id: setpci.c,v 1.6 1998/10/19 13:37:44 mj Exp $
  *
  *	Linux PCI Utilities -- Manipulate PCI Configuration Registers
  *
@@ -65,6 +65,8 @@ xmalloc(unsigned int howmuch)
  * As libc doesn't support pread/pwrite yet, we have to call them directly
  * or use lseek/read/write instead.
  */
+#if !(defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ > 0)
+
 #if defined(__GLIBC__) && !(defined(__powerpc__) && __GLIBC__ == 2 && __GLIBC_MINOR__ == 0)
 #ifndef SYS_pread
 #define SYS_pread __NR_pread
@@ -86,6 +88,8 @@ pwrite(unsigned int fd, void *buf, size_t size, loff_t where)
 #else
 static _syscall4(int, pread, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
 static _syscall4(int, pwrite, unsigned int, fd, void *, buf, size_t, size, loff_t, where);
+#endif
+
 #endif
 
 static void
