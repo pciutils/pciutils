@@ -1,5 +1,5 @@
 /*
- *	$Id: names.c,v 1.1 1997/12/23 10:29:18 mj Exp $
+ *	$Id: names.c,v 1.2 1997/12/27 18:38:30 mj Exp $
  *
  *	Linux PCI Utilities -- Device ID to Name Translation
  *
@@ -198,12 +198,12 @@ lookup_vendor(word i)
 {
   static char vendbuf[6];
 
+  if (!show_numeric_ids && !name_list_loaded)
+    load_name_list();
   if (!show_numeric_ids)
     {
       struct nl_entry *e;
 
-      if (!name_list_loaded)
-	load_name_list();
       e = nl_lookup(ID1_VENDOR, i);
       if (e)
 	return e->name;
@@ -217,12 +217,12 @@ lookup_device(word v, word i)
 {
   static char devbuf[6];
 
+  if (!show_numeric_ids && !name_list_loaded)
+    load_name_list();
   if (!show_numeric_ids)
     {
       struct nl_entry *e;
 
-      if (!name_list_loaded)
-	load_name_list();
       e = nl_lookup(v, i);
       if (e)
 	return e->name;
@@ -236,12 +236,12 @@ lookup_device_full(word v, word i)
 {
   static char fullbuf[256];
 
+  if (!show_numeric_ids && !name_list_loaded)
+    load_name_list();
   if (!show_numeric_ids)
     {
       struct nl_entry *e, *e2;
 
-      if (!name_list_loaded)
-	load_name_list();
       e = nl_lookup(ID1_VENDOR, v);
       e2 = nl_lookup(v, i);
       if (!e)
@@ -261,12 +261,12 @@ lookup_class(word c)
 {
   static char classbuf[80];
 
+  if (!show_numeric_ids && !name_list_loaded)
+    load_name_list();
   if (!show_numeric_ids)
     {
       struct nl_entry *e;
 
-      if (!name_list_loaded)
-	load_name_list();
       e = nl_lookup(ID1_SUBCLASS, c);
       if (e)
 	return e->name;
