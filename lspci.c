@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.1 1997/12/23 10:29:18 mj Exp $
+ *	$Id: lspci.c,v 1.2 1997/12/23 17:12:02 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -27,8 +27,9 @@ static int slot_filter = -1;
 static int func_filter = -1;
 static int vend_filter = -1;
 static int dev_filter = -1;
+static int show_tree;			/* Show bus tree */
 
-static char options[] = "nvbxB:S:F:V:D:";
+static char options[] = "nvbxB:S:F:V:D:t";
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -38,6 +39,7 @@ Usage: lspci [<switches>]\n\
 -b\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
 -x\tShow hex-dump of config space (-xx shows full 256 bytes)\n\
 -B <bus>, -S <slot>, -F <func>, -V <vendor>, -D <device>  Show only selected devices\n\
+-t\tShow bus tree\n\
 ";
 
 /* Our view of the PCI bus */
@@ -227,7 +229,7 @@ sort_them(void)
   *last_dev = NULL;
 }
 
-/* Output */
+/* Normal output */
 
 static void
 show_terse(struct device *d)
@@ -577,6 +579,223 @@ show(void)
     }
 }
 
+/* Tree output */
+
+struct bridge {
+  struct bridge *chain;			/* Single-linked list of bridges */
+  struct bridge *next, *child;		/* Tree of bridges */
+  struct bus *first_bus;		/* List of busses connected to this bridge */
+  unsigned int primary, secondary, subordinate;	/* Bus numbers */
+  struct device *br_dev;
+};
+
+struct bus {
+  unsigned int number;
+  struct bus *sibling;
+  struct device *first_dev, **last_dev;
+};
+
+static struct bridge host_bridge = { NULL, NULL, NULL, NULL, ~0, 0, ~0, NULL };
+
+static struct bus *
+find_bus(struct bridge *b, unsigned int n)
+{
+  struct bus *bus;
+
+  for(bus=b->first_bus; bus; bus=bus->sibling)
+    if (bus->number == n)
+      break;
+  return bus;
+}
+
+static struct bus *
+new_bus(struct bridge *b, unsigned int n)
+{
+  struct bus *bus = xmalloc(sizeof(struct bus));
+
+  bus = xmalloc(sizeof(struct bus));
+  bus->number = n;
+  bus->sibling = b->first_bus;
+  bus->first_dev = NULL;
+  bus->last_dev = &bus->first_dev;
+  b->first_bus = bus;
+  return bus;
+}
+
+static void
+insert_dev(struct device *d, struct bridge *b)
+{
+  struct bus *bus;
+
+  if (! (bus = find_bus(b, d->bus)))
+    {
+      struct bridge *c;
+      for(c=b->child; c; c=c->next)
+	if (c->secondary <= d->bus && d->bus <= c->subordinate)
+	  return insert_dev(d, c);
+      bus = new_bus(b, d->bus);
+    }
+  /* Simple insertion at the end _does_ guarantee the correct order as the
+   * original device list was sorted by (bus, devfn) lexicographically
+   * and all devices on the new list have the same bus number.
+   */
+  *bus->last_dev = d;
+  bus->last_dev = &d->next;
+  d->next = NULL;
+}
+
+static void
+grow_tree(void)
+{
+  struct device *d, *d2;
+  struct bridge *first_br, *b;
+
+  /* Build list of bridges */
+
+  first_br = &host_bridge;
+  for(d=first_dev; d; d=d->next)
+    {
+      word class = get_conf_word(d, PCI_CLASS_DEVICE);
+      if (class == PCI_CLASS_BRIDGE_PCI && (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f) == 1)
+	{
+	  b = xmalloc(sizeof(struct bridge));
+	  b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
+	  b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
+	  b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
+	  b->chain = first_br;
+	  first_br = b;
+	  b->next = b->child = NULL;
+	  b->first_bus = NULL;
+	  b->br_dev = d;
+	}
+    }
+
+  /* Create a bridge tree */
+
+  for(b=first_br; b; b=b->chain)
+    {
+      struct bridge *c, *best;
+      best = NULL;
+      for(c=first_br; c; c=c->chain)
+	if (c != b && b->primary >= c->secondary && b->primary <= c->subordinate &&
+	    (!best || best->subordinate - best->primary > c->subordinate - c->primary))
+	  best = c;
+      if (best)
+	{
+	  b->next = best->child;
+	  best->child = b;
+	}
+    }
+
+  /* Insert secondary bus for each bridge */
+
+  for(b=first_br; b; b=b->chain)
+    if (!find_bus(b, b->secondary))
+      new_bus(b, b->secondary);
+
+  /* Create bus structs and link devices */
+
+  for(d=first_dev; d;)
+    {
+      d2 = d->next;
+      insert_dev(d, &host_bridge);
+      d = d2;
+    }
+}
+
+static void
+print_it(byte *line, byte *p)
+{
+  *p++ = '\n';
+  *p = 0;
+  fputs(line, stdout);
+  for(p=line; *p; p++)
+    if (*p == '+')
+      *p = '|';
+    else
+      *p = ' ';
+}
+
+static void show_tree_bridge(struct bridge *, byte *, byte *);
+
+static void
+show_tree_dev(struct device *d, byte *line, byte *p)
+{
+  struct bridge *b;
+
+  p += sprintf(p, "%02x.%x", PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+  for(b=&host_bridge; b; b=b->chain)
+    if (b->br_dev == d)
+      {
+	p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
+        show_tree_bridge(b, line, p);
+        return;
+      }
+  print_it(line, p);
+}
+
+static void
+show_tree_bus(struct bus *b, byte *line, byte *p)
+{
+  if (!b->first_dev)
+    print_it(line, p);
+  else if (!b->first_dev->next)
+    {
+      *p++ = '-';
+      *p++ = '-';
+      show_tree_dev(b->first_dev, line, p);
+    }
+  else
+    {
+      struct device *d = b->first_dev;
+      while (d->next)
+	{
+	  p[0] = '+';
+	  p[1] = '-';
+	  show_tree_dev(d, line, p+2);
+	  d = d->next;
+	}
+      p[0] = '\\';
+      p[1] = '-';
+      show_tree_dev(d, line, p+2);
+    }
+}
+
+static void
+show_tree_bridge(struct bridge *b, byte *line, byte *p)
+{
+  *p++ = '-';
+  if (!b->first_bus->sibling)
+    {
+      if (b == &host_bridge)
+        p += sprintf(p, "[%02x]-", b->first_bus->number);
+      show_tree_bus(b->first_bus, line, p);
+    }
+  else
+    {
+      struct bus *u = b->first_bus;
+      byte *k;
+
+      while (u->sibling)
+        {
+          k = p + sprintf(p, "+-[%02x]-", u->number);
+          show_tree_bus(u, line, k);
+          u = u->sibling;
+        }
+      k = p + sprintf(p, "\\-[%02x]-", u->number);
+      show_tree_bus(u, line, k);
+    }
+}
+
+static void
+show_forest(void)
+{
+  char line[256];
+
+  grow_tree();
+  show_tree_bridge(&host_bridge, line, line);
+}
+
 /* Main */
 
 int
@@ -614,6 +833,9 @@ main(int argc, char **argv)
       case 'x':
 	show_hex++;
 	break;
+      case 't':
+	show_tree++;
+	break;
       default:
       bad:
 	fprintf(stderr, help_msg);
@@ -624,7 +846,10 @@ main(int argc, char **argv)
 
   scan_proc();
   sort_them();
-  show();
+  if (show_tree)
+    show_forest();
+  else
+    show();
 
   return 0;
 }
