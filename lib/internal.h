@@ -1,5 +1,5 @@
 /*
- *	$Id: internal.h,v 1.2 1999/07/07 11:23:10 mj Exp $
+ *	$Id: internal.h,v 1.3 1999/07/20 14:01:32 mj Exp $
  *
  *	The PCI Library -- Internal Include File
  *
@@ -20,8 +20,17 @@
 
 #else
 
+#ifdef OS_LINUX
 #include <endian.h>
-#if __BYTE_ORDER == __BIG_ENDIAN
+#define BYTE_ORDER __BYTE_ORDER
+#define BIG_ENDIAN __BIG_ENDIAN
+#endif
+
+#ifdef OS_FREEBSD
+#include <sys/types.h>
+#endif
+
+#if BYTE_ORDER == BIG_ENDIAN
 #define cpu_to_le16 swab16
 #define cpu_to_le32 swab32
 #define le16_to_cpu swab16
@@ -74,6 +83,6 @@ struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
-  pm_syscalls, pm_dump;
+  pm_syscalls, pm_fbsd_device, pm_dump;
 
 #define UNUSED __attribute__((unused))

@@ -1,5 +1,5 @@
 /*
- *	$Id: pci.h,v 1.5 1999/07/20 12:13:40 mj Exp $
+ *	$Id: pci.h,v 1.6 1999/07/20 14:01:35 mj Exp $
  *
  *	The PCI Library
  *
@@ -23,6 +23,7 @@
  *	Types
  */
 
+#ifdef OS_LINUX
 #include <linux/types.h>
 
 typedef __u8 byte;
@@ -30,6 +31,17 @@ typedef __u8 u8;
 typedef __u16 word;
 typedef __u16 u16;
 typedef __u32 u32;
+#endif
+
+#ifdef OS_FREEBSD
+#include <sys/types.h>
+
+typedef u_int8_t byte;
+typedef u_int8_t u8;
+typedef u_int16_t word;
+typedef u_int16_t u16;
+typedef u_int32_t u32;
+#endif
 
 #ifdef HAVE_LONG_ADDRESS
 typedef unsigned long long pciaddr_t;
@@ -49,8 +61,9 @@ struct nl_entry;
 #define PCI_ACCESS_SYSCALLS		2	/* pciconfig_read() syscalls (params: none) */
 #define PCI_ACCESS_I386_TYPE1		3	/* i386 ports, type 1 (params: none) */
 #define PCI_ACCESS_I386_TYPE2		4	/* i386 ports, type 2 (params: none) */
-#define PCI_ACCESS_DUMP			5	/* Dump file (params: filename) */
-#define PCI_ACCESS_MAX			6
+#define PCI_ACCESS_FBSD_DEVICE		5	/* FreeBSD /dev/pci (params: path) */
+#define PCI_ACCESS_DUMP			6	/* Dump file (params: filename) */
+#define PCI_ACCESS_MAX			7
 
 struct pci_access {
   /* Options you can change: */

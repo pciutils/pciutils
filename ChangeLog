@@ -1,5 +1,26 @@
 Tue Jul 20 13:25:09 1999  Martin Mares  <mj@albireo.ucw.cz>
 
+	* lib/pci.h: Types are OS dependent.
+
+	* lib/internal.h: Byte order hacks are OS dependent.
+
+	* lib/configure: Recognize FreeBSD. Also set OS_XXX according to the OS.
+
+	* lib/Makefile, lib/access.c: Added fbsd-device target.
+
+	* pci.ids: Added an entry for PLX 9080 bridges with subsystem ID
+	incorrectly set to device ID.
+
+	* README: Added a note that we support FreeBSD.
+
+	* Makefile (PREFIX, ROOT): Set it depending on the OS.
+	(%.8): Grrr, BSD date is not able to convert date formats the same way
+	as GNU date does. Use sed instead.
+	(install): Use `-c' when calling install.
+
+	* lib/fbsd-device.c: Added FreeBSD /dev/pci access module contributed
+	by Jari Kirma <kirma@cs.hut.fi>.
+
 	* lib/proc.c: Rewrote the pread/pwrite things once again. Use pread
 	and pwrite only when we are certain it's safe (i.e., glibc 2.1
 	on all architectures or any libc on a i386 where we really know

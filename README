@@ -11,8 +11,8 @@ for details.
 
    The PCI Utilities package contains a library for portable access to PCI bus
 configuration space and several utilities based on this library. Current
-version works only on Linux, but it can be easily extended to work on other
-systems as well.
+version works only on Linux and also has an experimental support for FreeBSD,
+but it can be easily extended to work on other systems as well.
 
    The utilities include:  (See manual pages for more details)
 
