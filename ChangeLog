@@ -1,5 +1,7 @@
 2002-03-24  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (format_agp_rate): Fixed AGP rate reporting.
+
 	* lib/filter.c (pci_filter_parse_slot): Allow bus 0xff, slot 0x1f and
 	function 7.
 

@@ -1,5 +1,5 @@
 /*
- *	$Id: lspci.c,v 1.38 2000/05/20 14:36:02 mj Exp $
+ *	$Id: lspci.c,v 1.39 2002/03/24 12:24:34 mj Exp $
  *
  *	Linux PCI Utilities -- List All PCI Devices
  *
@@ -413,7 +413,7 @@ format_agp_rate(int rate, char *buf)
   char *c = buf;
   int i;
 
-  for(i=0; i<2; i++)
+  for(i=0; i<=2; i++)
     if (rate & (1 << i))
       {
 	if (c != buf)
