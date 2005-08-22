@@ -1,5 +1,5 @@
 - lspci: don't die when non-root tries to dump cardbus data; mention the
-  "available only to root" things in the man page.
+  "available only to root" things in the man page. And possibly adjust exit code.
 
 - pci.ids: "Unknown mass storage controller" -> "Mass storage controller".
 
@@ -12,3 +12,11 @@
 PCIIDS:
 - another mirror at Atrey?
 - delete old DB at SF
+
+MERGES:
+- pcimodules???
+- Debian: a couple of bug fixes
+- RedHat: bug fixes
+- SuSE: synced
+- MDK: synced
+- Slack: obsolete

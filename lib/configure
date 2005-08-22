@@ -38,7 +38,7 @@ echo_n "Looking for access methods..."
 case $sys in
 	linux*)
 		case $rel in
-			2.[1-9]*|[3-9]*)	echo_n "sysfs proc"
+			2.[1-9]*|[3-9]*)	echo_n " sysfs proc"
 						echo >>$c '#define PCI_HAVE_PM_LINUX_SYSFS'
 						echo >>$c '#define PCI_HAVE_PM_LINUX_PROC'
 						echo >>$c '#define PCI_HAVE_LINUX_BYTEORDER_H'
@@ -52,7 +52,7 @@ case $sys in
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						ok=1
 						;;
-				alpha|ia64|sparc|sparc64|ppc|ppc64)
+				alpha|ia64|sparc|sparc64|ppc|ppc64|x86_64)
 						echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 						;;
 		esac

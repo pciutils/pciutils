@@ -1,3 +1,7 @@
+2005-08-23  Martin Mares  <mj@ucw.cz>
+
+	* lib/configure: Added x86_64 on Linux.
+
 2005-08-22  Martin Mares  <mj@ucw.cz>
 
 	* lib/filter.c (pci_filter_parse_slot): Fixed parsing of domain filters.
