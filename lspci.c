@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -1450,7 +1450,7 @@ show_htype1(struct device *d)
     }
 
   if (verbose > 1)
-    printf("\tSecondary status: 66Mhz%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c <SERR%c <PERR%c\n",
+    printf("\tSecondary status: 66MHz%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c <SERR%c <PERR%c\n",
 	     FLAG(sec_stat, PCI_STATUS_66MHZ),
 	     FLAG(sec_stat, PCI_STATUS_FAST_BACK),
 	     FLAG(sec_stat, PCI_STATUS_PARITY),
@@ -1602,7 +1602,7 @@ show_verbose(struct device *d)
 	     FLAG(cmd, PCI_COMMAND_WAIT),
 	     FLAG(cmd, PCI_COMMAND_SERR),
 	     FLAG(cmd, PCI_COMMAND_FAST_BACK));
-      printf("\tStatus: Cap%c 66Mhz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+      printf("\tStatus: Cap%c 66MHz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
 	     FLAG(status, PCI_STATUS_CAP_LIST),
 	     FLAG(status, PCI_STATUS_66MHZ),
 	     FLAG(status, PCI_STATUS_UDF),
@@ -1650,7 +1650,7 @@ show_verbose(struct device *d)
       if (cmd & PCI_COMMAND_FAST_BACK)
 	printf("fast Back2Back, ");
       if (status & PCI_STATUS_66MHZ)
-	printf("66Mhz, ");
+	printf("66MHz, ");
       if (status & PCI_STATUS_UDF)
 	printf("user-definable features, ");
       printf("%s devsel",

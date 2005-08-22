@@ -1,3 +1,8 @@
+2005-08-22  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c: Corrected spelling of "Hz" (it was "hz" at several places).
+	Thanks to Krzysztof Oledzki <ole@ans.pl> for pointing that out.
+
 2004-08-19  Martin Mares  <mj@ucw.cz>
 
 	* pciutils.spec (%attr): Setting attributes for /sbin/* is an anachronism,
