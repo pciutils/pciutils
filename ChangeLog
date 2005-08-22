@@ -1,7 +1,10 @@
 2005-08-22  Martin Mares  <mj@ucw.cz>
 
+	* lib/filter.c (pci_filter_parse_slot): Fixed parsing of domain filters.
+	Thanks to Matthew Wilcox for bug report.
+
 	* lspci.c: Corrected spelling of "Hz" (it was "hz" at several places).
-	Thanks to Krzysztof Oledzki <ole@ans.pl> for pointing that out.
+	Thanks to Krzysztof Oledzki for pointing that out.
 
 2004-08-19  Martin Mares  <mj@ucw.cz>
 
