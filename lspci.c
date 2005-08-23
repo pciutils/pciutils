@@ -49,13 +49,14 @@ GENERIC_HELP
 static struct pci_access *pacc;
 
 /*
- *  If we aren't being compiled by GCC, use malloc() instead of alloca().
+ *  If we aren't being compiled by GCC, use xmalloc() instead of alloca().
  *  This increases our memory footprint, but only slightly since we don't
  *  use alloca() much.
  */
 
 #ifndef __GNUC__
-#define alloca malloc
+#undef alloca
+#define alloca xmalloc
 #endif
 
 /* Our view of the PCI bus */

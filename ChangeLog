@@ -1,5 +1,7 @@
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c: If alloca() is not available, use xmalloc(), not malloc().
+
 	* lib/configure: Added x86_64 on Linux.
 
 2005-08-22  Martin Mares  <mj@ucw.cz>
