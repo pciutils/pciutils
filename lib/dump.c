@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Reading of Bus Dumps
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -14,7 +14,7 @@
 #include "internal.h"
 
 struct dump_data {
-  int len;
+  int len, allocated;
   byte data[1];
 };
 
@@ -28,7 +28,8 @@ static void
 dump_alloc_data(struct pci_dev *dev, int len)
 {
   struct dump_data *dd = pci_malloc(dev->access, sizeof(struct dump_data) + len - 1);
-  dd->len = len;
+  dd->allocated = len;
+  dd->len = 0;
   memset(dd->data, 0xff, len);
   dev->aux = dd;
 }
@@ -80,7 +81,7 @@ dump_init(struct pci_access *a)
 		a->error("dump: Malformed line");
 	      if (i >= 4096)
 		break;
-	      if (i > dd->len)		/* Need to re-allocate the buffer */
+	      if (i > dd->allocated)	/* Need to re-allocate the buffer */
 		{
 		  dump_alloc_data(dev, 4096);
 		  memcpy(((struct dump_data *) dev->aux)->data, dd->data, 256);
@@ -88,6 +89,8 @@ dump_init(struct pci_access *a)
 		  dd = dev->aux;
 		}
 	      dd->data[i++] = j;
+	      if (i > dd->len)
+		dd->len = i;
 	      z += 2;
 	    }
 	}

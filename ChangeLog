@@ -13,7 +13,9 @@
 	device has either PCI-X or PCI Express capability in its normal capability
 	list.
 
-	* lib/dump.c (dump_init): Reading of dumps works again.
+	* lib/dump.c (dump_init): Reading of dumps works again. The dump reader
+	now also remembers how much data it has read and refuses attempts to
+	access more than that.
 
 	* setpci.man, lspci.c, README: prefer spelling "buses" over "busses".
 
