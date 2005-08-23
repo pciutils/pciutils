@@ -64,8 +64,9 @@ static struct pci_access *pacc;
 struct device {
   struct device *next;
   struct pci_dev *dev;
-  unsigned int config_cnt, config_bufsize;
-  byte *config;
+  unsigned int config_cached, config_bufsize;
+  byte *config;				/* Cached configuration space data */
+  byte *present;			/* Maps which configuration bytes are present */
 };
 
 static struct device *first_dev;
@@ -75,17 +76,26 @@ config_fetch(struct device *d, unsigned int pos, unsigned int len)
 {
   unsigned int end = pos+len;
   int result;
-  if (end <= d->config_cnt)
+
+  while (pos < d->config_bufsize && len && d->present[pos])
+    pos++, len--;
+  while (pos+len <= d->config_bufsize && len && d->present[pos+len-1])
+    len--;
+  if (!len)
     return 1;
+
   if (end > d->config_bufsize)
     {
+      int orig_size = d->config_bufsize;
       while (end > d->config_bufsize)
 	d->config_bufsize *= 2;
       d->config = xrealloc(d->config, d->config_bufsize);
+      d->present = xrealloc(d->present, d->config_bufsize);
+      bzero(d->present + orig_size, d->config_bufsize - orig_size);
     }
   result = pci_read_block(d->dev, pos, d->config + pos, len);
-  if (result && pos == d->config_cnt)
-    d->config_cnt = end;
+  if (result)
+    memset(d->present + pos, 1, len);
   return result;
 }
 
@@ -99,18 +109,20 @@ scan_device(struct pci_dev *p)
   d = xmalloc(sizeof(struct device));
   bzero(d, sizeof(*d));
   d->dev = p;
-  d->config_cnt = d->config_bufsize = 64;
+  d->config_cached = d->config_bufsize = 64;
   d->config = xmalloc(64);
+  d->present = xmalloc(64);
+  memset(d->present, 1, 64);
   if (!pci_read_block(p, 0, d->config, 64))
-    die("Unable to read the configuration space header.");
+    die("Unable to read the standard configuration space header");
   if ((d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
     {
       /* For cardbus bridges, we need to fetch 64 bytes more to get the
        * full standard header... */
-      if (!config_fetch(d, 64, 64))
-	die("Unable to read cardbus bridge extension data.");
+      if (config_fetch(d, 64, 64))
+	d->config_cached += 64;
     }
-  pci_setup_cache(p, d->config, d->config_cnt);
+  pci_setup_cache(p, d->config, d->config_cached);
   pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
   return d;
 }
@@ -132,21 +144,34 @@ scan_devices(void)
 
 /* Config space accesses */
 
+static void
+check_conf_range(struct device *d, unsigned int pos, unsigned int len)
+{
+  while (len)
+    if (!d->present[pos])
+      die("Internal bug: Accessing non-read configuration byte at position %x", pos);
+    else
+      pos++, len--;
+}
+
 static inline byte
 get_conf_byte(struct device *d, unsigned int pos)
 {
+  check_conf_range(d, pos, 1);
   return d->config[pos];
 }
 
 static word
 get_conf_word(struct device *d, unsigned int pos)
 {
+  check_conf_range(d, pos, 2);
   return d->config[pos] | (d->config[pos+1] << 8);
 }
 
 static u32
 get_conf_long(struct device *d, unsigned int pos)
 {
+  check_conf_range(d, pos, 4);
   return d->config[pos] |
     (d->config[pos+1] << 8) |
     (d->config[pos+2] << 16) |
@@ -482,9 +507,9 @@ show_pcix_nobridge(struct device *d, int where)
 	 1 << (9 + ((command & PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT) >> 2U)),
 	 max_outstanding[(command & PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS) >> 4U]);
   printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c DC=%s DMMRBC=%u DMOST=%u DMCRS=%u RSCEM%c 266MHz%c 533MHz%c\n",
-	 ((status >> 8) & 0xff),			// bus
-	 ((status >> 3) & 0x1f),			// device
-	 (status & PCI_PCIX_STATUS_FUNCTION),		// function
+	 ((status >> 8) & 0xff),
+	 ((status >> 3) & 0x1f),
+	 (status & PCI_PCIX_STATUS_FUNCTION),
 	 FLAG(status, PCI_PCIX_STATUS_64BIT),
 	 FLAG(status, PCI_PCIX_STATUS_133MHZ),
 	 FLAG(status, PCI_PCIX_STATUS_SC_DISCARDED),
@@ -524,9 +549,9 @@ show_pcix_bridge(struct device *d, int where)
 	 sec_clock_freq[(secstatus >> 6) & 7]);
   status = get_conf_long(d, where + PCI_PCIX_BRIDGE_STATUS);
   printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c\n", 
-	 ((status >> 8) & 0xff), 			// bus
-	 ((status >> 3) & 0x1f),			// device
-	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION),	// function
+	 ((status >> 8) & 0xff),
+	 ((status >> 3) & 0x1f),
+	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_64BIT),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_133MHZ),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SC_DISCARDED),
@@ -1321,7 +1346,7 @@ show_caps(struct device *d)
 	  printf("\tCapabilities: ");
 	  if (!config_fetch(d, where, 4))
 	    {
-	      puts("<available only to root>");
+	      puts("<access denied>");
 	      break;
 	    }
 	  id = get_conf_byte(d, where + PCI_CAP_LIST_ID);
@@ -1493,7 +1518,7 @@ show_htype2(struct device *d)
   int i;
   word cmd = get_conf_word(d, PCI_COMMAND);
   word brc = get_conf_word(d, PCI_CB_BRIDGE_CONTROL);
-  word exca = get_conf_word(d, PCI_CB_LEGACY_MODE_BASE);
+  word exca;
   int verb = verbose > 2;
 
   show_bases(d, 1);
@@ -1541,6 +1566,14 @@ show_htype2(struct device *d)
 	   FLAG(brc, PCI_CB_BRIDGE_CTL_CB_RESET),
 	   FLAG(brc, PCI_CB_BRIDGE_CTL_16BIT_INT),
 	   FLAG(brc, PCI_CB_BRIDGE_CTL_POST_WRITES));
+
+  if (d->config_cached < 128)
+    {
+      printf("\t<access denied to the rest>\n");
+      return;
+    }
+
+  exca = get_conf_word(d, PCI_CB_LEGACY_MODE_BASE);
   if (exca)
     printf("\t16-bit legacy interface ports at %04x\n", exca);
 }
@@ -1559,7 +1592,7 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   unsigned int irq = p->irq;
-  word subsys_v, subsys_d;
+  word subsys_v = 0, subsys_d = 0;
   char ssnamebuf[256];
 
   show_terse(d);
@@ -1578,14 +1611,16 @@ show_verbose(struct device *d)
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       irq = int_pin = min_gnt = max_lat = 0;
-      subsys_v = subsys_d = 0;
       break;
     case PCI_HEADER_TYPE_CARDBUS:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       min_gnt = max_lat = 0;
-      subsys_v = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-      subsys_d = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+      if (d->config_cached >= 128)
+	{
+	  subsys_v = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+	  subsys_d = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+	}
       break;
     default:
       printf("\t!!! Unknown header type %02x\n", htype);
@@ -1700,7 +1735,7 @@ show_hex_dump(struct device *d)
 {
   unsigned int i, cnt;
 
-  cnt = d->config_cnt;
+  cnt = d->config_cached;
   if (show_hex >= 3 && config_fetch(d, cnt, 256-cnt))
     {
       cnt = 256;
@@ -1733,8 +1768,11 @@ show_machine(struct device *d)
       sd_id = get_conf_word(d, PCI_SUBSYSTEM_ID);
       break;
     case PCI_HEADER_TYPE_CARDBUS:
-      sv_id = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-      sd_id = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+      if (d->config_cached >= 128)
+	{
+	  sv_id = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+	  sd_id = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+	}
       break;
     }
 

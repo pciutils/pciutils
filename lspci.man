@@ -10,45 +10,65 @@ lspci \- list all PCI devices
 is a utility for displaying information about all PCI buses in the system and
 all devices connected to them.
 
+By default, it shows a brief list of devices. Use the options described
+below to request either a more verbose output or output intended for
+parsing by other programs.
+
 If you are going to report bugs in PCI device drivers or in
 .I lspci
-itself, please include output of "lspci -vvx".
+itself, please include output of "lspci -vvx" or even better "lspci -vvxxx"
+(however, see below for possible caveats).
+
+Some parts of the output, especially in the highly verbose modes, is probably
+intelligible only to experienced PCI hackers. For the exact definitions of
+the fields, please consult either the PCI specifications or the
+.B header.h
+and
+.B /usr/include/linux/pci.h
+include files.
+
+Access to some parts of the PCI configuration space is restricted to root
+on many operating systems, so the features of
+.I lspci
+available to normal users are limited. However,
+.I lspci
+tries its best to display as much as available and mark all other
+information with
+.I <access denied>
+text.
 
 .SH OPTIONS
 .TP
 .B -v
-Tells
-.I lspci
-to be verbose and display detailed information about all devices.
+Be verbose and display detailed information about all devices.
 .TP
 .B -vv
-Tells
-.I lspci
-to be very verbose and display even more information (actually everything the
-PCI device is able to tell). The exact meaning of these data is not explained
-in this manual page, if you want to know more, consult
-.B /usr/include/linux/pci.h
-or the PCI specs.
+Be very verbose and display more details. This level includes everything deemed
+useful.
+.TP
+.B -vvv
+Be even more verbose and display everything we are able to parse,
+even if it doesn't look interesting at all (e.g., undefined memory regions).
 .TP
 .B -n
 Show PCI vendor and device codes as numbers instead of looking them up in the
-PCI ID database.
+PCI ID list.
 .TP
 .B -x
-Show hexadecimal dump of first 64 bytes of the PCI configuration space (the standard
-header). Useful for debugging of drivers and
-.I lspci
-itself.
+Show hexadecimal dump of the standard part of the configuration space (the first
+64 bytes or 128 bytes for CardBus bridges).
 .TP
 .B -xxx
-Show hexadecimal dump of whole PCI configuration space. Available only for root
+Show hexadecimal dump of the whole PCI configuration space. It is available only to root
 as several PCI devices
 .B crash
-when you try to read undefined portions of the config space (this behavior probably
-doesn't violate the PCI standard, but it's at least very stupid).
+when you try to read some parts of the config space (this behavior probably
+doesn't violate the PCI standard, but it's at least very stupid). However, such
+devices are rare, so you needn't worry much.
 .TP
 .B -xxxx
-Show hexadecimal dump of the extended PCI configuration space.
+Show hexadecimal dump of the extended (4096-byte) PCI configuration space available
+on PCI-X 2.0 and PCI Express buses.
 .TP
 .B -b
 Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
@@ -75,12 +95,7 @@ hexadecimal and may be omitted or given as "*", both meaning "any value".
 Use
 .B
 <file>
-as PCI ID database instead of @SHAREDIR@/pci.ids.
-.TP
-.B -p <dir>
-Use
-.B <dir>
-as directory containing PCI bus information instead of /proc/bus/pci.
+as the PCI ID list instead of @SHAREDIR@/pci.ids.
 .TP
 .B -m
 Dump PCI device data in machine readable form (both normal and verbose format supported)
@@ -98,41 +113,79 @@ Shows
 .I lspci
 version. This option should be used stand-alone.
 
-.SH PCILIB OPTIONS
+.SH PCILIB AND ITS OPTIONS
 The PCI utilities use PCILIB (a portable library providing platform-independent
-functions for PCI configuration space access) to talk to the PCI cards. The following
-options control parameters of the library, especially what access method it uses.
+functions for PCI configuration space access) to talk to the PCI cards. It supports
+the following access methods:
+
+.TP
+.B linux_sysfs
+The
+.B /sys
+filesystem on Linux 2.6 and newer. The standard header of the config space is available
+to all users, the rest only to root. Supports extended configuration space and PCI domains.
+.TP
+.B linux_proc
+The
+.B /proc/bus/pci
+interface supported by Linux 2.1 and newer. The standard header of the config space is available
+to all users, the rest only to root.
+.TP
+.B intel_conf1
+Direct hardware access via Intel configuration mechanism 1. Available on i386 and compatibles
+on Linux, Solaris/x86, GNU Hurd and Windows. Requires root privileges.
+.TP
+.B intel_conf2
+Direct hardware access via Intel configuration mechanism 2. Available on i386 and compatibles
+on Linux, Solaris/x86 and GNU Hurd. Requires root privileges. Warning: This method
+is able to address only first 16 devices on any bus and it seems to be very
+unreliable in many cases.
+.TP
+.B fbsd_device
+The
+.B /dev/pci
+device on FreeBSD. Requires root privileges.
+.TP
+.B aix_device
+Access method used on AIX. Requires root privileges.
+.TP
+.B nbsd_libpci
+The
+.B /dev/pci0
+device on NetBSD accessed using the local libpci library.
+
+.P
 By default, PCILIB uses the first available access method and displays no debugging
-messages. Each switch is accompanied by a list of hardware/software configurations
-it's supported in.
+messages, but you can use the following switches to control its behavior:
 
 .TP
 .B -P <dir>
-Force use of Linux /proc/bus/pci style configuration access, using
+Force use of the linux_proc access method, using
 .B <dir>
-instead of /proc/bus/pci. (Linux 2.1 or newer only)
+instead of /proc/bus/pci.
 .TP
 .B -H1
-Use direct hardware access via Intel configuration mechanism 1. (i386 and compatible only)
+Use direct hardware access via Intel configuration mechanism 1.
 .TP
 .B -H2
-Use direct hardware access via Intel configuration mechanism 2. Warning: This method
-is able to address only first 16 devices on any bus and it seems to be very
-unreliable in many cases. (i386 and compatible only)
+Use direct hardware access via Intel configuration mechanism 2.
 .TP
 .B -F <file>
 Extract all information from given file containing output of lspci -x. This is very
 useful for analysis of user-supplied bug reports, because you can display the
 hardware configuration in any way you want without disturbing the user with
-requests for more dumps. (All systems)
+requests for more dumps.
 .TP
 .B -G
-Increase debug level of the library. (All systems)
+Increase debug level of the library.
 
 .SH FILES
 .TP
 .B @SHAREDIR@/pci.ids
-A list of all known PCI ID's (vendors, devices, classes and subclasses).
+A list of all known PCI ID's (vendors, devices, classes and subclasses). Maintained
+at http://pciids.sourceforge.net/, use the
+.B update-pciids
+utility to download the most recent version.
 .TP
 .B /proc/bus/pci
 An interface to PCI bus configuration space provided by the post-2.1.82 Linux

@@ -1,10 +1,20 @@
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
+	* lspci.man, setpci.man: Improved the man pages. Documented all access
+	methods and which operations are privileged.
+
+	* lspci.c: Another rewrite of config register caching, now also including
+	lots of internal checks. It should be now perfectly able to cope with
+	portions of the configuration space being inaccessible, for example
+	due to insufficient access rights.
+
 	* lspci.c (show_pcix_nobridge, show_pcix_bridge): Cleaned up dumping of PCI-X
 	capabilities. Includes partial support for PCI-X 2.0 (probably incomplete
 	as I haven't seen the spec).
 
 	* lspci.c: Quell warnings about unused parameters.
+
+	* lspci.c: Removed C++ comments.
 
 	* lib/header.h: Merged definitions of extended capabilities and some new
 	PCI-X capability bits from linux-2.6.11/include/pci.h.
