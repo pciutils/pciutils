@@ -197,7 +197,7 @@ Increase debug level of the library. (All systems)
 .PP
 `setpci -d *:* latency_timer=40' sets the latency timer to 64 (40 hexadecimal).
 .PP
-`setpci -s 0 device_id vendor_id' lists ID's of devices in slot 0 in all busses.
+`setpci -s 0 device_id vendor_id' lists ID's of devices in slot 0 in all buses.
 .PP
 `setpci -s 12:3.4 3c.l=1,2,3' writes longword 1 to register 3c, 2 to register 3d
 and 3 to register 3e of device at bus 12, slot 3, function 4.

@@ -1,11 +1,7 @@
 - lspci: don't die when non-root tries to dump cardbus data; mention the
   "available only to root" things in the man page. And possibly adjust exit code.
 
-- pci.ids: "Unknown mass storage controller" -> "Mass storage controller".
-
 - names.c: rewrite
-
-- spelling: buses x busses
 
 - update the web page
 

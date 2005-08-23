@@ -35,7 +35,7 @@ include them in the next version).
 
 The utilities include:  (See manual pages for more details)
 
-  - lspci: displays detailed information about all PCI busses and devices.
+  - lspci: displays detailed information about all PCI buses and devices.
 
   - setpci: allows to read from and write to PCI device configuration
     registers. For example, you can adjust the latency timers with it.
