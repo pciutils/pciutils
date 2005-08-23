@@ -1,5 +1,7 @@
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
+	* lib/dump.c (dump_init): Reading of dumps works again.
+
 	* setpci.man, lspci.c, README: prefer spelling "buses" over "busses".
 
 	* lspci.c: If alloca() is not available, use xmalloc(), not malloc().

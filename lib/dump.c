@@ -72,7 +72,7 @@ dump_init(struct pci_access *a)
 	       sscanf(buf, "%x: ", &i) == 1)
 	{
 	  struct dump_data *dd = dev->aux;
-	  z = strchr(buf, ' ') + 1;
+	  z = strchr(buf, ' ');
 	  while (isspace(z[0]) && isxdigit(z[1]) && isxdigit(z[2]))
 	    {
 	      z++;
