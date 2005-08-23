@@ -1,5 +1,15 @@
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.1.99-test9.
+
+	* Makefile (OPT): Removed -fomit-frame-pointer, it's default in recent
+	gcc versions when optimizing anyway.
+
+	* Made the path to pci.ids customizable and independent on the SHAREDIR.
+	Just override IDSDIR in the top-level Makefile.
+
+	* pci.ids: Synchronized with the current database snapshot.
+
 	* lspci.man, setpci.man: Improved the man pages. Documented all access
 	methods and which operations are privileged.
 

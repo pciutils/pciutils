@@ -95,7 +95,7 @@ hexadecimal and may be omitted or given as "*", both meaning "any value".
 Use
 .B
 <file>
-as the PCI ID list instead of @SHAREDIR@/pci.ids.
+as the PCI ID list instead of @IDSDIR@/pci.ids.
 .TP
 .B -m
 Dump PCI device data in machine readable form (both normal and verbose format supported)
@@ -181,7 +181,7 @@ Increase debug level of the library.
 
 .SH FILES
 .TP
-.B @SHAREDIR@/pci.ids
+.B @IDSDIR@/pci.ids
 A list of all known PCI ID's (vendors, devices, classes and subclasses). Maintained
 at http://pciids.sourceforge.net/, use the
 .B update-pciids

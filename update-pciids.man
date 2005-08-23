@@ -17,7 +17,7 @@ are available, it automatically downloads the compressed version of the list.
 
 .SH FILES
 .TP
-.B @SHAREDIR@/pci.ids
+.B @IDSDIR@/pci.ids
 Here we install the new list.
 
 .SH SEE ALSO

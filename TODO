@@ -1,4 +1,5 @@
-- names.c: rewrite
+- names.c: remove memory leaks
+- names.c: reading of separate subsystem entries
 
 - update the web page
 
@@ -6,16 +7,10 @@
 - finish PCI-X 2.0 capabilities
 - finish PCI Express support
 - reading of VPD
+- change machine-readable output?
+- "Class %04x" -> "%04x"
+- merge pcimodules?
 
 PCIIDS:
 - another mirror at Atrey?
 - delete old DB at SF
-
-MERGES:
-- pcimodules???
-- Debian: a couple of bug fixes
-- RedHat: bug fixes
-- SuSE: synced
-- MDK: synced
-- Slack: obsolete
-- make path to pci.ids customizable
