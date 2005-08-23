@@ -1,11 +1,16 @@
 - lspci: don't die when non-root tries to dump cardbus data; mention the
   "available only to root" things in the man page. And possibly adjust exit code.
+- reading of VPD
 
 - names.c: rewrite
 
 - update the web page
 
 - unused parameter warnings
+
+- some extended capabilities are currently only partially decoded
+- finish PCI-X 2.0 capabilities
+- finish PCI Express support
 
 PCIIDS:
 - another mirror at Atrey?

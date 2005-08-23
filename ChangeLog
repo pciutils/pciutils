@@ -1,5 +1,18 @@
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (show_pcix_nobridge, show_pcix_bridge): Cleaned up dumping of PCI-X
+	capabilities. Includes partial support for PCI-X 2.0 (probably incomplete
+	as I haven't seen the spec).
+
+	* lspci.c: Quell warnings about unused parameters.
+
+	* lib/header.h: Merged definitions of extended capabilities and some new
+	PCI-X capability bits from linux-2.6.11/include/pci.h.
+
+	* lspci.c (show_caps): Try to scan extended capabilities only if the
+	device has either PCI-X or PCI Express capability in its normal capability
+	list.
+
 	* lib/dump.c (dump_init): Reading of dumps works again.
 
 	* setpci.man, lspci.c, README: prefer spelling "buses" over "busses".

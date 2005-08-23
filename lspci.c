@@ -464,8 +464,9 @@ show_pcix_nobridge(struct device *d, int where)
 {
   u16 command;
   u32 status;
+  static const byte max_outstanding[8] = { 1, 2, 3, 4, 8, 12, 16, 32 };
 
-  printf("PCI-X non-bridge device.\n");
+  printf("PCI-X non-bridge device\n");
       
   if (verbose < 2)
     return;
@@ -478,31 +479,33 @@ show_pcix_nobridge(struct device *d, int where)
   printf("\t\tCommand: DPERE%c ERO%c RBC=%d OST=%d\n",
 	 FLAG(command, PCI_PCIX_COMMAND_DPERE),
 	 FLAG(command, PCI_PCIX_COMMAND_ERO),
-	 ((command & PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT) >> 2U),
-	 ((command & PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS) >> 4U));
-  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, DC=%s, DMMRBC=%u, DMOST=%u, DMCRS=%u, RSCEM%c\n",
-	 ((status >> 8) & 0xffU), // bus
-	 ((status >> 3) & 0x1fU), // dev
-	 (status & PCI_PCIX_STATUS_FUNCTION), // function
+	 1 << (9 + ((command & PCI_PCIX_COMMAND_MAX_MEM_READ_BYTE_COUNT) >> 2U)),
+	 max_outstanding[(command & PCI_PCIX_COMMAND_MAX_OUTSTANDING_SPLIT_TRANS) >> 4U]);
+  printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c DC=%s DMMRBC=%u DMOST=%u DMCRS=%u RSCEM%c 266MHz%c 533MHz%c\n",
+	 ((status >> 8) & 0xff),			// bus
+	 ((status >> 3) & 0x1f),			// device
+	 (status & PCI_PCIX_STATUS_FUNCTION),		// function
 	 FLAG(status, PCI_PCIX_STATUS_64BIT),
 	 FLAG(status, PCI_PCIX_STATUS_133MHZ),
 	 FLAG(status, PCI_PCIX_STATUS_SC_DISCARDED),
 	 FLAG(status, PCI_PCIX_STATUS_UNEXPECTED_SC),
 	 ((status & PCI_PCIX_STATUS_DEVICE_COMPLEXITY) ? "bridge" : "simple"),
-	 ((status >> 21) & 3U),
-	 ((status >> 23) & 7U),
-	 ((status >> 26) & 7U),
-	 FLAG(status, PCI_PCIX_STATUS_RCVD_SC_ERR_MESS));
+	 1 << (9 + ((status >> 21) & 3U)),
+	 max_outstanding[(status >> 23) & 7U],
+	 1 << (3 + ((status >> 26) & 7U)),
+	 FLAG(status, PCI_PCIX_STATUS_RCVD_SC_ERR_MESS),
+	 FLAG(status, PCI_PCIX_STATUS_266MHZ),
+	 FLAG(status, PCI_PCIX_STATUS_533MHZ));
 }
 
 static void
 show_pcix_bridge(struct device *d, int where)
 {
-
+  static const byte * const sec_clock_freq[8] = { "conv", "66MHz", "100MHz", "133MHz", "?4", "?5", "?6", "?7" };
   u16 secstatus;
   u32 status, upstcr, downstcr;
   
-  printf("PCI-X bridge device.\n");
+  printf("PCI-X bridge device\n");
   
   if (verbose < 2)
     return;
@@ -511,19 +514,19 @@ show_pcix_bridge(struct device *d, int where)
     return;
   
   secstatus = get_conf_word(d, where + PCI_PCIX_BRIDGE_SEC_STATUS);
-  printf("\t\tSecondary Status: 64bit%c, 133MHz%c, SCD%c, USC%c, SCO%c, SRD%c Freq=%d\n",
+  printf("\t\tSecondary Status: 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c Freq=%s\n",
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_64BIT),
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_133MHZ),
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SC_DISCARDED),
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_UNEXPECTED_SC),
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SC_OVERRUN),
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SPLIT_REQUEST_DELAYED),
-	 ((secstatus >> 6) & 7));
+	 sec_clock_freq[(secstatus >> 6) & 7]);
   status = get_conf_long(d, where + PCI_PCIX_BRIDGE_STATUS);
-  printf("\t\tStatus: Bus=%u Dev=%u Func=%u 64bit%c 133MHz%c SCD%c USC%c, SCO%c, SRD%c\n", 
-	 ((status >> 8) & 0xff), // bus
-	 ((status >> 3) & 0x1f), // dev
-	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION), // function
+  printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c\n", 
+	 ((status >> 8) & 0xff), 			// bus
+	 ((status >> 3) & 0x1f),			// device
+	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION),	// function
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_64BIT),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_133MHZ),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SC_DISCARDED),
@@ -531,11 +534,11 @@ show_pcix_bridge(struct device *d, int where)
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SC_OVERRUN),
 	 FLAG(status, PCI_PCIX_BRIDGE_STATUS_SPLIT_REQUEST_DELAYED));
   upstcr = get_conf_long(d, where + PCI_PCIX_BRIDGE_UPSTREAM_SPLIT_TRANS_CTRL);
-  printf("\t\t: Upstream: Capacity=%u, Commitment Limit=%u\n",
+  printf("\t\tUpstream: Capacity=%u CommitmentLimit=%u\n",
 	 (upstcr & PCI_PCIX_BRIDGE_STR_CAPACITY),
 	 (upstcr >> 16) & 0xffff);
   downstcr = get_conf_long(d, where + PCI_PCIX_BRIDGE_DOWNSTREAM_SPLIT_TRANS_CTRL);
-  printf("\t\t: Downstream: Capacity=%u, Commitment Limit=%u\n",
+  printf("\t\tDownstream: Capacity=%u CommitmentLimit=%u\n",
 	 (downstcr & PCI_PCIX_BRIDGE_STR_CAPACITY),
 	 (downstcr >> 16) & 0xffff);
 }
@@ -584,7 +587,7 @@ show_ht_pri(struct device *d, int where, int cmd)
     return;
   rid = get_conf_byte(d, where + PCI_HT_PRI_RID);
   if (rid < 0x23 && rid > 0x11)
-    printf("\t!!! Possibly incomplete decoding\n");
+    printf("\t\t!!! Possibly incomplete decoding\n");
 
   if (rid >= 0x23)
     fmt = "\t\tCommand: BaseUnitID=%u UnitCnt=%u MastHost%c DefDir%c DUL%c\n";
@@ -752,7 +755,7 @@ show_ht_sec(struct device *d, int where, int cmd)
     return;
   rid = get_conf_byte(d, where + PCI_HT_SEC_RID);
   if (rid < 0x23 && rid > 0x11)
-    printf("\t!!! Possibly incomplete decoding\n");
+    printf("\t\t!!! Possibly incomplete decoding\n");
 
   if (rid >= 0x23)
     fmt = "\t\tCommand: WarmRst%c DblEnd%c DevNum=%u ChainSide%c HostHide%c Slave%c <EOCErr%c DUL%c\n";
@@ -1236,13 +1239,13 @@ show_slotid(int cap)
 }
 
 static void
-show_aer(struct device *d, int where)
+show_aer(struct device *d UNUSED, int where UNUSED)
 {
   printf("Advanced Error Reporting\n");
 }
 
 static void
-show_vc(struct device *d, int where)
+show_vc(struct device *d UNUSED, int where UNUSED)
 {
   printf("Virtual Channel\n");
 }
@@ -1261,7 +1264,7 @@ show_dsn(struct device *d, int where)
 }
 
 static void
-show_pb(struct device *d, int where)
+show_pb(struct device *d UNUSED, int where UNUSED)
 {
   printf("Power Budgeting\n");
 }
@@ -1307,6 +1310,8 @@ show_ext_caps(struct device *d)
 static void
 show_caps(struct device *d)
 {
+  int can_have_ext_caps = 0;
+
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
       int where = get_conf_byte(d, PCI_CAPABILITY_LIST) & ~3;
@@ -1347,6 +1352,7 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_PCIX:
 	      show_pcix(d, where);
+	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_HT:
 	      show_ht(d, where, cap);
@@ -1359,6 +1365,7 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_EXP:
 	      show_express(d, where, cap);
+	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_MSIX:
 	      show_msix(d, where, cap);
@@ -1369,7 +1376,8 @@ show_caps(struct device *d)
 	  where = next;
 	}
     }
-  show_ext_caps(d);
+  if (can_have_ext_caps)
+    show_ext_caps(d);
 }
 
 static void
