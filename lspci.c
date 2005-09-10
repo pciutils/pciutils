@@ -266,7 +266,7 @@ show_terse(struct device *d)
       char *x;
       c = get_conf_byte(d, PCI_CLASS_PROG);
       x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
-			  PCI_LOOKUP_PROGIF,
+			  PCI_LOOKUP_PROGIF | PCI_LOOKUP_NO_NUMBERS,
 			  get_conf_word(d, PCI_CLASS_DEVICE), c, 0, 0);
       if (c || x)
 	{

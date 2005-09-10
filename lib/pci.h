@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -18,7 +18,6 @@
  */
 
 struct pci_methods;
-struct nl_entry;
 
 enum pci_access_type {
   /* Known access methods, remember to update access.c as well */
@@ -53,8 +52,8 @@ struct pci_access {
 
   /* Fields used internally: */
   struct pci_methods *methods;
-  char *nl_list;			/* Name list cache */
-  struct nl_entry **nl_hash;
+  struct id_entry **id_hash;		/* names.c */
+  struct id_bucket *current_id_bucket;
   int fd;				/* proc: fd */
   int fd_rw;				/* proc: fd opened read-write */
   struct pci_dev *cached_dev;		/* proc: device the fd is for */
@@ -136,17 +135,34 @@ char *pci_filter_parse_id(struct pci_filter *, char *);
 int pci_filter_match(struct pci_filter *, struct pci_dev *);
 
 /*
- *	Device names
+ *	Conversion of PCI ID's to names (according to the pci.ids file)
+ *
+ *	Call pci_lookup_name() to identify different types of ID's:
+ *
+ *	VENDOR				(vendorID) -> vendor
+ *	DEVICE				(vendorID, deviceID) -> device
+ *	VENDOR | DEVICE			(vendorID, deviceID) -> combined vendor and device
+ *	SUBSYSTEM | VENDOR		(subvendorID) -> subsystem vendor
+ *	SUBSYSTEM | DEVICE		(vendorID, deviceID, subvendorID, subdevID) -> subsystem device
+ *	SUBSYSTEM | VENDOR | DEVICE	(vendorID, deviceID, subvendorID, subdevID) -> combined subsystem v+d
+ *	SUBSYSTEM | ...			(-1, -1, subvendorID, subdevID) -> generic subsystem
+ *	CLASS				(classID) -> class
+ *	PROGIF				(classID, progif) -> programming interface
  */
 
-char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
-void pci_free_name_list(struct pci_access *a);
+char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...);
 
-#define PCI_LOOKUP_VENDOR 1
-#define PCI_LOOKUP_DEVICE 2
-#define PCI_LOOKUP_CLASS 4
-#define PCI_LOOKUP_SUBSYSTEM 8
-#define PCI_LOOKUP_PROGIF 16
-#define PCI_LOOKUP_NUMERIC 0x10000
+int pci_load_name_list(struct pci_access *a);	/* Called automatically by pci_lookup_*() when needed; returns success */
+void pci_free_name_list(struct pci_access *a);	/* Called automatically by pci_cleanup() */
+
+enum pci_lookup_mode {
+  PCI_LOOKUP_VENDOR = 1,		/* Vendor name (args: vendorID) */
+  PCI_LOOKUP_DEVICE = 2,		/* Device name (args: vendorID, deviceID) */
+  PCI_LOOKUP_CLASS = 4,			/* Device class (args: classID) */
+  PCI_LOOKUP_SUBSYSTEM = 8,
+  PCI_LOOKUP_PROGIF = 16,		/* Programming interface (args: classID, prog_if) */
+  PCI_LOOKUP_NUMERIC = 0x10000,		/* Want only formatted numbers; default if access->numeric_ids is set */
+  PCI_LOOKUP_NO_NUMBERS = 0x20000	/* Return NULL if not found in the database; default is to print numerically */
+};
 
 #endif

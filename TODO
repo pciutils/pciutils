@@ -1,7 +1,6 @@
-- names.c: remove memory leaks
-- names.c: reading of separate subsystem entries
-
 - update the web page
+
+- kill "word"
 
 - some extended capabilities are currently only partially decoded
 - finish PCI-X 2.0 capabilities
@@ -9,7 +8,7 @@
 - reading of VPD
 - change machine-readable output?
 - "Class %04x" -> "%04x"
-- merge pcimodules?
+- class 0805?
 
 PCIIDS:
 - another mirror at Atrey?

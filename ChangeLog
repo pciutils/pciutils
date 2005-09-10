@@ -1,3 +1,16 @@
+2005-09-10  Martin Mares  <mj@ucw.cz>
+
+	* lib/names.c: Rewritten the name database module almost from scratch.
+	Everything is much cleaner and there are hopefully no more memory leaks;
+	pci_lookup_name() now uses varargs in a backward compatible fashion.
+	Introduced PCI_LOOKUP_NO_NUMBERS.
+
+	The new code supports subsystem entries not tied to a specific device.
+	I had to extend the format of pci.ids in order to support it, so I have
+	extended the idea of the "C" (class) blocks and introduced "S" blocks
+	for subsystems. To avoid doing more incompatible changes in the future,
+	the parser skips unknown single-letter blocks without reporting errors.
+
 2005-08-23  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test9.
