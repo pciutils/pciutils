@@ -13,6 +13,8 @@
 #include "header.h"
 #include "types.h"
 
+#define PCI_LIB_VERSION 0x020200
+
 /*
  *	PCI Access Structure
  */

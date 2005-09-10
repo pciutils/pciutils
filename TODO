@@ -1,13 +1,10 @@
 - update the web page
 
-- kill "word"
-
 - some extended capabilities are currently only partially decoded
 - finish PCI-X 2.0 capabilities
 - finish PCI Express support
 - reading of VPD
 - change machine-readable output?
-- "Class %04x" -> "%04x"
 - class 0805?
 
 PCIIDS:

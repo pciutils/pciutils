@@ -1,5 +1,10 @@
 2005-09-10  Martin Mares  <mj@ucw.cz>
 
+	* update-pciids.sh: Changed the default URL for downloading pci.ids
+	to http://pciids.sourceforge.net/v2.2/pci.ids.
+
+	* lib/pci.h (PCI_LIB_VERSION): Added version identifier.
+
 	* lib/names.c: Rewritten the name database module almost from scratch.
 	Everything is much cleaner and there are hopefully no more memory leaks;
 	pci_lookup_name() now uses varargs in a backward compatible fashion.

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-SRC="http://pciids.sourceforge.net/pci.ids"
+SRC="http://pciids.sourceforge.net/v2.2/pci.ids"
 DEST=pci.ids
 
 if which bzip2 >/dev/null ; then
