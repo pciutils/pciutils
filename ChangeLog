@@ -1,5 +1,7 @@
 2005-09-10  Martin Mares  <mj@ucw.cz>
 
+	* pci.ids: Synchronized with the current database snapshot.
+
 	* update-pciids.sh: Changed the default URL for downloading pci.ids
 	to http://pciids.sourceforge.net/v2.2/pci.ids.
 
