@@ -41,7 +41,7 @@ struct id_bucket {
 #define BUCKET_SIZE 8192
 #define HASH_SIZE 4099
 
-#ifdef __GNUC__FIXME
+#ifdef __GNUC__
 #define BUCKET_ALIGNMENT __alignof__(struct id_bucket)
 #else
 union id_align {
