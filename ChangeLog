@@ -1,4 +1,12 @@
+2005-09-11  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.1.99-test11.
+
+	* lspci.c: Removed unnecessary trailing zeros in pci_lookup_name() calls.
+
 2005-09-10  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.1.99-test10.
 
 	* pci.ids: Synchronized with the current database snapshot.
 

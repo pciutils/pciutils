@@ -255,10 +255,10 @@ show_terse(struct device *d)
   printf(" %s: %s",
 	 pci_lookup_name(pacc, classbuf, sizeof(classbuf),
 			 PCI_LOOKUP_CLASS,
-			 get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
+			 get_conf_word(d, PCI_CLASS_DEVICE)),
 	 pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-			 p->vendor_id, p->device_id, 0, 0));
+			 p->vendor_id, p->device_id));
   if (c = get_conf_byte(d, PCI_REVISION_ID))
     printf(" (rev %02x)", c);
   if (verbose)
@@ -267,7 +267,7 @@ show_terse(struct device *d)
       c = get_conf_byte(d, PCI_CLASS_PROG);
       x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			  PCI_LOOKUP_PROGIF | PCI_LOOKUP_NO_NUMBERS,
-			  get_conf_word(d, PCI_CLASS_DEVICE), c, 0, 0);
+			  get_conf_word(d, PCI_CLASS_DEVICE), c);
       if (c || x)
 	{
 	  printf(" (prog-if %02x", c);
@@ -1782,11 +1782,11 @@ show_machine(struct device *d)
       show_slot_name(d);
       putchar('\n');
       printf("Class:\t%s\n",
-	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0));
+	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE)));
       printf("Vendor:\t%s\n",
-	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, 0, 0));
+	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
       printf("Device:\t%s\n",
-	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, 0, 0));
+	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id));
       if (sv_id && sv_id != 0xffff)
 	{
 	  printf("SVendor:\t%s\n",
@@ -1804,11 +1804,11 @@ show_machine(struct device *d)
       show_slot_name(d);
       printf(" \"%s\" \"%s\" \"%s\"",
 	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS,
-			     get_conf_word(d, PCI_CLASS_DEVICE), 0, 0, 0),
+			     get_conf_word(d, PCI_CLASS_DEVICE)),
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR,
-			     p->vendor_id, p->device_id, 0, 0),
+			     p->vendor_id, p->device_id),
 	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE,
-			     p->vendor_id, p->device_id, 0, 0));
+			     p->vendor_id, p->device_id));
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf(" -r%02x", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
@@ -2029,7 +2029,7 @@ show_tree_dev(struct device *d, byte *line, byte *p)
     p += sprintf(p, "  %s",
 		 pci_lookup_name(pacc, namebuf, sizeof(namebuf),
 				 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-				 q->vendor_id, q->device_id, 0, 0));
+				 q->vendor_id, q->device_id));
   print_it(line, p);
 }
 
