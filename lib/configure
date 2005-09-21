@@ -52,10 +52,8 @@ case $sys in
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						ok=1
 						;;
-				alpha|ia64|sparc|sparc64|ppc|ppc64|x86_64)
-						echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
-						;;
 		esac
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		;;
 	sunos)
 		case $cpu in

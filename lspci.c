@@ -355,8 +355,9 @@ show_bases(struct device *d, int cnt)
 		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
 		  if (buscentric_view)
 		    {
+		      u32 y = a & 0xffffffff;
 		      if (a || z)
-			printf("%08x" PCIADDR_T_FMT, z, a);
+			printf("%08x%08x", z, y);
 		      else
 			printf("<unassigned>");
 		      done = 1;

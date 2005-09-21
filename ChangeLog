@@ -1,3 +1,18 @@
+2005-09-21  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.2.0.
+
+	* lib/sysfs.c (sysfs_get_resources): Removed warning about unsupported
+	64-bit addresses, they are now always supported.
+
+	* lspci.c (show_bases): Corrected printing of 64-bit addresses
+	in bus-centric mode.
+
+	* lib/configure: Enable 64-bit addresses on all Linux systems.
+
+	* lib/types.h: Don't pad 64-bit addresses to 16 xigits, only to 8 if they
+	are shorter.
+
 2005-09-11  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.1.99-test11.

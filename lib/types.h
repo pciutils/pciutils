@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Types and Format Strings
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -35,7 +35,7 @@ typedef unsigned long long u64;
 
 #ifdef PCI_HAVE_64BIT_ADDRESS
 typedef u64 pciaddr_t;
-#define PCIADDR_T_FMT "%016" PCI_U64_FMT "x"
+#define PCIADDR_T_FMT "%08" PCI_U64_FMT "x"
 #define PCIADDR_PORT_FMT "%04" PCI_U64_FMT "x"
 #else
 typedef u32 pciaddr_t;
