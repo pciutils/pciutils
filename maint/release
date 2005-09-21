@@ -25,7 +25,7 @@ push @{$r->{"uploads"}}, {
 push @{$r->{"uploads"}}, {
 	"url" => "ftp://metalab.unc.edu/incoming/linux/",
 	"filter" => '(\.tar\.gz|\.lsm)$'
-	} if !defined $r->{"ALPHADIR"};
+	} if $r->{"ALPHADIR"} ne "";
 $r->ParseOptions;
 $r->InitDist("maint/dist");
 my $reldir = $r->GenPackage;
