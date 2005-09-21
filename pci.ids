@@ -1,11 +1,15 @@
 #
 #	List of PCI ID's
 #
-#	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
-#	Linux PCI ID's Project at http://pciids.sf.net/. New data are always
-#	welcome (if they are accurate), we're eagerly expecting new entries,
-#	so if you have anything to contribute, please visit the home page or
-#	send a diff -u against the most recent pci.ids to pci-ids@ucw.cz.
+#       Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
+#       Linux PCI ID's Project at http://pciids.sf.net/.
+#
+#       New data are always welcome, especially if accurate. If you have
+#       anything to contribute, please follow the instructions at the web site
+#       or send a diff -u against the most recent pci.ids to pci-ids@ucw.cz.
+#
+#       This file can be distributed under either the GNU General Public License
+#       (version 2 or higher) or the 3-clause BSD License.
 #
 #	$Id: pci.ids,v 1.51 2005/09/10 12:19:17 mares Exp $
 #

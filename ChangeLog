@@ -2,6 +2,8 @@
 
 	* Released as 2.2.0.
 
+	* pci.ids: Updated copyright header.
+
 	* lib/sysfs.c (sysfs_get_resources): Removed warning about unsupported
 	64-bit addresses, they are now always supported.
 
