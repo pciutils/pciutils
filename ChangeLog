@@ -1,3 +1,7 @@
+2005-10-11  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (new_bus): Fixed a memory leak. Thanks to Paul Sangree for reporting it.
+
 2005-09-21  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.0.

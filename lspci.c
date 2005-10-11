@@ -1883,8 +1883,6 @@ static struct bus *
 new_bus(struct bridge *b, unsigned int domain, unsigned int n)
 {
   struct bus *bus = xmalloc(sizeof(struct bus));
-
-  bus = xmalloc(sizeof(struct bus));
   bus->domain = domain;
   bus->number = n;
   bus->sibling = b->first_bus;
