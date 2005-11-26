@@ -1791,7 +1791,7 @@ show_machine(struct device *d)
       if (sv_id && sv_id != 0xffff)
 	{
 	  printf("SVendor:\t%s\n",
-		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, sv_id, sd_id));
+		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id));
 	  printf("SDevice:\t%s\n",
 		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
 	}
@@ -1816,7 +1816,7 @@ show_machine(struct device *d)
 	printf(" -p%02x", c);
       if (sv_id && sv_id != 0xffff)
 	printf(" \"%s\" \"%s\"",
-	       pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id, sv_id, sd_id),
+	       pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id),
 	       pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
       else
 	printf(" \"\" \"\"");
