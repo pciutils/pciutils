@@ -1,5 +1,7 @@
 2005-11-26  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.1.
+
 	* lspci.c (show_machine): Subsystem vendors were printed incorrectly
 	in machine-readable modes. Thanks to Pavel Celeda for a bug report.
 

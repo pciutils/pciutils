@@ -4,8 +4,8 @@
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.2.0
-DATE=2005-09-21
+VERSION=2.2.1
+DATE=2005-11-26
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
