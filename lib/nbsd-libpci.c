@@ -38,6 +38,11 @@ nbsd_detect(struct pci_access *a)
       a->warning("Cannot open %s", name);
       return 0;
     }
+
+  if (!access(name, W_OK))
+    {
+      a->writeable = O_RDWR;
+    }
   a->debug("...using %s", name);
   return 1;
 }
@@ -46,8 +51,9 @@ static void
 nbsd_init(struct pci_access *a)
 {
   char *name = a->method_params[PCI_ACCESS_NBSD_LIBPCI];
+  int mode = a->writeable ? O_RDWR : O_RDONLY;
 
-  a->fd = open(name, O_RDWR, 0);
+  a->fd = open(name, mode, 0);
   if (a->fd < 0)
     a->error("nbsd_init: %s open failed", name);
 }

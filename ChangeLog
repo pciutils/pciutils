@@ -1,3 +1,10 @@
+2005-12-12  Martin Mares  <mj@ucw.cz>
+
+	* lib/nbsd-libpci.c: If libpci is used by an ordinary user, allow
+	at least read-only access. Patch by Pavel Celeda <celeda@liberouter.org>.
+
+	* Makefile: Corrected library path on NetBSD.
+
 2005-11-26  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.1.
