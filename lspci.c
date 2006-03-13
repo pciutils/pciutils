@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -1676,7 +1676,7 @@ show_verbose(struct device *d)
 	      putchar(')');
 	    }
 	  if (cache_line)
-	    printf(", Cache Line Size %02x", cache_line);
+	    printf(", Cache Line Size: %d bytes", cache_line * 4);
 	  putchar('\n');
 	}
       if (int_pin || irq)
