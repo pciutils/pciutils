@@ -1,3 +1,7 @@
+2006-03-13  Martin Mares  <mj@ucw.cz>
+
+	* update-pciids.sh: Use curl if available. Patch by Matthew Wilcox.
+
 2006-01-04  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c (show_express_link): Fixed decoding of link status register.

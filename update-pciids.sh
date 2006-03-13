@@ -14,12 +14,14 @@ else
 	DECOMP="cat"
 fi
 
-if which wget >/dev/null ; then
+if which curl >/dev/null ; then
+	DL="curl -o $DEST.new $SRC"
+elif which wget >/dev/null ; then
 	DL="wget -O $DEST.new $SRC"
 elif which lynx >/dev/null ; then
 	DL="eval lynx -source $SRC >$DEST.new"
 else
-	echo >&2 "update-pciids: cannot find wget nor lynx"
+	echo >&2 "update-pciids: cannot find curl, wget or lynx"
 	exit 1
 fi
 
