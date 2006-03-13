@@ -1,3 +1,8 @@
+2006-01-04  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_express_link): Fixed decoding of link status register.
+	Thanks to Roland Dreier for his report.
+
 2005-12-12  Martin Mares  <mj@ucw.cz>
 
 	* lib/nbsd-libpci.c: If libpci is used by an ordinary user, allow

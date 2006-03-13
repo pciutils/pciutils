@@ -1129,7 +1129,7 @@ static void show_express_link(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_LNKCTL_XSYNCH));
   w = get_conf_word(d, where + PCI_EXP_LNKSTA);
   printf("\t\tLink: Speed %s, Width x%d\n",
-	link_speed(t & PCI_EXP_LNKSTA_SPEED), (t & PCI_EXP_LNKSTA_WIDTH) >> 4);
+	link_speed(w & PCI_EXP_LNKSTA_SPEED), (w & PCI_EXP_LNKSTA_WIDTH) >> 4);
 }
 
 static const char *indicator(int code)
