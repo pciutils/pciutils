@@ -1,5 +1,11 @@
 2006-03-13  Martin Mares  <mj@ucw.cz>
 
+	* lspci.man: Documented the -D switch.
+
+	* lspci.c (show_slot_name, scan_device): If there are multiple PCI
+	domains or if the `-D' switch is used, show the domain number for
+	all devices.
+
 	* lspci.c (show_verbose): Report cache line size in bytes.
 
 	* update-pciids.sh: Use curl if available. Patch by Matthew Wilcox.

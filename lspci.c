@@ -23,8 +23,9 @@ static struct pci_filter filter;	/* Device filter */
 static int show_tree;			/* Show bus tree */
 static int machine_readable;		/* Generate machine-readable output */
 static int map_mode;			/* Bus mapping mode enabled */
+static int show_domains;		/* Show domain numbers */
 
-static char options[] = "nvbxs:d:ti:mgM" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:ti:mgMD" GENERIC_OPTIONS ;
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -40,6 +41,7 @@ Usage: lspci [<switches>]\n\
 -t\t\tShow bus tree\n\
 -m\t\tProduce machine-readable output\n\
 -i <file>\tUse specified ID database instead of %s\n\
+-D\t\tAlways show domain numbers\n\
 -M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
 GENERIC_HELP
 ;
@@ -104,6 +106,8 @@ scan_device(struct pci_dev *p)
 {
   struct device *d;
 
+  if (p->domain)
+    show_domains = 1;
   if (!pci_filter_match(&filter, p))
     return NULL;
   d = xmalloc(sizeof(struct device));
@@ -239,7 +243,7 @@ show_slot_name(struct device *d)
 {
   struct pci_dev *p = d->dev;
 
-  if (p->domain)
+  if (show_domains)
     printf("%04x:", p->domain);
   printf("%02x:%02x.%d", p->bus, p->dev, p->func);
 }
@@ -2316,6 +2320,9 @@ main(int argc, char **argv)
 	break;
       case 'M':
 	map_mode++;
+	break;
+      case 'D':
+	show_domains = 1;
 	break;
       default:
 	if (parse_generic_option(i, pacc, optarg))

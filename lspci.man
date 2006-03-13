@@ -101,6 +101,10 @@ as the PCI ID list instead of @IDSDIR@/pci.ids.
 Dump PCI device data in machine readable form (both normal and verbose format supported)
 for easy parsing by scripts.
 .TP
+.B -D
+Always show PCI domain numbers. By default, lspci suppresses them on machines which
+have only domain 0.
+.TP
 .B -M
 Invoke bus mapping mode which performs a thorough scan of all PCI devices, including
 those behind misconfigured bridges etc. This option is available only to root and it
