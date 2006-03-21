@@ -1,5 +1,9 @@
 2006-03-21  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c (show_slot_name): Avoid the previous changes in default
+	display of domain name when in machine-readable mode. However, `-D'
+	forces domain display even there.
+
 	* lspci.man: Added a warning on -m being the only format, which is
 	guaranteed to be stable between lspci versions.
 

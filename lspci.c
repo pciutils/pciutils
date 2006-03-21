@@ -23,7 +23,7 @@ static struct pci_filter filter;	/* Device filter */
 static int show_tree;			/* Show bus tree */
 static int machine_readable;		/* Generate machine-readable output */
 static int map_mode;			/* Bus mapping mode enabled */
-static int show_domains;		/* Show domain numbers */
+static int show_domains;		/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
 
 static char options[] = "nvbxs:d:ti:mgMD" GENERIC_OPTIONS ;
 
@@ -243,7 +243,7 @@ show_slot_name(struct device *d)
 {
   struct pci_dev *p = d->dev;
 
-  if (show_domains)
+  if (!machine_readable ? show_domains : (p->domain || show_domains >= 2))
     printf("%04x:", p->domain);
   printf("%02x:%02x.%d", p->bus, p->dev, p->func);
 }
@@ -2322,7 +2322,7 @@ main(int argc, char **argv)
 	map_mode++;
 	break;
       case 'D':
-	show_domains = 1;
+	show_domains = 2;
 	break;
       default:
 	if (parse_generic_option(i, pacc, optarg))

@@ -2,8 +2,8 @@
 - finish PCI-X 2.0 capabilities
 - finish PCI Express support
 - reading of VPD
-- change machine-readable output?
 - class 0805?
+- document syntax of machine-readable output
 
 PCIIDS:
 - another mirror at Atrey?
