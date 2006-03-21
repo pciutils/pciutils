@@ -99,7 +99,8 @@ as the PCI ID list instead of @IDSDIR@/pci.ids.
 .TP
 .B -m
 Dump PCI device data in machine readable form (both normal and verbose format supported)
-for easy parsing by scripts.
+for easy parsing by scripts. Please don't use any other formats for this purpose, they
+are likely to change in the future versions of lspci.
 .TP
 .B -D
 Always show PCI domain numbers. By default, lspci suppresses them on machines which
