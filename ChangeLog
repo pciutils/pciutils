@@ -1,5 +1,7 @@
 2006-05-05  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.2.
+
 	* pci.ids: Updated to the current database snapshot.
 
 	* lib/obsd-device.c (and other files in lib/*): Added OpenBSD
