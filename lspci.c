@@ -106,7 +106,7 @@ scan_device(struct pci_dev *p)
 {
   struct device *d;
 
-  if (p->domain)
+  if (p->domain && !show_domains)
     show_domains = 1;
   if (!pci_filter_match(&filter, p))
     return NULL;

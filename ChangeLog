@@ -1,5 +1,12 @@
 2006-05-05  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.3.
+
+	* lspci.c (scan_device): The -D switch didn't work as intended
+	in -m mode.
+
+2006-05-05  Martin Mares  <mj@ucw.cz>
+
 	* Released as 2.2.2.
 
 	* pci.ids: Updated to the current database snapshot.
