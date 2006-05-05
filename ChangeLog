@@ -1,5 +1,9 @@
 2006-05-05  Martin Mares  <mj@ucw.cz>
 
+	* lib/obsd-device.c (and other files in lib/*): Added OpenBSD
+	interface by Matthieu Herrb <matthieu.herrb@laas.fr>, based on
+	the existing FreeBSD interface.
+
 	* Moved pciutils to a GIT repository, which now contains merged
 	history from both CVS and Arch. Good bye, TLA!
 

@@ -36,6 +36,10 @@ CFLAGS += -I${FREEBSD_SYS}
 endif
 endif
 
+ifdef PCI_HAVE_PM_OBSD_DEVICE
+OBJS += obsd-device.o
+endif
+
 ifdef PCI_HAVE_PM_AIX_DEVICE
 OBJS += aix-device.o
 endif

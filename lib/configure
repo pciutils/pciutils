@@ -74,6 +74,12 @@ case $sys in
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
 		ok=1
 		;;
+        openbsd)
+	        echo_n " obsd-device"
+		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
+		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
+		ok=1
+		;;
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'

@@ -31,6 +31,7 @@ enum pci_access_type {
   PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci (params: path) */
   PCI_ACCESS_AIX_DEVICE,		/* /dev/pci0, /dev/bus0, etc. */
   PCI_ACCESS_NBSD_LIBPCI,		/* NetBSD libpci */
+  PCI_ACCESS_OBSD_DEVICE,		/* OpenBSD /dev/pci */
   PCI_ACCESS_DUMP,			/* Dump file (params: filename) */
   PCI_ACCESS_MAX
 };
