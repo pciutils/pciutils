@@ -275,7 +275,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, u32 arg1, 
       if (n = nl_lookup(a, num, NL_VENDOR, arg3, 0, 0, 0))
 	return n->name;
       else
-	res = snprintf(buf, size, "%04x", arg2);
+	res = snprintf(buf, size, "%04x", arg3);
       break;
     case PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       if (n = nl_lookup(a, num, NL_SUBSYSTEM, arg1, arg2, arg3, arg4))
