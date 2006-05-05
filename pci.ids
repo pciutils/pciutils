@@ -1,0 +1,585 @@
+#
+#	List of PCI ID's
+#
+#	Maintained by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+#	If you have any new entries, send them to the maintainer.
+#
+#	$Id: pci.ids,v 1.1 1997/12/23 10:29:18 mj Exp $
+#
+
+# Vendors and devices. Please keep sorted.
+
+0e11  Compaq
+	3033  QVision 1280/p
+	ae10  Smart-2/P RAID Controller
+	ae32  Netelligent 10/100
+	ae34  Netelligent 10
+	ae35  NetFlex 3
+	ae40  Netelligent 10/100 Dual
+	ae43  Netelligent 10/100 ProLiant
+	b011  Netelligent 10/100 Integrated
+	f130  ThunderLAN
+	f150  NetFlex 3 BNC
+1000  NCR
+	0001  53c810
+	0002  53c820
+	0003  53c825
+	0004  53c815
+	0006  53c860
+	000b  53c896
+	000c  53c895
+	000d  53c885
+	000f  53c875
+	008f  53c876
+1002  ATI
+	4158  68800AX
+	4354  215CT222
+	4358  210888CX
+	4742  Mach64 GB
+	4750  Mach64 GP (Rage Pro)
+	4754  Mach64 GT (Rage II)
+	4755  Mach64 GT (Rage II)
+	4758  210888GX
+	5654  Mach64 VT
+1004  VLSI
+	0005  82C592-FC1
+	0006  82C593-FC1
+	0007  82C594-AFC2
+	0009  82C597-AFC2
+	000c  82C541 Lynx
+	000d  82C543 Lynx ISA
+	0702  VAS96011 (Golden Gate II)
+1005  Avance Logic
+	2301  2301
+100b  NS
+	0002  87415
+	d001  87410
+100c  Tseng'Lab
+	3202  ET4000W32P
+	3205  ET4000W32P rev B
+	3206  ET4000W32P rev C
+	3207  ET4000W32P rev D
+	3208  ET6000
+100e  Weitek
+	9001  P9000
+	9100  P9100
+1011  DEC
+	0001  DC21050
+	0002  DC21040
+	0004  TGA
+	0009  DC21140
+	000D  TGA2
+	000F  DEFPA
+	0014  DC21041
+	0019  DC21142
+	0021  DC21052
+	0024  DC21152
+1013  Cirrus Logic
+	0038  GD 7548
+	00a0  GD 5430
+	00a4  GD 5434
+	00a8  GD 5434
+	00ac  GD 5436
+	00b8  GD 5446
+	00bc  GD 5480
+	00d4  GD 5464
+	00d6  GD 5465
+	1100  CL 6729
+	1110  PD 6832
+	1200  CL 7542
+	1202  CL 7543
+	1204  CL 7541
+1014  IBM
+	000a  Fire Coral
+	0018  Token Ring
+	001d  82G2675
+	0022  82351
+101c  Western Digital
+	3296  WD 7197
+1022  AMD
+	2000  79C970
+	2020  53C974
+1023  Trident
+	9420  TG 9420
+	9440  TG 9440
+	9660  TG 9660
+	9750  Image 975
+1025  Acer Incorporated
+	1435  M1435
+102B  Matrox
+	0518  Atlas PX2085
+	0519  Millennium
+	051A  Mystique
+	051b  Millennium II
+	0d10  MGA Impression
+102c  Chips & Technologies
+	00d8  65545
+	00dc  65548
+	00e0  65550
+	00e4  65554
+1031  Miro
+	5601  ZR36050
+1033  NEC
+	0046  PowerVR PCX2
+1036  Future Domain
+	0000  TMC-18C30
+1039  Silicon Integrated Systems
+	0001  6201
+	0002  6202
+	0008  85C503
+	0205  6205
+	0406  85C501
+	0496  85C496
+	0601  85C601
+	5107  5107
+	5511  85C5511
+	5513  85C5513
+	5571  5571
+	5597  5597
+	7001  7001
+103c  Hewlett Packard
+	1030  J2585A
+	1031  J2585B (Lassen)
+1042  PCTECH
+	1000  RZ1000 (buggy)
+	1001  RZ1001 (buggy?)
+1044  DPT
+	a400  SmartCache/Raid
+1045  OPTi
+	c178  92C178
+	c557  82C557
+	c558  82C558
+	c621  82C621
+	c700  82C700
+	c701  82C701 FireStar Plus
+	c814  82C814 Firebridge 1
+	c822  82C822
+104B  BusLogic
+	0140  MultiMaster NC
+	1040  MultiMaster
+	8130  FlashPoint
+104a  SGS Thomson
+	0008  STG 2000X
+	0009  STG 1764X
+104c  Texas Instruments
+	3d04  TVP4010 Permedia
+	3d07  TVP4020 Permedia 2
+	ac12  PCI1130
+	ac15  PCI1131
+104e  OAK
+	0107  OTI107
+1050  Winbond
+	0940  NE2000-PCI
+1057  Motorola
+	0001  MPC105 Eagle
+	0002  MPC106 Grackle
+	4801  Raven
+105a  Promise Technology
+	4d33  IDE UltraDMA/33
+	5300  DC5030
+105d  Number Nine
+	2309  Imagine 128
+	2339  Imagine 128v2
+1060  UMC
+	0101  UM8673F
+	0891  UM8891A
+	673a  UM8886BF
+	886a  UM8886A
+	8881  UM8881F
+	8886  UM8886F
+	9017  UM9017F
+	e886  UM8886N
+	e891  UM8891N
+1061  X TECHNOLOGY
+	0001  ITT AGX016
+1066  PicoPower
+	0001  PT86C52x Vesuvius
+106b  Apple
+	0001  Bandit
+	0002  Grand Central
+	000e  Hydra
+1074  Nexgen
+	4e78  82C501
+1077  Q Logic
+	1020  ISP1020
+	1022  ISP1022
+107d  Leadtek Research
+	0000  S3 805
+1080  Contaq
+	0600  82C599
+1083  Forex
+108d  Olicom
+	0001  OC-3136/3137
+	0011  OC-2315
+	0012  OC-2325
+	0013  OC-2183/2185
+	0014  OC-2326
+	0021  OC-6151/6152
+108e  Sun Microsystems
+	1000  EBUS
+	1001  Happy Meal
+	8000  PCI Bus Module
+1095  CMD
+	0640  640 (buggy)
+	0643  643
+	0646  646
+	0670  670
+1098  Vision
+	0001  QD-8500
+	0002  QD-8580
+109e  Brooktree
+	0350  Bt848
+10a8  Sierra
+	0000  STB Horizon 64
+10aa  ACC MICROELECTRONICS
+	0000  2056
+10ad  Winbond
+	0001  W83769F
+	0105  SL82C105
+	0565  W83C553
+10b3  Databook
+	b106  DB87144
+10b7  3Com
+	5900  3C590 10bT
+	5950  3C595 100bTX
+	5951  3C595 100bT4
+	5952  3C595 100b-MII
+	9000  3C900 10bTPO
+	9001  3C900 10b Combo
+	9050  3C905 100bTX
+10b8  SMC
+	0005  9432 TX
+10b9  Acer Labs
+	1445  M1445
+	1449  M1449
+	1451  M1451
+	1461  M1461
+	1489  M1489
+	1511  M1511
+	1513  M1513
+	1521  M1521
+	1523  M1523
+	1531  M1531 Aladdin IV
+	1533  M1533 Aladdin IV
+	5215  M4803
+	5219  M5219
+	5229  M5229 TXpro
+10ba  Mitsubishi
+10bd  Surecom
+	0e34  NE-34PCI LAN
+10c8  Neomagic
+	0001  MagicGraph NM2070
+	0002  MagicGraph 128V
+	0003  MagicGraph 128ZV
+	0004  MagicGraph NM2160
+10cd  Advanced System Products
+	1200  ABP940
+	1300  ABP940U
+10dc  CERN
+	0001  STAR/RD24 SCI-PCI (PMC)
+	0002  STAR/RD24 SCI-PCI (PMC)
+10de  NVidia
+10e0  IMS
+	8849  8849
+10e1  Tekram
+	690c  DC690c
+10e3  Tundra
+	0000  CA91C042 Universe
+10e8  AMCC
+	8043  Myrinet PCI (M2-PCI-32)
+	807d  S5933
+10ea  Intergraphics
+	1680  IGA-1680
+	1682  IGA-1682
+10ec  Realtek
+	8029  8029
+	8129  8129
+10fa  Truevision
+	000c  TARGA 1000
+1101  Initio Corp
+	9100  320 P
+1106  VIA Technologies
+	0505  VT 82C505
+	0561  VT 82C561
+	0571  VT 82C586 Apollo IDE
+	0576  VT 82C576 3V
+	0585  VT 82C585 Apollo VP1/VPX
+	0586  VT 82C586 Apollo ISA
+	0595  VT 82C595 Apollo VP2
+	0926  VT 82C926 Amazon
+	1571  VT 82C416MV
+	1595  VT 82C595 Apollo VP2/97
+	3038  VT 82C586 Apollo USB
+	3040  VT 82C586B Apollo ACPI
+1119  VORTEX
+	0000  GDT 60
+	0001  GDT 6000b
+	0002  GDT 6110/6510
+	0003  GDT 6120/6520
+	0004  GDT 6530
+	0005  GDT 6550
+	0006  GDT 6117/6517
+	0007  GDT 6127/6527
+	0008  GDT 6537
+	0009  GDT 6557
+	000a  GDT 6115/6515
+	000b  GDT 6125/6525
+	000c  GDT 6535
+	000d  GDT 6555
+	0100  GDT 6117RP/6517RP
+	0101  GDT 6127RP/6527RP
+	0102  GDT 6537RP
+	0103  GDT 6557RP
+	0104  GDT 6111RP/6511RP
+	0105  GDT 6121RP/6521RP
+	0110  GDT 6117RP1/6517RP1
+	0111  GDT 6127RP1/6527RP1
+	0112  GDT 6537RP1
+	0113  GDT 6557RP1
+	0114  GDT 6111RP1/6511RP1
+	0115  GDT 6121RP1/6521RP1
+	0120  GDT 6117RP2/6517RP2
+	0121  GDT 6127RP2/6527RP2
+	0122  GDT 6537RP2
+	0123  GDT 6557RP2
+	0124  GDT 6111RP2/6511RP2
+	0125  GDT 6121RP2/6521RP2
+111a  Efficient Networks
+	0000  155P-MF1 (FPGA)
+	0002  155P-MF1 (ASIC)
+1127  Fore Systems
+	0210  PCA-200PC
+	0300  PCA-200E
+112f  Imaging Technology
+	0000  MVC IC-PCI
+1131  Philips
+	7146  SAA7146
+113c  PLX
+	0001  PCI9060 i960 bridge
+1142  Alliance
+	3210  Promotion-6410
+	6422  Provideo
+	6424  AT24
+	643d  AT3D
+114a  VMIC
+	7587  VMIVME-7587
+114f  Digi Intl.
+	0003  RightSwitch SE-6
+1159  Mutech
+	0001  MV-1000
+1163  Rendition
+	0001  Verite 1000
+1179  Toshiba
+	0601  Laptop
+1180  Ricoh
+	0466  RL5C466
+1193  ZeitNet
+	0001  1221
+	0002  1225
+119b  Omega Micro
+	1221  82C092G
+11ad  LiteOn
+	0002  LNE100TX
+11bc  Network Peripherals
+	0001  NP-PCI
+11cb  Specialix
+	4000  XIO/SIO host
+	8000  RIO host
+11d1  Auravision
+	01f7  VXP524
+11d5  Ikon
+	0115  10115 Greensheet
+	0117  10117 Greensheet
+11de  Zoran
+	6057  ZR36057
+	6120  ZR36120
+11f6  Compex
+	0112  Readylink ENET100-VG4
+	1401  ReadyLink 2000
+11fe  Comtrol
+	0001  RocketPort 8 Oct
+	0002  RocketPort 8 Intf
+	0003  RocketPort 16 Intf
+	0004  RocketPort 32 Intf
+120e  Cyclades
+	0100  Cyclom-Y below 1Mbyte
+	0101  Cyclom-Y above 1Mbyte
+	0200  Cyclom-Z below 1Mbyte
+	0201  Cyclom-Z above 1Mbyte
+121a  3Dfx
+	0001  Voodoo
+1236  Sigma Designs
+	6401  REALmagic64/GX
+1255  Optibase
+	1110  MPEG Forge
+	1210  MPEG Fusion
+	2110  VideoPlex
+	2120  VideoPlex CC
+	2130  VideoQuest
+1274  Ensoniq
+	5000  AudioPCI
+12c5  Picture Elements
+	0081  PCIVST
+12d2  NVidia/SGS Thomson
+	0018  Riva 128
+1c1c  Symphony
+	0001  82C101
+1de1  Tekram
+	dc29  DC-290
+3d3d  3Dlabs
+	0001  GLINT 300SX
+	0002  GLINT 500TX
+	0003  GLINT Delta
+	0004  PERMEDIA
+4005  Avance
+	2064  ALG2064i
+	2302  ALG-2302
+4a14  NetVin
+	5000  NV5000
+5333  S3 Inc.
+	0551  PLATO/PX (system)
+	5631  ViRGE
+	8811  Trio32/Trio64
+	8812  Aurora64V+
+	8814  Trio64UV+
+	883d  ViRGE/VX
+	8880  Vision 868
+	88b0  Vision 928-P
+	88c0  Vision 864-P
+	88c1  Vision 864-P
+	88d0  Vision 964-P
+	88d1  Vision 964-P
+	88f0  Vision 968
+	8901  Trio64V2/DX or /GX
+	8902  PLATO/PX (graphics)
+	8a01  ViRGE/DX or /GX
+	8a10  ViRGE/GX2
+8086  Intel
+	0482  82375EB
+	0483  82424ZX Saturn
+	0484  82378IB
+	0486  82430ZX Aries
+	04a3  82434LX Mercury/Neptune
+	1221  82092AA PCMCIA bridge
+	1222  82092AA EIDE
+	1223  SAA7116
+	1226  82596
+	1227  82865
+	1229  82557
+	122d  82437
+	122e  82371 Triton PIIX
+	1230  82371 Triton PIIX
+	1234  430MX - 82371MX MPIIX
+	1235  430MX - 82437MX MTSC
+	1237  82441FX Natoma
+	1250  82439HX Triton II
+	7000  82371SB Natoma/Triton II PIIX3
+	7010  82371SB Natoma/Triton II PIIX3
+	7020  82371SB Natoma/Triton II PIIX3
+	7030  82437VX Triton II
+	7100  82439TX
+	7110  82371AB PIIX4 ISA
+	7111  82371AB PIIX4 IDE
+	7112  82371AB PIIX4 USB
+	7113  82371AB PIIX4 ACPI
+	7180  440LX - 82443LX PAC Host
+	7181  440LX - 82443LX PAC AGP
+	84c4  Orion P6
+	84c5  82450GX Orion P6
+8e2e  KTI
+	3000  ET32P2
+9004  Adaptec
+	5078  AIC-7850
+	5578  AIC-7855
+	5800  AIC-5800
+	6078  AIC-7860
+	6178  AIC-7861
+	7078  AIC-7870
+	7178  AIC-7871
+	7278  AIC-7872
+	7378  AIC-7873
+	7478  AIC-7874
+	7895  AIC-7895U
+	8078  AIC-7880U
+	8178  AIC-7881U
+	8278  AIC-7882U
+	8378  AIC-7883U
+	8478  AIC-7884U
+907f  Atronics
+	2015  IDE-2015PL
+edd8  ARK Logic
+	a091  Stingray
+	a099  Stingray ARK 2000PV
+	a0a1  2000MT
+
+# List of known device classes and subclasses
+
+C 00  Unclassified device
+	0000  Non-VGA unclassified device
+	0001  VGA compatible unclassified device
+C 01  Mass storage controller
+	0000  SCSI storage controller
+	0001  IDE interface
+	0002  Floppy disk controller
+	0003  IPI bus controller
+	0004  RAID bus controller
+	0080  Unknown mass storage controller
+C 02  Network controller
+	0000  Ethernet controller
+	0001  Token ring network controller
+	0002  FDDI network controller
+	0003  ATM network controller
+	0080  Network controller
+C 03  Display controller
+	0000  VGA compatible controller
+	0001  XGA compatible controller
+	0080  Display controller
+C 04  Multimedia controller
+	0000  Multimedia video controller
+	0001  Multimedia audio controller
+	0080  Multimedia controller
+C 05  Memory controller
+	0000  RAM memory
+	0001  FLASH memory
+	0080  Memory
+C 06  Bridge
+	0000  Host bridge
+	0001  ISA bridge
+	0002  EISA bridge
+	0003  MicroChannel bridge
+	0004  PCI bridge
+	0005  PCMCIA bridge
+	0006  NuBus bridge
+	0007  CardBus bridge
+	0080  Bridge
+C 07  Communication controller
+	0000  Serial controller
+	0001  Parallel controller
+	0080  Communication controller
+C 08  Generic system peripheral
+	0000  PIC
+	0001  DMA controller
+	0002  Timer
+	0003  RTC
+	0080  System peripheral
+C 09  Input device controller
+	0000  Keyboard controller
+	0001  Digitizer Pen
+	0002  Mouse controller
+	0080  Input device controller
+C 0A  Docking station
+	0000  Generic Docking Station
+	0080  Docking Station
+C 0B  Processor
+	0000  386
+	0001  486
+	0002  Pentium
+	0010  Alpha
+	0020  Power PC
+	0040  Co-processor
+C 0C  Serial bus controller
+	0000  FireWire (IEEE 1394)
+	0001  ACCESS Bus
+	0002  SSA
+	0003  USB Controller
+	0004  Fiber Channel
