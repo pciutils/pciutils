@@ -1,5 +1,7 @@
 2006-05-05  Martin Mares  <mj@ucw.cz>
 
+	* pci.ids: Updated to the current database snapshot.
+
 	* lib/obsd-device.c (and other files in lib/*): Added OpenBSD
 	interface by Matthieu Herrb <matthieu.herrb@laas.fr>, based on
 	the existing FreeBSD interface.
