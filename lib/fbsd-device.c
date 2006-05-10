@@ -11,6 +11,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <osreldate.h>
+#include <stdint.h>
+
+#ifdef __FreeBSD_kernel_version
+#  ifndef __FreeBSD_version
+#    define __FreeBSD_version __FreeBSD_kernel_version
+#  endif
+#endif
 
 #if __FreeBSD_version < 500000
 #  include <pci/pcivar.h>

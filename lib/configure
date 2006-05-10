@@ -22,6 +22,10 @@ then
 else
 	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
 fi
+if [ "$sys" = "GNU/kFreeBSD" ]
+then
+	sys=freebsd
+fi
 host=${3:-$cpu-$sys}
 host=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)$/\1--\2/' | tr 'A-Z' 'a-z'`
 cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`

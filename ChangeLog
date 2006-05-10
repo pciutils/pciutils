@@ -1,3 +1,8 @@
+2006-05-10  Martin Mares  <mj@ucw.cz>
+
+	* lib/configure, lib/fbsd-device.c: Added support for GNU/kFreeBSD.
+	Thanks to Petr Salinger for the patch.
+
 2006-05-05  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.3.
