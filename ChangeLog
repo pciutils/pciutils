@@ -1,3 +1,9 @@
+2006-05-19  Martin Mares  <mj@ucw.cz>
+
+	* README: Mention the public GIT tree.
+
+	* README: Updated the list of ports.
+
 2006-05-10  Martin Mares  <mj@ucw.cz>
 
 	* lib/configure, lib/fbsd-device.c: Added support for GNU/kFreeBSD.

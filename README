@@ -12,8 +12,18 @@ to the terms of the GNU General Public License, either version 2 or
 The PCI Utilities package contains a library for portable access to PCI bus
 configuration registers and several utilities based on this library.
 
-Currently, pciutils work on all versions of Linux and they also have somewhat
-experimental support for FreeBSD, NetBSD, AIX, GNU Hurd and Solaris/x86.
+In runs on the following systems:
+
+	Linux		(via /sys/bus/pci, /proc/bus/pci or i386 ports)
+	FreeBSD		(via /dev/pci)
+	NetBSD		(via libpci)
+	OpenBSD		(via /dev/pci)
+	GNU/kFreeBSD	(via /dev/pci)
+	Solaris/i386	(direct port access)
+	Aix		(via /dev/pci and odmget)
+	GNU Hurd	(direct port access)
+	Windows		(direct port access)
+
 It should be very easy to add support for other systems as well (volunteers
 wanted; if you want to try that, I'll be very glad to see the patches and
 include them in the next version).
@@ -56,22 +66,17 @@ names, the detailed instructions for submissions are listed on the
 sf.net web page.
 
 
-4. Available access methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The library (and therefore all the utilities) know a variety of methods for
-accessing the PCI registers. Here is a list of them, sorted by autodetection
-priority:
+4. Getting new versions
+~~~~~~~~~~~~~~~~~~~~~~~
+New versions of pciutils are available at the following places:
 
-   /proc/bus/pci	on all Linux systems since kernel 2.1.82.
-   /sys/bus/pci		on all Linux systems since kernel 2.5.xx.
-   direct port access	on i386 systems running Linux, GNU Hurd or Solaris/x86;
-			available only to root, useful if no other access
-			method is available or you want to hunt kernel bugs
-   /dev/pci		used on FreeBSD
-   lsdev + odmget	used on AIX
-   libpci		used on NetBSD
-   dumps		reading of dumps produced by `lspci -x'
-			(this one is not autodetected)
+	ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/
+	ftp://ftp.kernel.org/pub/software/utils/pciutils/ (expect a couple of hours delay)
+	ftp://metalab.unc.edu/pub/Linux/hardware/ (expect a couple of days delay)
+
+There is also a public GIT tree at:
+
+	git://git.kernel.org/pub/scm/utils/pciutils/pciutils.git
 
 
 5. Using the library
