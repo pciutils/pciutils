@@ -435,7 +435,7 @@ next:
 		case 'L':
 		  op->width = 4; break;
 		default:
-		  usage("Invalid width \"%s\"", *e);
+		  usage("Invalid width \"%c\"", *e);
 		}
 	    }
 	  else

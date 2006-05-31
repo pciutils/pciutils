@@ -1,3 +1,7 @@
+2006-05-31  Martin Mares  <mj@ucw.cz>
+
+	* setpci.c (main): Don't crash when an invalid width is specified.
+
 2006-05-19  Martin Mares  <mj@ucw.cz>
 
 	* README: Mention the public GIT tree.
