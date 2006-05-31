@@ -2,6 +2,9 @@
 
 	* setpci.c (main): Don't crash when an invalid width is specified.
 
+	* lspci.c, setpci.c, common.c: die() now uses the right program
+	name when printing an error message.
+
 2006-05-19  Martin Mares  <mj@ucw.cz>
 
 	* README: Mention the public GIT tree.

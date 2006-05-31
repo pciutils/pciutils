@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1998--2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -17,6 +17,8 @@
 static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
 static int demo_mode;			/* Only show */
+
+const char program_name[] = "setpci";
 
 static struct pci_access *pacc;
 

@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Common Functions
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -20,7 +20,7 @@ die(char *msg, ...)
   va_list args;
 
   va_start(args, msg);
-  fputs("lspci: ", stderr);
+  fprintf(stderr, "%s: ", program_name);
   vfprintf(stderr, msg, args);
   fputc('\n', stderr);
   exit(1);

@@ -25,6 +25,8 @@ static int machine_readable;		/* Generate machine-readable output */
 static int map_mode;			/* Bus mapping mode enabled */
 static int show_domains;		/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
 
+const char program_name[] = "lspci";
+
 static char options[] = "nvbxs:d:ti:mgMD" GENERIC_OPTIONS ;
 
 static char help_msg[] = "\

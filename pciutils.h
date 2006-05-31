@@ -15,6 +15,8 @@
 
 #define PCIUTILS_VERSION PCILIB_VERSION
 
+extern const char program_name[];
+
 void die(char *msg, ...) NONRET;
 void *xmalloc(unsigned int howmuch);
 void *xrealloc(void *ptr, unsigned int howmuch);
