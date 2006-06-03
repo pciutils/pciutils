@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -383,10 +383,13 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 
   va_start(args, flags);
 
-  if (a->numeric_ids > 1)
-    flags |= PCI_LOOKUP_MIXED;
-  else if (a->numeric_ids)
-    flags |= PCI_LOOKUP_NUMERIC;
+  if (!(flags & PCI_LOOKUP_NO_NUMBERS))
+    {
+      if (a->numeric_ids > 1)
+	flags |= PCI_LOOKUP_MIXED;
+      else if (a->numeric_ids)
+	flags |= PCI_LOOKUP_NUMERIC;
+    }
   if (flags & PCI_LOOKUP_MIXED)
     flags &= ~PCI_LOOKUP_NUMERIC;
 
@@ -451,12 +454,14 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 	{
 	  /* IDE controllers have complex prog-if semantics */
 	  sprintf(pifbuf, "%s%s%s%s%s",
-		  (ipif & 0x80) ? "Master " : "",
-		  (ipif & 0x08) ? "SecP " : "",
-		  (ipif & 0x04) ? "SecO " : "",
-		  (ipif & 0x02) ? "PriP " : "",
-		  (ipif & 0x01) ? "PriO " : "");
+		  (ipif & 0x80) ? " Master" : "",
+		  (ipif & 0x08) ? " SecP" : "",
+		  (ipif & 0x04) ? " SecO" : "",
+		  (ipif & 0x02) ? " PriP" : "",
+		  (ipif & 0x01) ? " PriO" : "");
 	  pif = pifbuf;
+	  if (*pif)
+	    pif++;
 	}
       return format_name(buf, size, flags, pif, numbuf, "ProgIf");
     default:

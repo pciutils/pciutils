@@ -1,5 +1,8 @@
 2006-06-03  Martin Mares  <mj@ucw.cz>
 
+	* lib/names.c (pci_lookup_name): If PCI_LOOKUP_NO_NUMBERS is given,
+	pci_access->numeric_ids is ignored.
+
 	* lspci.c: Introduced the -nn switch. Thanks to David N. Welton
 	for the idea.
 
