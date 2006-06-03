@@ -34,6 +34,7 @@ Usage: lspci [<switches>]\n\
 \n\
 -v\t\tBe verbose\n\
 -n\t\tShow numeric ID's\n\
+-nn\t\tShow both textual and numeric ID's (names & numbers)\n\
 -b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
 -x\t\tShow hex-dump of the standard portion of config space\n\
 -xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n\
@@ -2291,7 +2292,7 @@ main(int argc, char **argv)
     switch (i)
       {
       case 'n':
-	pacc->numeric_ids = 1;
+	pacc->numeric_ids++;
 	break;
       case 'v':
 	verbose++;

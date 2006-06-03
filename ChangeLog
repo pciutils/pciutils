@@ -1,3 +1,11 @@
+2006-06-03  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c: Introduced the -nn switch. Thanks to David N. Welton
+	for the idea.
+
+	* lib/names.c (pci_lookup_name): Introduced PCI_LOOKUP_MIXED and
+	cleaned up the name selection code.
+
 2006-05-31  Martin Mares  <mj@ucw.cz>
 
 	* setpci.c (main): Don't crash when an invalid width is specified.

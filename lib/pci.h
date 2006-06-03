@@ -43,7 +43,7 @@ struct pci_access {
   int writeable;			/* Open in read/write mode */
   int buscentric;			/* Bus-centric view of the world */
   char *id_file_name;			/* Name of ID list file */
-  int numeric_ids;			/* Don't resolve device IDs to names */
+  int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */
@@ -57,6 +57,7 @@ struct pci_access {
   struct pci_methods *methods;
   struct id_entry **id_hash;		/* names.c */
   struct id_bucket *current_id_bucket;
+  int hash_load_failed;
   int fd;				/* proc: fd */
   int fd_rw;				/* proc: fd opened read-write */
   struct pci_dev *cached_dev;		/* proc: device the fd is for */
@@ -165,7 +166,8 @@ enum pci_lookup_mode {
   PCI_LOOKUP_SUBSYSTEM = 8,
   PCI_LOOKUP_PROGIF = 16,		/* Programming interface (args: classID, prog_if) */
   PCI_LOOKUP_NUMERIC = 0x10000,		/* Want only formatted numbers; default if access->numeric_ids is set */
-  PCI_LOOKUP_NO_NUMBERS = 0x20000	/* Return NULL if not found in the database; default is to print numerically */
+  PCI_LOOKUP_NO_NUMBERS = 0x20000,	/* Return NULL if not found in the database; default is to print numerically */
+  PCI_LOOKUP_MIXED = 0x40000,		/* Include both numbers and names */
 };
 
 #endif

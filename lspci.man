@@ -54,6 +54,9 @@ even if it doesn't look interesting at all (e.g., undefined memory regions).
 Show PCI vendor and device codes as numbers instead of looking them up in the
 PCI ID list.
 .TP
+.B -nn
+Show PCI vendor and device codes as both numbers and names.
+.TP
 .B -x
 Show hexadecimal dump of the standard part of the configuration space (the first
 64 bytes or 128 bytes for CardBus bridges).
