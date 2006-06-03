@@ -1,13 +1,16 @@
 2006-06-03  Martin Mares  <mj@ucw.cz>
 
-	* lib/names.c (pci_lookup_name): If PCI_LOOKUP_NO_NUMBERS is given,
-	pci_access->numeric_ids is ignored.
-
 	* lspci.c: Introduced the -nn switch. Thanks to David N. Welton
 	for the idea.
 
 	* lib/names.c (pci_lookup_name): Introduced PCI_LOOKUP_MIXED and
 	cleaned up the name selection code.
+
+	* lib/names.c (pci_lookup_name): If PCI_LOOKUP_NO_NUMBERS is given,
+	pci_access->numeric_ids is ignored.
+
+	* lib/names.c (pci_lookup_name): When class is identified and
+	subclass isn't, display class name and subclass number.
 
 2006-05-31  Martin Mares  <mj@ucw.cz>
 

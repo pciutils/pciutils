@@ -439,7 +439,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
       icls = va_arg(args, int);
       sprintf(numbuf, "%04x", icls);
       cls = id_lookup(a, ID_SUBCLASS, icls >> 8, icls & 0xff, 0, 0);
-      if (!cls && (cls = id_lookup(a, ID_CLASS, icls, 0, 0, 0)))
+      if (!cls && (cls = id_lookup(a, ID_CLASS, icls >> 8, 0, 0, 0)))
 	{
 	  if (!(flags & PCI_LOOKUP_NUMERIC)) /* Include full class number */
 	    flags |= PCI_LOOKUP_MIXED;
