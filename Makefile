@@ -58,7 +58,7 @@ update-pciids: update-pciids.sh
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core`
-	rm -f update-pciids lspci setpci lib/config.* *.8 pci.ids.*
+	rm -f update-pciids lspci setpci lib/config.* lib/example *.8 pci.ids.*
 	rm -rf maint/dist
 
 distclean: clean

@@ -1,5 +1,11 @@
 2006-06-27  Martin Mares  <mj@ucw.cz>
 
+	* lib/Makefile, Makefile: Added rules for building and cleaning the example.
+
+	* lib/example.c: Show how to use PCI_FILL_CLASS and used another register
+	for demonstrating the config space accesses. The example is still very
+	incomplete, though.
+
 	* lib/pci.h, lib/generic.c: Added PCI_FILL_CLASS.
 
 	* lib/sysfs.c: Fetch device ID and class from sysfs, because they can

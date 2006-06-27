@@ -68,3 +68,5 @@ dump.o: dump.c $(INCL)
 names.o: names.c $(INCL)
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
+
+example: example.c $(PCILIB)
