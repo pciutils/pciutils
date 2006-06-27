@@ -130,7 +130,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
   return d;
 }
 
@@ -262,7 +262,7 @@ show_terse(struct device *d)
   printf(" %s: %s",
 	 pci_lookup_name(pacc, classbuf, sizeof(classbuf),
 			 PCI_LOOKUP_CLASS,
-			 get_conf_word(d, PCI_CLASS_DEVICE)),
+			 p->device_class),
 	 pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
 			 p->vendor_id, p->device_id));
@@ -274,7 +274,7 @@ show_terse(struct device *d)
       c = get_conf_byte(d, PCI_CLASS_PROG);
       x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			  PCI_LOOKUP_PROGIF | PCI_LOOKUP_NO_NUMBERS,
-			  get_conf_word(d, PCI_CLASS_DEVICE), c);
+			  p->device_class, c);
       if (c || x)
 	{
 	  printf(" (prog-if %02x", c);
@@ -1592,7 +1592,7 @@ show_verbose(struct device *d)
   struct pci_dev *p = d->dev;
   word status = get_conf_word(d, PCI_STATUS);
   word cmd = get_conf_word(d, PCI_COMMAND);
-  word class = get_conf_word(d, PCI_CLASS_DEVICE);
+  word class = p->device_class;
   byte bist = get_conf_byte(d, PCI_BIST);
   byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
   byte latency = get_conf_byte(d, PCI_LATENCY_TIMER);
@@ -1790,7 +1790,7 @@ show_machine(struct device *d)
       show_slot_name(d);
       putchar('\n');
       printf("Class:\t%s\n",
-	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, get_conf_word(d, PCI_CLASS_DEVICE)));
+	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, p->device_class));
       printf("Vendor:\t%s\n",
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
       printf("Device:\t%s\n",
@@ -1812,7 +1812,7 @@ show_machine(struct device *d)
       show_slot_name(d);
       printf(" \"%s\" \"%s\" \"%s\"",
 	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS,
-			     get_conf_word(d, PCI_CLASS_DEVICE)),
+			     p->device_class),
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR,
 			     p->vendor_id, p->device_id),
 	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE,
@@ -1936,7 +1936,7 @@ grow_tree(void)
   last_br = &host_bridge.chain;
   for(d=first_dev; d; d=d->next)
     {
-      word class = get_conf_word(d, PCI_CLASS_DEVICE);
+      word class = d->dev->device_class;
       byte ht = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
       if (class == PCI_CLASS_BRIDGE_PCI &&
 	  (ht == PCI_HEADER_TYPE_BRIDGE || ht == PCI_HEADER_TYPE_CARDBUS))

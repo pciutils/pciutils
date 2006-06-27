@@ -86,6 +86,7 @@ struct pci_dev {
   /* These fields are set by pci_fill_info() */
   int known_fields;			/* Set of info fields already known */
   u16 vendor_id, device_id;		/* Identity of the device */
+  u16 device_class;			/* PCI device class */
   int irq;				/* IRQ number */
   pciaddr_t base_addr[6];		/* Base addresses */
   pciaddr_t size[6];			/* Region sizes */
@@ -120,6 +121,7 @@ int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
 #define PCI_FILL_BASES		4
 #define PCI_FILL_ROM_BASE	8
 #define PCI_FILL_SIZES		16
+#define PCI_FILL_CLASS		32
 #define PCI_FILL_RESCAN		0x10000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len);

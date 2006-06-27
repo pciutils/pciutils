@@ -1,3 +1,12 @@
+2006-06-27  Martin Mares  <mj@ucw.cz>
+
+	* lib/pci.h, lib/generic.c: Added PCI_FILL_CLASS.
+
+	* lib/sysfs.c: Fetch device ID and class from sysfs, because they can
+	be modified by kernel fixups.
+
+	* lspci.c: Use PCI_FILL_CLASS. Thanks to Matthew Willcox for the patch.
+
 2006-06-03  Martin Mares  <mj@ucw.cz>
 
 	* lspci.c: Introduced the -nn switch. Thanks to David N. Welton

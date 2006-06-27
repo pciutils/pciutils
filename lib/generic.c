@@ -86,6 +86,8 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
       d->vendor_id = pci_read_word(d, PCI_VENDOR_ID);
       d->device_id = pci_read_word(d, PCI_DEVICE_ID);
     }
+  if (flags & PCI_FILL_CLASS)
+      d->device_class = pci_read_word(d, PCI_CLASS_DEVICE);
   if (flags & PCI_FILL_IRQ)
     d->irq = pci_read_byte(d, PCI_INTERRUPT_LINE);
   if (flags & PCI_FILL_BASES)
