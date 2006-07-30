@@ -62,6 +62,7 @@ proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
 syscalls.o: syscalls.c $(INCL)
+obsd-device.o: obsd-device.c $(INCL)
 fbsd-device.o: fbsd-device.c $(INCL)
 aix-device.o: aix-device.c $(INCL)
 dump.o: dump.c $(INCL)

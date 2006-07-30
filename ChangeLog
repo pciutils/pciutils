@@ -1,5 +1,7 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lib/Makefile: Added a missing rule for obsd-device.o.
+
 	* lspci.c, lib/header.h: Added support for MSI per-vector masking.
 	Contributed by Petr Vandrovec.
 
