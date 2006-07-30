@@ -18,49 +18,43 @@
 #define inw(x) _inpw(x)
 #define inl(x) _inpd(x)
 
-static int intel_iopl_set = -1;
-
 static int
 intel_setup_io(void)
 {
-  if (intel_iopl_set < 0)
+  typedef int (*MYPROC)(void);
+  MYPROC InitializeWinIo;
+  HMODULE lib;
+
+  intel_iopl_set = 0;
+
+  lib = LoadLibrary("WinIo.dll");
+  if (!lib)
     {
-      typedef int (*MYPROC)(void);
-      MYPROC InitializeWinIo;
-      HMODULE lib;
-
-      intel_iopl_set = 0;
-
-      lib = LoadLibrary("WinIo.dll");
-      if (!lib)
-	{
-	  fprintf(stderr, "libpci: Couldn't load WinIo.dll.\n");
-	  return 0;
-	}
-      /* XXX: Is this really needed? --mj */
-      GetProcAddress(lib, "InitializeWinIo");
-
-      InitializeWinIo = (MYPROC) GetProcAddress(lib, "InitializeWinIo");
-      if (!InitializeWinIo)
-	{
-	  fprintf(stderr, "libpci: Couldn't find InitializeWinIo function.\n");
-	  return 0;
-	}
-
-      if (!InitializeWinIo())
-	{
-	  fprintf(stderr, "libpci: InitializeWinIo() failed.\n");
-	  return 0;
-	}
-
-      intel_iopl_set = 1;
+      fprintf(stderr, "libpci: Couldn't load WinIo.dll.\n");
+      return 0;
     }
-  return intel_iopl_set;
+  /* XXX: Is this really needed? --mj */
+  GetProcAddress(lib, "InitializeWinIo");
+
+  InitializeWinIo = (MYPROC) GetProcAddress(lib, "InitializeWinIo");
+  if (!InitializeWinIo)
+    {
+      fprintf(stderr, "libpci: Couldn't find InitializeWinIo function.\n");
+      return 0;
+    }
+
+  if (!InitializeWinIo())
+    {
+      fprintf(stderr, "libpci: InitializeWinIo() failed.\n");
+      return 0;
+    }
+
+  return 1;
 }
 
-static inline void
+static inline int
 intel_cleanup_io(void)
 {
   //TODO: DeInitializeWinIo!
-  //intel_iopl_set = -1;
+  return 1;
 }

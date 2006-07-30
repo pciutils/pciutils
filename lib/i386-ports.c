@@ -24,17 +24,28 @@
 #error Do not know how to access I/O ports on this OS.
 #endif
 
+static int conf12_io_enabled = -1;		/* -1=haven't tried, 0=failed, 1=succeeded */
+
+static int
+conf12_setup_io(void)
+{
+  if (conf12_io_enabled < 0)
+    conf12_io_enabled = intel_setup_io();
+  return conf12_io_enabled;
+}
+
 static void
 conf12_init(struct pci_access *a)
 {
-  if (!intel_setup_io())
-    a->error("You need to be root to have access to I/O ports.");
+  if (!conf12_setup_io())
+    a->error("No permission to access I/O ports (you probably have to be root).");
 }
 
 static void
 conf12_cleanup(struct pci_access *a UNUSED)
 {
-  intel_cleanup_io();
+  if (conf12_io_enabled > 0)
+    conf12_io_enabled = intel_cleanup_io();
 }
 
 /*
@@ -84,7 +95,7 @@ conf1_detect(struct pci_access *a)
   unsigned int tmp;
   int res = 0;
 
-  if (!intel_setup_io())
+  if (!conf12_setup_io())
     {
       a->debug("...no I/O permission");
       return 0;
@@ -161,7 +172,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 static int
 conf2_detect(struct pci_access *a)
 {
-  if (!intel_setup_io())
+  if (!conf12_setup_io())
     {
       a->debug("...no I/O permission");
       return 0;

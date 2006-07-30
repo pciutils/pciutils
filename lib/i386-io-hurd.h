@@ -38,11 +38,13 @@ intel_setup_io(void)
   return errno ? 0 : 1;
 }
 
-static inline void
+static inline int
 intel_cleanup_io(void)
 {
   if ((errno = i386_io_port_remove(mach_thread_self(), io_port)))
     perror("intel_cleanup_io() can't i386_io_port_remove()");
 
   mach_port_deallocate(mach_task_self(), io_port);
+
+  return -1;
 }
