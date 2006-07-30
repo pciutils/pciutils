@@ -13,13 +13,13 @@
 #endif
 
 static int
-intel_setup_io(void)
+intel_setup_io(struct pci_access *a UNUSED)
 {
   return (iopl(3) < 0) ? 0 : 1;
 }
 
 static inline int
-intel_cleanup_io(void)
+intel_cleanup_io(struct pci_access *a UNUSED)
 {
   iopl(3);
   return -1;

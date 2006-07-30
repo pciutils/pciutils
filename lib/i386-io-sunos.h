@@ -11,13 +11,13 @@
 #include <sys/psw.h>
 
 static int
-intel_setup_io(void)
+intel_setup_io(struct pci_access *a UNUSED)
 {
   return (sysi86(SI86V86, V86SC_IOPL, PS_IOPL) < 0) ? 0 : 1;
 }
 
 static inline int
-intel_cleanup_io(void)
+intel_cleanup_io(struct pci_access *a UNUSED)
 {
   /* FIXME: How to switch off I/O port access? */
   return 1;

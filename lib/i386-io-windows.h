@@ -2,6 +2,7 @@
  *	The PCI Library -- Access to i386 I/O ports on Windows
  *
  *	Copyright (c) 2004 Alexander Stock <stock.alexander@gmx.de>
+ *	Copyright (c) 2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -19,7 +20,7 @@
 #define inl(x) _inpd(x)
 
 static int
-intel_setup_io(void)
+intel_setup_io(struct pci_access *a)
 {
   typedef int (*MYPROC)(void);
   MYPROC InitializeWinIo;
@@ -30,7 +31,7 @@ intel_setup_io(void)
   lib = LoadLibrary("WinIo.dll");
   if (!lib)
     {
-      fprintf(stderr, "libpci: Couldn't load WinIo.dll.\n");
+      a->warning("i386-io-windows: Couldn't load WinIo.dll.");
       return 0;
     }
   /* XXX: Is this really needed? --mj */
@@ -39,13 +40,13 @@ intel_setup_io(void)
   InitializeWinIo = (MYPROC) GetProcAddress(lib, "InitializeWinIo");
   if (!InitializeWinIo)
     {
-      fprintf(stderr, "libpci: Couldn't find InitializeWinIo function.\n");
+      a->warning("i386-io-windows: Couldn't find InitializeWinIo function.");
       return 0;
     }
 
   if (!InitializeWinIo())
     {
-      fprintf(stderr, "libpci: InitializeWinIo() failed.\n");
+      a->warning("i386-io-windows: InitializeWinIo() failed.");
       return 0;
     }
 
@@ -53,7 +54,7 @@ intel_setup_io(void)
 }
 
 static inline int
-intel_cleanup_io(void)
+intel_cleanup_io(struct pci_access *a UNUSED)
 {
   //TODO: DeInitializeWinIo!
   return 1;

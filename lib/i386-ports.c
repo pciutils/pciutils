@@ -27,17 +27,17 @@
 static int conf12_io_enabled = -1;		/* -1=haven't tried, 0=failed, 1=succeeded */
 
 static int
-conf12_setup_io(void)
+conf12_setup_io(struct pci_access *a)
 {
   if (conf12_io_enabled < 0)
-    conf12_io_enabled = intel_setup_io();
+    conf12_io_enabled = intel_setup_io(a);
   return conf12_io_enabled;
 }
 
 static void
 conf12_init(struct pci_access *a)
 {
-  if (!conf12_setup_io())
+  if (!conf12_setup_io(a))
     a->error("No permission to access I/O ports (you probably have to be root).");
 }
 
@@ -45,7 +45,7 @@ static void
 conf12_cleanup(struct pci_access *a UNUSED)
 {
   if (conf12_io_enabled > 0)
-    conf12_io_enabled = intel_cleanup_io();
+    conf12_io_enabled = intel_cleanup_io(a);
 }
 
 /*
@@ -95,7 +95,7 @@ conf1_detect(struct pci_access *a)
   unsigned int tmp;
   int res = 0;
 
-  if (!conf12_setup_io())
+  if (!conf12_setup_io(a))
     {
       a->debug("...no I/O permission");
       return 0;
@@ -172,7 +172,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 static int
 conf2_detect(struct pci_access *a)
 {
-  if (!conf12_setup_io())
+  if (!conf12_setup_io(a))
     {
       a->debug("...no I/O permission");
       return 0;

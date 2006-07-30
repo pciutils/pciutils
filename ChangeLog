@@ -1,5 +1,9 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lib/i386-ports.c, lib/i386-io-*: Report failures during port access
+	initialization by a->warn() instead of calling printf() or perror()
+	directly.
+
 	* lib/i386-ports.c, lib/i386-io-*: Moved the logic which keeps track of
 	the port access state to generic code.
 
