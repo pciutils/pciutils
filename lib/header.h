@@ -188,6 +188,7 @@
 #define  PCI_CAP_ID_VNDR	0x09	/* Vendor specific */
 #define  PCI_CAP_ID_DBG		0x0A	/* Debug port */
 #define  PCI_CAP_ID_CCRC	0x0B	/* CompactPCI Central Resource Control */
+#define  PCI_CAP_ID_SSVID	0x0D	/* Bridge subsystem vendor/device ID */
 #define  PCI_CAP_ID_AGP3	0x0E	/* AGP 8x */
 #define  PCI_CAP_ID_EXP		0x10	/* PCI Express */
 #define  PCI_CAP_ID_MSIX	0x11	/* MSI-X */
@@ -773,6 +774,10 @@
 #define PCI_MSIX_TABLE		4
 #define PCI_MSIX_PBA		8
 #define  PCI_MSIX_BIR		0x7
+
+/* Subsystem vendor/device ID for PCI bridges */
+#define PCI_SSVID_VENDOR	4
+#define PCI_SSVID_DEVICE	6
 
 /* Advanced Error Reporting */
 #define PCI_ERR_UNCOR_STATUS	4	/* Uncorrectable Error Status */

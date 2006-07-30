@@ -1272,6 +1272,22 @@ show_slotid(int cap)
 }
 
 static void
+show_ssvid(struct device *d, int where)
+{
+  u16 subsys_v, subsys_d;
+  char ssnamebuf[256];
+
+  if (!config_fetch(d, where, 8))
+    return;
+  subsys_v = get_conf_word(d, where + PCI_SSVID_VENDOR);
+  subsys_d = get_conf_word(d, where + PCI_SSVID_DEVICE);
+  printf("Subsystem: %s\n",
+	   pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
+			   PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
+			   d->dev->vendor_id, d->dev->device_id, subsys_v, subsys_d));
+}
+
+static void
 show_aer(struct device *d UNUSED, int where UNUSED)
 {
   printf("Advanced Error Reporting\n");
@@ -1395,6 +1411,9 @@ show_caps(struct device *d)
 	      break;
 	    case PCI_CAP_ID_DBG:
 	      show_debug();
+	      break;
+	    case PCI_CAP_ID_SSVID:
+	      show_ssvid(d, where);
 	      break;
 	    case PCI_CAP_ID_EXP:
 	      show_express(d, where, cap);
