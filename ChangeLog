@@ -1,5 +1,8 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lspci.c, lib/header.h: Added support for MSI per-vector masking.
+	Contributed by Petr Vandrovec.
+
 	* lspci.c, lib/header.h: Added support for the `bridge subsystem ID'
 	capability. Contributed by Petr Vandrovec.
 

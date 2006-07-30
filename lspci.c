@@ -991,7 +991,8 @@ show_msi(struct device *d, int where, int cap)
   u32 t;
   u16 w;
 
-  printf("Message Signalled Interrupts: 64bit%c Queue=%d/%d Enable%c\n",
+  printf("Message Signalled Interrupts: Mask%c 64bit%c Queue=%d/%d Enable%c\n",
+         FLAG(cap, PCI_MSI_FLAGS_MASK_BIT),
 	 FLAG(cap, PCI_MSI_FLAGS_64BIT),
 	 (cap & PCI_MSI_FLAGS_QSIZE) >> 4,
 	 (cap & PCI_MSI_FLAGS_QMASK) >> 1,
@@ -1012,6 +1013,26 @@ show_msi(struct device *d, int where, int cap)
     w = get_conf_word(d, where + PCI_MSI_DATA_32);
   t = get_conf_long(d, where + PCI_MSI_ADDRESS_LO);
   printf("%08x  Data: %04x\n", t, w);
+  if (cap & PCI_MSI_FLAGS_MASK_BIT)
+    {
+      u32 mask, pending;
+
+      if (is64)
+	{
+	  if (!config_fetch(d, where + PCI_MSI_MASK_BIT_64, 8))
+	    return;
+	  mask = get_conf_long(d, where + PCI_MSI_MASK_BIT_64);
+	  pending = get_conf_long(d, where + PCI_MSI_PENDING_64);
+	}
+      else
+        {
+	  if (!config_fetch(d, where + PCI_MSI_MASK_BIT_32, 8))
+	    return;
+	  mask = get_conf_long(d, where + PCI_MSI_MASK_BIT_32);
+	  pending = get_conf_long(d, where + PCI_MSI_PENDING_32);
+	}
+      printf("\t\tMasking: %08x  Pending: %08x\n", mask, pending);
+    }
 }
 
 static void show_vendor(void)
