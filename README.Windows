@@ -1,5 +1,8 @@
 Since 2.1.99-test5, pciutils should also be compilable on Windows. Thanks
 to Alexander Stock for contributing the port.
 
+To build this port, you need to install WinIO.dll first. You can get it
+from http://www.internals.com/.
+
 However, you need to use win32/config.h instead of the automatically
 generated lib/config.h as lib/configure does not run on Windows.

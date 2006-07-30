@@ -1,3 +1,9 @@
+2006-07-30  Martin Mares  <mj@ucw.cz>
+
+	* lib/i386-io-windows.h: Fixed indentation and spelling.
+
+	* README.Windows: Mention that WinIO.dll is needed and where to get it.
+
 2006-06-27  Martin Mares  <mj@ucw.cz>
 
 	* lib/Makefile, Makefile: Added rules for building and cleaning the example.
