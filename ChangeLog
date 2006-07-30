@@ -1,5 +1,7 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lib/header.h: Whitespace cleanups.
+
 	* lib/i386-io-windows.h: Fixed indentation and spelling.
 
 	* README.Windows: Mention that WinIO.dll is needed and where to get it.
