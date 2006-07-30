@@ -1,5 +1,8 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lib/i386-io-hurd.h: Ask the kernel for I/O port access appropriately.
+	Contributed by Thomas Schwinge and Samuel Thibault.
+
 	* lib/i386-ports.c: Define _GNU_SOURCE, it's needed by the Hurd module.
 
 	* lib/header.h: Whitespace cleanups.
