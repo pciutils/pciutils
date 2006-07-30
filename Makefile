@@ -4,7 +4,7 @@
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes -Winline
 
-VERSION=2.2.4-pre3
+VERSION=2.2.4-pre4
 DATE=2006-07-30
 
 PREFIX=/usr/local
