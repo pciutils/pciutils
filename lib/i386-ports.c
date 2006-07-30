@@ -1,14 +1,16 @@
 /*
  *	The PCI Library -- Direct Configuration access via i386 Ports
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#include <unistd.h>
+#define _GNU_SOURCE
 
 #include "internal.h"
+
+#include <unistd.h>
 
 #if defined(PCI_OS_LINUX)
 #include "i386-io-linux.h"

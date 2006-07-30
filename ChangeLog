@@ -1,5 +1,7 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* lib/i386-ports.c: Define _GNU_SOURCE, it's needed by the Hurd module.
+
 	* lib/header.h: Whitespace cleanups.
 
 	* lib/i386-io-windows.h: Fixed indentation and spelling.
