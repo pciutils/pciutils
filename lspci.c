@@ -1487,7 +1487,7 @@ show_htype1(struct device *d)
 		   get_conf_long(d, PCI_PREF_BASE_UPPER32),
 		   pref_base,
 		   get_conf_long(d, PCI_PREF_LIMIT_UPPER32),
-		   pref_limit);
+		   pref_limit + 0xfffff);
 	}
     }
 
