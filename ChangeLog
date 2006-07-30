@@ -1,5 +1,7 @@
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
+	* maint/release.pm: Exclude .git directory from releases.
+
 	* lib/i386-ports.c, lib/i386-io-*: Report failures during port access
 	initialization by a->warn() instead of calling printf() or perror()
 	directly.
