@@ -1,3 +1,7 @@
+2006-08-01  Martin Mares  <mj@ucw.cz>
+
+	* lib/i386-io-hurd.h: Fixed a silly typo.
+
 2006-07-30  Martin Mares  <mj@ucw.cz>
 
 	* lib/Makefile: Added a missing rule for obsd-device.o.
