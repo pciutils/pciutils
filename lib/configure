@@ -42,20 +42,15 @@ echo_n "Looking for access methods..."
 
 case $sys in
 	linux*)
-		case $rel in
-			2.[1-9]*|[3-9]*)	echo_n " sysfs proc"
-						echo >>$c '#define PCI_HAVE_PM_LINUX_SYSFS'
-						echo >>$c '#define PCI_HAVE_PM_LINUX_PROC'
-						echo >>$c '#define PCI_HAVE_LINUX_BYTEORDER_H'
-						echo >>$c '#define PCI_PATH_PROC_BUS_PCI "/proc/bus/pci"'
-						echo >>$c '#define PCI_PATH_SYS_BUS_PCI "/sys/bus/pci"'
-						ok=1
-						;;
-		esac
+		echo_n " sysfs proc"
+		echo >>$c '#define PCI_HAVE_PM_LINUX_SYSFS'
+		echo >>$c '#define PCI_HAVE_PM_LINUX_PROC'
+		echo >>$c '#define PCI_HAVE_LINUX_BYTEORDER_H'
+		echo >>$c '#define PCI_PATH_PROC_BUS_PCI "/proc/bus/pci"'
+		echo >>$c '#define PCI_PATH_SYS_BUS_PCI "/sys/bus/pci"'
 		case $cpu in
 				i386)		echo_n " i386-ports"
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-						ok=1
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
@@ -64,7 +59,6 @@ case $sys in
 		case $cpu in
 				i386)		echo_n " i386-ports"
 						echo >>$c "#define PCI_HAVE_PM_INTEL_CONF"
-						ok=1
 						;;
 				*)
 						echo " The PCI library is does not support Solaris for this architecture: $cpu"
@@ -76,29 +70,24 @@ case $sys in
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
-		ok=1
 		;;
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
-		ok=1
 		;;
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'
-		ok=1
 		;;
 	netbsd)
 		echo_n " nbsd-libpci"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
-		ok=1
 		;;
     	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-		ok=1
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
@@ -108,9 +97,6 @@ esac
 
 echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
-if [ -z "$ok" ] ; then
-	echo "WARNING: No real configuration access method is available."
-fi
 
 echo_n "Checking for zlib support... "
 if [ "$zlib" = yes -o "$zlib" = no ] ; then

@@ -1,5 +1,8 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* lib/configure: When configuring for Linux, ignore the kernel version
+	and always build all access methods.
+
 	* Makefile (CFLAGS): Removed -Winline, it's not needed and triggers
 	at many non-interesting places with gcc 3.4.
 
