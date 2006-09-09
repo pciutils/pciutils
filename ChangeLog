@@ -1,3 +1,8 @@
+2006-09-09  Martin Mares  <mj@ucw.cz>
+
+	* lib/header.h: Added PCI_CLASS_xxx constants for all classes currently
+	defined in the pci.ids file.
+
 2006-08-01  Martin Mares  <mj@ucw.cz>
 
 	* lib/i386-io-hurd.h: Fixed a silly typo.
