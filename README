@@ -52,6 +52,13 @@ will allow you to install to a different directory from the one you intend
 to eventually run it from.  This is useful for people who are packaging
 pciutils to install on other computers.
 
+The configure script will automatically enable support for a compressed
+pci.ids if you have zlib installed.  You can override its guess by using
+"make ZLIB=no" or "make ZLIB=yes".  If compressed support is enabled,
+pciutils will use pci.ids.gz in preference to pci.ids, even if the
+pci.ids file is newer.  If the pci.ids.gz file is missing, it will use
+pci.ids instead.
+
 When you are bored of dumping PCI registers, just use "make uninstall".
 
 

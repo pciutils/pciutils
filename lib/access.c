@@ -66,7 +66,7 @@ pci_alloc(void)
   int i;
 
   bzero(a, sizeof(*a));
-  a->id_file_name = PCI_PATH_IDS;
+  pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);
@@ -182,6 +182,7 @@ pci_cleanup(struct pci_access *a)
   if (a->methods)
     a->methods->cleanup(a);
   pci_free_name_list(a);
+  pci_set_name_list_path(a, NULL, 0);
   pci_mfree(a);
 }
 

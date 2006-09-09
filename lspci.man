@@ -195,6 +195,9 @@ at http://pciids.sourceforge.net/, use the
 .B update-pciids
 utility to download the most recent version.
 .TP
+.B @IDSDIR@/pci.ids.gz
+If lspci is compiled with support for compression, this file is tried before pci.ids.
+.TP
 .B /proc/bus/pci
 An interface to PCI bus configuration space provided by the post-2.1.82 Linux
 kernels. Contains per-bus subdirectories with per-card config space files and a

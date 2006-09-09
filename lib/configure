@@ -32,6 +32,7 @@ cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
 sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 rel=${4:-$rel}
 echo " $host $rel"
+zlib=$5
 
 c=config.h
 echo >$c "#define PCI_ARCH_`echo $cpu | tr 'a-z' 'A-Z'`"
@@ -71,7 +72,6 @@ case $sys in
 						;;
 		esac
 		;;
-		
 	freebsd)
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
@@ -111,6 +111,25 @@ echo " dump"
 if [ -z "$ok" ] ; then
 	echo "WARNING: No real configuration access method is available."
 fi
-echo >>$c "#define PCI_PATH_IDS \"$idsdir/pci.ids\""
+
+echo_n "Checking for zlib support... "
+if [ "$zlib" = yes -o "$zlib" = no ] ; then
+	echo "$zlib (set manually)"
+else
+	if [ -f /usr/include/zlib.h ] ; then
+		zlib=yes
+	else
+		zlib=no
+	fi
+	echo "$zlib (auto-detected)"
+fi
+if [ "$zlib" = yes ] ; then
+	echo >>$c '#define PCI_COMPRESSED_IDS'
+	echo >>$c "#define PCI_IDS \"pci.ids.gz\""
+else
+	echo >>$c "#define PCI_IDS \"pci.ids\""
+fi
+echo >>$c "#define PCI_PATH_IDS_DIR \"$idsdir\""
+
 echo >>$c "#define PCILIB_VERSION \"$version\""
-sed '/^#define [^ ]*$/!d;s/^#define \(.*\)/\1=1/' <$c >config.mk
+sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >config.mk

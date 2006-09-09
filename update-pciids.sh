@@ -3,8 +3,14 @@
 set -e
 SRC="http://pciids.sourceforge.net/v2.2/pci.ids"
 DEST=pci.ids
+PCI_COMPRESSED_IDS=
+GREP=grep
 
-if which bzip2 >/dev/null ; then
+if [ -n "$PCI_COMPRESSED_IDS" ] ; then
+	DECOMP="cat"
+	SRC="$SRC.gz"
+	GREP=zgrep
+elif which bzip2 >/dev/null ; then
 	DECOMP="bzip2 -d"
 	SRC="$SRC.bz2"
 elif which gzip >/dev/null ; then
@@ -36,7 +42,7 @@ if ! $DECOMP <$DEST.new >$DEST.neww ; then
 	exit 1
 fi
 
-if ! grep >/dev/null "^C " $DEST.neww ; then
+if ! $GREP >/dev/null "^C " $DEST.neww ; then
 	echo >&2 "update-pciids: missing class info, probably truncated file"
 	exit 1
 fi

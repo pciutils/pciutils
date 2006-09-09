@@ -2356,7 +2356,7 @@ main(int argc, char **argv)
 	show_tree++;
 	break;
       case 'i':
-	pacc->id_file_name = optarg;
+        pci_set_name_list_path(pacc, optarg, 0);
 	break;
       case 'm':
 	machine_readable++;

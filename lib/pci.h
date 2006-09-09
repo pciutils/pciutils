@@ -43,6 +43,7 @@ struct pci_access {
   int writeable;			/* Open in read/write mode */
   int buscentric;			/* Bus-centric view of the world */
   char *id_file_name;			/* Name of ID list file */
+  int free_id_name;			/* Set if id_file_name is malloced */
   int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
   int debugging;			/* Turn on debugging messages */
 
@@ -160,6 +161,7 @@ char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 
 int pci_load_name_list(struct pci_access *a);	/* Called automatically by pci_lookup_*() when needed; returns success */
 void pci_free_name_list(struct pci_access *a);	/* Called automatically by pci_cleanup() */
+void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed);
 
 enum pci_lookup_mode {
   PCI_LOOKUP_VENDOR = 1,		/* Vendor name (args: vendorID) */

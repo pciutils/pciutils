@@ -1,5 +1,10 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* The pci.ids file can be stored compressed if zlib is available.
+	Added transparent decompression to lib/names.c, modified update-pciids.sh
+	to keep the file compressed if applicable, updated Makefiles.
+	Based on a patch by Matthew Wilcox, but all the bugs are mine.
+
 	* Makefile, README: Allow installation to be done to a different directory
 	from the one we will eventually be placed in by setting DESTDIR.
 	Patch by Matthew Wilcox.

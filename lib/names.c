@@ -14,6 +14,48 @@
 
 #include "internal.h"
 
+#ifdef PCI_COMPRESSED_IDS
+#include <zlib.h>
+typedef gzFile pci_file;
+#define pci_gets(f, l, s)	gzgets(f, l, s)
+#define pci_eof(f)		gzeof(f)
+
+static pci_file pci_open(struct pci_access *a)
+{
+  pci_file result;
+  size_t len;
+  char *new_name;
+
+  result = gzopen(a->id_file_name, "r");
+  if (result)
+    return result;
+  len = strlen(a->id_file_name);
+  if (len >= 3 && memcmp(a->id_file_name + len - 3, ".gz", 3) != 0)
+    return result;
+  new_name = malloc(len - 2);
+  memcpy(new_name, a->id_file_name, len - 3);
+  new_name[len - 3] = 0;
+  pci_set_name_list_path(a, new_name, 1);
+  return gzopen(a->id_file_name, "r");
+}
+
+#define pci_close(f)		gzclose(f)
+#define PCI_ERROR(f, err)						\
+	if (!err) {							\
+		int errnum;						\
+		err = gzerror(f, &errnum);				\
+		if (errnum == Z_ERRNO)	err = "I/O error";		\
+		else if (errnum >= 0)	err = NULL;			\
+	}
+#else
+typedef FILE * pci_file;
+#define pci_gets(f, l, s)	fgets(l, s, f)
+#define pci_eof(f)		feof(f)
+#define pci_open(a)		fopen(a->id_file_name, "r")
+#define pci_close(f)		fclose(f)
+#define PCI_ERROR(f, err)	if (!err && ferror(f))	err = "I/O error";
+#endif
+
 struct id_entry {
   struct id_entry *next;
   u32 id12, id34;
@@ -141,7 +183,7 @@ static inline int id_white_p(int c)
   return (c == ' ') || (c == '\t');
 }
 
-static const char *id_parse_list(struct pci_access *a, FILE *f, int *lino)
+static const char *id_parse_list(struct pci_access *a, pci_file f, int *lino)
 {
   char line[MAX_LINE];
   char *p;
@@ -151,13 +193,13 @@ static const char *id_parse_list(struct pci_access *a, FILE *f, int *lino)
   static const char parse_error[] = "Parse error";
 
   *lino = 0;
-  while (fgets(line, sizeof(line), f))
+  while (pci_gets(f, line, sizeof(line)))
     {
       (*lino)++;
       p = line;
       while (*p && *p != '\n' && *p != '\r')
 	p++;
-      if (!*p && !feof(f))
+      if (!*p && !pci_eof(f))
 	return "Line too long";
       *p = 0;
       if (p > line && (p[-1] == ' ' || p[-1] == '\t'))
@@ -275,20 +317,19 @@ static const char *id_parse_list(struct pci_access *a, FILE *f, int *lino)
 int
 pci_load_name_list(struct pci_access *a)
 {
-  FILE *f;
+  pci_file f;
   int lino;
   const char *err;
 
   pci_free_name_list(a);
   a->hash_load_failed = 1;
-  if (!(f = fopen(a->id_file_name, "r")))
+  if (!(f = pci_open(a)))
     return 0;
   a->id_hash = pci_malloc(a, sizeof(struct id_entry *) * HASH_SIZE);
   bzero(a->id_hash, sizeof(struct id_entry *) * HASH_SIZE);
   err = id_parse_list(a, f, &lino);
-  if (!err && ferror(f))
-    err = "I/O error";
-  fclose(f);
+  PCI_ERROR(f, err);
+  pci_close(f);
   if (err)
     a->error("%s at %s, line %d\n", err, a->id_file_name, lino);
   a->hash_load_failed = 0;
@@ -467,4 +508,12 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
     default:
       return "<pci_lookup_name: invalid request>";
     }
+}
+
+void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed)
+{
+  if (a->free_id_name)
+    free(a->id_file_name);
+  a->id_file_name = name;
+  a->free_id_name = to_be_freed;
 }
