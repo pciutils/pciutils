@@ -3,7 +3,6 @@
 - finish PCI Express support
 - reading of VPD
 - class 0805?
-- document syntax of machine-readable output
 
 PCIIDS:
 - another mirror at Atrey?

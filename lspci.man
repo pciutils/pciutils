@@ -101,9 +101,12 @@ Use
 as the PCI ID list instead of @IDSDIR@/pci.ids.
 .TP
 .B -m
-Dump PCI device data in machine readable form (both normal and verbose format supported)
-for easy parsing by scripts. Please don't use any other formats for this purpose, they
-are likely to change in the future versions of lspci.
+Dump PCI device data in a backward-compatible machine readable form.
+See below for details.
+.TP
+.B -mm
+Dump PCI device data in a machine readable form for easy parsing by scripts.
+See below for details.
 .TP
 .B -D
 Always show PCI domain numbers. By default, lspci suppresses them on machines which
@@ -186,6 +189,108 @@ requests for more dumps.
 .TP
 .B -G
 Increase debug level of the library.
+
+.SH MACHINE READABLE OUTPUT
+If you intend to process the output of lspci automatically, please use one of the
+machine-readable output formats
+.RB ( -m ,
+.BR -vm ,
+.BR -vmm )
+described in this section. All other formats are likely to change
+between versions of lspci.
+
+.P
+All numbers are always printed in hexadecimal. If you want to process numeric ID's instead of
+names, please add the
+.B -n
+switch.
+
+.SS Simple format (-m)
+
+In the simple format, each device is described on a single line, which is
+formatted as parameters suitable for passing to a shell script, i.e., values
+separated by whitespaces, quoted and escaped if necessary.
+Some of the arguments are positional: slot, class, vendor name, device name,
+subsystem vendor name and subsystem name (the last two are empty if
+the device has no subsystem); the remaining arguments are option-like:
+
+.TP
+.BI -r rev
+Revision number.
+
+.TP
+.BI -p progif
+Programming interface.
+
+.P
+The relative order of positional arguments and options is undefined.
+New options can be added in future versions, but they will always
+have a single argument not separated from the option by any spaces,
+so they can be easily ignored if not recognized.
+
+.SS Verbose format (-vmm)
+
+The verbose output is a sequence of records separated by blank lines.
+Each record describes a single device by a sequence of lines, each line
+containing a single
+.RI ` tag :
+.IR value '
+pair. The
+.I tag
+and the
+.I value
+are separated by a single tab character.
+Neither the records nor the lines within a record are in any particular order.
+Tags are case-sensitive.
+
+.P
+The following tags are defined:
+
+.TP
+.B Slot
+The name of the slot where the device resides
+.RI ([ domain :] bus : device . function ).
+This tag is always the first in a record.
+
+.TP
+.B Class
+Name of the class.
+
+.TP
+.B Vendor
+Name of the vendor.
+
+.TP
+.B Device
+Name of the device.
+
+.TP
+.B SVendor
+Name of the subsystem vendor (optional).
+
+.TP
+.B SDevice
+Name of the subsystem (optional).
+
+.TP
+.B Rev
+Revision number (optional).
+
+.TP
+.B ProgIf
+Programming interface (optional).
+
+.P
+New tags can be added in future versions, so you should silently ignore any tags you don't recognize.
+
+.SS Backward-compatible verbose format (-vm)
+
+In this mode, lspci tries to be perfectly compatible with its old versions.
+It's almost the same as the regular verbose format, but the
+.B
+Device
+tag is used for both the slot and the device name, so it occurs twice
+in a single record. Please avoid using this format in any new code.
 
 .SH FILES
 .TP
