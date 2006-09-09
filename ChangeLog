@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* lib/header.h: PCI_CLASS_DOCKING_OTHER should be 0x0a80, not 0x0a01.
+
 	* lib/header.h: Added PCI_CLASS_xxx constants for all classes currently
 	defined in the pci.ids file.
 
