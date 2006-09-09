@@ -1826,7 +1826,7 @@ show_machine(struct device *d)
 
   if (verbose)
     {
-      printf("Device:\t");
+      printf((machine_readable >= 2) ? "Slot:\t" : "Device:\t");
       show_slot_name(d);
       putchar('\n');
       printf("Class:\t%s\n",
