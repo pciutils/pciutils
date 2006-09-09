@@ -1802,6 +1802,19 @@ show_hex_dump(struct device *d)
 }
 
 static void
+print_shell_escaped(char *c)
+{
+  printf(" \"");
+  while (*c)
+    {
+      if (*c == '"' || *c == '\\')
+	putchar('\\');
+      putchar(*c++);
+    }
+  putchar('"');
+}
+
+static void
 show_machine(struct device *d)
 {
   struct pci_dev *p = d->dev;
@@ -1850,21 +1863,18 @@ show_machine(struct device *d)
   else
     {
       show_slot_name(d);
-      printf(" \"%s\" \"%s\" \"%s\"",
-	     pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS,
-			     p->device_class),
-	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR,
-			     p->vendor_id, p->device_id),
-	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE,
-			     p->vendor_id, p->device_id));
+      print_shell_escaped(pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, p->device_class));
+      print_shell_escaped(pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
+      print_shell_escaped(pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id));
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf(" -r%02x", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
 	printf(" -p%02x", c);
       if (sv_id && sv_id != 0xffff)
-	printf(" \"%s\" \"%s\"",
-	       pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id),
-	       pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
+	{
+	  print_shell_escaped(pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id));
+	  print_shell_escaped(pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
+	}
       else
 	printf(" \"\" \"\"");
       putchar('\n');
