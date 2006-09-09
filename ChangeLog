@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* Added .gitignore files.
+
 	* Makefile (clean): Clean *.orig, too.
 
 	* Cleaned up usage of `char' and `byte'.
