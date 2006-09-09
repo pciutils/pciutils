@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* Makefile (clean): Clean *.orig, too.
+
 	* Cleaned up usage of `char' and `byte'.
 
 	* lib/header.h: PCI_CLASS_DOCKING_OTHER should be 0x0a80, not 0x0a01.
