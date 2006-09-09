@@ -1,5 +1,9 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* Makefile, README: Allow installation to be done to a different directory
+	from the one we will eventually be placed in by setting DESTDIR.
+	Patch by Matthew Wilcox.
+
 	* Added .gitignore files.
 
 	* Makefile (clean): Clean *.orig, too.

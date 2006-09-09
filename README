@@ -45,9 +45,12 @@ The utilities include:  (See manual pages for more details)
 Just run "make" to compile the package and then "make install" to install it.
 
 If you want to change the default installation location, please override
-the ROOT and PREFIX variables specified in the Makefile -- e.g., you can
-use "make PREFIX=/opt/pciutils ROOT=/opt/pciutils install" to create
-a separate installation not interfering with the rest of your system.
+the PREFIX variable specified in the Makefile -- e.g., you can use
+"make PREFIX=/opt/pciutils install" to create a separate installation
+not interfering with the rest of your system.  Setting the DESTDIR variable
+will allow you to install to a different directory from the one you intend
+to eventually run it from.  This is useful for people who are packaging
+pciutils to install on other computers.
 
 When you are bored of dumping PCI registers, just use "make uninstall".
 

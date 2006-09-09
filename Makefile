@@ -65,16 +65,16 @@ distclean: clean
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
-	$(DIRINSTALL) -m 755 $(SBINDIR) $(IDSDIR) $(MANDIR)/man8
-	$(INSTALL) -c -m 755 -s lspci setpci $(SBINDIR)
-	$(INSTALL) -c -m 755 update-pciids $(SBINDIR)
-	$(INSTALL) -c -m 644 pci.ids $(IDSDIR)
-	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(MANDIR)/man8
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8
+	$(INSTALL) -c -m 755 -s lspci setpci $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -c -m 644 pci.ids $(DESTDIR)$(IDSDIR)
+	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
 
 uninstall: all
-	rm -f $(SBINDIR)/lspci $(SBINDIR)/setpci $(SBINDIR)/update-pciids
-	rm -f $(IDSDIR)/pci.ids
-	rm -f $(MANDIR)/man8/lspci.8 $(MANDIR)/man8/setpci.8 $(MANDIR)/man8/update-pciids.8
+	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
+	rm -f $(DESTDIR)$(IDSDIR)/pci.ids
+	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
 
 get-ids:
 	cp ~/tree/pciids/pci.ids pci.ids
