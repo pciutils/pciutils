@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* Whitespace cleanup of all source files.
+
 	* The pci.ids file can be stored compressed if zlib is available.
 	Added transparent decompression to lib/names.c, modified update-pciids.sh
 	to keep the file compressed if applicable, updated Makefiles.
@@ -1220,7 +1222,7 @@ Tue Jan 19 23:00:12 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* Started the "New Generation" branch and introduced the
 	PCI library.
-	
+
 	* lspci: Rewritten to use the library.
 
 Tue Jan 19 22:24:08 1999  Martin Mares  <mj@albireo.ucw.cz>

@@ -78,7 +78,7 @@ obsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   pi.pi_reg = pos - (pos % 4);
   pi.pi_width = 4;
-	
+
   if (ioctl(d->access->fd, PCIOCREAD, &pi) < 0) {
 	  if (errno == ENXIO) {
 		  pi.pi_data = 0xffffffff;
@@ -122,7 +122,7 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   pi.pi_reg = pos;
   pi.pi_width = len;
-	
+
   switch (len)
     {
     case 1:
@@ -135,7 +135,7 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
       pi.pi_data = ((u32 *) buf)[0];
       break;
     }
-  
+
   if (ioctl(d->access->fd, PCIOCWRITE, &pi) < 0)
     {
       d->access->error("obsd_write: ioctl(PCIOCWRITE) failed");

@@ -78,7 +78,7 @@ nbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   shift = 8*(pos % 4);
   pos &= ~3;
-	
+
   if (pcibus_conf_read(d->access->fd, d->bus, d->dev, d->func, pos, &val) < 0)
     d->access->error("nbsd_read: pci_bus_conf_read() failed");
 
@@ -135,7 +135,7 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
       val = le32_to_cpu(*(u32*)buf);
       break;
     }
-  
+
   if (pcibus_conf_write(d->access->fd, d->bus, d->dev, d->func, pos, val) < 0)
     d->access->error("nbsd_write: pci_bus_conf_write() failed");
 

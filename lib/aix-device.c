@@ -236,7 +236,7 @@ aix_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (ioctl(fd, MIOPCFGET, &mdio) < 0)
     d->access->error("aix_read: ioctl(MIOPCFGET) failed");
-  
+
   return 1;
 }
 

@@ -117,7 +117,7 @@ the results are identical to normal listing modes, modulo bugs in lspci). Please
 that the bus mapper doesn't support PCI domains and scans only domain 0.
 .TP
 .B --version
-Shows 
+Shows
 .I lspci
 version. This option should be used stand-alone.
 

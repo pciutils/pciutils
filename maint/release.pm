@@ -147,7 +147,7 @@ sub CopyFile($$$$) {
 					$empty && next;
 					$empty = 1;
 				} else { $empty = 0; }
-			}		
+			}
 			print O;
 		}
 		close O;

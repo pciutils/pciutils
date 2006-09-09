@@ -500,13 +500,13 @@ show_pcix_nobridge(struct device *d, int where)
   static const byte max_outstanding[8] = { 1, 2, 3, 4, 8, 12, 16, 32 };
 
   printf("PCI-X non-bridge device\n");
-      
+
   if (verbose < 2)
     return;
 
   if (!config_fetch(d, where + PCI_PCIX_STATUS, 4))
     return;
-  
+
   command = get_conf_word(d, where + PCI_PCIX_COMMAND);
   status = get_conf_long(d, where + PCI_PCIX_STATUS);
   printf("\t\tCommand: DPERE%c ERO%c RBC=%d OST=%d\n",
@@ -537,15 +537,15 @@ show_pcix_bridge(struct device *d, int where)
   static const char * const sec_clock_freq[8] = { "conv", "66MHz", "100MHz", "133MHz", "?4", "?5", "?6", "?7" };
   u16 secstatus;
   u32 status, upstcr, downstcr;
-  
+
   printf("PCI-X bridge device\n");
-  
+
   if (verbose < 2)
     return;
-  
+
   if (!config_fetch(d, where + PCI_PCIX_BRIDGE_STATUS, 12))
     return;
-  
+
   secstatus = get_conf_word(d, where + PCI_PCIX_BRIDGE_SEC_STATUS);
   printf("\t\tSecondary Status: 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c Freq=%s\n",
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_64BIT),
@@ -556,7 +556,7 @@ show_pcix_bridge(struct device *d, int where)
 	 FLAG(secstatus, PCI_PCIX_BRIDGE_SEC_STATUS_SPLIT_REQUEST_DELAYED),
 	 sec_clock_freq[(secstatus >> 6) & 7]);
   status = get_conf_long(d, where + PCI_PCIX_BRIDGE_STATUS);
-  printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c\n", 
+  printf("\t\tStatus: Dev=%02x:%02x.%d 64bit%c 133MHz%c SCD%c USC%c SCO%c SRD%c\n",
 	 ((status >> 8) & 0xff),
 	 ((status >> 3) & 0x1f),
 	 (status & PCI_PCIX_BRIDGE_STATUS_FUNCTION),
@@ -1088,9 +1088,9 @@ static void show_express_dev(struct device *d, int where, int type)
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
   printf("\t\tDevice: Errors: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
-	FLAG(w, PCI_EXP_DEVCTL_CERE), 
-	FLAG(w, PCI_EXP_DEVCTL_NFERE), 
-	FLAG(w, PCI_EXP_DEVCTL_FERE), 
+	FLAG(w, PCI_EXP_DEVCTL_CERE),
+	FLAG(w, PCI_EXP_DEVCTL_NFERE),
+	FLAG(w, PCI_EXP_DEVCTL_FERE),
 	FLAG(w, PCI_EXP_DEVCTL_URRE));
   printf("\t\tDevice: RlxdOrd%c ExtTag%c PhantFunc%c AuxPwr%c NoSnoop%c\n",
 	FLAG(w, PCI_EXP_DEVCTL_RELAXED),

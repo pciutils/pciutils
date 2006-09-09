@@ -90,10 +90,10 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   pi.pi_reg = pos;
   pi.pi_width = len;
-	
+
   if (ioctl(d->access->fd, PCIOCREAD, &pi) < 0)
     d->access->error("fbsd_read: ioctl(PCIOCREAD) failed");
-  
+
   switch (len)
     {
     case 1:
@@ -128,7 +128,7 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   pi.pi_reg = pos;
   pi.pi_width = len;
-	
+
   switch (len)
     {
     case 1:
@@ -141,7 +141,7 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
       pi.pi_data = ((u32 *) buf)[0];
       break;
     }
-  
+
   if (ioctl(d->access->fd, PCIOCWRITE, &pi) < 0)
     {
       d->access->error("fbsd_write: ioctl(PCIOCWRITE) failed");
