@@ -4,3 +4,4 @@
 lspci
 setpci
 update-pciids
+pci.ids.gz
