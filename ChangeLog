@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* lib/pci.h: Updated PCI_LIB_VERSION.
+
 	* lspci.c (show_machine): In the `-m' mode, do proper shell escaping
 	if the fields printed contain quotes or backslashes.
 
