@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.4.
+
 	* maint/release: Remind the maintainer about the current PCI_LIB_VERSION.
 
 	* lib/pci.h: Updated PCI_LIB_VERSION.
