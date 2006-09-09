@@ -18,7 +18,7 @@ struct id_entry {
   struct id_entry *next;
   u32 id12, id34;
   byte cat;
-  byte name[1];
+  char name[1];
 };
 
 enum id_entry_type {
@@ -81,7 +81,7 @@ static inline unsigned int id_hash(int cat, u32 id12, u32 id34)
   return h % HASH_SIZE;
 }
 
-static byte *id_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
+static char *id_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
 {
   struct id_entry *n;
   u32 id12 = id_pair(id1, id2);
@@ -95,7 +95,7 @@ static byte *id_lookup(struct pci_access *a, int cat, int id1, int id2, int id3,
   return n ? n->name : NULL;
 }
 
-static int id_insert(struct pci_access *a, int cat, int id1, int id2, int id3, int id4, byte *text)
+static int id_insert(struct pci_access *a, int cat, int id1, int id2, int id3, int id4, char *text)
 {
   u32 id12 = id_pair(id1, id2);
   u32 id34 = id_pair(id3, id4);
@@ -117,7 +117,7 @@ static int id_insert(struct pci_access *a, int cat, int id1, int id2, int id3, i
   return 0;
 }
 
-static int id_hex(byte *p, int cnt)
+static int id_hex(char *p, int cnt)
 {
   int x = 0;
   while (cnt--)
@@ -143,8 +143,8 @@ static inline int id_white_p(int c)
 
 static const char *id_parse_list(struct pci_access *a, FILE *f, int *lino)
 {
-  byte line[MAX_LINE];
-  byte *p;
+  char line[MAX_LINE];
+  char *p;
   int id1=0, id2=0, id3=0, id4=0;
   int cat = -1;
   int nest;
@@ -308,10 +308,10 @@ pci_free_name_list(struct pci_access *a)
     }
 }
 
-static byte *
+static char *
 id_lookup_subsys(struct pci_access *a, int iv, int id, int isv, int isd)
 {
-  byte *d = NULL;
+  char *d = NULL;
   if (iv > 0 && id > 0)						/* Per-device lookup */
     d = id_lookup(a, ID_SUBSYSTEM, iv, id, isv, isd);
   if (!d)							/* Generic lookup */
@@ -321,8 +321,8 @@ id_lookup_subsys(struct pci_access *a, int iv, int id, int isv, int isd)
   return d;
 }
 
-static byte *
-format_name(char *buf, int size, int flags, byte *name, byte *num, byte *unknown)
+static char *
+format_name(char *buf, int size, int flags, char *name, char *num, char *unknown)
 {
   int res;
   if ((flags & PCI_LOOKUP_NO_NUMBERS) && !name)
@@ -341,8 +341,8 @@ format_name(char *buf, int size, int flags, byte *name, byte *num, byte *unknown
     return buf;
 }
 
-static byte *
-format_name_pair(char *buf, int size, int flags, byte *v, byte *d, byte *num)
+static char *
+format_name_pair(char *buf, int size, int flags, char *v, char *d, char *num)
 {
   int res;
   if ((flags & PCI_LOOKUP_NO_NUMBERS) && (!v || !d))
@@ -377,9 +377,9 @@ char *
 pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 {
   va_list args;
-  byte *v, *d, *cls, *pif;
+  char *v, *d, *cls, *pif;
   int iv, id, isv, isd, icls, ipif;
-  byte numbuf[16], pifbuf[32];
+  char numbuf[16], pifbuf[32];
 
   va_start(args, flags);
 

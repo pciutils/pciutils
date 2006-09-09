@@ -256,7 +256,7 @@ show_terse(struct device *d)
 {
   int c;
   struct pci_dev *p = d->dev;
-  byte classbuf[128], devbuf[128];
+  char classbuf[128], devbuf[128];
 
   show_slot_name(d);
   printf(" %s: %s",
@@ -534,7 +534,7 @@ show_pcix_nobridge(struct device *d, int where)
 static void
 show_pcix_bridge(struct device *d, int where)
 {
-  static const byte * const sec_clock_freq[8] = { "conv", "66MHz", "100MHz", "133MHz", "?4", "?5", "?6", "?7" };
+  static const char * const sec_clock_freq[8] = { "conv", "66MHz", "100MHz", "133MHz", "?4", "?5", "?6", "?7" };
   u16 secstatus;
   u32 status, upstcr, downstcr;
   
@@ -2039,7 +2039,7 @@ grow_tree(void)
 }
 
 static void
-print_it(byte *line, byte *p)
+print_it(char *line, char *p)
 {
   *p++ = '\n';
   *p = 0;
@@ -2051,10 +2051,10 @@ print_it(byte *line, byte *p)
       *p = ' ';
 }
 
-static void show_tree_bridge(struct bridge *, byte *, byte *);
+static void show_tree_bridge(struct bridge *, char *, char *);
 
 static void
-show_tree_dev(struct device *d, byte *line, byte *p)
+show_tree_dev(struct device *d, char *line, char *p)
 {
   struct pci_dev *q = d->dev;
   struct bridge *b;
@@ -2080,7 +2080,7 @@ show_tree_dev(struct device *d, byte *line, byte *p)
 }
 
 static void
-show_tree_bus(struct bus *b, byte *line, byte *p)
+show_tree_bus(struct bus *b, char*line, char *p)
 {
   if (!b->first_dev)
     print_it(line, p);
@@ -2107,7 +2107,7 @@ show_tree_bus(struct bus *b, byte *line, byte *p)
 }
 
 static void
-show_tree_bridge(struct bridge *b, byte *line, byte *p)
+show_tree_bridge(struct bridge *b, char *line, char *p)
 {
   *p++ = '-';
   if (!b->first_bus->sibling)
@@ -2119,7 +2119,7 @@ show_tree_bridge(struct bridge *b, byte *line, byte *p)
   else
     {
       struct bus *u = b->first_bus;
-      byte *k;
+      char *k;
 
       while (u->sibling)
         {
