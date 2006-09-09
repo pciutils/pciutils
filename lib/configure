@@ -35,8 +35,10 @@ echo " $host $rel"
 zlib=$5
 
 c=config.h
+m=config.mk
 echo >$c "#define PCI_ARCH_`echo $cpu | tr 'a-z' 'A-Z'`"
 echo >>$c "#define PCI_OS_`echo $sys | tr 'a-z' 'A-Z'`"
+rm -f $m
 
 echo_n "Looking for access methods..."
 
@@ -79,11 +81,16 @@ case $sys in
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'
+		echo >>$m 'CFLAGS=-g'
+		echo >>$m 'INSTALL=installbsd'
+		echo >>$m 'DIRINSTALL=mkdir -p'
 		;;
 	netbsd)
 		echo_n " nbsd-libpci"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
+		echo >>$m 'PCILIB=lib/libpciutils.a'
+		echo >>$m 'LDFLAGS+=-lpci'
 		;;
     	gnu)
 		echo_n " i386-ports"
@@ -111,11 +118,12 @@ else
 fi
 if [ "$zlib" = yes ] ; then
 	echo >>$c '#define PCI_COMPRESSED_IDS'
-	echo >>$c "#define PCI_IDS \"pci.ids.gz\""
+	echo >>$c '#define PCI_IDS "pci.ids.gz"'
+	echo >>$m 'LDFLAGS+=-lz'
 else
-	echo >>$c "#define PCI_IDS \"pci.ids\""
+	echo >>$c '#define PCI_IDS "pci.ids"'
 fi
 echo >>$c "#define PCI_PATH_IDS_DIR \"$idsdir\""
 
 echo >>$c "#define PCILIB_VERSION \"$version\""
-sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >config.mk
+sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m

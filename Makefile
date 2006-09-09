@@ -18,20 +18,6 @@ PCILIB=lib/libpci.a
 PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
 
 -include lib/config.mk
-ifdef PCI_COMPRESSED_IDS
-LDFLAGS += -lz
-endif
-
-ifeq ($(shell uname),NetBSD)
-PCILIB=lib/libpciutils.a
-LDFLAGS+=-lpci
-else
-ifeq ($(shell uname),AIX)
-CFLAGS=-g
-INSTALL=installbsd
-DIRINSTALL=mkdir -p
-endif
-endif
 
 HOST=
 RELEASE=
