@@ -1,5 +1,7 @@
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
+	* maint/release: Remind the maintainer about the current PCI_LIB_VERSION.
+
 	* lib/pci.h: Updated PCI_LIB_VERSION.
 
 	* lspci.c (show_machine): In the `-m' mode, do proper shell escaping

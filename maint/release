@@ -6,6 +6,14 @@ use strict;
 use warnings;
 require "maint/release.pm";
 
+# Check API version
+my $apiver = "???";
+open X, "lib/pci.h" or die;
+while (<X>) {
+	/^#define PCI_LIB_VERSION 0x(.{6})$/ and $apiver = $1;
+}
+print "API version is $apiver ... <confirm> "; <STDIN>;
+
 my $r = new UCW::Release("pciutils");
 my $ver = $r->GetVersionFromFile("Makefile", "VERSION=(.*)");
 $r->GetVersionsFromChangelog("ChangeLog", "Released as (.*)\.");
