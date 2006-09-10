@@ -1,5 +1,7 @@
 2006-09-10  Martin Mares  <mj@ucw.cz>
 
+	* pci.ids: Updated to the current database snapshot.
+
 	* lspci.c (scan_device): If an error occurs when reading the standard config
 	header of a device, report it and ignore the device and return with exit
 	code 2 at the end.
