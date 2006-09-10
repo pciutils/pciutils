@@ -1,3 +1,9 @@
+2006-09-10  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (scan_device): If an error occurs when reading the standard config
+	header of a device, report it and ignore the device and return with exit
+	code 2 at the end.
+
 2006-09-09  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.4.

@@ -75,6 +75,7 @@ struct device {
 };
 
 static struct device *first_dev;
+static int seen_errors;
 
 static int
 config_fetch(struct device *d, unsigned int pos, unsigned int len)
@@ -121,7 +122,12 @@ scan_device(struct pci_dev *p)
   d->present = xmalloc(64);
   memset(d->present, 1, 64);
   if (!pci_read_block(p, 0, d->config, 64))
-    die("Unable to read the standard configuration space header");
+    {
+      fprintf(stderr, "lspci: Unable to read the standard configuration space header of device %04x:%02x:%02x.%d\n",
+	      p->domain, p->bus, p->dev, p->func);
+      seen_errors++;
+      return NULL;
+    }
   if ((d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
     {
       /* For cardbus bridges, we need to fetch 64 bytes more to get the
@@ -2401,5 +2407,5 @@ main(int argc, char **argv)
     }
   pci_cleanup(pacc);
 
-  return 0;
+  return (seen_errors ? 2 : 0);
 }
