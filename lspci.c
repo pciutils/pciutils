@@ -2090,7 +2090,7 @@ show_tree_dev(struct device *d, char *line, char *p)
 }
 
 static void
-show_tree_bus(struct bus *b, char*line, char *p)
+show_tree_bus(struct bus *b, char *line, char *p)
 {
   if (!b->first_dev)
     print_it(line, p);
