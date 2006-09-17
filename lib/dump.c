@@ -34,6 +34,18 @@ dump_alloc_data(struct pci_dev *dev, int len)
   dev->aux = dd;
 }
 
+static int
+dump_validate(char *s, char *fmt)
+{
+  while (*fmt)
+    {
+      if (*fmt == '#' ? !isxdigit(*s) : *fmt != *s)
+	return 0;
+      *fmt++, *s++;
+    }
+  return 1;
+}
+
 static void
 dump_init(struct pci_access *a)
 {
@@ -57,10 +69,8 @@ dump_init(struct pci_access *a)
 	*z-- = 0;
       len = z - buf + 1;
       mn = 0;
-      if ((len >= 8 && buf[2] == ':' && buf[5] == '.' && buf[7] == ' ' &&
-	   sscanf(buf, "%x:%x.%d ", &bn, &dn, &fn) == 3) ||
-	  (len >= 13 && buf[4] == ':' && buf[7] == ':' && buf[10] == '.' && buf[12] == ' ' &&
-	   sscanf(buf, "%x:%x:%x.%d", &mn, &bn, &dn, &fn) == 4))
+      if (dump_validate(buf, "##:##.# ") && sscanf(buf, "%x:%x.%d", &bn, &dn, &fn) == 3 ||
+	  dump_validate(buf, "####:##:##.# ") && sscanf(buf, "%x:%x:%x.%d", &mn, &bn, &dn, &fn) == 4)
 	{
 	  dev = pci_get_dev(a, mn, bn, dn, fn);
 	  dump_alloc_data(dev, 256);
@@ -69,19 +79,17 @@ dump_init(struct pci_access *a)
       else if (!len)
 	dev = NULL;
       else if (dev &&
-	       (len >= 51 && buf[2] == ':' && buf[3] == ' ' || len >= 52 && buf[3] == ':' && buf[4] == ' ') &&
+	       (dump_validate(buf, "##: ") || dump_validate(buf, "###: ")) &&
 	       sscanf(buf, "%x: ", &i) == 1)
 	{
 	  struct dump_data *dd = dev->aux;
-	  z = strchr(buf, ' ');
-	  while (isspace(z[0]) && isxdigit(z[1]) && isxdigit(z[2]))
+	  z = strchr(buf, ' ') + 1;
+	  while (isxdigit(z[0]) && isxdigit(z[1]) && (!z[2] || z[2] == ' ') &&
+		 sscanf(z, "%x", &j) == 1 && j < 256)
 	    {
-	      z++;
-	      if (sscanf(z, "%x", &j) != 1 || i >= 256)
-		a->error("dump: Malformed line");
 	      if (i >= 4096)
-		break;
-	      if (i > dd->allocated)	/* Need to re-allocate the buffer */
+		a->error("dump: At most 4096 bytes of config space are supported");
+	      if (i >= dd->allocated)	/* Need to re-allocate the buffer */
 		{
 		  dump_alloc_data(dev, 4096);
 		  memcpy(((struct dump_data *) dev->aux)->data, dd->data, 256);
@@ -92,7 +100,11 @@ dump_init(struct pci_access *a)
 	      if (i > dd->len)
 		dd->len = i;
 	      z += 2;
+	      if (*z)
+		z++;
 	    }
+	  if (*z)
+	    a->error("dump: Malformed line");
 	}
     }
 }
@@ -114,7 +126,7 @@ dump_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (!(dd = d->aux))
     {
       struct pci_dev *e = d->access->devices;
-      while (e && (e->bus != d->bus || e->dev != d->dev || e->func != d->func))
+      while (e && (e->domain != d->domain || e->bus != d->bus || e->dev != d->dev || e->func != d->func))
 	e = e->next;
       if (!e)
 	return 0;

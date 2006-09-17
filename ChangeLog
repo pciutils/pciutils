@@ -1,3 +1,9 @@
+2006-09-17  Martin Mares  <mj@ucw.cz>
+
+	* lib/dump.c: Fixed a couple of bugs in the dump backend which caused
+	devices with domains or with extended config space to be read incorrectly.
+	Also, dumps with partial lines are allowed now.
+
 2006-09-10  Martin Mares  <mj@ucw.cz>
 
 	* pci.ids: Updated to the current database snapshot.
