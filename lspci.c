@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -59,7 +59,9 @@ static struct pci_access *pacc;
  *  use alloca() much.
  */
 
-#ifndef __GNUC__
+#ifdef __GNUC__
+#include <alloca.h>
+#else
 #undef alloca
 #define alloca xmalloc
 #endif
