@@ -1,5 +1,8 @@
 2007-02-06  Martin Mares  <mj@ucw.cz>
 
+	* lib/configure: tr on Solaris is a bit weird and it requires `[A-Z]'
+	instead of `A-Z'. Fortunately, the extra brackets don't hurt otherwise.
+
 	* lib/types.h, lib/configure: Solaris should use <stdint.h> to get precise
 	integer types.
 
