@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Types and Format Strings
  *
- *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -14,6 +14,11 @@
 typedef unsigned __int8 u8;
 typedef unsigned __int16 u16;
 typedef unsigned __int32 u32;
+#elif defined(PCI_HAVE_STDINT_H)
+#include <stdint.h>
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
 #else
 typedef u_int8_t u8;
 typedef u_int16_t u16;

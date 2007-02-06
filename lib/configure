@@ -67,6 +67,7 @@ case $sys in
 						exit 1
 						;;
 		esac
+		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	freebsd)
 		echo_n " fbsd-device"
