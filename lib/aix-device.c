@@ -207,7 +207,7 @@ aix_scan(struct pci_access *a)
   int bus_number;
   byte busmap[256];
 
-  bzero(busmap, sizeof(busmap));
+  memset(busmap, 0, sizeof(busmap));
   for (i = 0; i < pci_bus_count; i++)
     {
       bus_number = pci_buses[i].bus_number;

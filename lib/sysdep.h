@@ -19,7 +19,6 @@ typedef u8 byte;
 typedef u16 word;
 
 #ifdef PCI_OS_WINDOWS
-#define bzero(x,y) memset(x,0,y)
 #define strcasecmp strcmpi
 #endif
 

@@ -70,7 +70,7 @@ pci_generic_scan(struct pci_access *a)
 {
   byte busmap[256];
 
-  bzero(busmap, sizeof(busmap));
+  memset(busmap, 0, sizeof(busmap));
   pci_generic_scan_bus(a, busmap, 0);
 }
 
@@ -93,7 +93,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
   if (flags & PCI_FILL_BASES)
     {
       int cnt = 0, i;
-      bzero(d->base_addr, sizeof(d->base_addr));
+      memset(d->base_addr, 0, sizeof(d->base_addr));
       switch (d->hdrtype)
 	{
 	case PCI_HEADER_TYPE_NORMAL:

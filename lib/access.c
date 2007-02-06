@@ -65,7 +65,7 @@ pci_alloc(void)
   struct pci_access *a = malloc(sizeof(struct pci_access));
   int i;
 
-  bzero(a, sizeof(*a));
+  memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
@@ -197,7 +197,7 @@ pci_alloc_dev(struct pci_access *a)
 {
   struct pci_dev *d = pci_malloc(a, sizeof(struct pci_dev));
 
-  bzero(d, sizeof(*d));
+  memset(d, 0, sizeof(*d));
   d->access = a;
   d->methods = a->methods;
   d->hdrtype = -1;

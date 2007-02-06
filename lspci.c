@@ -99,7 +99,7 @@ config_fetch(struct device *d, unsigned int pos, unsigned int len)
 	d->config_bufsize *= 2;
       d->config = xrealloc(d->config, d->config_bufsize);
       d->present = xrealloc(d->present, d->config_bufsize);
-      bzero(d->present + orig_size, d->config_bufsize - orig_size);
+      memset(d->present + orig_size, 0, d->config_bufsize - orig_size);
     }
   result = pci_read_block(d->dev, pos, d->config + pos, len);
   if (result)
@@ -117,7 +117,7 @@ scan_device(struct pci_dev *p)
   if (!pci_filter_match(&filter, p))
     return NULL;
   d = xmalloc(sizeof(struct device));
-  bzero(d, sizeof(*d));
+  memset(d, 0, sizeof(*d));
   d->dev = p;
   d->config_cached = d->config_bufsize = 64;
   d->config = xmalloc(64);
@@ -2316,7 +2316,7 @@ map_the_bus(void)
       pacc->method == PCI_ACCESS_DUMP)
     printf("WARNING: Bus mapping can be reliable only with direct hardware access enabled.\n\n");
   bus_info = xmalloc(sizeof(struct bus_info) * 256);
-  bzero(bus_info, sizeof(struct bus_info) * 256);
+  memset(bus_info, 0, sizeof(struct bus_info) * 256);
   if (filter.bus >= 0)
     do_map_bus(filter.bus);
   else

@@ -326,7 +326,7 @@ pci_load_name_list(struct pci_access *a)
   if (!(f = pci_open(a)))
     return 0;
   a->id_hash = pci_malloc(a, sizeof(struct id_entry *) * HASH_SIZE);
-  bzero(a->id_hash, sizeof(struct id_entry *) * HASH_SIZE);
+  memset(a->id_hash, 0, sizeof(struct id_entry *) * HASH_SIZE);
   err = id_parse_list(a, f, &lino);
   PCI_ERROR(f, err);
   pci_close(f);
