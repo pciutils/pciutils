@@ -1,11 +1,11 @@
 # Makefile for The PCI Utilities
-# (c) 1998--2006 Martin Mares <mj@ucw.cz>
+# (c) 1998--2007 Martin Mares <mj@ucw.cz>
 
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
-VERSION=2.2.4
-DATE=2006-09-09
+VERSION=2.2.5-test1
+DATE=2007-02-06
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
