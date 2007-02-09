@@ -1,3 +1,7 @@
+2007-02-09  Martin Mares  <mj@ucw.cz>
+
+	* pci.ids: Updated to the current snapshot of the database.
+
 2007-02-06  Martin Mares  <mj@ucw.cz>
 
 	* Replaced bzero() by memset() everywhere, it's better to lose a tiny
