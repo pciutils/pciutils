@@ -126,6 +126,7 @@ else
 	echo >>$c '#define PCI_IDS "pci.ids"'
 fi
 echo >>$c "#define PCI_PATH_IDS_DIR \"$idsdir\""
+echo >>$c "#define PCI_ID_DOMAIN \"pci-id.ucw.cz\""
 
 echo >>$c "#define PCILIB_VERSION \"$version\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m

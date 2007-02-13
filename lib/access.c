@@ -67,6 +67,8 @@ pci_alloc(void)
 
   memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
+  a->id_domain = PCI_ID_DOMAIN;
+  a->network_ids = 1;			/* FIXME */
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);

@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -45,6 +45,8 @@ struct pci_access {
   char *id_file_name;			/* Name of ID list file */
   int free_id_name;			/* Set if id_file_name is malloced */
   int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
+  int network_ids;			/* Try DNS lookups on unknown ID's */
+  char *id_domain;			/* DNS domain used for the lookups */  /* FIXME: set function? */
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */

@@ -4,8 +4,8 @@
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
-VERSION=2.2.5-test1
-DATE=2007-02-06
+VERSION=2.2.5-net1
+DATE=2007-02-13
 
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
@@ -34,8 +34,8 @@ force:
 lib/config.h lib/config.mk:
 	cd lib && ./configure "$(IDSDIR)" "$(VERSION)" "$(HOST)" "$(RELEASE)" "$(ZLIB)"
 
-lspci: lspci.o common.o $(PCILIB)
-setpci: setpci.o common.o $(PCILIB)
+lspci: lspci.o common.o $(PCILIB) /usr/lib/libresolv.a
+setpci: setpci.o common.o $(PCILIB) /usr/lib/libresolv.a
 
 lspci.o: lspci.c pciutils.h $(PCIINC)
 setpci.o: setpci.c pciutils.h $(PCIINC)
