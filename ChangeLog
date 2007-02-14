@@ -1,3 +1,8 @@
+2007-02-14  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_express): Added PCI/PCI-X to PCI-Express Bridge type.
+	Patch by Mark Glines.
+
 2007-02-09  Martin Mares  <mj@ucw.cz>
 
 	* pci.ids: Updated to the current snapshot of the database.

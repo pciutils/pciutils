@@ -1245,6 +1245,9 @@ show_express(struct device *d, int where, int cap)
     case PCI_EXP_TYPE_PCI_BRIDGE:
       printf("PCI/PCI-X Bridge");
       break;
+    case PCI_EXP_TYPE_PCIE_BRIDGE:
+      printf("PCI/PCI-X to PCI-Express Bridge");
+      break;
     default:
       printf("Unknown type");
   }
