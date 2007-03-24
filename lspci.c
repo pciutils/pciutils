@@ -2006,15 +2006,15 @@ grow_tree(void)
 	  b->domain = d->dev->domain;
 	  if (ht == PCI_HEADER_TYPE_BRIDGE)
 	    {
-	      b->primary = get_conf_byte(d, PCI_CB_PRIMARY_BUS);
-	      b->secondary = get_conf_byte(d, PCI_CB_CARD_BUS);
-	      b->subordinate = get_conf_byte(d, PCI_CB_SUBORDINATE_BUS);
-	    }
-	  else
-	    {
 	      b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
 	      b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
 	      b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
+	    }
+	  else
+	    {
+	      b->primary = get_conf_byte(d, PCI_CB_PRIMARY_BUS);
+	      b->secondary = get_conf_byte(d, PCI_CB_CARD_BUS);
+	      b->subordinate = get_conf_byte(d, PCI_CB_SUBORDINATE_BUS);
 	    }
 	  *last_br = b;
 	  last_br = &b->chain;
