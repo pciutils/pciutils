@@ -1,5 +1,7 @@
 2007-05-04  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.5.
+
 	* pci.ids: Updated to the current snapshot of the database.
 
 2007-02-14  Martin Mares  <mj@ucw.cz>
