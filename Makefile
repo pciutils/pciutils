@@ -12,10 +12,13 @@ SBINDIR=$(PREFIX)/sbin
 SHAREDIR=$(PREFIX)/share
 IDSDIR=$(SHAREDIR)
 MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
+INCDIR=$(PREFIX)/include/pci
+LIBDIR=$(PREFIX)/lib
 INSTALL=install
 DIRINSTALL=install -d
 PCILIB=lib/libpci.a
 PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
+PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 -include lib/config.mk
 
@@ -62,6 +65,11 @@ install: all
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
+
+install-lib: $(PCIINC_INS) $(PCILIB)
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR) $(DESTDIR)$(LIBDIR)
+	$(INSTALL) -c -m 644 $(PCIINC_INS) $(DESTDIR)$(INCDIR)
+	$(INSTALL) -c -m 644 $(PCILIB) $(DESTDIR)$(LIBDIR)
 
 uninstall: all
 	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
