@@ -1,3 +1,12 @@
+2007-06-20  Martin Mares  <mj@ucw.cz>
+
+	* Makefile: Added an "install-lib" target. Thanks to Dan Nicholson
+	for a patch.
+
+2007-06-20  Thomas Schwinge  <tschwinge@gnu.org>
+
+	* lib/i386-io-hurd.h: Rewritten for new Hurd kernels.
+
 2007-05-04  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.5.
