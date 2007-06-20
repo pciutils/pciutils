@@ -7,6 +7,7 @@ OBJS=access.o generic.o dump.o names.o filter.o
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
+PCILIBPC=libpci.pc
 
 ifdef PCI_HAVE_PM_LINUX_SYSFS
 OBJS += sysfs.o
@@ -49,12 +50,20 @@ OBJS += nbsd-libpci.o
 PCILIB=libpciutils.a
 endif
 
-all: $(PCILIB)
+all: $(PCILIB) $(PCILIBPC)
 
 $(PCILIB): $(OBJS)
 	rm -f $@
 	ar rcs $@ $^
 	ranlib $@
+
+$(PCILIBPC): $(PCILIBPC).in
+	sed <$< >$@ -e 's,@PREFIX@,$(PREFIX),' \
+		-e 's,@INCDIR@,$(INCDIR),' \
+		-e 's,@LIBDIR@,$(LIBDIR),' \
+		-e 's,@IDSDIR@,$(IDSDIR),' \
+		-e 's,@VERSION@,$(VERSION),' \
+		-e 's,@LIBZ@,$(LIBZ),'
 
 access.o: access.c $(INCL)
 i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h

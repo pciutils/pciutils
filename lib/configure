@@ -121,7 +121,8 @@ fi
 if [ "$zlib" = yes ] ; then
 	echo >>$c '#define PCI_COMPRESSED_IDS'
 	echo >>$c '#define PCI_IDS "pci.ids.gz"'
-	echo >>$m 'LDFLAGS+=-lz'
+	echo >>$m 'LIBZ=-lz'
+	echo >>$m 'LDFLAGS+=$(LIBZ)'
 else
 	echo >>$c '#define PCI_IDS "pci.ids"'
 fi
