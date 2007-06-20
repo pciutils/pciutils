@@ -1,7 +1,12 @@
 2007-06-20  Martin Mares  <mj@ucw.cz>
 
+	* Released as 2.2.6.
+
 	* Makefile: Added an "install-lib" target. Thanks to Dan Nicholson
 	for a patch.
+
+	* Makefile, lib/Makefile: Generate and install pkg-config file
+	for libpci. Again by Dan Nicholson.
 
 2007-06-20  Thomas Schwinge  <tschwinge@gnu.org>
 
