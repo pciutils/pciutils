@@ -1,3 +1,11 @@
+2007-08-14  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_ht): Added decoding of Hypertransport MSI mapping capability,
+	based on a patch by Jason Gunthorpe.
+
+	* tests/cap-MSI-mapping: Added a test case. I plan to add test cases
+	(which are dumps of config space) for all new features.
+
 2007-06-20  Martin Mares  <mj@ucw.cz>
 
 	* Released as 2.2.6.

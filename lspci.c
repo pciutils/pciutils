@@ -941,7 +941,18 @@ show_ht(struct device *d, int where, int cmd)
       printf("HyperTransport: Address Mapping\n");
       break;
     case PCI_HT_CMD_TYP_MSIM:
-      printf("HyperTransport: MSI Mapping\n");
+      printf("HyperTransport: MSI Mapping Enable%c Fixed%c\n",
+	     FLAG(cmd, PCI_HT_MSIM_CMD_EN),
+	     FLAG(cmd, PCI_HT_MSIM_CMD_FIXD));
+      if (verbose >= 2 && !(cmd & PCI_HT_MSIM_CMD_FIXD))
+	{
+	  u32 offl, offh;
+	  if (!config_fetch(d, where + PCI_HT_MSIM_ADDR_LO, 8))
+	    break;
+	  offl = get_conf_long(d, where + PCI_HT_MSIM_ADDR_LO);
+	  offh = get_conf_long(d, where + PCI_HT_MSIM_ADDR_HI);
+	  printf("\t\tMapping Address Base: %016llx\n", ((unsigned long long)offh << 32) | (offl & ~0xfffff));
+	}
       break;
     case PCI_HT_CMD_TYP_DR:
       printf("HyperTransport: DirectRoute\n");
