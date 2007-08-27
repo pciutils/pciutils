@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -26,7 +26,7 @@ static pci_file pci_open(struct pci_access *a)
   size_t len;
   char *new_name;
 
-  result = gzopen(a->id_file_name, "r");
+  result = gzopen(a->id_file_name, "rb");
   if (result)
     return result;
   len = strlen(a->id_file_name);
@@ -36,7 +36,7 @@ static pci_file pci_open(struct pci_access *a)
   memcpy(new_name, a->id_file_name, len - 3);
   new_name[len - 3] = 0;
   pci_set_name_list_path(a, new_name, 1);
-  return gzopen(a->id_file_name, "r");
+  return gzopen(a->id_file_name, "rb");
 }
 
 #define pci_close(f)		gzclose(f)
