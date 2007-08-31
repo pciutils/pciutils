@@ -1,3 +1,8 @@
+2007-08-31  Martin Mares <mj@ucw.cz>
+
+	* Makefile, lib/Makefile: `ar' and `ranlib' can be overriden to allow
+	cross-compilation.
+
 2007-08-27  Martin Mares  <mj@ucw.cz>
 
 	* lib/names.c (pci_open): When calling gzopen(), use "rb" file mode

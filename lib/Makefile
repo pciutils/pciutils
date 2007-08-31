@@ -54,8 +54,8 @@ all: $(PCILIB) $(PCILIBPC)
 
 $(PCILIB): $(OBJS)
 	rm -f $@
-	ar rcs $@ $^
-	ranlib $@
+	$(AR) rcs $@ $^
+	$(RANLIB) $@
 
 $(PCILIBPC): $(PCILIBPC).in
 	sed <$< >$@ -e 's,@PREFIX@,$(PREFIX),' \
