@@ -59,7 +59,7 @@ static struct pci_access *pacc;
  *  use alloca() much.
  */
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(PCI_OS_WINDOWS)
 #include <alloca.h>
 #else
 #undef alloca

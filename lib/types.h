@@ -11,9 +11,10 @@
 #ifndef PCI_HAVE_Uxx_TYPES
 
 #ifdef PCI_OS_WINDOWS
-typedef unsigned __int8 u8;
-typedef unsigned __int16 u16;
-typedef unsigned __int32 u32;
+#include <windef.h>
+typedef BYTE u8;
+typedef WORD u16;
+typedef DWORD u32;
 #elif defined(PCI_HAVE_STDINT_H)
 #include <stdint.h>
 typedef uint8_t u8;

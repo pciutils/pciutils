@@ -8,8 +8,18 @@
  */
 
 #include <io.h>
-#include <conio.h>
 #include <windows.h>
+
+#ifndef __GNUC__
+#include <conio.h>
+#else
+int _outp(unsigned short port, int databyte);
+unsigned short _outpw(unsigned short port, unsigned short dataword);
+unsigned long _outpd(unsigned short port, unsigned long dataword);
+int _inp(unsigned short port);
+unsigned short _inpw(unsigned short port);
+unsigned long _inpd(unsigned short port);
+#endif
 
 #define outb(x,y) _outp(y,x)
 #define outw(x,y) _outpw(y,x)
@@ -25,8 +35,6 @@ intel_setup_io(struct pci_access *a)
   typedef int (*MYPROC)(void);
   MYPROC InitializeWinIo;
   HMODULE lib;
-
-  intel_iopl_set = 0;
 
   lib = LoadLibrary("WinIo.dll");
   if (!lib)

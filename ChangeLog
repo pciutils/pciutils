@@ -1,3 +1,8 @@
+2007-09-03  Martin Mares <mj@ucw.cz>
+
+	* Resurrected the Windows port, including cross-compilation by MinGW.
+	Patch by Samuel Bronson <naesten@gmail.com>.
+
 2007-08-31  Martin Mares <mj@ucw.cz>
 
 	* Makefile, lib/Makefile: `ar' and `ranlib' can be overriden to allow
