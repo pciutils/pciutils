@@ -1,3 +1,9 @@
+2007-09-12  Hasso Tepper <hasso@estpak.ee>
+
+	* Extended the fbsd-device backend to run on Dragonfly BSD.
+
+	* lspci.c: alloca() is declared in <stdlib.h> on BSD's, not <alloca.h>.
+
 2007-09-03  Martin Mares <mj@ucw.cz>
 
 	* Resurrected the Windows port, including cross-compilation by MinGW.

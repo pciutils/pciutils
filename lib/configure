@@ -22,7 +22,7 @@ then
 else
 	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
 fi
-if [ "$sys" = "GNU/kFreeBSD" ]
+if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
 then
 	sys=freebsd
 fi

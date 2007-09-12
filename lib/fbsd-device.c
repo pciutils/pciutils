@@ -19,13 +19,15 @@
 #  endif
 #endif
 
-#if __FreeBSD_version < 500000
+#if defined(__DragonFly__)
+#  include <bus/pci/pcivar.h>
+#elif __FreeBSD_version < 500000
 #  include <pci/pcivar.h>
 #else
 #  include <dev/pci/pcivar.h>
 #endif
 
-#if __FreeBSD_version < 430000
+#if __FreeBSD_version < 430000 && !defined(__DragonFly__)
 #  include <pci/pci_ioctl.h>
 #else
 #  include <sys/pciio.h>
