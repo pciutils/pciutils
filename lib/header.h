@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- PCI Header Structure (based on <linux/pci.h>)
  *
- *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -23,8 +23,10 @@
 #define  PCI_COMMAND_WAIT 	0x80	/* Enable address/data stepping */
 #define  PCI_COMMAND_SERR	0x100	/* Enable SERR */
 #define  PCI_COMMAND_FAST_BACK	0x200	/* Enable back-to-back writes */
+#define  PCI_COMMAND_DISABLE_INTx	0x400	/* PCIE: Disable INTx interrupts */
 
 #define PCI_STATUS		0x06	/* 16 bits */
+#define  PCI_STATUS_INTx	0x08	/* PCIE: INTx interrupt pending */
 #define  PCI_STATUS_CAP_LIST	0x10	/* Support Capability List */
 #define  PCI_STATUS_66MHZ	0x20	/* Support 66 Mhz PCI 2.1 bus */
 #define  PCI_STATUS_UDF		0x40	/* Support User Definable Features [obsolete] */
@@ -136,6 +138,10 @@
 #define  PCI_BRIDGE_CTL_MASTER_ABORT 0x20  /* Report master aborts */
 #define  PCI_BRIDGE_CTL_BUS_RESET 0x40	/* Secondary bus reset */
 #define  PCI_BRIDGE_CTL_FAST_BACK 0x80	/* Fast Back2Back enabled on secondary interface */
+#define  PCI_BRIDGE_CTL_PRI_DISCARD_TIMER 0x100		/* PCI-X? */
+#define  PCI_BRIDGE_CTL_SEC_DISCARD_TIMER 0x200		/* PCI-X? */
+#define  PCI_BRIDGE_CTL_DISCARD_TIMER_STATUS 0x400	/* PCI-X? */
+#define  PCI_BRIDGE_CTL_DISCARD_TIMER_SERR_EN 0x800	/* PCI-X? */
 
 /* Header type 2 (CardBus bridges) */
 /* 0x14-0x15 reserved */
@@ -692,6 +698,8 @@
 #define  PCI_EXP_TYPE_DOWNSTREAM 0x6	/* Downstream Port */
 #define  PCI_EXP_TYPE_PCI_BRIDGE 0x7	/* PCI/PCI-X Bridge */
 #define  PCI_EXP_TYPE_PCIE_BRIDGE 0x8	/* PCI/PCI-X to PCIE Bridge */
+#define  PCI_EXP_TYPE_ROOT_INT_EP 0x9	/* Root Complex Integrated Endpoint */
+#define  PCI_EXP_TYPE_ROOT_EC 0xa	/* Root Complex Event Collector */
 #define PCI_EXP_FLAGS_SLOT	0x0100	/* Slot implemented */
 #define PCI_EXP_FLAGS_IRQ	0x3e00	/* Interrupt message number */
 #define PCI_EXP_DEVCAP		0x4	/* Device capabilities */

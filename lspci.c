@@ -1235,6 +1235,8 @@ show_express(struct device *d, int where, int cap)
   int slot = 0;
 
   printf("Express ");
+  if (verbose >= 2)
+    printf("(v%d) ", cap & PCI_EXP_FLAGS_VERS);
   switch (type)
     {
     case PCI_EXP_TYPE_ENDPOINT:
@@ -1260,8 +1262,14 @@ show_express(struct device *d, int where, int cap)
     case PCI_EXP_TYPE_PCIE_BRIDGE:
       printf("PCI/PCI-X to PCI-Express Bridge");
       break;
+    case PCI_EXP_TYPE_ROOT_INT_EP:
+      printf("Root Complex Integrated Endpoint");
+      break;
+    case PCI_EXP_TYPE_ROOT_EC:
+      printf("Root Complex Event Collector");
+      break;
     default:
-      printf("Unknown type");
+      printf("Unknown type %d", type);
   }
   printf(" IRQ %d\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
   if (verbose < 2)
