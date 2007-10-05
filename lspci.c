@@ -1480,7 +1480,7 @@ show_ext_caps(struct device *d)
 	    /* FIXME: Not decoded yet */
 	    break;
 	  case PCI_EXT_CAP_ID_VNDR:
-	    printf("Vendor specific\n");
+	    printf("Vendor Specific Information\n");
 	    break;
 	  case PCI_EXT_CAP_ID_ACS:
 	    printf("Access Controls\n");
@@ -1672,14 +1672,21 @@ show_htype1(struct device *d)
   show_rom(d, PCI_ROM_ADDRESS1);
 
   if (verbose > 1)
-    printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",
-	   FLAG(brc, PCI_BRIDGE_CTL_PARITY),
-	   FLAG(brc, PCI_BRIDGE_CTL_SERR),
-	   FLAG(brc, PCI_BRIDGE_CTL_NO_ISA),
-	   FLAG(brc, PCI_BRIDGE_CTL_VGA),
-	   FLAG(brc, PCI_BRIDGE_CTL_MASTER_ABORT),
-	   FLAG(brc, PCI_BRIDGE_CTL_BUS_RESET),
-	   FLAG(brc, PCI_BRIDGE_CTL_FAST_BACK));
+    {
+      printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",
+	FLAG(brc, PCI_BRIDGE_CTL_PARITY),
+	FLAG(brc, PCI_BRIDGE_CTL_SERR),
+	FLAG(brc, PCI_BRIDGE_CTL_NO_ISA),
+	FLAG(brc, PCI_BRIDGE_CTL_VGA),
+	FLAG(brc, PCI_BRIDGE_CTL_MASTER_ABORT),
+	FLAG(brc, PCI_BRIDGE_CTL_BUS_RESET),
+	FLAG(brc, PCI_BRIDGE_CTL_FAST_BACK));
+      printf("\t\tPriDiscTmr%c SecDiscTmr%c DiscTmrStat%c DiscTmrSERREn%c\n",
+	FLAG(brc, PCI_BRIDGE_CTL_PRI_DISCARD_TIMER),
+	FLAG(brc, PCI_BRIDGE_CTL_SEC_DISCARD_TIMER),
+	FLAG(brc, PCI_BRIDGE_CTL_DISCARD_TIMER_STATUS),
+	FLAG(brc, PCI_BRIDGE_CTL_DISCARD_TIMER_SERR_EN));
+    }
 
   show_caps(d);
 }
@@ -1807,7 +1814,7 @@ show_verbose(struct device *d)
 
   if (verbose > 1)
     {
-      printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c\n",
+      printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
 	     FLAG(cmd, PCI_COMMAND_IO),
 	     FLAG(cmd, PCI_COMMAND_MEMORY),
 	     FLAG(cmd, PCI_COMMAND_MASTER),
@@ -1817,8 +1824,9 @@ show_verbose(struct device *d)
 	     FLAG(cmd, PCI_COMMAND_PARITY),
 	     FLAG(cmd, PCI_COMMAND_WAIT),
 	     FLAG(cmd, PCI_COMMAND_SERR),
-	     FLAG(cmd, PCI_COMMAND_FAST_BACK));
-      printf("\tStatus: Cap%c 66MHz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c\n",
+	     FLAG(cmd, PCI_COMMAND_FAST_BACK),
+	     FLAG(cmd, PCI_COMMAND_DISABLE_INTx));
+      printf("\tStatus: Cap%c 66MHz%c UDF%c FastB2B%c ParErr%c DEVSEL=%s >TAbort%c <TAbort%c <MAbort%c >SERR%c <PERR%c INTx%c\n",
 	     FLAG(status, PCI_STATUS_CAP_LIST),
 	     FLAG(status, PCI_STATUS_66MHZ),
 	     FLAG(status, PCI_STATUS_UDF),
@@ -1831,7 +1839,8 @@ show_verbose(struct device *d)
 	     FLAG(status, PCI_STATUS_REC_TARGET_ABORT),
 	     FLAG(status, PCI_STATUS_REC_MASTER_ABORT),
 	     FLAG(status, PCI_STATUS_SIG_SYSTEM_ERROR),
-	     FLAG(status, PCI_STATUS_DETECTED_PARITY));
+	     FLAG(status, PCI_STATUS_DETECTED_PARITY),
+	     FLAG(status, PCI_STATUS_INTx));
       if (cmd & PCI_COMMAND_MASTER)
 	{
 	  printf("\tLatency: %d", latency);
