@@ -7,7 +7,9 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
+#include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <osreldate.h>
@@ -19,15 +21,8 @@
 #  endif
 #endif
 
-#if defined(__DragonFly__)
-#  include <bus/pci/pcivar.h>
-#elif __FreeBSD_version < 500000
-#  include <pci/pcivar.h>
-#else
-#  include <dev/pci/pcivar.h>
-#endif
-
 #if __FreeBSD_version < 430000 && !defined(__DragonFly__)
+#  include <pci/pcivar.h>
 #  include <pci/pci_ioctl.h>
 #else
 #  include <sys/pciio.h>
@@ -86,6 +81,9 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (pos >= 256)
     return 0;
 
+#if __FreeBSD_version >= 700053
+  pi.pi_sel.pc_domain = d->domain;
+#endif
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;
   pi.pi_sel.pc_func = d->func;
@@ -94,7 +92,13 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   pi.pi_width = len;
 
   if (ioctl(d->access->fd, PCIOCREAD, &pi) < 0)
-    d->access->error("fbsd_read: ioctl(PCIOCREAD) failed");
+    {
+      if (errno == ENODEV)
+        {
+          return 0;
+        }
+      d->access->error("fbsd_read: ioctl(PCIOCREAD) failed: %s", strerror(errno));
+    }
 
   switch (len)
     {
@@ -102,10 +106,10 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
       buf[0] = (u8) pi.pi_data;
       break;
     case 2:
-      ((u16 *) buf)[0] = (u16) pi.pi_data;
+      ((u16 *) buf)[0] = cpu_to_le16((u16) pi.pi_data);
       break;
     case 4:
-      ((u32 *) buf)[0] = (u32) pi.pi_data;
+      ((u32 *) buf)[0] = cpu_to_le32((u32) pi.pi_data);
       break;
     }
   return 1;
@@ -124,6 +128,9 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (pos >= 256)
     return 0;
 
+#if __FreeBSD_version >= 700053
+  pi.pi_sel.pc_domain = d->domain;
+#endif
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;
   pi.pi_sel.pc_func = d->func;
@@ -137,16 +144,20 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
       pi.pi_data = buf[0];
       break;
     case 2:
-      pi.pi_data = ((u16 *) buf)[0];
+      pi.pi_data = le16_to_cpu(((u16 *) buf)[0]);
       break;
     case 4:
-      pi.pi_data = ((u32 *) buf)[0];
+      pi.pi_data = le32_to_cpu(((u32 *) buf)[0]);
       break;
     }
 
   if (ioctl(d->access->fd, PCIOCWRITE, &pi) < 0)
     {
-      d->access->error("fbsd_write: ioctl(PCIOCWRITE) failed");
+      if (errno == ENODEV)
+        {
+          return 0;
+        }
+      d->access->error("fbsd_write: ioctl(PCIOCWRITE) failed: %s", strerror(errno));
     }
 
   return 1;
