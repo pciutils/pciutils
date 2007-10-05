@@ -1,7 +1,22 @@
 2007-10-05  Martin Mares <mj@ucw.cz>
 
+	* Released as 2.2.7.
+
 	* lspci.c (show_caps, show_ext_caps): Detect and report loops in
 	capability lists.
+
+	* lspci.c, lib/header.h: Finished decoding of the PCI Express
+	capability. The extended capabilities remain undecoded for now,
+	but at least the list of them has been updated to reflect the
+	current PCI Express 2.0 spec.
+
+	* lspci.c, lib/header.h: Decode new bits of traditional registers
+	as defined by PCIE / PCI-X. This includes discard timers in the bridge
+	control register and INTx enable/status in device control/status
+	registers.
+
+	* lib/fbsd-device.c: Support domains on new FreeBSD's. Contributed
+	by Marius Strobl.
 
 2007-09-12  Hasso Tepper <hasso@estpak.ee>
 
