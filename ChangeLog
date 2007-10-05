@@ -1,3 +1,8 @@
+2007-10-05  Martin Mares <mj@ucw.cz>
+
+	* lspci.c (show_caps, show_ext_caps): Detect and report loops in
+	capability lists.
+
 2007-09-12  Hasso Tepper <hasso@estpak.ee>
 
 	* Extended the fbsd-device backend to run on Dragonfly BSD.

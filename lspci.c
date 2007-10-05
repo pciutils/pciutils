@@ -1374,6 +1374,8 @@ static void
 show_ext_caps(struct device *d)
 {
   int where = 0x100;
+  char been_there[0x1000];
+  memset(been_there, 0, 0x1000);
   do
     {
       u32 header;
@@ -1386,6 +1388,11 @@ show_ext_caps(struct device *d)
 	break;
       id = header & 0xffff;
       printf("\tCapabilities: [%03x] ", where);
+      if (been_there[where++])
+	{
+	  printf("<chain looped>\n");
+	  break;
+	}
       switch (id)
 	{
 	  case PCI_EXT_CAP_ID_AER:
@@ -1416,6 +1423,8 @@ show_caps(struct device *d)
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
       int where = get_conf_byte(d, PCI_CAPABILITY_LIST) & ~3;
+      byte been_there[256];
+      memset(been_there, 0, 256);
       while (where)
 	{
 	  int id, next, cap;
@@ -1429,6 +1438,11 @@ show_caps(struct device *d)
 	  next = get_conf_byte(d, where + PCI_CAP_LIST_NEXT) & ~3;
 	  cap = get_conf_word(d, where + PCI_CAP_FLAGS);
 	  printf("[%02x] ", where);
+	  if (been_there[where]++)
+	    {
+	      printf("<chain looped>\n");
+	      break;
+	    }
 	  if (id == 0xff)
 	    {
 	      printf("<chain broken>\n");
