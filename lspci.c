@@ -1089,38 +1089,56 @@ static void show_express_dev(struct device *d, int where, int type)
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_DEVCAP);
-  printf("\t\tDevice: Supported: MaxPayload %d bytes, PhantFunc %d, ExtTag%c\n",
+  printf("\t\tDevCap:\tMaxPayload %d bytes, PhantFunc %d, Latency L0s %s, L1 %s\n",
 	128 << (t & PCI_EXP_DEVCAP_PAYLOAD),
 	(1 << ((t & PCI_EXP_DEVCAP_PHANTOM) >> 3)) - 1,
-	FLAG(t, PCI_EXP_DEVCAP_EXT_TAG));
-  printf("\t\tDevice: Latency L0s %s, L1 %s\n",
 	latency_l0s((t & PCI_EXP_DEVCAP_L0S) >> 6),
 	latency_l1((t & PCI_EXP_DEVCAP_L1) >> 9));
+  printf("\t\t\tExtTag%c", FLAG(t, PCI_EXP_DEVCAP_EXT_TAG));
   if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END) ||
       (type == PCI_EXP_TYPE_UPSTREAM) || (type == PCI_EXP_TYPE_PCI_BRIDGE))
-    printf("\t\tDevice: AtnBtn%c AtnInd%c PwrInd%c\n",
+    printf(" AttnBtn%c AttnInd%c PwrInd%c",
 	FLAG(t, PCI_EXP_DEVCAP_ATN_BUT),
 	FLAG(t, PCI_EXP_DEVCAP_ATN_IND), FLAG(t, PCI_EXP_DEVCAP_PWR_IND));
+  printf(" RBE%c FLReset%c",
+	FLAG(t, PCI_EXP_DEVCAP_RBE),
+	FLAG(t, PCI_EXP_DEVCAP_FLRESET));
   if (type == PCI_EXP_TYPE_UPSTREAM)
-    printf("\t\tDevice: SlotPowerLimit %f\n",
+    printf("SlotPowerLimit %fW",
 	power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18,
 		    (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26));
+  printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
-  printf("\t\tDevice: Errors: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
+  printf("\t\tDevCtl:\tReport errors: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
 	FLAG(w, PCI_EXP_DEVCTL_CERE),
 	FLAG(w, PCI_EXP_DEVCTL_NFERE),
 	FLAG(w, PCI_EXP_DEVCTL_FERE),
 	FLAG(w, PCI_EXP_DEVCTL_URRE));
-  printf("\t\tDevice: RlxdOrd%c ExtTag%c PhantFunc%c AuxPwr%c NoSnoop%c\n",
+  printf("\t\t\tRlxdOrd%c ExtTag%c PhantFunc%c AuxPwr%c NoSnoop%c",
 	FLAG(w, PCI_EXP_DEVCTL_RELAXED),
 	FLAG(w, PCI_EXP_DEVCTL_EXT_TAG),
 	FLAG(w, PCI_EXP_DEVCTL_PHANTOM),
 	FLAG(w, PCI_EXP_DEVCTL_AUX_PME),
 	FLAG(w, PCI_EXP_DEVCTL_NOSNOOP));
-  printf("\t\tDevice: MaxPayload %d bytes, MaxReadReq %d bytes\n",
+  if (type == PCI_EXP_TYPE_PCI_BRIDGE || type == PCI_EXP_TYPE_PCIE_BRIDGE)
+    printf(" BrConfRtry%c", FLAG(w, PCI_EXP_DEVCTL_BCRE));
+  if (type == PCI_EXP_TYPE_ENDPOINT && (t & PCI_EXP_DEVCAP_FLRESET))
+    printf(" FLReset%c", FLAG(w, PCI_EXP_DEVCTL_FLRESET));
+  printf("\n\t\t\tMaxPayload %d bytes, MaxReadReq %d bytes\n",
 	128 << ((w & PCI_EXP_DEVCTL_PAYLOAD) >> 5),
 	128 << ((w & PCI_EXP_DEVCTL_READRQ) >> 12));
+
+  w = get_conf_word(d, where + PCI_EXP_DEVSTA);
+  printf("\t\tDevSta:\tCorrErr%c UncorrErr%c FatalErr%c UnsuppReq%c AuxPwr%c TransPend%c\n",
+	FLAG(w, PCI_EXP_DEVSTA_CED),
+	FLAG(w, PCI_EXP_DEVSTA_NFED),
+	FLAG(w, PCI_EXP_DEVSTA_FED),
+	FLAG(w, PCI_EXP_DEVSTA_URD),
+	FLAG(w, PCI_EXP_DEVSTA_AUXPD),
+	FLAG(w, PCI_EXP_DEVSTA_TRPND));
+
+  /* FIXME: Second set of control/status registers is not supported yet. */
 }
 
 static char *link_speed(int speed)
@@ -1128,7 +1146,9 @@ static char *link_speed(int speed)
   switch (speed)
     {
       case 1:
-	return "2.5Gb/s";
+	return "2.5GT/s";
+      case 2:
+	return "5GT/s";
       default:
 	return "unknown";
     }
@@ -1159,25 +1179,43 @@ static void show_express_link(struct device *d, int where, int type)
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_LNKCAP);
-  printf("\t\tLink: Supported Speed %s, Width x%d, ASPM %s, Port %d\n",
+  printf("\t\tLnkCap:\tPort #%d, Speed %s, Width x%d, ASPM %s, Latency L0 %s, L1 %s\n",
+	t >> 24,
 	link_speed(t & PCI_EXP_LNKCAP_SPEED), (t & PCI_EXP_LNKCAP_WIDTH) >> 4,
 	aspm_support((t & PCI_EXP_LNKCAP_ASPM) >> 10),
-	t >> 24);
-  printf("\t\tLink: Latency L0s %s, L1 %s\n",
 	latency_l0s((t & PCI_EXP_LNKCAP_L0S) >> 12),
 	latency_l1((t & PCI_EXP_LNKCAP_L1) >> 15));
+  printf("\t\t\tClockPM%c Suprise%c LLActRep%c BwNot%c\n",
+	FLAG(t, PCI_EXP_LNKCAP_CLOCKPM),
+	FLAG(t, PCI_EXP_LNKCAP_SURPRISE),
+	FLAG(t, PCI_EXP_LNKCAP_DLLA),
+	FLAG(t, PCI_EXP_LNKCAP_LBNC));
+
   w = get_conf_word(d, where + PCI_EXP_LNKCTL);
-  printf("\t\tLink: ASPM %s", aspm_enabled(w & PCI_EXP_LNKCTL_ASPM));
+  printf("\t\tLnkCtl:\tASPM %s;", aspm_enabled(w & PCI_EXP_LNKCTL_ASPM));
   if ((type == PCI_EXP_TYPE_ROOT_PORT) || (type == PCI_EXP_TYPE_ENDPOINT) ||
       (type == PCI_EXP_TYPE_LEG_END))
     printf(" RCB %d bytes", w & PCI_EXP_LNKCTL_RCB ? 128 : 64);
-  if (w & PCI_EXP_LNKCTL_DISABLE)
-    printf(" Disabled");
-  printf(" CommClk%c ExtSynch%c\n", FLAG(w, PCI_EXP_LNKCTL_CLOCK),
-	FLAG(w, PCI_EXP_LNKCTL_XSYNCH));
+  printf(" Disabled%c Retrain%c CommClk%c\n\t\t\tExtSynch%c ClockPM%c AutWidDis%c BWInt%c AutBWInt%c\n",
+	FLAG(w, PCI_EXP_LNKCTL_DISABLE),
+	FLAG(w, PCI_EXP_LNKCTL_RETRAIN),
+	FLAG(w, PCI_EXP_LNKCTL_CLOCK),
+	FLAG(w, PCI_EXP_LNKCTL_XSYNCH),
+	FLAG(w, PCI_EXP_LNKCTL_CLOCKPM),
+	FLAG(w, PCI_EXP_LNKCTL_HWAUTWD),
+	FLAG(w, PCI_EXP_LNKCTL_BWMIE),
+	FLAG(w, PCI_EXP_LNKCTL_AUTBWIE));
+
   w = get_conf_word(d, where + PCI_EXP_LNKSTA);
-  printf("\t\tLink: Speed %s, Width x%d\n",
-	link_speed(w & PCI_EXP_LNKSTA_SPEED), (w & PCI_EXP_LNKSTA_WIDTH) >> 4);
+  printf("\t\tLnkSta:\tSpeed %s, Width x%d, TrErr%c Train%c SlotClk%c DLActive%c BWMgmt%c ABWMgmt%c\n",
+	link_speed(w & PCI_EXP_LNKSTA_SPEED),
+	(w & PCI_EXP_LNKSTA_WIDTH) >> 4,
+	FLAG(w, PCI_EXP_LNKSTA_TR_ERR),
+	FLAG(w, PCI_EXP_LNKSTA_TRAIN),
+	FLAG(w, PCI_EXP_LNKSTA_SL_CLK),
+	FLAG(w, PCI_EXP_LNKSTA_DL_ACT),
+	FLAG(w, PCI_EXP_LNKSTA_BWMGMT),
+	FLAG(w, PCI_EXP_LNKSTA_AUTBW));
 }
 
 static const char *indicator(int code)
@@ -1192,7 +1230,7 @@ static void show_express_slot(struct device *d, int where)
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_SLTCAP);
-  printf("\t\tSlot: AtnBtn%c PwrCtrl%c MRL%c AtnInd%c PwrInd%c HotPlug%c Surpise%c\n",
+  printf("\t\tSltCap:\tAttnBtn%c PwrCtrl%c MRL%c AttnInd%c PwrInd%c HotPlug%c Surpise%c\n",
 	FLAG(t, PCI_EXP_SLTCAP_ATNB),
 	FLAG(t, PCI_EXP_SLTCAP_PWRC),
 	FLAG(t, PCI_EXP_SLTCAP_MRL),
@@ -1200,31 +1238,60 @@ static void show_express_slot(struct device *d, int where)
 	FLAG(t, PCI_EXP_SLTCAP_PWRI),
 	FLAG(t, PCI_EXP_SLTCAP_HPC),
 	FLAG(t, PCI_EXP_SLTCAP_HPS));
-  printf("\t\tSlot: Number %d, PowerLimit %f\n", t >> 19,
-		power_limit((t & PCI_EXP_SLTCAP_PWR_VAL) >> 7,
-			(t & PCI_EXP_SLTCAP_PWR_SCL) >> 15));
+  printf("\t\t\tSlot #%3x, PowerLimit %f; Interlock%c NoCompl%c\n",
+	t >> 19,
+	power_limit((t & PCI_EXP_SLTCAP_PWR_VAL) >> 7, (t & PCI_EXP_SLTCAP_PWR_SCL) >> 15),
+	FLAG(t, PCI_EXP_SLTCAP_INTERLOCK),
+	FLAG(t, PCI_EXP_SLTCAP_NOCMDCOMP));
+
   w = get_conf_word(d, where + PCI_EXP_SLTCTL);
-  printf("\t\tSlot: Enabled AtnBtn%c PwrFlt%c MRL%c PresDet%c CmdCplt%c HPIrq%c\n",
+  printf("\t\tSltCtl:\tEnable: AttnBtn%c PwrFlt%c MRL%c PresDet%c CmdCplt%c HPIrq%c LinkChg%c\n",
 	FLAG(w, PCI_EXP_SLTCTL_ATNB),
 	FLAG(w, PCI_EXP_SLTCTL_PWRF),
 	FLAG(w, PCI_EXP_SLTCTL_MRLS),
 	FLAG(w, PCI_EXP_SLTCTL_PRSD),
 	FLAG(w, PCI_EXP_SLTCTL_CMDC),
-	FLAG(w, PCI_EXP_SLTCTL_HPIE));
-  printf("\t\tSlot: AttnInd %s, PwrInd %s, Power%c\n",
+	FLAG(w, PCI_EXP_SLTCTL_HPIE),
+	FLAG(w, PCI_EXP_SLTCTL_LLCHG));
+  printf("\t\t\tControl: AttnInd %s, PwrInd %s, Power%c Interlock%c\n",
 	indicator((w & PCI_EXP_SLTCTL_ATNI) >> 6),
 	indicator((w & PCI_EXP_SLTCTL_PWRI) >> 8),
-	FLAG(w, w & PCI_EXP_SLTCTL_PWRC));
+	FLAG(w, PCI_EXP_SLTCTL_PWRC),
+	FLAG(w, PCI_EXP_SLTCTL_INTERLOCK));
+
+  w = get_conf_word(d, where + PCI_EXP_SLTSTA);
+  printf("\t\tSltSta:\tStatus: AttnBtn%c PowerFlt%c MRL%c CmdCplt%c PresDet%c Interlock%c\n",
+	FLAG(w, PCI_EXP_SLTSTA_ATNB),
+	FLAG(w, PCI_EXP_SLTSTA_PWRF),
+	FLAG(w, PCI_EXP_SLTSTA_MRL_ST),
+	FLAG(w, PCI_EXP_SLTSTA_CMDC),
+	FLAG(w, PCI_EXP_SLTSTA_PRES),
+	FLAG(w, PCI_EXP_SLTSTA_INTERLOCK));
+  printf("\t\t\tChanged: MRL%c PresDet%c LinkState%c\n",
+	FLAG(w, PCI_EXP_SLTSTA_MRLS),
+	FLAG(w, PCI_EXP_SLTSTA_PRSD),
+	FLAG(w, PCI_EXP_SLTSTA_LLCHG));
 }
 
 static void show_express_root(struct device *d, int where)
 {
-  u16 w = get_conf_word(d, where + PCI_EXP_RTCTL);
-  printf("\t\tRoot: Correctable%c Non-Fatal%c Fatal%c PME%c\n",
+  u32 w = get_conf_word(d, where + PCI_EXP_RTCTL);
+  printf("\t\tRootCtl: ErrCorrectable%c ErrNon-Fatal%c ErrFatal%c PMEIntEna%c CRSVisible%c\n",
 	FLAG(w, PCI_EXP_RTCTL_SECEE),
 	FLAG(w, PCI_EXP_RTCTL_SENFEE),
 	FLAG(w, PCI_EXP_RTCTL_SEFEE),
-	FLAG(w, PCI_EXP_RTCTL_PMEIE));
+	FLAG(w, PCI_EXP_RTCTL_PMEIE),
+	FLAG(w, PCI_EXP_RTCTL_CRSVIS));
+
+  w = get_conf_word(d, where + PCI_EXP_RTCAP);
+  printf("\t\tRootCap: CRSVisible%c\n",
+	FLAG(w, PCI_EXP_RTCAP_CRSVIS));
+
+  w = get_conf_word(d, where + PCI_EXP_RTSTA);
+  printf("\t\tRootSta: PME ReqID %04x, PMEStatus%c PMEPending%c\n",
+	w & PCI_EXP_RTSTA_PME_REQID,
+	FLAG(w, PCI_EXP_RTSTA_PME_STATUS),
+	FLAG(w, PCI_EXP_RTSTA_PME_PENDING));
 }
 
 static void
@@ -1271,7 +1338,7 @@ show_express(struct device *d, int where, int cap)
     default:
       printf("Unknown type %d", type);
   }
-  printf(" IRQ %d\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
+  printf(", MSI %02x\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
   if (verbose < 2)
     return;
 
@@ -1340,18 +1407,6 @@ show_ssvid(struct device *d, int where)
 }
 
 static void
-show_aer(struct device *d UNUSED, int where UNUSED)
-{
-  printf("Advanced Error Reporting\n");
-}
-
-static void
-show_vc(struct device *d UNUSED, int where UNUSED)
-{
-  printf("Virtual Channel\n");
-}
-
-static void
 show_dsn(struct device *d, int where)
 {
   u32 t1, t2;
@@ -1362,12 +1417,6 @@ show_dsn(struct device *d, int where)
   printf("Device Serial Number %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x\n",
 	t1 & 0xff, (t1 >> 8) & 0xff, (t1 >> 16) & 0xff, t1 >> 24,
 	t2 & 0xff, (t2 >> 8) & 0xff, (t2 >> 16) & 0xff, t2 >> 24);
-}
-
-static void
-show_pb(struct device *d UNUSED, int where UNUSED)
-{
-  printf("Power Budgeting\n");
 }
 
 static void
@@ -1396,19 +1445,49 @@ show_ext_caps(struct device *d)
       switch (id)
 	{
 	  case PCI_EXT_CAP_ID_AER:
-	    show_aer(d, where);
+	    printf("Advanced Error Reporting\n");
+	    /* FIXME: Not decoded yet */
 	    break;
 	  case PCI_EXT_CAP_ID_VC:
-	    show_vc(d, where);
+	    printf("Virtual Channel\n");
+	    /* FIXME: Not decoded yet */
 	    break;
 	  case PCI_EXT_CAP_ID_DSN:
 	    show_dsn(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_PB:
-	    show_pb(d, where);
+	    printf("Power Budgeting\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_RCLINK:
+	    printf("Root Complex Link\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_RCILINK:
+	    printf("Root Complex Internal Link\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_RCECOLL:
+	    printf("Root Complex Event Collector\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_MFVC:
+	    printf("Multi-Function Virtual Channel\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_RBCB:
+	    printf("Root Bridge Control Block\n");
+	    /* FIXME: Not decoded yet */
+	    break;
+	  case PCI_EXT_CAP_ID_VNDR:
+	    printf("Vendor specific\n");
+	    break;
+	  case PCI_EXT_CAP_ID_ACS:
+	    printf("Access Controls\n");
+	    /* FIXME: Not decoded yet */
 	    break;
 	  default:
-	    printf("Unknown (%d)\n", id);
+	    printf("#%02x\n", id);
 	    break;
 	}
       where = header >> 20;
