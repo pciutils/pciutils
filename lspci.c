@@ -1437,7 +1437,7 @@ show_ext_caps(struct device *d)
 	break;
       id = header & 0xffff;
       printf("\tCapabilities: [%03x] ", where);
-      if (been_there[where++])
+      if (been_there[where]++)
 	{
 	  printf("<chain looped>\n");
 	  break;

@@ -1,3 +1,8 @@
+2007-10-12  Martin Mares <mj@ucw.cz>
+
+	* Capability loop detection introduced 2.2.7 did not work
+	  properly with extended capabilities. Fixed.
+
 2007-10-05  Martin Mares <mj@ucw.cz>
 
 	* Released as 2.2.7.
