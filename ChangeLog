@@ -1,3 +1,7 @@
+2007-10-14  Martin Mares <mj@ucw.cz>
+
+	* lib/[fno]bsd-*: Removed extraneous braces.
+
 2007-10-12  Martin Mares <mj@ucw.cz>
 
 	* Capability loop detection introduced 2.2.7 did not work

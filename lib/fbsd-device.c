@@ -57,9 +57,7 @@ fbsd_init(struct pci_access *a)
 
   a->fd = open(name, O_RDWR, 0);
   if (a->fd < 0)
-    {
-      a->error("fbsd_init: %s open failed", name);
-    }
+    a->error("fbsd_init: %s open failed", name);
 }
 
 static void
@@ -74,9 +72,7 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   struct pci_io pi;
 
   if (!(len == 1 || len == 2 || len == 4))
-    {
-      return pci_generic_block_read(d, pos, buf, len);
-    }
+    return pci_generic_block_read(d, pos, buf, len);
 
   if (pos >= 256)
     return 0;
@@ -94,9 +90,7 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (ioctl(d->access->fd, PCIOCREAD, &pi) < 0)
     {
       if (errno == ENODEV)
-        {
-          return 0;
-        }
+	return 0;
       d->access->error("fbsd_read: ioctl(PCIOCREAD) failed: %s", strerror(errno));
     }
 
@@ -121,9 +115,7 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   struct pci_io pi;
 
   if (!(len == 1 || len == 2 || len == 4))
-    {
-      return pci_generic_block_write(d, pos, buf, len);
-    }
+    return pci_generic_block_write(d, pos, buf, len);
 
   if (pos >= 256)
     return 0;
@@ -154,9 +146,7 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (ioctl(d->access->fd, PCIOCWRITE, &pi) < 0)
     {
       if (errno == ENODEV)
-        {
-          return 0;
-        }
+	return 0;
       d->access->error("fbsd_write: ioctl(PCIOCWRITE) failed: %s", strerror(errno));
     }
 

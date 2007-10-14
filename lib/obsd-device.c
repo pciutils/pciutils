@@ -43,9 +43,7 @@ obsd_init(struct pci_access *a)
 
   a->fd = open(name, O_RDWR, 0);
   if (a->fd < 0)
-    {
-      a->error("obsd_init: %s open failed", name);
-    }
+    a->error("obsd_init: %s open failed", name);
 }
 
 static void
@@ -65,9 +63,7 @@ obsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   } u;
 
   if (!(len == 1 || len == 2 || len == 4))
-    {
-      return pci_generic_block_read(d, pos, buf, len);
-    }
+    return pci_generic_block_read(d, pos, buf, len);
 
   if (pos >= 256)
     return 0;
@@ -80,11 +76,10 @@ obsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   pi.pi_width = 4;
 
   if (ioctl(d->access->fd, PCIOCREAD, &pi) < 0) {
-	  if (errno == ENXIO) {
+	  if (errno == ENXIO)
 		  pi.pi_data = 0xffffffff;
-	  } else {
+	  else
 		  d->access->error("obsd_read: ioctl(PCIOCREAD) failed");
-	  }
   }
   u.u32 = pi.pi_data;
 
@@ -109,9 +104,7 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   struct pci_io pi;
 
   if (!(len == 1 || len == 2 || len == 4))
-    {
-      return pci_generic_block_write(d, pos, buf, len);
-    }
+    return pci_generic_block_write(d, pos, buf, len);
 
   if (pos >= 256)
     return 0;
@@ -137,9 +130,7 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
     }
 
   if (ioctl(d->access->fd, PCIOCWRITE, &pi) < 0)
-    {
-      d->access->error("obsd_write: ioctl(PCIOCWRITE) failed");
-    }
+    d->access->error("obsd_write: ioctl(PCIOCWRITE) failed");
 
   return 1;
 }
