@@ -1,3 +1,10 @@
+2007-10-19  Martin Mares <mj@ucw.cz>
+
+	* pci.ids: Revised class codes to match Conventional PCI 3.0 specs.
+	Added a couple of new ones, renumbered `ADMA continuous operation'
+	prog-if to 0x30 (even the old SATA Class Code ECN doesn't mention
+	0x40) and renumbered the satellite communication controllers.
+
 2007-10-14  Martin Mares <mj@ucw.cz>
 
 	* lib/[fno]bsd-*: Removed extraneous braces.
