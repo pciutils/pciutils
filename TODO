@@ -1,13 +1,15 @@
 Capabilities with partial decoding:
-- PCIe 2nd set of control/status registers
-- HyperTransport caps
+- PCIe 2nd set of control/status registers (have spec)
+- HyperTransport caps (have spec)
 
 Capabilities with no decoding:
-- VPD
+- VPD (have spec)
 - CompactPCI hot-swap
 - CompactPCI central resource control
 - AGP3
 - Secure device
+- SATA HBA (have spec)
+- Advanced features (have spec)
 - Advanced Error Reporting (ext'd)
 - Virtual Channel (ext'd)
 - Power Budgeting (ext'd)

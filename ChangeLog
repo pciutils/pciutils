@@ -6,7 +6,8 @@
 	0x40) and renumbered the satellite communication controllers.
 
 	* lib/header.h: Include `PCI hot-plug' and `Secure device'
-	capabilities from PCI 3.0 specs.
+	capabilities from PCI 3.0 specs. Also added `SATA HBA' and
+	`Advanced features' caps from various ECN's.
 
 	* lspci.c: All known capabilities have at least their name displayed
 	now. When we are unable to decode them completely, we signalize it

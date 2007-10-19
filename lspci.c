@@ -1436,6 +1436,12 @@ show_caps(struct device *d)
 	    case PCI_CAP_ID_MSIX:
 	      cap_msix(d, where, cap);
 	      break;
+	    case PCI_CAP_ID_SATA:
+	      printf("SATA HBA <?>\n");
+	      break;
+	    case PCI_CAP_ID_AF:
+	      printf("PCIe advanced features <?>\n");
+	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);
 	    }
