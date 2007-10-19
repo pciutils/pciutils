@@ -1055,16 +1055,6 @@ show_msi(struct device *d, int where, int cap)
     }
 }
 
-static void show_vendor(void)
-{
-  printf("Vendor Specific Information\n");
-}
-
-static void show_debug(void)
-{
-  printf("Debug port\n");
-}
-
 static float power_limit(int value, int scale)
 {
   static const float scales[4] = { 1.0, 0.1, 0.01, 0.001 };
@@ -1445,46 +1435,37 @@ show_ext_caps(struct device *d)
       switch (id)
 	{
 	  case PCI_EXT_CAP_ID_AER:
-	    printf("Advanced Error Reporting\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Advanced Error Reporting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_VC:
-	    printf("Virtual Channel\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Virtual Channel <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_DSN:
 	    show_dsn(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_PB:
-	    printf("Power Budgeting\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Power Budgeting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_RCLINK:
-	    printf("Root Complex Link\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Root Complex Link <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_RCILINK:
-	    printf("Root Complex Internal Link\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Root Complex Internal Link <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_RCECOLL:
-	    printf("Root Complex Event Collector\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Root Complex Event Collector <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_MFVC:
-	    printf("Multi-Function Virtual Channel\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Multi-Function Virtual Channel <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_RBCB:
-	    printf("Root Bridge Control Block\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Root Bridge Control Block <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_VNDR:
-	    printf("Vendor Specific Information\n");
+	    printf("Vendor Specific Information <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_ACS:
-	    printf("Access Controls\n");
-	    /* FIXME: Not decoded yet */
+	    printf("Access Controls <?>\n");
 	    break;
 	  default:
 	    printf("#%02x\n", id);
@@ -1536,13 +1517,16 @@ show_caps(struct device *d)
 	      show_agp(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_VPD:
-	      printf("Vital Product Data\n");
+	      printf("Vital Product Data <?>\n");
 	      break;
 	    case PCI_CAP_ID_SLOTID:
 	      show_slotid(cap);
 	      break;
 	    case PCI_CAP_ID_MSI:
 	      show_msi(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_CHSWP:
+	      printf("CompactPCI hot-swap <?>\n");
 	      break;
 	    case PCI_CAP_ID_PCIX:
 	      show_pcix(d, where);
@@ -1552,13 +1536,25 @@ show_caps(struct device *d)
 	      show_ht(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_VNDR:
-	      show_vendor();
+	      printf("Vendor Specific Information <?>\n");
 	      break;
 	    case PCI_CAP_ID_DBG:
-	      show_debug();
+	      printf("Debug port <?>\n");
+	      break;
+	    case PCI_CAP_ID_CCRC:
+	      printf("CompactPCI central resource control <?>\n");
+	      break;
+	    case PCI_CAP_ID_HOTPLUG:
+	      printf("Hot-plug capable\n");
 	      break;
 	    case PCI_CAP_ID_SSVID:
 	      show_ssvid(d, where);
+	      break;
+	    case PCI_CAP_ID_AGP3:
+	      printf("AGP3 <?>\n");
+	      break;
+	    case PCI_CAP_ID_SECURE:
+	      printf("Secure device <?>\n");
 	      break;
 	    case PCI_CAP_ID_EXP:
 	      show_express(d, where, cap);

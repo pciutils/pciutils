@@ -309,6 +309,19 @@ kernels. Contains per-bus subdirectories with per-card config space files and a
 .I devices
 file containing a list of all PCI devices.
 
+.SH BUGS
+
+Sometimes, lspci is not able to decode the configuration registers completely.
+This usually happens when not enough documentation was available to the authors.
+In such cases, it at least prints the
+.B <?>
+mark to signal that there is potentially something more to say. If you know
+the details, patches will be of course welcome.
+
+Access to the extended configuration space is currently supported only by the
+.B linux_sysfs
+back-end.
+
 .SH SEE ALSO
 .BR setpci (8),
 .BR update-pciids (8)

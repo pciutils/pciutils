@@ -8,6 +8,13 @@
 	* lib/header.h: Include `PCI hot-plug' and `Secure device'
 	capabilities from PCI 3.0 specs.
 
+	* lspci.c: All known capabilities have at least their name displayed
+	now. When we are unable to decode them completely, we signalize it
+	with a `<?>' mark.
+
+	* lspci.man: Document `<?>' and also mention that extended config
+	space is currently available only with the linux_sysfs back-end.
+
 2007-10-14  Martin Mares <mj@ucw.cz>
 
 	* lib/[fno]bsd-*: Removed extraneous braces.
