@@ -1,9 +1,20 @@
-- some extended capabilities are currently only partially decoded
-- finish PCI-X 2.0 capabilities
-- finish PCI Express support
-- reading of VPD
-- class 0805?
+Capabilities with partial decoding:
+- PCIe 2nd set of control/status registers
+- HyperTransport caps
+
+Capabilities with no decoding:
+- VPD
+- CompactPCI hot-swap
+- CompactPCI central resource control
+- AGP3
+- Secure device
+- Advanced Error Reporting (ext'd)
+- Virtual Channel (ext'd)
+- Power Budgeting (ext'd)
+- Root Complex * (ext'd)
+- Multi-Function Virtual Channel (ext'd)
+- Root Bridge Control Block (ext'd)
+- Access Controls (ext'd)
 
 PCIIDS:
-- another mirror at Atrey?
 - delete old DB at SF
