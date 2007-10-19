@@ -1410,6 +1410,14 @@ show_dsn(struct device *d, int where)
 }
 
 static void
+show_debug_port(int cap)
+{
+  int bar = cap >> 13;
+  int pos = cap & 0x1fff;
+  printf("Debug port: BAR=%d offset=%04x\n", bar, pos);
+}
+
+static void
 show_ext_caps(struct device *d)
 {
   int where = 0x100;
@@ -1539,7 +1547,7 @@ show_caps(struct device *d)
 	      printf("Vendor Specific Information <?>\n");
 	      break;
 	    case PCI_CAP_ID_DBG:
-	      printf("Debug port <?>\n");
+	      show_debug_port(cap);
 	      break;
 	    case PCI_CAP_ID_CCRC:
 	      printf("CompactPCI central resource control <?>\n");
