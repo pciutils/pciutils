@@ -157,13 +157,18 @@ The
 .B /dev/pci
 device on FreeBSD. Requires root privileges.
 .TP
-.B aix_device
-Access method used on AIX. Requires root privileges.
+.B obsd_device
+The
+.B /dev/pci
+device on OpenBSD. Requires root privileges.
 .TP
 .B nbsd_libpci
 The
 .B /dev/pci0
 device on NetBSD accessed using the local libpci library.
+.TP
+.B aix_device
+Access method used on AIX. Requires root privileges.
 
 .P
 By default, PCILIB uses the first available access method and displays no debugging
