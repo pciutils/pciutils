@@ -1,5 +1,5 @@
 # Makefile for The PCI Library
-# (c) 1999 Martin Mares <mj@ucw.cz>
+# (c) 1999--2007 Martin Mares <mj@ucw.cz>
 
 include config.mk
 
@@ -23,10 +23,6 @@ endif
 
 ifdef PCI_HAVE_PM_DUMP
 OBJS += dump.o
-endif
-
-ifdef PCI_HAVE_PM_SYSCALLS
-OBJS += syscalls.o
 endif
 
 ifdef PCI_HAVE_PM_FBSD_DEVICE
