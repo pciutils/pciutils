@@ -1,5 +1,12 @@
 2007-10-19  Martin Mares <mj@ucw.cz>
 
+	* Makefile, lib/Makefile: Moved -lz from LDFLAGS to LDLIBS.
+	Also added an explicit pattern rule for linking to make sure
+	that LDLIBS is used on all platforms. Thanks to Dan Nicholson
+	for the suggestion.
+
+2007-10-19  Martin Mares <mj@ucw.cz>
+
 	* Released as 2.2.8.
 
 	* pci.ids: Revised class codes to match Conventional PCI 3.0 specs.

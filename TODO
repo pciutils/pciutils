@@ -1,3 +1,5 @@
+- review class names
+
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)
 - HyperTransport caps (have spec)
