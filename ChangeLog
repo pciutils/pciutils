@@ -5,6 +5,9 @@
 	prog-if to 0x30 (even the old SATA Class Code ECN doesn't mention
 	0x40) and renumbered the satellite communication controllers.
 
+	* lib/header.h: Include `PCI hot-plug' and `Secure device'
+	capabilities from PCI 3.0 specs.
+
 2007-10-14  Martin Mares <mj@ucw.cz>
 
 	* lib/[fno]bsd-*: Removed extraneous braces.

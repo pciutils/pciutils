@@ -194,8 +194,10 @@
 #define  PCI_CAP_ID_VNDR	0x09	/* Vendor specific */
 #define  PCI_CAP_ID_DBG		0x0A	/* Debug port */
 #define  PCI_CAP_ID_CCRC	0x0B	/* CompactPCI Central Resource Control */
+#define  PCI_CAP_ID_HOTPLUG	0x0C	/* PCI hot-plug */
 #define  PCI_CAP_ID_SSVID	0x0D	/* Bridge subsystem vendor/device ID */
 #define  PCI_CAP_ID_AGP3	0x0E	/* AGP 8x */
+#define  PCI_CAP_ID_SECURE	0x0F	/* Secure device (?) */
 #define  PCI_CAP_ID_EXP		0x10	/* PCI Express */
 #define  PCI_CAP_ID_MSIX	0x11	/* MSI-X */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
