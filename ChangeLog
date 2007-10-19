@@ -17,6 +17,10 @@
 
 	* lspci.c: Decode the Debug port capability (per EHCI 0.96 spec).
 
+	* lspci.c: Big code cleanup: re-arranged functions in the code,
+	renamed everything related to capabilities to cap_* and
+	all options except verbose to opt_*.
+
 2007-10-14  Martin Mares <mj@ucw.cz>
 
 	* lib/[fno]bsd-*: Removed extraneous braces.

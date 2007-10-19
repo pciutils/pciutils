@@ -17,13 +17,13 @@
 /* Options */
 
 static int verbose;			/* Show detailed information */
-static int buscentric_view;		/* Show bus addresses/IRQ's instead of CPU-visible ones */
-static int show_hex;			/* Show contents of config space as hexadecimal numbers */
+static int opt_buscentric;		/* Show bus addresses/IRQ's instead of CPU-visible ones */
+static int opt_hex;			/* Show contents of config space as hexadecimal numbers */
 static struct pci_filter filter;	/* Device filter */
-static int show_tree;			/* Show bus tree */
-static int machine_readable;		/* Generate machine-readable output */
-static int map_mode;			/* Bus mapping mode enabled */
-static int show_domains;		/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
+static int opt_tree;			/* Show bus tree */
+static int opt_machine;			/* Generate machine-readable output */
+static int opt_map_mode;		/* Bus mapping mode enabled */
+static int opt_domains;			/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
 
 const char program_name[] = "lspci";
 
@@ -49,7 +49,7 @@ Usage: lspci [<switches>]\n\
 GENERIC_HELP
 ;
 
-/* Communication with libpci */
+/*** Communication with libpci ***/
 
 static struct pci_access *pacc;
 
@@ -67,7 +67,7 @@ static struct pci_access *pacc;
 #define alloca xmalloc
 #endif
 
-/* Our view of the PCI bus */
+/*** Our view of the PCI bus ***/
 
 struct device {
   struct device *next;
@@ -113,8 +113,8 @@ scan_device(struct pci_dev *p)
 {
   struct device *d;
 
-  if (p->domain && !show_domains)
-    show_domains = 1;
+  if (p->domain && !opt_domains)
+    opt_domains = 1;
   if (!pci_filter_match(&filter, p))
     return NULL;
   d = xmalloc(sizeof(struct device));
@@ -158,7 +158,7 @@ scan_devices(void)
       }
 }
 
-/* Config space accesses */
+/*** Config space accesses ***/
 
 static void
 check_conf_range(struct device *d, unsigned int pos, unsigned int len)
@@ -194,7 +194,7 @@ get_conf_long(struct device *d, unsigned int pos)
     (d->config[pos+3] << 24);
 }
 
-/* Sorting */
+/*** Sorting ***/
 
 static int
 compare_them(const void *A, const void *B)
@@ -246,7 +246,7 @@ sort_them(void)
   *last_dev = NULL;
 }
 
-/* Normal output */
+/*** Normal output ***/
 
 #define FLAG(x,y) ((x & y) ? '+' : '-')
 
@@ -255,7 +255,7 @@ show_slot_name(struct device *d)
 {
   struct pci_dev *p = d->dev;
 
-  if (!machine_readable ? show_domains : (p->domain || show_domains >= 2))
+  if (!opt_machine ? opt_domains : (p->domain || opt_domains >= 2))
     printf("%04x:", p->domain);
   printf("%02x:%02x.%d", p->bus, p->dev, p->func);
 }
@@ -295,113 +295,10 @@ show_terse(struct device *d)
   putchar('\n');
 }
 
-static void
-show_size(pciaddr_t x)
-{
-  if (!x)
-    return;
-  printf(" [size=");
-  if (x < 1024)
-    printf("%d", (int) x);
-  else if (x < 1048576)
-    printf("%dK", (int)(x / 1024));
-  else if (x < 0x80000000)
-    printf("%dM", (int)(x / 1048576));
-  else
-    printf(PCIADDR_T_FMT, x);
-  putchar(']');
-}
+/*** Capabilities ***/
 
 static void
-show_bases(struct device *d, int cnt)
-{
-  struct pci_dev *p = d->dev;
-  word cmd = get_conf_word(d, PCI_COMMAND);
-  int i;
-
-  for(i=0; i<cnt; i++)
-    {
-      pciaddr_t pos = p->base_addr[i];
-      pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
-      u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-      if (flg == 0xffffffff)
-	flg = 0;
-      if (!pos && !flg && !len)
-	continue;
-      if (verbose > 1)
-	printf("\tRegion %d: ", i);
-      else
-	putchar('\t');
-      if (pos && !flg)			/* Reported by the OS, but not by the device */
-	{
-	  printf("[virtual] ");
-	  flg = pos;
-	}
-      if (flg & PCI_BASE_ADDRESS_SPACE_IO)
-	{
-	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
-	  printf("I/O ports at ");
-	  if (a)
-	    printf(PCIADDR_PORT_FMT, a);
-	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
-	    printf("<ignored>");
-	  else
-	    printf("<unassigned>");
-	  if (!(cmd & PCI_COMMAND_IO))
-	    printf(" [disabled]");
-	}
-      else
-	{
-	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
-	  pciaddr_t a = pos & PCI_ADDR_MEM_MASK;
-	  int done = 0;
-	  u32 z = 0;
-
-	  printf("Memory at ");
-	  if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
-	    {
-	      if (i >= cnt - 1)
-		{
-		  printf("<invalid-64bit-slot>");
-		  done = 1;
-		}
-	      else
-		{
-		  i++;
-		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-		  if (buscentric_view)
-		    {
-		      u32 y = a & 0xffffffff;
-		      if (a || z)
-			printf("%08x%08x", z, y);
-		      else
-			printf("<unassigned>");
-		      done = 1;
-		    }
-		}
-	    }
-	  if (!done)
-	    {
-	      if (a)
-		printf(PCIADDR_T_FMT, a);
-	      else
-		printf(((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
-	    }
-	  printf(" (%s, %sprefetchable)",
-		 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
-		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
-		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
-		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
-	  if (!(cmd & PCI_COMMAND_MEMORY))
-	    printf(" [disabled]");
-	}
-      show_size(len);
-      putchar('\n');
-    }
-}
-
-static void
-show_pm(struct device *d, int where, int cap)
+cap_pm(struct device *d, int where, int cap)
 {
   int t, b;
   static int pm_aux_current[8] = { 0, 55, 100, 160, 220, 270, 320, 375 };
@@ -456,7 +353,7 @@ format_agp_rate(int rate, char *buf, int agp3)
 }
 
 static void
-show_agp(struct device *d, int where, int cap)
+cap_agp(struct device *d, int where, int cap)
 {
   u32 t;
   char rate[16];
@@ -502,7 +399,7 @@ show_agp(struct device *d, int where, int cap)
 }
 
 static void
-show_pcix_nobridge(struct device *d, int where)
+cap_pcix_nobridge(struct device *d, int where)
 {
   u16 command;
   u32 status;
@@ -541,7 +438,7 @@ show_pcix_nobridge(struct device *d, int where)
 }
 
 static void
-show_pcix_bridge(struct device *d, int where)
+cap_pcix_bridge(struct device *d, int where)
 {
   static const char * const sec_clock_freq[8] = { "conv", "66MHz", "100MHz", "133MHz", "?4", "?5", "?6", "?7" };
   u16 secstatus;
@@ -586,15 +483,15 @@ show_pcix_bridge(struct device *d, int where)
 }
 
 static void
-show_pcix(struct device *d, int where)
+cap_pcix(struct device *d, int where)
 {
   switch (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f)
     {
     case PCI_HEADER_TYPE_NORMAL:
-      show_pcix_nobridge(d, where);
+      cap_pcix_nobridge(d, where);
       break;
     case PCI_HEADER_TYPE_BRIDGE:
-      show_pcix_bridge(d, where);
+      cap_pcix_bridge(d, where);
       break;
     }
 }
@@ -615,7 +512,7 @@ ht_link_freq(unsigned freq)
 }
 
 static void
-show_ht_pri(struct device *d, int where, int cmd)
+cap_ht_pri(struct device *d, int where, int cmd)
 {
   u16 lctr0, lcnf0, lctr1, lcnf1, eh;
   u8 rid, lfrer0, lfcap0, ftr, lfrer1, lfcap1, mbu, mlu, bn;
@@ -783,7 +680,7 @@ show_ht_pri(struct device *d, int where, int cmd)
 }
 
 static void
-show_ht_sec(struct device *d, int where, int cmd)
+cap_ht_sec(struct device *d, int where, int cmd)
 {
   u16 lctr, lcnf, ftr, eh;
   u8 rid, lfrer, lfcap, mbu, mlu;
@@ -905,17 +802,17 @@ show_ht_sec(struct device *d, int where, int cmd)
 }
 
 static void
-show_ht(struct device *d, int where, int cmd)
+cap_ht(struct device *d, int where, int cmd)
 {
   int type;
 
   switch (cmd & PCI_HT_CMD_TYP_HI)
     {
     case PCI_HT_CMD_TYP_HI_PRI:
-      show_ht_pri(d, where, cmd);
+      cap_ht_pri(d, where, cmd);
       return;
     case PCI_HT_CMD_TYP_HI_SEC:
-      show_ht_sec(d, where, cmd);
+      cap_ht_sec(d, where, cmd);
       return;
     }
 
@@ -973,39 +870,7 @@ show_ht(struct device *d, int where, int cmd)
 }
 
 static void
-show_rom(struct device *d, int reg)
-{
-  struct pci_dev *p = d->dev;
-  pciaddr_t rom = p->rom_base_addr;
-  pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
-  u32 flg = get_conf_long(d, reg);
-  word cmd = get_conf_word(d, PCI_COMMAND);
-
-  if (!rom && !flg && !len)
-    return;
-  putchar('\t');
-  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
-    {
-      printf("[virtual] ");
-      flg = rom;
-    }
-  printf("Expansion ROM at ");
-  if (rom & PCI_ROM_ADDRESS_MASK)
-    printf(PCIADDR_T_FMT, rom & PCI_ROM_ADDRESS_MASK);
-  else if (flg & PCI_ROM_ADDRESS_MASK)
-    printf("<ignored>");
-  else
-    printf("<unassigned>");
-  if (!(flg & PCI_ROM_ADDRESS_ENABLE))
-    printf(" [disabled]");
-  else if (!(cmd & PCI_COMMAND_MEMORY))
-    printf(" [disabled by cmd]");
-  show_size(len);
-  putchar('\n');
-}
-
-static void
-show_msi(struct device *d, int where, int cap)
+cap_msi(struct device *d, int where, int cap)
 {
   int is64;
   u32 t;
@@ -1073,7 +938,7 @@ static const char *latency_l1(int value)
   return latencies[value];
 }
 
-static void show_express_dev(struct device *d, int where, int type)
+static void cap_express_dev(struct device *d, int where, int type)
 {
   u32 t;
   u16 w;
@@ -1163,7 +1028,7 @@ static const char *aspm_enabled(int code)
   return desc[code];
 }
 
-static void show_express_link(struct device *d, int where, int type)
+static void cap_express_link(struct device *d, int where, int type)
 {
   u32 t;
   u16 w;
@@ -1214,7 +1079,7 @@ static const char *indicator(int code)
   return names[code];
 }
 
-static void show_express_slot(struct device *d, int where)
+static void cap_express_slot(struct device *d, int where)
 {
   u32 t;
   u16 w;
@@ -1263,7 +1128,7 @@ static void show_express_slot(struct device *d, int where)
 	FLAG(w, PCI_EXP_SLTSTA_LLCHG));
 }
 
-static void show_express_root(struct device *d, int where)
+static void cap_express_root(struct device *d, int where)
 {
   u32 w = get_conf_word(d, where + PCI_EXP_RTCTL);
   printf("\t\tRootCtl: ErrCorrectable%c ErrNon-Fatal%c ErrFatal%c PMEIntEna%c CRSVisible%c\n",
@@ -1285,7 +1150,7 @@ static void show_express_root(struct device *d, int where)
 }
 
 static void
-show_express(struct device *d, int where, int cap)
+cap_express(struct device *d, int where, int cap)
 {
   int type = (cap & PCI_EXP_FLAGS_TYPE) >> 4;
   int size;
@@ -1340,16 +1205,16 @@ show_express(struct device *d, int where, int cap)
   if (!config_fetch(d, where + PCI_EXP_DEVCAP, size))
     return;
 
-  show_express_dev(d, where, type);
-  show_express_link(d, where, type);
+  cap_express_dev(d, where, type);
+  cap_express_link(d, where, type);
   if (slot)
-    show_express_slot(d, where);
+    cap_express_slot(d, where);
   if (type == PCI_EXP_TYPE_ROOT_PORT)
-    show_express_root(d, where);
+    cap_express_root(d, where);
 }
 
 static void
-show_msix(struct device *d, int where, int cap)
+cap_msix(struct device *d, int where, int cap)
 {
   u32 off;
 
@@ -1369,7 +1234,7 @@ show_msix(struct device *d, int where, int cap)
 }
 
 static void
-show_slotid(int cap)
+cap_slotid(int cap)
 {
   int esr = cap & 0xff;
   int chs = cap >> 8;
@@ -1381,7 +1246,7 @@ show_slotid(int cap)
 }
 
 static void
-show_ssvid(struct device *d, int where)
+cap_ssvid(struct device *d, int where)
 {
   u16 subsys_v, subsys_d;
   char ssnamebuf[256];
@@ -1397,7 +1262,7 @@ show_ssvid(struct device *d, int where)
 }
 
 static void
-show_dsn(struct device *d, int where)
+cap_dsn(struct device *d, int where)
 {
   u32 t1, t2;
   if (!config_fetch(d, where + 4, 8))
@@ -1410,7 +1275,7 @@ show_dsn(struct device *d, int where)
 }
 
 static void
-show_debug_port(int cap)
+cap_debug_port(int cap)
 {
   int bar = cap >> 13;
   int pos = cap & 0x1fff;
@@ -1449,7 +1314,7 @@ show_ext_caps(struct device *d)
 	    printf("Virtual Channel <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_DSN:
-	    show_dsn(d, where);
+	    cap_dsn(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_PB:
 	    printf("Power Budgeting <?>\n");
@@ -1519,35 +1384,35 @@ show_caps(struct device *d)
 	  switch (id)
 	    {
 	    case PCI_CAP_ID_PM:
-	      show_pm(d, where, cap);
+	      cap_pm(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_AGP:
-	      show_agp(d, where, cap);
+	      cap_agp(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_VPD:
 	      printf("Vital Product Data <?>\n");
 	      break;
 	    case PCI_CAP_ID_SLOTID:
-	      show_slotid(cap);
+	      cap_slotid(cap);
 	      break;
 	    case PCI_CAP_ID_MSI:
-	      show_msi(d, where, cap);
+	      cap_msi(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_CHSWP:
 	      printf("CompactPCI hot-swap <?>\n");
 	      break;
 	    case PCI_CAP_ID_PCIX:
-	      show_pcix(d, where);
+	      cap_pcix(d, where);
 	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_HT:
-	      show_ht(d, where, cap);
+	      cap_ht(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_VNDR:
 	      printf("Vendor Specific Information <?>\n");
 	      break;
 	    case PCI_CAP_ID_DBG:
-	      show_debug_port(cap);
+	      cap_debug_port(cap);
 	      break;
 	    case PCI_CAP_ID_CCRC:
 	      printf("CompactPCI central resource control <?>\n");
@@ -1556,7 +1421,7 @@ show_caps(struct device *d)
 	      printf("Hot-plug capable\n");
 	      break;
 	    case PCI_CAP_ID_SSVID:
-	      show_ssvid(d, where);
+	      cap_ssvid(d, where);
 	      break;
 	    case PCI_CAP_ID_AGP3:
 	      printf("AGP3 <?>\n");
@@ -1565,11 +1430,11 @@ show_caps(struct device *d)
 	      printf("Secure device <?>\n");
 	      break;
 	    case PCI_CAP_ID_EXP:
-	      show_express(d, where, cap);
+	      cap_express(d, where, cap);
 	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_MSIX:
-	      show_msix(d, where, cap);
+	      cap_msix(d, where, cap);
 	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);
@@ -1579,6 +1444,145 @@ show_caps(struct device *d)
     }
   if (can_have_ext_caps)
     show_ext_caps(d);
+}
+
+/*** Verbose output ***/
+
+static void
+show_size(pciaddr_t x)
+{
+  if (!x)
+    return;
+  printf(" [size=");
+  if (x < 1024)
+    printf("%d", (int) x);
+  else if (x < 1048576)
+    printf("%dK", (int)(x / 1024));
+  else if (x < 0x80000000)
+    printf("%dM", (int)(x / 1048576));
+  else
+    printf(PCIADDR_T_FMT, x);
+  putchar(']');
+}
+
+static void
+show_bases(struct device *d, int cnt)
+{
+  struct pci_dev *p = d->dev;
+  word cmd = get_conf_word(d, PCI_COMMAND);
+  int i;
+
+  for(i=0; i<cnt; i++)
+    {
+      pciaddr_t pos = p->base_addr[i];
+      pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
+      u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+      if (flg == 0xffffffff)
+	flg = 0;
+      if (!pos && !flg && !len)
+	continue;
+      if (verbose > 1)
+	printf("\tRegion %d: ", i);
+      else
+	putchar('\t');
+      if (pos && !flg)			/* Reported by the OS, but not by the device */
+	{
+	  printf("[virtual] ");
+	  flg = pos;
+	}
+      if (flg & PCI_BASE_ADDRESS_SPACE_IO)
+	{
+	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
+	  printf("I/O ports at ");
+	  if (a)
+	    printf(PCIADDR_PORT_FMT, a);
+	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
+	    printf("<ignored>");
+	  else
+	    printf("<unassigned>");
+	  if (!(cmd & PCI_COMMAND_IO))
+	    printf(" [disabled]");
+	}
+      else
+	{
+	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
+	  pciaddr_t a = pos & PCI_ADDR_MEM_MASK;
+	  int done = 0;
+	  u32 z = 0;
+
+	  printf("Memory at ");
+	  if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
+	    {
+	      if (i >= cnt - 1)
+		{
+		  printf("<invalid-64bit-slot>");
+		  done = 1;
+		}
+	      else
+		{
+		  i++;
+		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+		  if (opt_buscentric)
+		    {
+		      u32 y = a & 0xffffffff;
+		      if (a || z)
+			printf("%08x%08x", z, y);
+		      else
+			printf("<unassigned>");
+		      done = 1;
+		    }
+		}
+	    }
+	  if (!done)
+	    {
+	      if (a)
+		printf(PCIADDR_T_FMT, a);
+	      else
+		printf(((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
+	    }
+	  printf(" (%s, %sprefetchable)",
+		 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
+		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
+		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
+		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
+	  if (!(cmd & PCI_COMMAND_MEMORY))
+	    printf(" [disabled]");
+	}
+      show_size(len);
+      putchar('\n');
+    }
+}
+
+static void
+show_rom(struct device *d, int reg)
+{
+  struct pci_dev *p = d->dev;
+  pciaddr_t rom = p->rom_base_addr;
+  pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
+  u32 flg = get_conf_long(d, reg);
+  word cmd = get_conf_word(d, PCI_COMMAND);
+
+  if (!rom && !flg && !len)
+    return;
+  putchar('\t');
+  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
+    {
+      printf("[virtual] ");
+      flg = rom;
+    }
+  printf("Expansion ROM at ");
+  if (rom & PCI_ROM_ADDRESS_MASK)
+    printf(PCIADDR_T_FMT, rom & PCI_ROM_ADDRESS_MASK);
+  else if (flg & PCI_ROM_ADDRESS_MASK)
+    printf("<ignored>");
+  else
+    printf("<unassigned>");
+  if (!(flg & PCI_ROM_ADDRESS_ENABLE))
+    printf(" [disabled]");
+  else if (!(cmd & PCI_COMMAND_MEMORY))
+    printf(" [disabled by cmd]");
+  show_size(len);
+  putchar('\n');
 }
 
 static void
@@ -1915,16 +1919,18 @@ show_verbose(struct device *d)
     }
 }
 
+/*** Machine-readable dumps ***/
+
 static void
 show_hex_dump(struct device *d)
 {
   unsigned int i, cnt;
 
   cnt = d->config_cached;
-  if (show_hex >= 3 && config_fetch(d, cnt, 256-cnt))
+  if (opt_hex >= 3 && config_fetch(d, cnt, 256-cnt))
     {
       cnt = 256;
-      if (show_hex >= 4 && config_fetch(d, 256, 4096-256))
+      if (opt_hex >= 4 && config_fetch(d, 256, 4096-256))
 	cnt = 4096;
     }
 
@@ -1976,7 +1982,7 @@ show_machine(struct device *d)
 
   if (verbose)
     {
-      printf((machine_readable >= 2) ? "Slot:\t" : "Device:\t");
+      printf((opt_machine >= 2) ? "Slot:\t" : "Device:\t");
       show_slot_name(d);
       putchar('\n');
       printf("Class:\t%s\n",
@@ -2018,18 +2024,20 @@ show_machine(struct device *d)
     }
 }
 
+/*** Main show function ***/
+
 static void
 show_device(struct device *d)
 {
-  if (machine_readable)
+  if (opt_machine)
     show_machine(d);
   else if (verbose)
     show_verbose(d);
   else
     show_terse(d);
-  if (show_hex)
+  if (opt_hex)
     show_hex_dump(d);
-  if (verbose || show_hex)
+  if (verbose || opt_hex)
     putchar('\n');
 }
 
@@ -2042,7 +2050,7 @@ show(void)
     show_device(d);
 }
 
-/* Tree output */
+/*** Tree output ***/
 
 struct bridge {
   struct bridge *chain;			/* Single-linked list of bridges */
@@ -2288,7 +2296,7 @@ show_forest(void)
   show_tree_bridge(&host_bridge, line, line);
 }
 
-/* Bus mapping mode */
+/*** Bus mapping mode ***/
 
 struct bus_bridge {
   struct bus_bridge *next;
@@ -2486,7 +2494,7 @@ main(int argc, char **argv)
 	break;
       case 'b':
 	pacc->buscentric = 1;
-	buscentric_view = 1;
+	opt_buscentric = 1;
 	break;
       case 's':
 	if (msg = pci_filter_parse_slot(&filter, optarg))
@@ -2497,22 +2505,22 @@ main(int argc, char **argv)
 	  die("-d: %s", msg);
 	break;
       case 'x':
-	show_hex++;
+	opt_hex++;
 	break;
       case 't':
-	show_tree++;
+	opt_tree++;
 	break;
       case 'i':
         pci_set_name_list_path(pacc, optarg, 0);
 	break;
       case 'm':
-	machine_readable++;
+	opt_machine++;
 	break;
       case 'M':
-	map_mode++;
+	opt_map_mode++;
 	break;
       case 'D':
-	show_domains = 2;
+	opt_domains = 2;
 	break;
       default:
 	if (parse_generic_option(i, pacc, optarg))
@@ -2525,13 +2533,13 @@ main(int argc, char **argv)
     goto bad;
 
   pci_init(pacc);
-  if (map_mode)
+  if (opt_map_mode)
     map_the_bus();
   else
     {
       scan_devices();
       sort_them();
-      if (show_tree)
+      if (opt_tree)
 	show_forest();
       else
 	show();
