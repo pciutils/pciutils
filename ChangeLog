@@ -1,5 +1,7 @@
 2007-10-19  Martin Mares <mj@ucw.cz>
 
+	* Released as 2.2.8.
+
 	* pci.ids: Revised class codes to match Conventional PCI 3.0 specs.
 	Added a couple of new ones, renumbered `ADMA continuous operation'
 	prog-if to 0x30 (even the old SATA Class Code ECN doesn't mention
