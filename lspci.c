@@ -24,10 +24,11 @@ static int opt_tree;			/* Show bus tree */
 static int opt_machine;			/* Generate machine-readable output */
 static int opt_map_mode;		/* Bus mapping mode enabled */
 static int opt_domains;			/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
+static char *opt_pcimap;		/* Override path to Linux modules.pcimap */
 
 const char program_name[] = "lspci";
 
-static char options[] = "nvbxs:d:ti:mgMD" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:ti:mgp:MD" GENERIC_OPTIONS ;
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -43,7 +44,12 @@ Usage: lspci [<switches>]\n\
 -d [<vendor>]:[<device>]\tShow only selected devices\n\
 -t\t\tShow bus tree\n\
 -m\t\tProduce machine-readable output\n\
--i <file>\tUse specified ID database instead of %s\n\
+-i <file>\tUse specified ID database instead of %s\n"
+#ifdef PCI_OS_LINUX
+"\
+-p <file>\tLook up kernel modules in a given file instead of default modules.pcimap\n"
+#endif
+"\
 -D\t\tAlways show domain numbers\n\
 -M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
 GENERIC_HELP
@@ -293,6 +299,25 @@ show_terse(struct device *d)
 	}
     }
   putchar('\n');
+}
+
+static void
+get_subid(struct device *d, word *subvp, word *subdp)
+{
+  byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+
+  if (htype == PCI_HEADER_TYPE_NORMAL)
+    {
+      *subvp = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
+      *subdp = get_conf_word(d, PCI_SUBSYSTEM_ID);
+    }
+  else if (htype == PCI_HEADER_TYPE_CARDBUS && d->config_cached >= 128)
+    {
+      *subvp = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+      *subdp = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+    }
+  else
+    *subvp = *subdp = 0xffff;
 }
 
 /*** Capabilities ***/
@@ -1452,6 +1477,163 @@ show_caps(struct device *d)
     show_ext_caps(d);
 }
 
+/*** Kernel drivers ***/
+
+#ifdef PCI_OS_LINUX
+
+#include <sys/utsname.h>
+
+struct pcimap_entry {
+  struct pcimap_entry *next;
+  unsigned int vendor, device;
+  unsigned int subvendor, subdevice;
+  unsigned int class, class_mask;
+  char module[1];
+};
+
+static struct pcimap_entry *pcimap_head;
+
+static void
+load_pcimap(void)
+{
+  static int tried_pcimap;
+  struct utsname uts;
+  char *name, line[1024];
+  FILE *f;
+
+  if (tried_pcimap)
+    return;
+  tried_pcimap = 1;
+
+  if (name = opt_pcimap)
+    {
+      f = fopen(name, "r");
+      if (!f)
+	die("Cannot open pcimap file %s: %m", name);
+    }
+  else
+    {
+      if (uname(&uts) < 0)
+	die("uname() failed: %m");
+      name = alloca(64 + strlen(uts.release));
+      sprintf(name, "/lib/modules/%s/modules.pcimap", uts.release);
+      f = fopen(name, "r");
+      if (!f)
+	return;
+    }
+
+  while (fgets(line, sizeof(line), f))
+    {
+      char *c = strchr(line, '\n');
+      struct pcimap_entry *e;
+
+      if (!c)
+	die("Unterminated or too long line in %s", name);
+      *c = 0;
+      if (!line[0] || line[0] == '#')
+	continue;
+
+      c = line;
+      while (*c && *c != ' ' && *c != '\t')
+	c++;
+      if (!*c)
+	continue;	/* FIXME: Emit warnings! */
+      *c++ = 0;
+
+      e = xmalloc(sizeof(*e) + strlen(line));
+      if (sscanf(c, "%i%i%i%i%i%i",
+		 &e->vendor, &e->device,
+		 &e->subvendor, &e->subdevice,
+		 &e->class, &e->class_mask) != 6)
+	continue;
+      e->next = pcimap_head;
+      pcimap_head = e;
+      strcpy(e->module, line);
+    }
+  fclose(f);
+}
+
+static int
+match_pcimap(struct device *d, struct pcimap_entry *e)
+{
+  struct pci_dev *dev = d->dev;
+  unsigned int class = get_conf_long(d, PCI_REVISION_ID) >> 8;
+  word subv, subd;
+
+#define MATCH(x, y) ((y) > 0xffff || (x) == (y))
+  get_subid(d, &subv, &subd);
+  return
+    MATCH(dev->vendor_id, e->vendor) &&
+    MATCH(dev->device_id, e->device) &&
+    MATCH(subv, e->subvendor) &&
+    MATCH(subd, e->subdevice) &&
+    (class & e->class_mask) == e->class;
+#undef MATCH
+}
+
+static void
+show_driver(struct device *d)
+{
+  struct pci_dev *dev = d->dev;
+  char *base = dev->access->method_params[PCI_ACCESS_SYS_BUS_PCI];
+  char name[1024], driver[1024], *drv;
+  int n;
+
+  if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
+    return;
+
+  n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",
+	       base, dev->domain, dev->bus, dev->dev, dev->func);
+  if (n < 0 || n >= 1024)
+    die("show_driver: sysfs device name too long, why?");
+
+  n = readlink(name, driver, sizeof(driver));
+  if (n < 0)
+    return;
+  if (n >= (int)sizeof(driver))
+    {
+      printf("\t!!! Driver name too long\n");
+      return;
+    }
+  driver[n] = 0;
+
+  if (drv = strrchr(driver, '/'))
+    drv++;
+  else
+    drv = driver;
+  printf("\tKernel driver in use: %s\n", drv);
+}
+
+static void
+show_module(struct device *d)
+{
+  struct pcimap_entry *e, *last = NULL;
+
+  load_pcimap();
+  for (e=pcimap_head; e; e=e->next)
+    if (match_pcimap(d, e) && (!last || strcmp(last->module, e->module)))
+      {
+	printf("%s %s", (last ? "," : "\tKernel modules:"), e->module);
+	last = e;
+      }
+  if (last)
+    putchar('\n');
+}
+
+#else
+
+static void
+show_driver(void)
+{
+}
+
+static void
+show_module(void)
+{
+}
+
+#endif
+
 /*** Verbose output ***/
 
 static void
@@ -1772,39 +1954,6 @@ show_htype2(struct device *d)
 }
 
 static void
-show_driver(struct device *d)
-{
-  struct pci_dev *dev = d->dev;
-  char *base = dev->access->method_params[PCI_ACCESS_SYS_BUS_PCI];
-  char name[1024], driver[1024], *drv;
-  int n;
-
-  if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
-    return;
-
-  n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",
-	       base, dev->domain, dev->bus, dev->dev, dev->func);
-  if (n < 0 || n >= 1024)
-    die("show_driver: sysfs device name too long, why?");
-
-  n = readlink(name, driver, sizeof(driver));
-  if (n < 0)
-    return;
-  if (n >= (int)sizeof(driver))
-    {
-      printf("\t!!! Driver name too long\n");
-      return;
-    }
-  driver[n] = 0;
-
-  if (drv = strrchr(driver, '/'))
-    drv++;
-  else
-    drv = driver;
-  printf("\tKernel driver: %s\n", drv);
-}
-
-static void
 show_verbose(struct device *d)
 {
   struct pci_dev *p = d->dev;
@@ -1818,7 +1967,7 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   unsigned int irq = p->irq;
-  word subsys_v = 0, subsys_d = 0;
+  word subsys_v, subsys_d;
   char ssnamebuf[256];
 
   show_terse(d);
@@ -1830,8 +1979,6 @@ show_verbose(struct device *d)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       max_lat = get_conf_byte(d, PCI_MAX_LAT);
       min_gnt = get_conf_byte(d, PCI_MIN_GNT);
-      subsys_v = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
-      subsys_d = get_conf_word(d, PCI_SUBSYSTEM_ID);
       break;
     case PCI_HEADER_TYPE_BRIDGE:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
@@ -1842,17 +1989,13 @@ show_verbose(struct device *d)
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
       min_gnt = max_lat = 0;
-      if (d->config_cached >= 128)
-	{
-	  subsys_v = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-	  subsys_d = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
-	}
       break;
     default:
       printf("\t!!! Unknown header type %02x\n", htype);
       return;
     }
 
+  get_subid(d, &subsys_v, &subsys_d);
   if (subsys_v && subsys_v != 0xffff)
     printf("\tSubsystem: %s\n",
 	   pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
@@ -1958,6 +2101,7 @@ show_verbose(struct device *d)
     }
 
   show_driver(d);
+  show_module(d);
 }
 
 /*** Machine-readable dumps ***/
@@ -2003,23 +2147,10 @@ show_machine(struct device *d)
 {
   struct pci_dev *p = d->dev;
   int c;
-  word sv_id=0, sd_id=0;
+  word sv_id, sd_id;
   char classbuf[128], vendbuf[128], devbuf[128], svbuf[128], sdbuf[128];
 
-  switch (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f)
-    {
-    case PCI_HEADER_TYPE_NORMAL:
-      sv_id = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
-      sd_id = get_conf_word(d, PCI_SUBSYSTEM_ID);
-      break;
-    case PCI_HEADER_TYPE_CARDBUS:
-      if (d->config_cached >= 128)
-	{
-	  sv_id = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-	  sd_id = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
-	}
-      break;
-    }
+  get_subid(d, &sv_id, &sd_id);
 
   if (verbose)
     {
@@ -2556,6 +2687,9 @@ main(int argc, char **argv)
 	break;
       case 'm':
 	opt_machine++;
+	break;
+      case 'p':
+	opt_pcimap = optarg;
 	break;
       case 'M':
 	opt_map_mode++;
