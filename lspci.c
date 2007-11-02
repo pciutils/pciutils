@@ -1772,6 +1772,39 @@ show_htype2(struct device *d)
 }
 
 static void
+show_driver(struct device *d)
+{
+  struct pci_dev *dev = d->dev;
+  char *base = dev->access->method_params[PCI_ACCESS_SYS_BUS_PCI];
+  char name[1024], driver[1024], *drv;
+  int n;
+
+  if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
+    return;
+
+  n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",
+	       base, dev->domain, dev->bus, dev->dev, dev->func);
+  if (n < 0 || n >= 1024)
+    die("show_driver: sysfs device name too long, why?");
+
+  n = readlink(name, driver, sizeof(driver));
+  if (n < 0)
+    return;
+  if (n >= (int)sizeof(driver))
+    {
+      printf("\t!!! Driver name too long\n");
+      return;
+    }
+  driver[n] = 0;
+
+  if (drv = strrchr(driver, '/'))
+    drv++;
+  else
+    drv = driver;
+  printf("\tKernel driver: %s\n", drv);
+}
+
+static void
 show_verbose(struct device *d)
 {
   struct pci_dev *p = d->dev;
@@ -1923,6 +1956,8 @@ show_verbose(struct device *d)
       show_htype2(d);
       break;
     }
+
+  show_driver(d);
 }
 
 /*** Machine-readable dumps ***/
