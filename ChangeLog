@@ -1,3 +1,13 @@
+2007-11-06  Martin Mares <mj@ucw.cz>
+
+	* lspci.c: Added a new switch `-k' which requests printing
+	of information on kernel drivers attached to each device
+	and on kernel modules reporting the ability to handle the
+	device. So far, this is supported only on Linux with the
+	sysfs back-end, so it is implemented internally in the lspci
+	instead of the libpci. Thanks to Anicka <anicka@anicka.net>
+	for help.
+
 2007-10-19  Martin Mares <mj@ucw.cz>
 
 	* Makefile, lib/Makefile: Moved -lz from LDFLAGS to LDLIBS.

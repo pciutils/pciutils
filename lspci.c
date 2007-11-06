@@ -24,11 +24,12 @@ static int opt_tree;			/* Show bus tree */
 static int opt_machine;			/* Generate machine-readable output */
 static int opt_map_mode;		/* Bus mapping mode enabled */
 static int opt_domains;			/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
+static int opt_kernel;			/* Show kernel drivers */
 static char *opt_pcimap;		/* Override path to Linux modules.pcimap */
 
 const char program_name[] = "lspci";
 
-static char options[] = "nvbxs:d:ti:mgp:MD" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:ti:mgp:kMD" GENERIC_OPTIONS ;
 
 static char help_msg[] = "\
 Usage: lspci [<switches>]\n\
@@ -47,6 +48,7 @@ Usage: lspci [<switches>]\n\
 -i <file>\tUse specified ID database instead of %s\n"
 #ifdef PCI_OS_LINUX
 "\
+-k\t\tShow kernel drivers handling each device\n\
 -p <file>\tLook up kernel modules in a given file instead of default modules.pcimap\n"
 #endif
 "\
@@ -1571,43 +1573,46 @@ match_pcimap(struct device *d, struct pcimap_entry *e)
 #undef MATCH
 }
 
-static void
-show_driver(struct device *d)
+#define DRIVER_BUF_SIZE 1024
+
+static char *
+find_driver(struct device *d, char *buf)
 {
   struct pci_dev *dev = d->dev;
   char *base = dev->access->method_params[PCI_ACCESS_SYS_BUS_PCI];
-  char name[1024], driver[1024], *drv;
+  char name[1024], *drv;
   int n;
 
   if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
-    return;
+    return NULL;
 
   n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",
 	       base, dev->domain, dev->bus, dev->dev, dev->func);
-  if (n < 0 || n >= 1024)
+  if (n < 0 || n >= (int)sizeof(name))
     die("show_driver: sysfs device name too long, why?");
 
-  n = readlink(name, driver, sizeof(driver));
+  n = readlink(name, buf, DRIVER_BUF_SIZE);
   if (n < 0)
-    return;
-  if (n >= (int)sizeof(driver))
-    {
-      printf("\t!!! Driver name too long\n");
-      return;
-    }
-  driver[n] = 0;
+    return NULL;
+  if (n >= DRIVER_BUF_SIZE)
+    return "<name-too-long>";
+  buf[n] = 0;
 
-  if (drv = strrchr(driver, '/'))
-    drv++;
+  if (drv = strrchr(buf, '/'))
+    return drv+1;
   else
-    drv = driver;
-  printf("\tKernel driver in use: %s\n", drv);
+    return buf;
 }
 
 static void
-show_module(struct device *d)
+show_kernel(struct device *d)
 {
+  char buf[DRIVER_BUF_SIZE];
+  char *driver;
   struct pcimap_entry *e, *last = NULL;
+
+  if (driver = find_driver(d, buf))
+    printf("\tKernel driver in use: %s\n", driver);
 
   load_pcimap();
   for (e=pcimap_head; e; e=e->next)
@@ -1620,15 +1625,34 @@ show_module(struct device *d)
     putchar('\n');
 }
 
+static void
+show_kernel_machine(struct device *d)
+{
+  char buf[DRIVER_BUF_SIZE];
+  char *driver;
+  struct pcimap_entry *e, *last = NULL;
+
+  if (driver = find_driver(d, buf))
+    printf("Driver:\t%s\n", driver);
+
+  load_pcimap();
+  for (e=pcimap_head; e; e=e->next)
+    if (match_pcimap(d, e) && (!last || strcmp(last->module, e->module)))
+      {
+	printf("Module:\t%s\n", e->module);
+	last = e;
+      }
+}
+
 #else
 
 static void
-show_driver(void)
+show_kernel(struct device *d UNUSED)
 {
 }
 
 static void
-show_module(void)
+show_kernel_machine(struct device *d UNUSED)
 {
 }
 
@@ -2099,9 +2123,6 @@ show_verbose(struct device *d)
       show_htype2(d);
       break;
     }
-
-  show_driver(d);
-  show_module(d);
 }
 
 /*** Machine-readable dumps ***/
@@ -2174,6 +2195,8 @@ show_machine(struct device *d)
 	printf("Rev:\t%02x\n", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))
 	printf("ProgIf:\t%02x\n", c);
+      if (opt_kernel)
+	show_kernel_machine(d);
     }
   else
     {
@@ -2203,10 +2226,15 @@ show_device(struct device *d)
 {
   if (opt_machine)
     show_machine(d);
-  else if (verbose)
-    show_verbose(d);
   else
-    show_terse(d);
+    {
+      if (verbose)
+	show_verbose(d);
+      else
+	show_terse(d);
+      if (opt_kernel || verbose)
+	show_kernel(d);
+    }
   if (opt_hex)
     show_hex_dump(d);
   if (verbose || opt_hex)
@@ -2690,6 +2718,9 @@ main(int argc, char **argv)
 	break;
       case 'p':
 	opt_pcimap = optarg;
+	break;
+      case 'k':
+	opt_kernel++;
 	break;
       case 'M':
 	opt_map_mode++;

@@ -73,6 +73,13 @@ devices are rare, so you needn't worry much.
 Show hexadecimal dump of the extended (4096-byte) PCI configuration space available
 on PCI-X 2.0 and PCI Express buses.
 .TP
+.B -k
+Show kernel drivers handling each device and also kernel modules capable of handling it.
+Turned on by default when
+.B -v
+is given in the normal mode of output.
+(Currently works only on Linux with kernel 2.6 or newer.)
+.TP
 .B -b
 Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
 PCI bus instead of as seen by the kernel.
@@ -99,6 +106,14 @@ Use
 .B
 <file>
 as the PCI ID list instead of @IDSDIR@/pci.ids.
+.TP
+.B -p <file>
+Use
+.B
+<file>
+as the map of PCI ID's handled by kernel modules. By default, lspci uses
+.RI /lib/modules/ kernel_version /modules.pcimap.
+Applies only to Linux systems with recent enough module tools.
 .TP
 .B -m
 Dump PCI device data in a backward-compatible machine readable form.
@@ -134,7 +149,8 @@ the following access methods:
 The
 .B /sys
 filesystem on Linux 2.6 and newer. The standard header of the config space is available
-to all users, the rest only to root. Supports extended configuration space and PCI domains.
+to all users, the rest only to root. Supports extended configuration space, PCI domains
+and information on attached kernel drivers.
 .TP
 .B linux_proc
 The
@@ -284,6 +300,15 @@ Revision number (optional).
 .TP
 .B ProgIf
 Programming interface (optional).
+
+.TP
+.B Driver
+Kernel driver currently handling the device (optional, Linux only).
+
+.TP
+.B Module
+Kernel module reporting that it is capable of handling the device
+(optional, Linux only).
 
 .P
 New tags can be added in future versions, so you should silently ignore any tags you don't recognize.
