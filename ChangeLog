@@ -1,5 +1,7 @@
 2007-11-06  Martin Mares <mj@ucw.cz>
 
+	* Released as 2.2.9.
+
 	* lspci.c: Added a new switch `-k' which requests printing
 	of information on kernel drivers attached to each device
 	and on kernel modules reporting the ability to handle the
