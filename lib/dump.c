@@ -41,7 +41,7 @@ dump_validate(char *s, char *fmt)
     {
       if (*fmt == '#' ? !isxdigit(*s) : *fmt != *s)
 	return 0;
-      *fmt++, *s++;
+      fmt++, s++;
     }
   return 1;
 }

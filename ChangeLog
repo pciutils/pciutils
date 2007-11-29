@@ -1,3 +1,8 @@
+2007-11-29  Martin Mares <mj@ucw.cz>
+
+	* lib/dump.c: Squashed compiler warnings about code with
+	no effect (there really were surplus *'s).
+
 2007-11-06  Martin Mares <mj@ucw.cz>
 
 	* Released as 2.2.9.
