@@ -1,3 +1,11 @@
+2008-01-07  Martin Mares <mj@ucw.cz>
+
+	* update-pciids.sh: Added quiet mode (-q). Clean up uncompressed
+	files left by previous versions of the pciutils. Patch by Mike
+	Frysinger.
+
+	* update-pciids.man: Mention the -q switch.
+
 2007-11-29  Martin Mares <mj@ucw.cz>
 
 	* lib/dump.c: Squashed compiler warnings about code with

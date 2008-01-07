@@ -6,6 +6,7 @@ update-pciids \- download new version of the PCI ID list
 
 .SH SYNOPSIS
 .B update-pciids
+.RB [ -q ]
 
 .SH DESCRIPTION
 .B update-pciids
@@ -14,6 +15,11 @@ site and installs it.
 
 This utility requires curl, wget or lynx to be installed. If gzip or bzip2
 are available, it automatically downloads the compressed version of the list.
+
+.SH OPTIONS
+.TP
+.B -q
+Be quiet and do not report anything except errors.
 
 .SH FILES
 .TP
