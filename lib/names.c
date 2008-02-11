@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -43,9 +43,10 @@ static pci_file pci_open(struct pci_access *a)
 #define PCI_ERROR(f, err)						\
 	if (!err) {							\
 		int errnum;						\
-		err = gzerror(f, &errnum);				\
-		if (errnum == Z_ERRNO)	err = "I/O error";		\
-		else if (errnum >= 0)	err = NULL;			\
+		gzerror(f, &errnum);					\
+		if (errnum >= 0) err = NULL;				\
+		else if (errnum == Z_ERRNO) err = "I/O error";		\
+		else err = zError(errnum);				\
 	}
 #else
 typedef FILE * pci_file;
