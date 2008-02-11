@@ -1,5 +1,7 @@
 2008-02-11  Martin Mares <mj@ucw.cz>
 
+	* lspci.c, setpci.c: Cleaned up the list of options.
+
 	* lib/names.c: Fix displaying of errors reported by zlib.
 	Previously, the buffer containing the error message had
 	been deallocated by gzclose() before the message was printed.
