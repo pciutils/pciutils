@@ -1,9 +1,9 @@
 # Makefile for The PCI Library
-# (c) 1999--2007 Martin Mares <mj@ucw.cz>
+# (c) 1999--2008 Martin Mares <mj@ucw.cz>
 
 include config.mk
 
-OBJS=access.o generic.o dump.o names.o filter.o
+OBJS=access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
@@ -46,6 +46,9 @@ OBJS += nbsd-libpci.o
 PCILIB=libpciutils.a
 endif
 
+# FIXME: Conditions
+OBJS += names-net.o names-cache.o
+
 all: $(PCILIB) $(PCILIBPC)
 
 $(PCILIB): $(OBJS)
@@ -71,7 +74,11 @@ obsd-device.o: obsd-device.c $(INCL)
 fbsd-device.o: fbsd-device.c $(INCL)
 aix-device.o: aix-device.c $(INCL)
 dump.o: dump.c $(INCL)
-names.o: names.c $(INCL)
+names.o: names.c $(INCL) names.h
+names-cache.o: names-cache.c $(INCL) names.h
+names-hash.o: names-hash.c $(INCL) names.h
+names-net.o: names-net.c $(INCL) names.h
+names-parse.o: names-parse.c $(INCL) names.h
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
 
