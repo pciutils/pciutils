@@ -64,7 +64,7 @@ case $sys in
 						echo >>$c "#define PCI_HAVE_PM_INTEL_CONF"
 						;;
 				*)
-						echo " The PCI library is does not support Solaris for this architecture: $cpu"
+						echo " The PCI library does not support Solaris for this architecture: $cpu"
 						exit 1
 						;;
 		esac
