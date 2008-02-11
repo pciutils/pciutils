@@ -1,6 +1,8 @@
-2008-02-11  Martin Mares  <mj@ucw.cz>
+2008-02-11  Martin Mares <mj@ucw.cz>
 
-	* Very experimental resolving of PCI ID's using DNS.
+	* lib/names.c: Fix displaying of errors reported by zlib.
+	Previously, the buffer containing the error message had
+	been deallocated by gzclose() before the message was printed.
 
 2008-01-07  Martin Mares <mj@ucw.cz>
 

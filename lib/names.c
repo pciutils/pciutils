@@ -45,9 +45,10 @@ static pci_file pci_open(struct pci_access *a)
 #define PCI_ERROR(f, err)						\
 	if (!err) {							\
 		int errnum;						\
-		err = gzerror(f, &errnum);				\
-		if (errnum == Z_ERRNO)	err = "I/O error";		\
-		else if (errnum >= 0)	err = NULL;			\
+		gzerror(f, &errnum);					\
+		if (errnum >= 0) err = NULL;				\
+		else if (errnum == Z_ERRNO) err = "I/O error";		\
+		else err = zError(errnum);				\
 	}
 #else
 typedef FILE * pci_file;
