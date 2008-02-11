@@ -1,9 +1,9 @@
 - review class names
 
 DNS mode:
-- update man pages
+- update README
 - check negative caching
-- check network errors
+- check handling of network errors
 - try to avoid libresolv.a
 
 Capabilities with partial decoding:

@@ -57,6 +57,25 @@ PCI ID list.
 .B -nn
 Show PCI vendor and device codes as both numbers and names.
 .TP
+.B -q
+Use DNS to query the central PCI ID database if a device is not found in the local
+.B pci.ids
+file. If the DNS query succeeds, the result is cached in
+.B ~/.pciids-cache
+and it is recognized in subsequent runs even if
+.B -q
+is not given any more. Please use this switch inside automated scripts only
+with caution to avoid overloading the database servers.
+.TP
+.B -qq
+Same as
+.BR -q ,
+but the local cache is reset.
+.TP
+.B -Q
+Query the central database even for entries which are recognized locally.
+Use this if you suspect that the displayed entry is wrong.
+.TP
 .B -x
 Show hexadecimal dump of the standard part of the configuration space (the first
 64 bytes or 128 bytes for CardBus bridges).
@@ -332,6 +351,9 @@ utility to download the most recent version.
 .TP
 .B @IDSDIR@/pci.ids.gz
 If lspci is compiled with support for compression, this file is tried before pci.ids.
+.TP
+.B ~/.pciids-cache
+All ID's found in the DNS query mode are cached in this file.
 .TP
 .B /proc/bus/pci
 An interface to PCI bus configuration space provided by the post-2.1.82 Linux
