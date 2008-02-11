@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -134,7 +134,8 @@ static inline unsigned int id_hash(int cat, u32 id12, u32 id34)
 
 static char *id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
 {
-  byte name[256], dnsname[256], answer[4096], txt[256];
+  char name[256], dnsname[256], txt[256];
+  byte answer[4096];
   const byte *data;
   int res, i, j, dlen;
   ns_msg m;
