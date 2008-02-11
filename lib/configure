@@ -57,6 +57,7 @@ case $sys in
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		echo >>$c '#define PCI_USE_DNS'
 		;;
 	sunos)
 		case $cpu in
@@ -69,16 +70,19 @@ case $sys in
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_STDINT_H'
+		echo >>$c '#define PCI_USE_DNS'
 		;;
 	freebsd)
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
+		echo >>$c '#define PCI_USE_DNS'
 		;;
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
+		echo >>$c '#define PCI_USE_DNS'
 		;;
 	aix)
 		echo_n " aix-device"
@@ -89,6 +93,7 @@ case $sys in
 		;;
 	netbsd)
 		echo_n " nbsd-libpci"
+		echo >>$c '#define PCI_USE_DNS'
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$m 'PCILIB=lib/libpciutils.a'
@@ -97,6 +102,7 @@ case $sys in
     	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		echo >>$c '#define PCI_USE_DNS'
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"

@@ -3,7 +3,7 @@
 
 include config.mk
 
-OBJS=access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o
+OBJS=access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o names-net.o names-cache.o
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
@@ -45,9 +45,6 @@ ifdef PCI_HAVE_PM_NBSD_LIBPCI
 OBJS += nbsd-libpci.o
 PCILIB=libpciutils.a
 endif
-
-# FIXME: Conditions
-OBJS += names-net.o names-cache.o
 
 all: $(PCILIB) $(PCILIBPC)
 

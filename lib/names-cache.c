@@ -17,6 +17,8 @@
 #include "internal.h"
 #include "names.h"
 
+#ifdef PCI_USE_DNS
+
 static const char cache_version[] = "#PCI-CACHE-1.0";
 
 int
@@ -97,13 +99,6 @@ pci_id_cache_load(struct pci_access *a, int flags)
 }
 
 void
-pci_id_cache_dirty(struct pci_access *a)
-{
-  if (a->id_cache_status >= 1)
-    a->id_cache_status = 2;
-}
-
-void
 pci_id_cache_flush(struct pci_access *a)
 {
   int orig_status = a->id_cache_status;
@@ -147,6 +142,28 @@ pci_id_cache_flush(struct pci_access *a)
   if (ferror(f))
     a->warning("Error writing %s", a->id_cache_file);
   fclose(f);
+}
+
+#else
+
+int pci_id_cache_load(struct pci_access *a UNUSED, int flags UNUSED)
+{
+  a->id_cache_status = 1;
+  return 0;
+}
+
+void pci_id_cache_flush(struct pci_access *a)
+{
+  a->id_cache_status = 0;
+}
+
+#endif
+
+void
+pci_id_cache_dirty(struct pci_access *a)
+{
+  if (a->id_cache_status >= 1)
+    a->id_cache_status = 2;
 }
 
 void

@@ -8,12 +8,15 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <netinet/in.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
 
 #include "internal.h"
 #include "names.h"
+
+#ifdef PCI_USE_DNS
+
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
 
 char
 *pci_id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
@@ -87,6 +90,15 @@ char
 
   return NULL;
 }
+
+#else
+
+char *pci_id_net_lookup(struct pci_access *a UNUSED, int cat UNUSED, int id1 UNUSED, int id2 UNUSED, int id3 UNUSED, int id4 UNUSED)
+{
+  return NULL;
+}
+
+#endif
 
 void
 pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed)
