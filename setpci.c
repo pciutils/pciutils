@@ -258,10 +258,10 @@ usage(char *msg, ...)
       fprintf(stderr, "\n\n");
     }
   fprintf(stderr,
-"Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n\
--f\t\tDon't complain if there's nothing to do\n\
--v\t\tBe verbose\n\
--D\t\tList changes, don't commit them\n"
+"Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n"
+"-f\t\tDon't complain if there's nothing to do\n"
+"-v\t\tBe verbose\n"
+"-D\t\tList changes, don't commit them\n"
 GENERIC_HELP
 "<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t|\t-d [<vendor>]:[<device>]\n"
