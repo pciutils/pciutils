@@ -14,6 +14,9 @@
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <resolv.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
 
 #include "internal.h"
 
@@ -64,6 +67,7 @@ struct id_entry {
   struct id_entry *next;
   u32 id12, id34;
   byte cat;
+  byte src;
   char name[1];
 };
 
@@ -76,6 +80,13 @@ enum id_entry_type {
   ID_CLASS,
   ID_SUBCLASS,
   ID_PROGIF
+};
+
+enum id_entry_src {
+  SRC_UNKNOWN,
+  SRC_CACHE,
+  SRC_NET,
+  SRC_LOCAL,
 };
 
 struct id_bucket {
@@ -126,12 +137,206 @@ static inline u32 id_pair(unsigned int x, unsigned int y)
   return ((x << 16) | y);
 }
 
+static inline unsigned int pair_first(unsigned int x)
+{
+  return (x >> 16) & 0xffff;
+}
+
+static inline unsigned int pair_second(unsigned int x)
+{
+  return x & 0xffff;
+}
+
 static inline unsigned int id_hash(int cat, u32 id12, u32 id34)
 {
   unsigned int h;
 
   h = id12 ^ (id34 << 3) ^ (cat << 5);
   return h % HASH_SIZE;
+}
+
+static int id_insert(struct pci_access *a, int cat, int id1, int id2, int id3, int id4, char *text, enum id_entry_src src)
+{
+  u32 id12 = id_pair(id1, id2);
+  u32 id34 = id_pair(id3, id4);
+  unsigned int h = id_hash(cat, id12, id34);
+  struct id_entry *n = a->id_hash ? a->id_hash[h] : NULL;
+  int len = strlen(text);
+
+  while (n && (n->id12 != id12 || n->id34 != id34 || n->cat != cat))
+    n = n->next;
+  if (n)
+    return 1;
+  n = id_alloc(a, sizeof(struct id_entry) + len);
+  n->id12 = id12;
+  n->id34 = id34;
+  n->cat = cat;
+  n->src = src;
+  memcpy(n->name, text, len+1);
+  n->next = a->id_hash[h];
+  a->id_hash[h] = n;
+  return 0;
+}
+
+static char *id_lookup_raw(struct pci_access *a, int flags, int cat, int id1, int id2, int id3, int id4)
+{
+  struct id_entry *n, *best;
+  u32 id12 = id_pair(id1, id2);
+  u32 id34 = id_pair(id3, id4);
+
+  if (a->id_hash)
+    {
+      n = a->id_hash[id_hash(cat, id12, id34)];
+      best = NULL;
+      for (; n; n=n->next)
+        {
+	  if (n->id12 != id12 || n->id34 != id34 || n->cat != cat)
+	    continue;
+	  if (n->src == SRC_LOCAL && (flags & PCI_LOOKUP_SKIP_LOCAL))
+	    continue;
+	  if (n->src == SRC_NET && !(flags & PCI_LOOKUP_NETWORK))
+	    continue;
+	  if (n->src == SRC_CACHE && !(flags & PCI_LOOKUP_CACHE))
+	    continue;
+	  if (!best || best->src < n->src)
+	    best = n;
+	}
+      if (best)
+	return best->name;
+    }
+  return NULL;
+}
+
+static const char cache_version[] = "#PCI-CACHE-1.0";
+
+static int
+pci_id_cache_load(struct pci_access *a, int flags)
+{
+  char *name;
+  char line[MAX_LINE];
+  const char default_name[] = "/.pciids-cache";
+  FILE *f;
+  int lino;
+
+  a->id_cache_status = 1;
+  if (!a->id_cache_file)
+    {
+      /* Construct the default ID cache name */
+      uid_t uid = getuid();
+      struct passwd *pw = getpwuid(uid);
+      if (!pw)
+        return 0;
+      name = pci_malloc(a, strlen(pw->pw_dir) + sizeof(default_name));
+      sprintf(name, "%s%s", pw->pw_dir, default_name);
+      pci_set_id_cache(a, name, 1);
+    }
+  a->debug("Using cache %s\n", a->id_cache_file);
+  if (flags & PCI_LOOKUP_REFRESH_CACHE)
+    {
+      a->debug("Not loading cache, will refresh everything\n");
+      a->id_cache_status = 2;
+      return 0;
+    }
+
+  f = fopen(a->id_cache_file, "rb");
+  if (!f)
+    {
+      a->debug("Cache file does not exist\n");
+      return 0;
+    }
+  /* FIXME: Compare timestamp with the pci.ids file? */
+
+  lino = 0;
+  while (fgets(line, sizeof(line), f))
+    {
+      char *p = strchr(line, '\n');
+      lino++;
+      if (p)
+        {
+	  *p = 0;
+	  if (lino == 1)
+	    {
+	      if (strcmp(line, cache_version))
+	        {
+		  a->debug("Unrecognized cache version %s, ignoring\n", line);
+		  break;
+		}
+	      continue;
+	    }
+	  else
+	    {
+	      int cat, id1, id2, id3, id4, cnt;
+	      if (sscanf(line, "%d%x%x%x%x%n", &cat, &id1, &id2, &id3, &id4, &cnt) >= 5)
+	        {
+		  p = line + cnt;
+		  while (*p && *p == ' ')
+		    p++;
+		  id_insert(a, cat, id1, id2, id3, id4, p, SRC_CACHE);
+		  continue;
+		}
+	    }
+	}
+      a->warning("Malformed cache file %s (line %d), ignoring", a->id_cache_file, lino);
+      break;
+    }
+
+  if (ferror(f))
+    a->warning("Error while reading %s", a->id_cache_file);
+  fclose(f);
+  return 1;
+}
+
+static void
+pci_id_cache_dirty(struct pci_access *a)
+{
+  if (a->id_cache_status >= 1)
+    a->id_cache_status = 2;
+}
+
+void
+pci_id_cache_flush(struct pci_access *a)
+{
+  int orig_status = a->id_cache_status;
+  FILE *f;
+  unsigned int h;
+  struct id_entry *e, *e2;
+
+  a->id_cache_status = 0;
+  if (orig_status < 2)
+    return;
+  if (!a->id_cache_file)
+    return;
+  f = fopen(a->id_cache_file, "wb");
+  if (!f)
+    {
+      a->warning("Cannot write %s: %s", a->id_cache_file, strerror(errno));
+      return;
+    }
+  a->debug("Writing cache to %s\n", a->id_cache_file);
+  fprintf(f, "%s\n", cache_version);
+
+  for (h=0; h<HASH_SIZE; h++)
+    for (e=a->id_hash[h]; e; e=e->next)
+      if (e->src == SRC_CACHE || e->src == SRC_NET)
+	{
+	  /* Verify that every entry is written at most once */
+	  for (e2=a->id_hash[h]; e2 != e; e2=e2->next)
+	    if ((e2->src == SRC_CACHE || e2->src == SRC_NET) &&
+	        e2->cat == e->cat &&
+		e2->id12 == e->id12 && e2->id34 == e->id34)
+	    break;
+	  if (e2 == e)
+	    fprintf(f, "%d %x %x %x %x %s\n",
+	            e->cat,
+		    pair_first(e->id12), pair_second(e->id12),
+		    pair_first(e->id34), pair_second(e->id34),
+		    e->name);
+	}
+
+  fflush(f);
+  if (ferror(f))
+    a->warning("Error writing %s", a->id_cache_file);
+  fclose(f);
 }
 
 static char *id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
@@ -199,56 +404,40 @@ static char *id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int 
 	  j += 1+data[j];
 	  a->debug("\t\t%s\n", txt);
 	  if (txt[0] == 'i' && txt[1] == '=')
-	    return strdup(txt+2);	/* FIXME */
+	    return strdup(txt+2);
 	}
     }
 
   return NULL;
 }
 
-static int id_insert(struct pci_access *a, int cat, int id1, int id2, int id3, int id4, char *text)
+static char *id_lookup(struct pci_access *a, int flags, int cat, int id1, int id2, int id3, int id4)
 {
-  u32 id12 = id_pair(id1, id2);
-  u32 id34 = id_pair(id3, id4);
-  unsigned int h = id_hash(cat, id12, id34);
-  struct id_entry *n = a->id_hash ? a->id_hash[h] : NULL;
-  int len = strlen(text);
-
-  while (n && (n->id12 != id12 || n->id34 != id34 || n->cat != cat))
-    n = n->next;
-  if (n)
-    return 1;
-  n = id_alloc(a, sizeof(struct id_entry) + len);
-  n->id12 = id12;
-  n->id34 = id34;
-  n->cat = cat;
-  memcpy(n->name, text, len+1);
-  n->next = a->id_hash[h];
-  a->id_hash[h] = n;
-  return 0;
-}
-
-static char *id_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
-{
-  struct id_entry *n;
-  u32 id12 = id_pair(id1, id2);
-  u32 id34 = id_pair(id3, id4);
   char *name;
 
-  if (a->id_hash)
+  while (!(name = id_lookup_raw(a, flags, cat, id1, id2, id3, id4)))
     {
-      n = a->id_hash[id_hash(cat, id12, id34)];
-      while (n && (n->id12 != id12 || n->id34 != id34 || n->cat != cat))
-	n = n->next;
-      if (n)
-	return n->name;
+      if ((flags & PCI_LOOKUP_CACHE) && !a->id_cache_status)
+	{
+	  if (pci_id_cache_load(a, flags))
+	    continue;
+	}
+      if (flags & PCI_LOOKUP_NETWORK)
+        {
+	  if (name = id_net_lookup(a, cat, id1, id2, id3, id4))
+	    {
+	      id_insert(a, cat, id1, id2, id3, id4, name, SRC_NET);
+	      free(name);
+	      pci_id_cache_dirty(a);
+	    }
+	  else
+	    id_insert(a, cat, id1, id2, id3, id4, "", SRC_NET);	/* FIXME: Check that negative caching works */
+	  /* We want to iterate the lookup to get the allocated ID entry from the hash */
+	  continue;
+	}
+      return NULL;
     }
-  if (name = id_net_lookup(a, cat, id1, id2, id3, id4))
-    {
-      id_insert(a, cat, id1, id2, id3, id4, name);
-      return name;
-    }
-  return NULL;
+  return (name[0] ? name : NULL);
 }
 
 static int id_hex(char *p, int cnt)
@@ -321,7 +510,7 @@ static const char *id_parse_list(struct pci_access *a, pci_file f, int *lino)
 	    {						/* Generic subsystem block */
 	      if ((id1 = id_hex(p+2, 4)) < 0 || p[6])
 		return parse_error;
-	      if (!id_lookup(a, ID_VENDOR, id1, 0, 0, 0))
+	      if (!id_lookup(a, 0, ID_VENDOR, id1, 0, 0, 0))
 		return "Vendor does not exist";
 	      cat = ID_GEN_SUBSYSTEM;
 	      continue;
@@ -400,7 +589,7 @@ static const char *id_parse_list(struct pci_access *a, pci_file f, int *lino)
 	p++;
       if (!*p)
 	return parse_error;
-      if (id_insert(a, cat, id1, id2, id3, id4, p))
+      if (id_insert(a, cat, id1, id2, id3, id4, p, SRC_LOCAL))
 	return "Duplicate entry";
     }
   return NULL;
@@ -414,7 +603,7 @@ pci_load_name_list(struct pci_access *a)
   const char *err;
 
   pci_free_name_list(a);
-  a->hash_load_failed = 1;
+  a->id_load_failed = 1;
   if (!(f = pci_open(a)))
     return 0;
   err = id_parse_list(a, f, &lino);
@@ -422,15 +611,17 @@ pci_load_name_list(struct pci_access *a)
   pci_close(f);
   if (err)
     a->error("%s at %s, line %d\n", err, a->id_file_name, lino);
-  a->hash_load_failed = 0;
+  a->id_load_failed = 0;
   return 1;
 }
 
 void
 pci_free_name_list(struct pci_access *a)
 {
+  pci_id_cache_flush(a);
   pci_mfree(a->id_hash);
   a->id_hash = NULL;
+  a->id_cache_status = 0;
   while (a->current_id_bucket)
     {
       struct id_bucket *buck = a->current_id_bucket;
@@ -440,15 +631,15 @@ pci_free_name_list(struct pci_access *a)
 }
 
 static char *
-id_lookup_subsys(struct pci_access *a, int iv, int id, int isv, int isd)
+id_lookup_subsys(struct pci_access *a, int flags, int iv, int id, int isv, int isd)
 {
   char *d = NULL;
   if (iv > 0 && id > 0)						/* Per-device lookup */
-    d = id_lookup(a, ID_SUBSYSTEM, iv, id, isv, isd);
+    d = id_lookup(a, flags, ID_SUBSYSTEM, iv, id, isv, isd);
   if (!d)							/* Generic lookup */
-    d = id_lookup(a, ID_GEN_SUBSYSTEM, isv, isd, 0, 0);
+    d = id_lookup(a, flags, ID_GEN_SUBSYSTEM, isv, isd, 0, 0);
   if (!d && iv == isv && id == isd)				/* Check for subsystem == device */
-    d = id_lookup(a, ID_DEVICE, iv, id, 0, 0);
+    d = id_lookup(a, flags, ID_DEVICE, iv, id, 0, 0);
   return d;
 }
 
@@ -514,6 +705,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 
   va_start(args, flags);
 
+  flags |= a->id_lookup_mode;
   if (!(flags & PCI_LOOKUP_NO_NUMBERS))
     {
       if (a->numeric_ids > 1)
@@ -524,7 +716,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
   if (flags & PCI_LOOKUP_MIXED)
     flags &= ~PCI_LOOKUP_NUMERIC;
 
-  if (!a->id_hash && !(flags & PCI_LOOKUP_NUMERIC) && !a->hash_load_failed)
+  if (!a->id_hash && !(flags & (PCI_LOOKUP_NUMERIC | PCI_LOOKUP_SKIP_LOCAL)) && !a->id_load_failed)
     pci_load_name_list(a);
 
   switch (flags & 0xffff)
@@ -532,23 +724,23 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
     case PCI_LOOKUP_VENDOR:
       iv = va_arg(args, int);
       sprintf(numbuf, "%04x", iv);
-      return format_name(buf, size, flags, id_lookup(a, ID_VENDOR, iv, 0, 0, 0), numbuf, "Unknown vendor");
+      return format_name(buf, size, flags, id_lookup(a, flags, ID_VENDOR, iv, 0, 0, 0), numbuf, "Unknown vendor");
     case PCI_LOOKUP_DEVICE:
       iv = va_arg(args, int);
       id = va_arg(args, int);
       sprintf(numbuf, "%04x", id);
-      return format_name(buf, size, flags, id_lookup(a, ID_DEVICE, iv, id, 0, 0), numbuf, "Unknown device");
+      return format_name(buf, size, flags, id_lookup(a, flags, ID_DEVICE, iv, id, 0, 0), numbuf, "Unknown device");
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE:
       iv = va_arg(args, int);
       id = va_arg(args, int);
       sprintf(numbuf, "%04x:%04x", iv, id);
-      v = id_lookup(a, ID_VENDOR, iv, 0, 0, 0);
-      d = id_lookup(a, ID_DEVICE, iv, id, 0, 0);
+      v = id_lookup(a, flags, ID_VENDOR, iv, 0, 0, 0);
+      d = id_lookup(a, flags, ID_DEVICE, iv, id, 0, 0);
       return format_name_pair(buf, size, flags, v, d, numbuf);
     case PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR:
       isv = va_arg(args, int);
       sprintf(numbuf, "%04x", isv);
-      v = id_lookup(a, ID_VENDOR, isv, 0, 0, 0);
+      v = id_lookup(a, flags, ID_VENDOR, isv, 0, 0, 0);
       return format_name(buf, size, flags, v, numbuf, "Unknown vendor");
     case PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE:
       iv = va_arg(args, int);
@@ -556,21 +748,21 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
       isv = va_arg(args, int);
       isd = va_arg(args, int);
       sprintf(numbuf, "%04x", isd);
-      return format_name(buf, size, flags, id_lookup_subsys(a, iv, id, isv, isd), numbuf, "Unknown device");
+      return format_name(buf, size, flags, id_lookup_subsys(a, flags, iv, id, isv, isd), numbuf, "Unknown device");
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       iv = va_arg(args, int);
       id = va_arg(args, int);
       isv = va_arg(args, int);
       isd = va_arg(args, int);
-      v = id_lookup(a, ID_VENDOR, isv, 0, 0, 0);
-      d = id_lookup_subsys(a, iv, id, isv, isd);
+      v = id_lookup(a, flags, ID_VENDOR, isv, 0, 0, 0);
+      d = id_lookup_subsys(a, flags, iv, id, isv, isd);
       sprintf(numbuf, "%04x:%04x", isv, isd);
       return format_name_pair(buf, size, flags, v, d, numbuf);
     case PCI_LOOKUP_CLASS:
       icls = va_arg(args, int);
       sprintf(numbuf, "%04x", icls);
-      cls = id_lookup(a, ID_SUBCLASS, icls >> 8, icls & 0xff, 0, 0);
-      if (!cls && (cls = id_lookup(a, ID_CLASS, icls >> 8, 0, 0, 0)))
+      cls = id_lookup(a, flags, ID_SUBCLASS, icls >> 8, icls & 0xff, 0, 0);
+      if (!cls && (cls = id_lookup(a, flags, ID_CLASS, icls >> 8, 0, 0, 0)))
 	{
 	  if (!(flags & PCI_LOOKUP_NUMERIC)) /* Include full class number */
 	    flags |= PCI_LOOKUP_MIXED;
@@ -580,7 +772,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
       icls = va_arg(args, int);
       ipif = va_arg(args, int);
       sprintf(numbuf, "%02x", ipif);
-      pif = id_lookup(a, ID_PROGIF, icls >> 8, icls & 0xff, ipif, 0);
+      pif = id_lookup(a, flags, ID_PROGIF, icls >> 8, icls & 0xff, ipif, 0);
       if (!pif && icls == 0x0101 && !(ipif & 0x70))
 	{
 	  /* IDE controllers have complex prog-if semantics */
@@ -606,4 +798,20 @@ void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed)
     free(a->id_file_name);
   a->id_file_name = name;
   a->free_id_name = to_be_freed;
+}
+
+void pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed)
+{
+  if (a->free_id_domain)
+    free(a->id_domain);
+  a->id_domain = name;
+  a->free_id_domain = to_be_freed;
+}
+
+void pci_set_id_cache(struct pci_access *a, char *name, int to_be_freed)
+{
+  if (a->free_id_cache_file)
+    free(a->id_cache_file);
+  a->id_cache_file = name;
+  a->free_id_cache_file = to_be_freed;
 }

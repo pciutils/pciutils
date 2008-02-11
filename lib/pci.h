@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -13,7 +13,7 @@
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x020204
+#define PCI_LIB_VERSION 0x020204	/* FIXME: Update */
 
 /*
  *	PCI Access Structure
@@ -42,11 +42,18 @@ struct pci_access {
   char *method_params[PCI_ACCESS_MAX];	/* Parameters for the methods */
   int writeable;			/* Open in read/write mode */
   int buscentric;			/* Bus-centric view of the world */
-  char *id_file_name;			/* Name of ID list file */
+
+  char *id_file_name;			/* Name of ID list file (use pci_set_name_list_path()) */
   int free_id_name;			/* Set if id_file_name is malloced */
   int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
-  int network_ids;			/* Try DNS lookups on unknown ID's */
-  char *id_domain;			/* DNS domain used for the lookups */  /* FIXME: set function? */
+
+  unsigned int id_lookup_mode;		/* pci_lookup_mode flags which are set automatically */
+  					/* Default: PCI_LOOKUP_CACHE */
+  char *id_domain;			/* DNS domain used for the lookups (use pci_set_net_domain()) */
+  int free_id_domain;			/* Set if id_domain is malloced */
+  char *id_cache_file;			/* Name of the ID cache file (use pci_set_net_cache()) */
+  int free_id_cache_file;		/* Set if id_cache_file is malloced */
+
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */
@@ -60,7 +67,8 @@ struct pci_access {
   struct pci_methods *methods;
   struct id_entry **id_hash;		/* names.c */
   struct id_bucket *current_id_bucket;
-  int hash_load_failed;
+  int id_load_failed;
+  int id_cache_status;			/* 0=not read, 1=read, 2=dirty */
   int fd;				/* proc: fd */
   int fd_rw;				/* proc: fd opened read-write */
   struct pci_dev *cached_dev;		/* proc: device the fd is for */
@@ -164,6 +172,9 @@ char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 int pci_load_name_list(struct pci_access *a);	/* Called automatically by pci_lookup_*() when needed; returns success */
 void pci_free_name_list(struct pci_access *a);	/* Called automatically by pci_cleanup() */
 void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed);
+void pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed);
+void pci_set_id_cache(struct pci_access *a, char *name, int to_be_freed);
+void pci_id_cache_flush(struct pci_access *a);
 
 enum pci_lookup_mode {
   PCI_LOOKUP_VENDOR = 1,		/* Vendor name (args: vendorID) */
@@ -174,6 +185,10 @@ enum pci_lookup_mode {
   PCI_LOOKUP_NUMERIC = 0x10000,		/* Want only formatted numbers; default if access->numeric_ids is set */
   PCI_LOOKUP_NO_NUMBERS = 0x20000,	/* Return NULL if not found in the database; default is to print numerically */
   PCI_LOOKUP_MIXED = 0x40000,		/* Include both numbers and names */
+  PCI_LOOKUP_NETWORK = 0x80000,		/* Try to resolve unknown ID's by DNS */
+  PCI_LOOKUP_SKIP_LOCAL = 0x100000,	/* Do not consult local database */
+  PCI_LOOKUP_CACHE = 0x200000,		/* Consult the local cache before using DNS */
+  PCI_LOOKUP_REFRESH_CACHE = 0x400000,	/* Forget all previously cached entries, but still allow updating the cache */
 };
 
 #endif

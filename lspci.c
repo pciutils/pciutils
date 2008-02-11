@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -2738,6 +2738,8 @@ main(int argc, char **argv)
   if (optind < argc)
     goto bad;
 
+  /* FIXME */
+  pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK;
   pci_init(pacc);
   if (opt_map_mode)
     map_the_bus();

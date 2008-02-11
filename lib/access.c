@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- User Access
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -67,8 +67,8 @@ pci_alloc(void)
 
   memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
-  a->id_domain = PCI_ID_DOMAIN;
-  a->network_ids = 1;			/* FIXME */
+  pci_set_net_domain(a, PCI_ID_DOMAIN, 0);
+  a->id_lookup_mode = PCI_LOOKUP_CACHE;
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);
@@ -185,6 +185,8 @@ pci_cleanup(struct pci_access *a)
     a->methods->cleanup(a);
   pci_free_name_list(a);
   pci_set_name_list_path(a, NULL, 0);
+  pci_set_net_domain(a, NULL, 0);
+  pci_set_id_cache(a, NULL, 0);
   pci_mfree(a);
 }
 
