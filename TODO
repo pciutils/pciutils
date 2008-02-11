@@ -2,8 +2,9 @@
 
 DNS mode:
 - races when writing cache
-- options in lspci
+- update man pages
 - check negative caching
+- check network errors
 
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)

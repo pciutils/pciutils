@@ -25,35 +25,40 @@ static int opt_machine;			/* Generate machine-readable output */
 static int opt_map_mode;		/* Bus mapping mode enabled */
 static int opt_domains;			/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
 static int opt_kernel;			/* Show kernel drivers */
+static int opt_query_dns;		/* Query the DNS (0=disabled, 1=enabled, 2=refresh cache) */
+static int opt_query_all;		/* Query the DNS for all entries */
 static char *opt_pcimap;		/* Override path to Linux modules.pcimap */
 
 const char program_name[] = "lspci";
 
-static char options[] = "nvbxs:d:ti:mgp:kMD" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:ti:mgp:qkMDQ" GENERIC_OPTIONS ;
 
-static char help_msg[] = "\
-Usage: lspci [<switches>]\n\
-\n\
--v\t\tBe verbose\n\
--n\t\tShow numeric ID's\n\
--nn\t\tShow both textual and numeric ID's (names & numbers)\n\
--b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n\
--x\t\tShow hex-dump of the standard portion of config space\n\
--xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n\
--xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n\
--s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n\
--d [<vendor>]:[<device>]\tShow only selected devices\n\
--t\t\tShow bus tree\n\
--m\t\tProduce machine-readable output\n\
--i <file>\tUse specified ID database instead of %s\n"
-#ifdef PCI_OS_LINUX
-"\
--k\t\tShow kernel drivers handling each device\n\
--p <file>\tLook up kernel modules in a given file instead of default modules.pcimap\n"
+static char help_msg[] =
+"Usage: lspci [<switches>]\n"
+"\n"
+"-v\t\tBe verbose\n"
+"-n\t\tShow numeric ID's\n"
+"-nn\t\tShow both textual and numeric ID's (names & numbers)\n"
+#ifdef PCI_USE_DNS
+"-q\t\tQuery the PCI ID database for unknown ID's via DNS\n"
+"-qq\t\tAs above, but re-query locally cached entries\n"
+"-Q\t\tQuery the PCI ID database for all ID's via DNS\n"
 #endif
-"\
--D\t\tAlways show domain numbers\n\
--M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
+"-b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n"
+"-x\t\tShow hex-dump of the standard portion of config space\n"
+"-xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n"
+"-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n"
+"-s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n"
+"-d [<vendor>]:[<device>]\tShow only selected devices\n"
+"-t\t\tShow bus tree\n"
+"-m\t\tProduce machine-readable output\n"
+"-i <file>\tUse specified ID database instead of %s\n"
+#ifdef PCI_OS_LINUX
+"-k\t\tShow kernel drivers handling each device\n"
+"-p <file>\tLook up kernel modules in a given file instead of default modules.pcimap\n"
+#endif
+"-D\t\tAlways show domain numbers\n"
+"-M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
 GENERIC_HELP
 ;
 
@@ -2728,6 +2733,12 @@ main(int argc, char **argv)
       case 'D':
 	opt_domains = 2;
 	break;
+      case 'q':
+	opt_query_dns++;
+	break;
+      case 'Q':
+	opt_query_all = 1;
+	break;
       default:
 	if (parse_generic_option(i, pacc, optarg))
 	  break;
@@ -2738,8 +2749,15 @@ main(int argc, char **argv)
   if (optind < argc)
     goto bad;
 
-  /* FIXME */
-  pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK;
+  if (opt_query_dns)
+    {
+      pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK;
+      if (opt_query_dns > 1)
+	pacc->id_lookup_mode |= PCI_LOOKUP_REFRESH_CACHE;
+    }
+  if (opt_query_all)
+    pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK | PCI_LOOKUP_SKIP_LOCAL;
+
   pci_init(pacc);
   if (opt_map_mode)
     map_the_bus();
