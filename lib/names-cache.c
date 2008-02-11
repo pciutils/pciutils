@@ -105,16 +105,28 @@ pci_id_cache_flush(struct pci_access *a)
   FILE *f;
   unsigned int h;
   struct id_entry *e, *e2;
+  char hostname[256], *tmpname;
+  int this_pid;
 
   a->id_cache_status = 0;
   if (orig_status < 2)
     return;
   if (!a->id_cache_file)
     return;
-  f = fopen(a->id_cache_file, "wb");
+
+  this_pid = getpid();
+  if (gethostname(hostname, sizeof(hostname)) < 0)
+    hostname[0] = 0;
+  else
+    hostname[sizeof(hostname)-1] = 0;
+  tmpname = pci_malloc(a, strlen(a->id_cache_file) + strlen(hostname) + 64);
+  sprintf(tmpname, "%s.tmp-%s-%d", a->id_cache_file, hostname, this_pid);
+
+  f = fopen(tmpname, "wb");
   if (!f)
     {
-      a->warning("Cannot write %s: %s", a->id_cache_file, strerror(errno));
+      a->warning("Cannot write to %s: %s", a->id_cache_file, strerror(errno));
+      pci_mfree(tmpname);
       return;
     }
   a->debug("Writing cache to %s\n", a->id_cache_file);
@@ -124,6 +136,10 @@ pci_id_cache_flush(struct pci_access *a)
     for (e=a->id_hash[h]; e; e=e->next)
       if (e->src == SRC_CACHE || e->src == SRC_NET)
 	{
+	  /* Negative entries are not written */
+	  if (!e->name[0])
+	    continue;
+
 	  /* Verify that every entry is written at most once */
 	  for (e2=a->id_hash[h]; e2 != e; e2=e2->next)
 	    if ((e2->src == SRC_CACHE || e2->src == SRC_NET) &&
@@ -142,6 +158,13 @@ pci_id_cache_flush(struct pci_access *a)
   if (ferror(f))
     a->warning("Error writing %s", a->id_cache_file);
   fclose(f);
+
+  if (rename(tmpname, a->id_cache_file) < 0)
+    {
+      a->warning("Cannot rename %s to %s: %s", tmpname, a->id_cache_status, strerror(errno));
+      unlink(tmpname);
+    }
+  pci_mfree(tmpname);
 }
 
 #else
