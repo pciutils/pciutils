@@ -2733,12 +2733,18 @@ main(int argc, char **argv)
       case 'D':
 	opt_domains = 2;
 	break;
+#ifdef PCI_USE_DNS
       case 'q':
 	opt_query_dns++;
 	break;
       case 'Q':
 	opt_query_all = 1;
 	break;
+#else
+      case 'q':
+      case 'Q':
+	die("DNS queries are not available in this version");
+#endif
       default:
 	if (parse_generic_option(i, pacc, optarg))
 	  break;
