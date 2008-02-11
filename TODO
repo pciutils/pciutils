@@ -5,6 +5,7 @@ DNS mode:
 - check negative caching
 - check handling of network errors
 - try to avoid libresolv.a
+- replace "Unknown device" with "Device"
 
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)
