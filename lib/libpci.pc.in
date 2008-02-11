@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+includedir=@INCDIR@
+libdir=@LIBDIR@
+idsdir=@IDSDIR@
+
+Name: libpci
+Description: libpci
+Version: @VERSION@
+Libs: -L${libdir} -lpci @LIBZ@
+Cflags: -I${includedir}

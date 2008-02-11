@@ -1,5 +1,5 @@
 # Makefile for The PCI Library
-# (c) 1999 Martin Mares <mj@ucw.cz>
+# (c) 1999--2007 Martin Mares <mj@ucw.cz>
 
 include config.mk
 
@@ -7,6 +7,7 @@ OBJS=access.o generic.o dump.o names.o filter.o
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
+PCILIBPC=libpci.pc
 
 ifdef PCI_HAVE_PM_LINUX_SYSFS
 OBJS += sysfs.o
@@ -22,10 +23,6 @@ endif
 
 ifdef PCI_HAVE_PM_DUMP
 OBJS += dump.o
-endif
-
-ifdef PCI_HAVE_PM_SYSCALLS
-OBJS += syscalls.o
 endif
 
 ifdef PCI_HAVE_PM_FBSD_DEVICE
@@ -49,15 +46,23 @@ OBJS += nbsd-libpci.o
 PCILIB=libpciutils.a
 endif
 
-all: $(PCILIB)
+all: $(PCILIB) $(PCILIBPC)
 
 $(PCILIB): $(OBJS)
 	rm -f $@
-	ar rcs $@ $^
-	ranlib $@
+	$(AR) rcs $@ $^
+	$(RANLIB) $@
+
+$(PCILIBPC): $(PCILIBPC).in
+	sed <$< >$@ -e 's,@PREFIX@,$(PREFIX),' \
+		-e 's,@INCDIR@,$(INCDIR),' \
+		-e 's,@LIBDIR@,$(LIBDIR),' \
+		-e 's,@IDSDIR@,$(IDSDIR),' \
+		-e 's,@VERSION@,$(VERSION),' \
+		-e 's,@LIBZ@,$(LIBZ),'
 
 access.o: access.c $(INCL)
-i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h
+i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h
 proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)

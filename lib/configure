@@ -22,7 +22,7 @@ then
 else
 	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
 fi
-if [ "$sys" = "GNU/kFreeBSD" ]
+if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
 then
 	sys=freebsd
 fi
@@ -92,7 +92,7 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$m 'PCILIB=lib/libpciutils.a'
-		echo >>$m 'LDFLAGS+=-lpci'
+		echo >>$m 'LDLIBS+=-lpci'
 		;;
     	gnu)
 		echo_n " i386-ports"
@@ -121,7 +121,8 @@ fi
 if [ "$zlib" = yes ] ; then
 	echo >>$c '#define PCI_COMPRESSED_IDS'
 	echo >>$c '#define PCI_IDS "pci.ids.gz"'
-	echo >>$m 'LDFLAGS+=-lz'
+	echo >>$m 'LIBZ=-lz'
+	echo >>$m 'LDLIBS+=$(LIBZ)'
 else
 	echo >>$c '#define PCI_IDS "pci.ids"'
 fi

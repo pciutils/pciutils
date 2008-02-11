@@ -1,30 +1,41 @@
 #!/bin/sh
 
+[ "$1" = "-q" ] && quiet=true || quiet=false
+
 set -e
 SRC="http://pciids.sourceforge.net/v2.2/pci.ids"
 DEST=pci.ids
 PCI_COMPRESSED_IDS=
 GREP=grep
 
+# if pci.ids is read-only (because the filesystem is read-only),
+# then just skip this whole process.
+if ! touch ${DEST} >/dev/null 2>&1 ; then
+	${quiet} || echo "${DEST} is read-only, exiting." 1>&2
+	exit 1
+fi
+
 if [ -n "$PCI_COMPRESSED_IDS" ] ; then
 	DECOMP="cat"
 	SRC="$SRC.gz"
 	GREP=zgrep
-elif which bzip2 >/dev/null ; then
+elif which bzip2 >/dev/null 2>&1 ; then
 	DECOMP="bzip2 -d"
 	SRC="$SRC.bz2"
-elif which gzip >/dev/null ; then
+elif which gzip >/dev/null 2>&1 ; then
 	DECOMP="gzip -d"
 	SRC="$SRC.gz"
 else
 	DECOMP="cat"
 fi
 
-if which curl >/dev/null ; then
+if which curl >/dev/null 2>&1 ; then
 	DL="curl -o $DEST.new $SRC"
-elif which wget >/dev/null ; then
+    ${quiet} && DL="$DL -s -S"
+elif which wget >/dev/null 2>&1 ; then
 	DL="wget -O $DEST.new $SRC"
-elif which lynx >/dev/null ; then
+	${quiet} && DL="$DL -q"
+elif which lynx >/dev/null 2>&1 ; then
 	DL="eval lynx -source $SRC >$DEST.new"
 else
 	echo >&2 "update-pciids: cannot find curl, wget or lynx"
@@ -55,4 +66,10 @@ fi
 mv $DEST.neww $DEST
 rm $DEST.new
 
-echo "Done."
+# Older versions did not compress the ids file, so let's make sure we
+# clean that up.
+if [ ${DEST%.gz} != ${DEST} ] ; then
+	rm -f ${DEST%.gz} ${DEST%.gz}.old
+fi
+
+${quiet} || echo "Done."

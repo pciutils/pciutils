@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -112,7 +112,7 @@ the Linux PCI support will be probably discussed there, too.
 7. Miscellanea
 ~~~~~~~~~~~~~~
 You also might want to look at the pciutils web page containing release
-notes and other news: http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml .
+notes and other news: http://mj.ucw.cz/pciutils.shtml .
 
 There also exists a utility called PowerTweak which is able to fine tune
 parameters of many chipsets much better than the Bridge Optimization code

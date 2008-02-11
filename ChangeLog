@@ -1,7 +1,152 @@
-2007-02-13  Martin Mares  <mj@ucw.cz>
+2008-02-11  Martin Mares  <mj@ucw.cz>
 
 	* Very experimental resolving of PCI ID's using DNS.
 
+2008-01-07  Martin Mares <mj@ucw.cz>
+
+	* update-pciids.sh: Added quiet mode (-q). Clean up uncompressed
+	files left by previous versions of the pciutils. Patch by Mike
+	Frysinger.
+
+	* update-pciids.man: Mention the -q switch.
+
+2007-11-29  Martin Mares <mj@ucw.cz>
+
+	* lib/dump.c: Squashed compiler warnings about code with
+	no effect (there really were surplus *'s).
+
+2007-11-06  Martin Mares <mj@ucw.cz>
+
+	* Released as 2.2.9.
+
+	* lspci.c: Added a new switch `-k' which requests printing
+	of information on kernel drivers attached to each device
+	and on kernel modules reporting the ability to handle the
+	device. So far, this is supported only on Linux with the
+	sysfs back-end, so it is implemented internally in the lspci
+	instead of the libpci. Thanks to Anicka <anicka@anicka.net>
+	for help.
+
+2007-10-19  Martin Mares <mj@ucw.cz>
+
+	* Makefile, lib/Makefile: Moved -lz from LDFLAGS to LDLIBS.
+	Also added an explicit pattern rule for linking to make sure
+	that LDLIBS is used on all platforms. Thanks to Dan Nicholson
+	for the suggestion.
+
+2007-10-19  Martin Mares <mj@ucw.cz>
+
+	* Released as 2.2.8.
+
+	* pci.ids: Revised class codes to match Conventional PCI 3.0 specs.
+	Added a couple of new ones, renumbered `ADMA continuous operation'
+	prog-if to 0x30 (even the old SATA Class Code ECN doesn't mention
+	0x40) and renumbered the satellite communication controllers.
+
+	* lib/header.h: Include `PCI hot-plug' and `Secure device'
+	capabilities from PCI 3.0 specs. Also added `SATA HBA' and
+	`Advanced features' caps from various ECN's.
+
+	* lspci.c: All known capabilities have at least their name displayed
+	now. When we are unable to decode them completely, we signalize it
+	with a `<?>' mark.
+
+	* lspci.man: Document `<?>' and also mention that extended config
+	space is currently available only with the linux_sysfs back-end.
+
+	* lspci.c: Decode the Debug port capability (per EHCI 0.96 spec).
+
+	* lspci.c: Big code cleanup: re-arranged functions in the code,
+	renamed everything related to capabilities to cap_* and
+	all options except verbose to opt_*.
+
+2007-10-14  Martin Mares <mj@ucw.cz>
+
+	* lib/[fno]bsd-*: Removed extraneous braces.
+
+2007-10-12  Martin Mares <mj@ucw.cz>
+
+	* Capability loop detection introduced 2.2.7 did not work
+	  properly with extended capabilities. Fixed.
+
+2007-10-05  Martin Mares <mj@ucw.cz>
+
+	* Released as 2.2.7.
+
+	* lspci.c (show_caps, show_ext_caps): Detect and report loops in
+	capability lists.
+
+	* lspci.c, lib/header.h: Finished decoding of the PCI Express
+	capability. The extended capabilities remain undecoded for now,
+	but at least the list of them has been updated to reflect the
+	current PCI Express 2.0 spec.
+
+	* lspci.c, lib/header.h: Decode new bits of traditional registers
+	as defined by PCIE / PCI-X. This includes discard timers in the bridge
+	control register and INTx enable/status in device control/status
+	registers.
+
+	* lib/fbsd-device.c: Support domains on new FreeBSD's. Contributed
+	by Marius Strobl.
+
+2007-09-12  Hasso Tepper <hasso@estpak.ee>
+
+	* Extended the fbsd-device backend to run on Dragonfly BSD.
+
+	* lspci.c: alloca() is declared in <stdlib.h> on BSD's, not <alloca.h>.
+
+2007-09-03  Martin Mares <mj@ucw.cz>
+
+	* Resurrected the Windows port, including cross-compilation by MinGW.
+	Patch by Samuel Bronson <naesten@gmail.com>.
+
+2007-08-31  Martin Mares <mj@ucw.cz>
+
+	* Makefile, lib/Makefile: `ar' and `ranlib' can be overriden to allow
+	cross-compilation.
+
+2007-08-27  Martin Mares  <mj@ucw.cz>
+
+	* lib/names.c (pci_open): When calling gzopen(), use "rb" file mode
+	instead of "r". This is needed on DOS systems, where this function
+	somewhat illogically uses the binary flag for the compressed file
+	instead of the decompressed stream inside, where binariness really
+	matters.
+
+2007-08-14  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_ht): Added decoding of Hypertransport MSI mapping capability,
+	based on a patch by Jason Gunthorpe.
+
+	* tests/cap-MSI-mapping: Added a test case. I plan to add test cases
+	(which are dumps of config space) for all new features.
+
+2007-06-20  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.2.6.
+
+	* Makefile: Added an "install-lib" target. Thanks to Dan Nicholson
+	for a patch.
+
+	* Makefile, lib/Makefile: Generate and install pkg-config file
+	for libpci. Again by Dan Nicholson.
+
+2007-06-20  Thomas Schwinge  <tschwinge@gnu.org>
+
+	* lib/i386-io-hurd.h: Rewritten for new Hurd kernels.
+
+2007-05-04  Martin Mares  <mj@ucw.cz>
+
+	* Released as 2.2.5.
+
+	* pci.ids: Updated to the current snapshot of the database.
+
+2007-02-14  Martin Mares  <mj@ucw.cz>
+
+	* lspci.c (show_express): Added PCI/PCI-X to PCI-Express Bridge type.
+	Patch by Mark Glines.
+
+>>>>>>> main
 2007-02-09  Martin Mares  <mj@ucw.cz>
 
 	* pci.ids: Updated to the current snapshot of the database.

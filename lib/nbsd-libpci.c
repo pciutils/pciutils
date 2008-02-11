@@ -40,9 +40,7 @@ nbsd_detect(struct pci_access *a)
     }
 
   if (!access(name, W_OK))
-    {
-      a->writeable = O_RDWR;
-    }
+    a->writeable = O_RDWR;
   a->debug("...using %s", name);
   return 1;
 }
