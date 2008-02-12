@@ -45,6 +45,29 @@ xrealloc(void *ptr, unsigned int howmuch)
 }
 
 static void
+set_pci_method(struct pci_access *pacc, char *arg)
+{
+  char *name;
+  int i;
+
+  if (!strcmp(arg, "help"))
+    {
+      printf("Known PCI access methods:\n\n");
+      for (i=0; name = pci_get_method_name(i); i++)
+	if (name[0])
+	  printf("%s\n", name);
+      exit(0);
+    }
+  else
+    {
+      i = pci_lookup_method(arg);
+      if (i < 0)
+	die("No such PCI access method: %s (see `-A help' for a list)", arg);
+      pacc->method = i;
+    }
+}
+
+static void
 set_pci_option(struct pci_access *pacc, char *arg)
 {
   if (!strcmp(arg, "help"))
@@ -62,7 +85,7 @@ set_pci_option(struct pci_access *pacc, char *arg)
 	die("Invalid PCI access parameter syntax: %s", arg);
       *sep++ = 0;
       if (pci_set_param(pacc, arg, sep) < 0)
-	die("Unrecognized PCI access parameter: %s", arg);
+	die("Unrecognized PCI access parameter: %s (see `-O help' for a list)", arg);
     }
 }
 
@@ -93,6 +116,9 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
       pacc->method = PCI_ACCESS_DUMP;
       break;
 #endif
+    case 'A':
+      set_pci_method(pacc, optarg);
+      break;
     case 'G':
       pacc->debugging++;
       break;

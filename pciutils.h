@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Declarations
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -44,7 +44,8 @@ int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 #define GENHELP_DUMP
 #endif
 
-#define GENERIC_OPTIONS "GO:" GENOPT_PROC GENOPT_INTEL GENOPT_DUMP
+#define GENERIC_OPTIONS "A:GO:" GENOPT_PROC GENOPT_INTEL GENOPT_DUMP
 #define GENERIC_HELP GENHELP_PROC GENHELP_INTEL GENHELP_DUMP \
+	"-A <method>\tUse the specified PCI access method (see `-A help' for a list)\n" \
 	"-G\t\tEnable PCI access debugging\n" \
-	"-O <par>=<val>\tSet PCI access parameter (see `-O help' for the list)\n"
+	"-O <par>=<val>\tSet PCI access parameter (see `-O help' for a list)\n"
