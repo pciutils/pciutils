@@ -48,11 +48,7 @@ struct pci_access {
   int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
 
   unsigned int id_lookup_mode;		/* pci_lookup_mode flags which are set automatically */
-  					/* Default: PCI_LOOKUP_CACHE */
-  char *id_domain;			/* DNS domain used for the lookups (use pci_set_net_domain()) */
-  int free_id_domain;			/* Set if id_domain is malloced */
-  char *id_cache_file;			/* Name of the ID cache file (use pci_set_net_cache()) */
-  int free_id_cache_file;		/* Set if id_cache_file is malloced */
+					/* Default: PCI_LOOKUP_CACHE */
 
   int debugging;			/* Turn on debugging messages */
 
@@ -189,8 +185,6 @@ char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 int pci_load_name_list(struct pci_access *a);	/* Called automatically by pci_lookup_*() when needed; returns success */
 void pci_free_name_list(struct pci_access *a);	/* Called automatically by pci_cleanup() */
 void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed);
-void pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed);
-void pci_set_id_cache(struct pci_access *a, char *name, int to_be_freed);
 void pci_id_cache_flush(struct pci_access *a);
 
 enum pci_lookup_mode {

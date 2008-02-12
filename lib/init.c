@@ -67,8 +67,11 @@ pci_alloc(void)
 
   memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
-  pci_set_net_domain(a, PCI_ID_DOMAIN, 0);
+#ifdef PCI_USE_DNS
+  pci_define_param(a, "net.domain", PCI_ID_DOMAIN);
+  pci_define_param(a, "net.cache_path", "~/.pciids-cache");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
+#endif
   for(i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);
@@ -163,7 +166,7 @@ pci_define_param(struct pci_access *acc, char *param, char *value)
 }
 
 int
-pci_set_param(struct pci_access *acc, char *param, char *value)
+pci_set_param_internal(struct pci_access *acc, char *param, char *value, int copy)
 {
   struct pci_param *p;
 
@@ -172,11 +175,20 @@ pci_set_param(struct pci_access *acc, char *param, char *value)
       {
 	if (p->value_malloced)
 	  pci_mfree(p->value);
-	p->value_malloced = 1;
-	p->value = pci_strdup(acc, value);
+	p->value_malloced = copy;
+	if (copy)
+	  p->value = pci_strdup(acc, value);
+	else
+	  p->value = value;
 	return 0;
       }
   return -1;
+}
+
+int
+pci_set_param(struct pci_access *acc, char *param, char *value)
+{
+  return pci_set_param_internal(acc, param, value, 1);
 }
 
 static void
@@ -259,7 +271,5 @@ pci_cleanup(struct pci_access *a)
   pci_free_name_list(a);
   pci_free_params(a);
   pci_set_name_list_path(a, NULL, 0);
-  pci_set_net_domain(a, NULL, 0);
-  pci_set_id_cache(a, NULL, 0);
   pci_mfree(a);
 }

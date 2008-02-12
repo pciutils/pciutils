@@ -21,12 +21,16 @@
 char
 *pci_id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
 {
-  char name[256], dnsname[256], txt[256];
+  char name[256], dnsname[256], txt[256], *domain;
   byte answer[4096];
   const byte *data;
   int res, i, j, dlen;
   ns_msg m;
   ns_rr rr;
+
+  domain = pci_get_param(a, "net.domain");
+  if (!domain || !domain[0])
+    return NULL;
 
   switch (cat)
     {
@@ -54,7 +58,7 @@ char
     default:
       return NULL;
     }
-  sprintf(dnsname, "%s.%s", name, a->id_domain);
+  sprintf(dnsname, "%s.%s", name, domain);
 
   a->debug("Resolving %s\n", dnsname);
   res_init();
@@ -99,12 +103,3 @@ char *pci_id_net_lookup(struct pci_access *a UNUSED, int cat UNUSED, int id1 UNU
 }
 
 #endif
-
-void
-pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed)
-{
-  if (a->free_id_domain)
-    free(a->id_domain);
-  a->id_domain = name;
-  a->free_id_domain = to_be_freed;
-}

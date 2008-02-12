@@ -21,28 +21,40 @@
 
 static const char cache_version[] = "#PCI-CACHE-1.0";
 
+static char *get_cache_name(struct pci_access *a)
+{
+  char *name, *buf;
+  
+  name = pci_get_param(a, "net.cache_path");
+  if (!name || name[0])
+    return NULL;
+  if (strncmp(name, "~/", 2))
+    return name;
+
+  uid_t uid = getuid();
+  struct passwd *pw = getpwuid(uid);
+  if (!pw)
+    return name;
+
+  buf = pci_malloc(a, strlen(pw->pw_dir) + strlen(name+1) + 1);
+  sprintf(buf, "%s%s", pw->pw_dir, name+1);
+  pci_set_param_internal(a, "net.cache_path", buf, 0);
+  return buf;
+}
+
 int
 pci_id_cache_load(struct pci_access *a, int flags)
 {
   char *name;
   char line[MAX_LINE];
-  const char default_name[] = "/.pciids-cache";
   FILE *f;
   int lino;
 
   a->id_cache_status = 1;
-  if (!a->id_cache_file)
-    {
-      /* Construct the default ID cache name */
-      uid_t uid = getuid();
-      struct passwd *pw = getpwuid(uid);
-      if (!pw)
-        return 0;
-      name = pci_malloc(a, strlen(pw->pw_dir) + sizeof(default_name));
-      sprintf(name, "%s%s", pw->pw_dir, default_name);
-      pci_set_id_cache(a, name, 1);
-    }
-  a->debug("Using cache %s\n", a->id_cache_file);
+  name = get_cache_name(a);
+  if (!name)
+    return 0;
+  a->debug("Using cache %s\n", name);
   if (flags & PCI_LOOKUP_REFRESH_CACHE)
     {
       a->debug("Not loading cache, will refresh everything\n");
@@ -50,7 +62,7 @@ pci_id_cache_load(struct pci_access *a, int flags)
       return 0;
     }
 
-  f = fopen(a->id_cache_file, "rb");
+  f = fopen(name, "rb");
   if (!f)
     {
       a->debug("Cache file does not exist\n");
@@ -88,12 +100,12 @@ pci_id_cache_load(struct pci_access *a, int flags)
 		}
 	    }
 	}
-      a->warning("Malformed cache file %s (line %d), ignoring", a->id_cache_file, lino);
+      a->warning("Malformed cache file %s (line %d), ignoring", name, lino);
       break;
     }
 
   if (ferror(f))
-    a->warning("Error while reading %s", a->id_cache_file);
+    a->warning("Error while reading %s", name);
   fclose(f);
   return 1;
 }
@@ -105,13 +117,14 @@ pci_id_cache_flush(struct pci_access *a)
   FILE *f;
   unsigned int h;
   struct id_entry *e, *e2;
-  char hostname[256], *tmpname;
+  char hostname[256], *tmpname, *name;
   int this_pid;
 
   a->id_cache_status = 0;
   if (orig_status < 2)
     return;
-  if (!a->id_cache_file)
+  name = get_cache_name(a);
+  if (!name)
     return;
 
   this_pid = getpid();
@@ -119,17 +132,17 @@ pci_id_cache_flush(struct pci_access *a)
     hostname[0] = 0;
   else
     hostname[sizeof(hostname)-1] = 0;
-  tmpname = pci_malloc(a, strlen(a->id_cache_file) + strlen(hostname) + 64);
-  sprintf(tmpname, "%s.tmp-%s-%d", a->id_cache_file, hostname, this_pid);
+  tmpname = pci_malloc(a, strlen(name) + strlen(hostname) + 64);
+  sprintf(tmpname, "%s.tmp-%s-%d", name, hostname, this_pid);
 
   f = fopen(tmpname, "wb");
   if (!f)
     {
-      a->warning("Cannot write to %s: %s", a->id_cache_file, strerror(errno));
+      a->warning("Cannot write to %s: %s", name, strerror(errno));
       pci_mfree(tmpname);
       return;
     }
-  a->debug("Writing cache to %s\n", a->id_cache_file);
+  a->debug("Writing cache to %s\n", name);
   fprintf(f, "%s\n", cache_version);
 
   for (h=0; h<HASH_SIZE; h++)
@@ -156,12 +169,12 @@ pci_id_cache_flush(struct pci_access *a)
 
   fflush(f);
   if (ferror(f))
-    a->warning("Error writing %s", a->id_cache_file);
+    a->warning("Error writing %s", name);
   fclose(f);
 
-  if (rename(tmpname, a->id_cache_file) < 0)
+  if (rename(tmpname, name) < 0)
     {
-      a->warning("Cannot rename %s to %s: %s", tmpname, a->id_cache_status, strerror(errno));
+      a->warning("Cannot rename %s to %s: %s", tmpname, name, strerror(errno));
       unlink(tmpname);
     }
   pci_mfree(tmpname);
@@ -187,13 +200,4 @@ pci_id_cache_dirty(struct pci_access *a)
 {
   if (a->id_cache_status >= 1)
     a->id_cache_status = 2;
-}
-
-void
-pci_set_id_cache(struct pci_access *a, char *name, int to_be_freed)
-{
-  if (a->free_id_cache_file)
-    free(a->id_cache_file);
-  a->id_cache_file = name;
-  a->free_id_cache_file = to_be_freed;
 }
