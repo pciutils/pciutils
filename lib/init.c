@@ -69,7 +69,7 @@ pci_alloc(void)
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
 #ifdef PCI_USE_DNS
   pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
-  pci_define_param(a, "net.cache_path", "~/.pciids-cache", "Name of the ID cache file");
+  pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
 #endif
   for(i=0; i<PCI_ACCESS_MAX; i++)

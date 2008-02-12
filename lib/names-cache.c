@@ -24,9 +24,9 @@ static const char cache_version[] = "#PCI-CACHE-1.0";
 static char *get_cache_name(struct pci_access *a)
 {
   char *name, *buf;
-  
-  name = pci_get_param(a, "net.cache_path");
-  if (!name || name[0])
+
+  name = pci_get_param(a, "net.cache_name");
+  if (!name || !name[0])
     return NULL;
   if (strncmp(name, "~/", 2))
     return name;
@@ -38,7 +38,7 @@ static char *get_cache_name(struct pci_access *a)
 
   buf = pci_malloc(a, strlen(pw->pw_dir) + strlen(name+1) + 1);
   sprintf(buf, "%s%s", pw->pw_dir, name+1);
-  pci_set_param_internal(a, "net.cache_path", buf, 0);
+  pci_set_param_internal(a, "net.cache_name", buf, 0);
   return buf;
 }
 
