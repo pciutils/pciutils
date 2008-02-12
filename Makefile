@@ -31,7 +31,7 @@ RELEASE=
 
 export
 
-all: $(PCILIB) lspci setpci lspci.8 setpci.8 update-pciids update-pciids.8 $(PCI_IDS)
+all: $(PCILIB) lspci setpci lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
 
 $(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -55,12 +55,12 @@ update-pciids: update-pciids.sh
 %: %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
-%.8: %.man
+%.8 %.7: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci setpci lib/config.* lib/example *.8 pci.ids.* lib/*.pc
+	rm -f update-pciids lspci setpci lib/config.* lib/example *.[78] pci.ids.* lib/*.pc
 	rm -rf maint/dist
 
 distclean: clean
@@ -72,6 +72,7 @@ install: all
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
+	$(INSTALL) -c -m 644 pcilib.7 $(DESTDIR)$(MANDIR)/man7
 
 install-lib: $(PCIINC_INS) $(PCILIB) $(PCILIBPC)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(LIBDIR) $(DESTDIR)$(PKGCFDIR)

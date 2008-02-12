@@ -22,6 +22,8 @@ Please see
 for details on access rights.
 
 .SH OPTIONS
+
+.SS General options
 .TP
 .B -v
 Tells
@@ -48,6 +50,34 @@ operations does before you actually execute it.
 Shows
 .I setpci
 version. This option should be used stand-alone.
+
+.SS PCI access options
+.PP
+The PCI utilities use the PCI library to talk to PCI devices (see
+\fBpcilib\fP(7) for details). You can use the following options to
+influence its behavior:
+.TP
+.B -A <method>
+The library supports a variety of methods to access the PCI hardware.
+By default, it uses the first access method available, but you can use
+this option to override this decision. See \fB-A help\fP for a list of
+available methods and their descriptions.
+.TP
+.B -O <param>=<value>
+The behavior of the library is controlled by several named parameters.
+This option allows to set the value of any of the parameters. Use \fB-O help\fP
+for a list of known parameters and their default values.
+.TP
+.B -H1
+Use direct hardware access via Intel configuration mechanism 1.
+(This is a shorthand for \fB-A intel-conf1\fP.)
+.TP
+.B -H2
+Use direct hardware access via Intel configuration mechanism 2.
+(This is a shorthand for \fB-A intel-conf2\fP.)
+.TP
+.B -G
+Increase debug level of the library.
 
 .SH DEVICE SELECTION
 .PP
@@ -169,29 +199,9 @@ CB_SUBSYSTEM_VENDOR_ID
 CB_SUBSYSTEM_ID
 CB_LEGACY_MODE_BASE
 
-.SH PCILIB OPTIONS
-The PCI utilities use PCILIB (a portable library providing platform-independent
-functions for PCI configuration space access) to talk to the PCI cards. Please
-see
-.BR lspci(8)
-for a list of switches controlling behavior of the library.
-
-.SH EXAMPLES
-.PP
-`setpci -d *:* latency_timer=40' sets the latency timer to 64 (40 hexadecimal).
-.PP
-`setpci -s 0 device_id vendor_id' lists ID's of devices in slot 0 in all buses.
-.PP
-`setpci -s 12:3.4 3c.l=1,2,3' writes longword 1 to register 3c, 2 to register 3d
-and 3 to register 3e of device at bus 12, slot 3, function 4.
-.PP
-`setpci -s 13:8.4 40.b=50:d0,04:0c,ff' works on bus 13, device 8, function
-4: turns bit 7 off and bits 6 and 4 on in the byte register 40; turns
-bit 3 off and bit 2 on in the byte register 41; sets byte register
-42 to ff.
-
 .SH SEE ALSO
-.BR lspci (8)
+.BR lspci (8),
+.BR pcilib (7)
 
 .SH AUTHOR
 The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

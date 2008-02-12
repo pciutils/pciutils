@@ -7,8 +7,8 @@ lspci \- list all PCI devices
 .RB [ options ]
 .SH DESCRIPTION
 .B lspci
-is a utility for displaying information about all PCI buses in the system and
-all devices connected to them.
+is a utility for displaying information about PCI buses in the system and
+devices connected to them.
 
 By default, it shows a brief list of devices. Use the options described
 below to request either a more verbose output or output intended for
@@ -19,8 +19,8 @@ If you are going to report bugs in PCI device drivers or in
 itself, please include output of "lspci -vvx" or even better "lspci -vvxxx"
 (however, see below for possible caveats).
 
-Some parts of the output, especially in the highly verbose modes, is probably
-intelligible only to experienced PCI hackers. For the exact definitions of
+Some parts of the output, especially in the highly verbose modes, are probably
+intelligible only to experienced PCI hackers. For exact definitions of
 the fields, please consult either the PCI specifications or the
 .B header.h
 and
@@ -38,6 +38,22 @@ information with
 text.
 
 .SH OPTIONS
+
+.SS Basic display modes
+.TP
+.B -m
+Dump PCI device data in a backward-compatible machine readable form.
+See below for details.
+.TP
+.B -mm
+Dump PCI device data in a machine readable form for easy parsing by scripts.
+See below for details.
+.TP
+.B -t
+Show a tree-like diagram containing all buses, bridges, devices and connections
+between them.
+
+.SS Display options
 .TP
 .B -v
 Be verbose and display detailed information about all devices.
@@ -49,6 +65,39 @@ useful.
 .B -vvv
 Be even more verbose and display everything we are able to parse,
 even if it doesn't look interesting at all (e.g., undefined memory regions).
+.TP
+.B -k
+Show kernel drivers handling each device and also kernel modules capable of handling it.
+Turned on by default when
+.B -v
+is given in the normal mode of output.
+(Currently works only on Linux with kernel 2.6 or newer.)
+.TP
+.B -x
+Show hexadecimal dump of the standard part of the configuration space (the first
+64 bytes or 128 bytes for CardBus bridges).
+.TP
+.B -xxx
+Show hexadecimal dump of the whole PCI configuration space. It is available only to root
+as several PCI devices
+.B crash
+when you try to read some parts of the config space (this behavior probably
+doesn't violate the PCI standard, but it's at least very stupid). However, such
+devices are rare, so you needn't worry much.
+.TP
+.B -xxxx
+Show hexadecimal dump of the extended (4096-byte) PCI configuration space available
+on PCI-X 2.0 and PCI Express buses.
+.TP
+.B -b
+Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
+PCI bus instead of as seen by the kernel.
+.TP
+.B -D
+Always show PCI domain numbers. By default, lspci suppresses them on machines which
+have only domain 0.
+
+.SS Options to control resolving ID's to names
 .TP
 .B -n
 Show PCI vendor and device codes as numbers instead of looking them up in the
@@ -75,37 +124,8 @@ but the local cache is reset.
 .B -Q
 Query the central database even for entries which are recognized locally.
 Use this if you suspect that the displayed entry is wrong.
-.TP
-.B -x
-Show hexadecimal dump of the standard part of the configuration space (the first
-64 bytes or 128 bytes for CardBus bridges).
-.TP
-.B -xxx
-Show hexadecimal dump of the whole PCI configuration space. It is available only to root
-as several PCI devices
-.B crash
-when you try to read some parts of the config space (this behavior probably
-doesn't violate the PCI standard, but it's at least very stupid). However, such
-devices are rare, so you needn't worry much.
-.TP
-.B -xxxx
-Show hexadecimal dump of the extended (4096-byte) PCI configuration space available
-on PCI-X 2.0 and PCI Express buses.
-.TP
-.B -k
-Show kernel drivers handling each device and also kernel modules capable of handling it.
-Turned on by default when
-.B -v
-is given in the normal mode of output.
-(Currently works only on Linux with kernel 2.6 or newer.)
-.TP
-.B -b
-Bus-centric view. Show all IRQ numbers and addresses as seen by the cards on the
-PCI bus instead of as seen by the kernel.
-.TP
-.B -t
-Show a tree-like diagram containing all buses, bridges, devices and connections
-between them.
+
+.SS Options for selection of devices
 .TP
 .B -s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]
 Show only devices in the specified domain (in case your machine has several host bridges,
@@ -119,6 +139,8 @@ the fourth function of each device.
 .B -d [<vendor>]:[<device>]
 Show only devices with specified vendor and device ID. Both ID's are given in
 hexadecimal and may be omitted or given as "*", both meaning "any value".
+
+.SS Other options
 .TP
 .B -i <file>
 Use
@@ -134,18 +156,6 @@ as the map of PCI ID's handled by kernel modules. By default, lspci uses
 .RI /lib/modules/ kernel_version /modules.pcimap.
 Applies only to Linux systems with recent enough module tools.
 .TP
-.B -m
-Dump PCI device data in a backward-compatible machine readable form.
-See below for details.
-.TP
-.B -mm
-Dump PCI device data in a machine readable form for easy parsing by scripts.
-See below for details.
-.TP
-.B -D
-Always show PCI domain numbers. By default, lspci suppresses them on machines which
-have only domain 0.
-.TP
 .B -M
 Invoke bus mapping mode which performs a thorough scan of all PCI devices, including
 those behind misconfigured bridges etc. This option is available only to root and it
@@ -158,73 +168,36 @@ Shows
 .I lspci
 version. This option should be used stand-alone.
 
-.SH PCILIB AND ITS OPTIONS
-The PCI utilities use PCILIB (a portable library providing platform-independent
-functions for PCI configuration space access) to talk to the PCI cards. It supports
-the following access methods:
-
+.SS PCI access options
+.PP
+The PCI utilities use the PCI library to talk to PCI devices (see
+\fBpcilib\fP(7) for details). You can use the following options to
+influence its behavior:
 .TP
-.B linux_sysfs
-The
-.B /sys
-filesystem on Linux 2.6 and newer. The standard header of the config space is available
-to all users, the rest only to root. Supports extended configuration space, PCI domains
-and information on attached kernel drivers.
+.B -A <method>
+The library supports a variety of methods to access the PCI hardware.
+By default, it uses the first access method available, but you can use
+this option to override this decision. See \fB-A help\fP for a list of
+available methods and their descriptions.
 .TP
-.B linux_proc
-The
-.B /proc/bus/pci
-interface supported by Linux 2.1 and newer. The standard header of the config space is available
-to all users, the rest only to root.
-.TP
-.B intel_conf1
-Direct hardware access via Intel configuration mechanism 1. Available on i386 and compatibles
-on Linux, Solaris/x86, GNU Hurd and Windows. Requires root privileges.
-.TP
-.B intel_conf2
-Direct hardware access via Intel configuration mechanism 2. Available on i386 and compatibles
-on Linux, Solaris/x86 and GNU Hurd. Requires root privileges. Warning: This method
-is able to address only first 16 devices on any bus and it seems to be very
-unreliable in many cases.
-.TP
-.B fbsd_device
-The
-.B /dev/pci
-device on FreeBSD. Requires root privileges.
-.TP
-.B obsd_device
-The
-.B /dev/pci
-device on OpenBSD. Requires root privileges.
-.TP
-.B nbsd_libpci
-The
-.B /dev/pci0
-device on NetBSD accessed using the local libpci library.
-.TP
-.B aix_device
-Access method used on AIX. Requires root privileges.
-
-.P
-By default, PCILIB uses the first available access method and displays no debugging
-messages, but you can use the following switches to control its behavior:
-
-.TP
-.B -P <dir>
-Force use of the linux_proc access method, using
-.B <dir>
-instead of /proc/bus/pci.
+.B -O <param>=<value>
+The behavior of the library is controlled by several named parameters.
+This option allows to set the value of any of the parameters. Use \fB-O help\fP
+for a list of known parameters and their default values.
 .TP
 .B -H1
 Use direct hardware access via Intel configuration mechanism 1.
+(This is a shorthand for \fB-A intel-conf1\fP.)
 .TP
 .B -H2
 Use direct hardware access via Intel configuration mechanism 2.
+(This is a shorthand for \fB-A intel-conf2\fP.)
 .TP
 .B -F <file>
-Extract all information from given file containing output of lspci -x. This is very
-useful for analysis of user-supplied bug reports, because you can display the
-hardware configuration in any way you want without disturbing the user with
+Instead of accessing real hardware, read the list of devices and values of their
+configuration registers from the given file produced by an earlier run of lspci -x.
+This is very useful for analysis of user-supplied bug reports, because you can display
+the hardware configuration in any way you want without disturbing the user with
 requests for more dumps.
 .TP
 .B -G
@@ -354,12 +327,6 @@ If lspci is compiled with support for compression, this file is tried before pci
 .TP
 .B ~/.pciids-cache
 All ID's found in the DNS query mode are cached in this file.
-.TP
-.B /proc/bus/pci
-An interface to PCI bus configuration space provided by the post-2.1.82 Linux
-kernels. Contains per-bus subdirectories with per-card config space files and a
-.I devices
-file containing a list of all PCI devices.
 
 .SH BUGS
 
@@ -376,7 +343,8 @@ back-end.
 
 .SH SEE ALSO
 .BR setpci (8),
-.BR update-pciids (8)
+.BR update-pciids (8),
+.BR pcilib (7)
 
 .SH AUTHOR
 The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.
