@@ -23,23 +23,22 @@ struct pci_methods;
 
 enum pci_access_type {
   /* Known access methods, remember to update access.c as well */
-  PCI_ACCESS_AUTO,			/* Autodetection (params: none) */
-  PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci (params: path) */
-  PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci (params: path) */
-  PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 (params: none) */
-  PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 (params: none) */
-  PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci (params: path) */
+  PCI_ACCESS_AUTO,			/* Autodetection */
+  PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci */
+  PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci */
+  PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 */
+  PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 */
+  PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci */
   PCI_ACCESS_AIX_DEVICE,		/* /dev/pci0, /dev/bus0, etc. */
   PCI_ACCESS_NBSD_LIBPCI,		/* NetBSD libpci */
   PCI_ACCESS_OBSD_DEVICE,		/* OpenBSD /dev/pci */
-  PCI_ACCESS_DUMP,			/* Dump file (params: filename) */
+  PCI_ACCESS_DUMP,			/* Dump file */
   PCI_ACCESS_MAX
 };
 
 struct pci_access {
   /* Options you can change: */
   unsigned int method;			/* Access method */
-  char *method_params[PCI_ACCESS_MAX];	/* Parameters for the methods */
   int writeable;			/* Open in read/write mode */
   int buscentric;			/* Bus-centric view of the world */
 

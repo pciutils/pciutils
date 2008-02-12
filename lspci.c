@@ -1584,11 +1584,14 @@ static char *
 find_driver(struct device *d, char *buf)
 {
   struct pci_dev *dev = d->dev;
-  char *base = dev->access->method_params[PCI_ACCESS_SYS_BUS_PCI];
-  char name[1024], *drv;
+  char name[1024], *drv, *base;
   int n;
 
   if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
+    return NULL;
+
+  base = pci_get_param(dev->access, "sysfs.path");
+  if (!base || !base[0])
     return NULL;
 
   n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",

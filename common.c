@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Common Functions
  *
- *	Copyright (c) 1997--2006 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -73,7 +73,7 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
     {
 #ifdef PCI_HAVE_PM_LINUX_PROC
     case 'P':
-      pacc->method_params[PCI_ACCESS_PROC_BUS_PCI] = optarg;
+      pci_set_param(pacc, "proc.path", optarg);
       pacc->method = PCI_ACCESS_PROC_BUS_PCI;
       break;
 #endif
@@ -89,7 +89,7 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 #endif
 #ifdef PCI_HAVE_PM_DUMP
     case 'F':
-      pacc->method_params[PCI_ACCESS_DUMP] = optarg;
+      pci_set_param(pacc, "dump.name", optarg);
       pacc->method = PCI_ACCESS_DUMP;
       break;
 #endif

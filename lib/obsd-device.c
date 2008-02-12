@@ -19,13 +19,13 @@
 static void
 obsd_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_OBSD_DEVICE] = PCI_PATH_OBSD_DEVICE;
+  pci_define_param(a, "obsd.path", PCI_PATH_OBSD_DEVICE, "Path to the OpenBSD PCI device");
 }
 
 static int
 obsd_detect(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_OBSD_DEVICE];
+  char *name = pci_get_param(a, "obsd.path");
 
   if (access(name, R_OK))
     {
@@ -39,7 +39,7 @@ obsd_detect(struct pci_access *a)
 static void
 obsd_init(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_OBSD_DEVICE];
+  char *name = pci_get_param(a, "obsd.path");
 
   a->fd = open(name, O_RDWR, 0);
   if (a->fd < 0)

@@ -33,13 +33,13 @@
 static void
 fbsd_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_FBSD_DEVICE] = PCI_PATH_FBSD_DEVICE;
+  pci_define_param(a, "fbsd.path", PCI_PATH_FBSD_DEVICE, "Path to the FreeBSD PCI device");
 }
 
 static int
 fbsd_detect(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_FBSD_DEVICE];
+  char *name = pci_get_param(a, "fbsd.path");
 
   if (access(name, R_OK))
     {
@@ -53,7 +53,7 @@ fbsd_detect(struct pci_access *a)
 static void
 fbsd_init(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_FBSD_DEVICE];
+  char *name = pci_get_param(a, "fbsd.path");
 
   a->fd = open(name, O_RDWR, 0);
   if (a->fd < 0)

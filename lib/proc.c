@@ -21,13 +21,13 @@
 static void
 proc_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_PROC_BUS_PCI] = PCI_PATH_PROC_BUS_PCI;
+  pci_define_param(a, "proc.path", PCI_PATH_PROC_BUS_PCI, "Path to the procfs bus tree");
 }
 
 static int
 proc_detect(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_PROC_BUS_PCI];
+  char *name = pci_get_param(a, "proc.path");
 
   if (access(name, R_OK))
     {
@@ -60,7 +60,7 @@ proc_scan(struct pci_access *a)
   FILE *f;
   char buf[512];
 
-  if (snprintf(buf, sizeof(buf), "%s/devices", a->method_params[PCI_ACCESS_PROC_BUS_PCI]) == sizeof(buf))
+  if (snprintf(buf, sizeof(buf), "%s/devices", pci_get_param(a, "proc.path")) == sizeof(buf))
     a->error("File name too long");
   f = fopen(buf, "r");
   if (!f)
@@ -124,7 +124,7 @@ proc_setup(struct pci_dev *d, int rw)
       if (a->fd >= 0)
 	close(a->fd);
       e = snprintf(buf, sizeof(buf), "%s/%02x/%02x.%d",
-		   a->method_params[PCI_ACCESS_PROC_BUS_PCI],
+		   pci_get_param(a, "proc.path"),
 		   d->bus, d->dev, d->func);
       if (e < 0 || e >= (int) sizeof(buf))
 	a->error("File name too long");
