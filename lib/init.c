@@ -68,8 +68,8 @@ pci_alloc(void)
   memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
 #ifdef PCI_USE_DNS
-  pci_define_param(a, "net.domain", PCI_ID_DOMAIN);
-  pci_define_param(a, "net.cache_path", "~/.pciids-cache");
+  pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
+  pci_define_param(a, "net.cache_path", "~/.pciids-cache", "Name of the ID cache file");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
 #endif
   for(i=0; i<PCI_ACCESS_MAX; i++)
@@ -154,7 +154,7 @@ pci_get_param(struct pci_access *acc, char *param)
 }
 
 void
-pci_define_param(struct pci_access *acc, char *param, char *value)
+pci_define_param(struct pci_access *acc, char *param, char *value, char *help)
 {
   struct pci_param *p = pci_malloc(acc, sizeof(*p));
 
@@ -163,6 +163,7 @@ pci_define_param(struct pci_access *acc, char *param, char *value)
   p->param = param;
   p->value = value;
   p->value_malloced = 0;
+  p->help = help;
 }
 
 int

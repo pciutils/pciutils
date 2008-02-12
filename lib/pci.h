@@ -91,6 +91,7 @@ struct pci_param {
   char *param;				/* Name of the parameter */
   char *value;				/* Value of the parameter */
   int value_malloced;			/* used internally */
+  char *help;				/* Explanation of the parameter */
 };
 
 char *pci_get_param(struct pci_access *acc, char *param);
