@@ -1,5 +1,7 @@
 2008-02-11  Martin Mares <mj@ucw.cz>
 
+	* Released as 2.2.10.
+
 	* lspci.c, setpci.c: Cleaned up the list of options.
 
 	* lib/names.c: Fix displaying of errors reported by zlib.
