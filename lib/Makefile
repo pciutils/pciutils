@@ -3,7 +3,7 @@
 
 include config.mk
 
-OBJS=access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o names-net.o names-cache.o
+OBJS=init.o access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o names-net.o names-cache.o
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 PCILIB=libpci.a
@@ -61,6 +61,7 @@ $(PCILIBPC): $(PCILIBPC).in
 		-e 's,@VERSION@,$(VERSION),' \
 		-e 's,@LIBZ@,$(LIBZ),'
 
+init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h
 proc.o: proc.c $(INCL) pread.h
