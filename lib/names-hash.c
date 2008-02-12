@@ -112,23 +112,15 @@ char
   return NULL;
 }
 
-static void
+void
 pci_id_hash_free(struct pci_access *a)
 {
   pci_mfree(a->id_hash);
   a->id_hash = NULL;
-  a->id_cache_status = 0;
   while (a->current_id_bucket)
     {
       struct id_bucket *buck = a->current_id_bucket;
       a->current_id_bucket = buck->next;
       pci_mfree(buck);
     }
-}
-
-void
-pci_free_name_list(struct pci_access *a)
-{
-  pci_id_cache_flush(a);
-  pci_id_hash_free(a);
 }

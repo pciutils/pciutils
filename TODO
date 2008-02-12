@@ -1,12 +1,10 @@
 - review class names
 
 DNS mode:
-- update README
 - check negative caching
 - check handling of network errors
 - try to avoid libresolv.a
 - replace "Unknown device" with "Device"
-- check the logic around id_load_failed
 
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)

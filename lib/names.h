@@ -62,6 +62,7 @@ char *pci_id_lookup(struct pci_access *a, int flags, int cat, int id1, int id2, 
 int pci_id_cache_load(struct pci_access *a, int flags);
 void pci_id_cache_dirty(struct pci_access *a);
 void pci_id_cache_flush(struct pci_access *a);
+void pci_id_hash_free(struct pci_access *a);
 
 /* names-dns.c */
 

@@ -233,7 +233,16 @@ pci_load_name_list(struct pci_access *a)
   return 1;
 }
 
-void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed)
+void
+pci_free_name_list(struct pci_access *a)
+{
+  pci_id_cache_flush(a);
+  pci_id_hash_free(a);
+  a->id_load_failed = 0;
+}
+
+void
+pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed)
 {
   if (a->free_id_name)
     free(a->id_file_name);
