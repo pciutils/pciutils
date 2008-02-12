@@ -88,18 +88,18 @@ format_name_pair(char *buf, int size, int flags, char *v, char *d, char *num)
       if (v && d)
 	res = snprintf(buf, size, "%s %s [%s]", v, d, num);
       else if (!v)
-	res = snprintf(buf, size, "Unknown device [%s]", num);
+	res = snprintf(buf, size, "Device [%s]", num);
       else /* v && !d */
-	res = snprintf(buf, size, "%s Unknown device [%s]", v, num);
+	res = snprintf(buf, size, "%s Device [%s]", v, num);
     }
   else
     {
       if (v && d)
 	res = snprintf(buf, size, "%s %s", v, d);
       else if (!v)
-	res = snprintf(buf, size, "Unknown device %s", num);
+	res = snprintf(buf, size, "Device %s", num);
       else /* v && !d */
-	res = snprintf(buf, size, "%s Unknown device %s", v, num+5);
+	res = snprintf(buf, size, "%s Device %s", v, num+5);
     }
   if (res < 0 || res >= size)
     return "<pci_lookup_name: buffer too small>";
@@ -136,12 +136,12 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
     case PCI_LOOKUP_VENDOR:
       iv = va_arg(args, int);
       sprintf(numbuf, "%04x", iv);
-      return format_name(buf, size, flags, id_lookup(a, flags, ID_VENDOR, iv, 0, 0, 0), numbuf, "Unknown vendor");
+      return format_name(buf, size, flags, id_lookup(a, flags, ID_VENDOR, iv, 0, 0, 0), numbuf, "Vendor");
     case PCI_LOOKUP_DEVICE:
       iv = va_arg(args, int);
       id = va_arg(args, int);
       sprintf(numbuf, "%04x", id);
-      return format_name(buf, size, flags, id_lookup(a, flags, ID_DEVICE, iv, id, 0, 0), numbuf, "Unknown device");
+      return format_name(buf, size, flags, id_lookup(a, flags, ID_DEVICE, iv, id, 0, 0), numbuf, "Device");
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE:
       iv = va_arg(args, int);
       id = va_arg(args, int);
@@ -160,7 +160,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
       isv = va_arg(args, int);
       isd = va_arg(args, int);
       sprintf(numbuf, "%04x", isd);
-      return format_name(buf, size, flags, id_lookup_subsys(a, flags, iv, id, isv, isd), numbuf, "Unknown device");
+      return format_name(buf, size, flags, id_lookup_subsys(a, flags, iv, id, isv, isd), numbuf, "Device");
     case PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE | PCI_LOOKUP_SUBSYSTEM:
       iv = va_arg(args, int);
       id = va_arg(args, int);
@@ -179,7 +179,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
 	  if (!(flags & PCI_LOOKUP_NUMERIC)) /* Include full class number */
 	    flags |= PCI_LOOKUP_MIXED;
 	}
-      return format_name(buf, size, flags, cls, numbuf, ((flags & PCI_LOOKUP_MIXED) ? "Unknown class" : "Class"));
+      return format_name(buf, size, flags, cls, numbuf, "Class");
     case PCI_LOOKUP_PROGIF:
       icls = va_arg(args, int);
       ipif = va_arg(args, int);
