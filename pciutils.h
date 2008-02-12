@@ -22,13 +22,6 @@ void *xmalloc(unsigned int howmuch);
 void *xrealloc(void *ptr, unsigned int howmuch);
 int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 
-#ifdef PCI_HAVE_PM_LINUX_PROC
-#define GENOPT_PROC "P:"
-#define GENHELP_PROC "-P <dir>\tUse specified directory instead of " PCI_PATH_PROC_BUS_PCI "\n"
-#else
-#define GENOPT_PROC
-#define GENHELP_PROC
-#endif
 #ifdef PCI_HAVE_PM_INTEL_CONF
 #define GENOPT_INTEL "H:"
 #define GENHELP_INTEL "-H <mode>\tUse direct hardware access (<mode> = 1 or 2)\n"
@@ -44,8 +37,8 @@ int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 #define GENHELP_DUMP
 #endif
 
-#define GENERIC_OPTIONS "A:GO:" GENOPT_PROC GENOPT_INTEL GENOPT_DUMP
-#define GENERIC_HELP GENHELP_PROC GENHELP_INTEL GENHELP_DUMP \
+#define GENERIC_OPTIONS "A:GO:" GENOPT_INTEL GENOPT_DUMP
+#define GENERIC_HELP GENHELP_INTEL GENHELP_DUMP \
 	"-A <method>\tUse the specified PCI access method (see `-A help' for a list)\n" \
 	"-G\t\tEnable PCI access debugging\n" \
 	"-O <par>=<val>\tSet PCI access parameter (see `-O help' for a list)\n"

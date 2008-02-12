@@ -94,12 +94,6 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 {
   switch (i)
     {
-#ifdef PCI_HAVE_PM_LINUX_PROC
-    case 'P':
-      pci_set_param(pacc, "proc.path", optarg);
-      pacc->method = PCI_ACCESS_PROC_BUS_PCI;
-      break;
-#endif
 #ifdef PCI_HAVE_PM_INTEL_CONF
     case 'H':
       if (!strcmp(optarg, "1"))
