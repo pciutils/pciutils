@@ -13,7 +13,7 @@
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x020204	/* FIXME: Update */
+#define PCI_LIB_VERSION 0x020299
 
 /*
  *	PCI Access Structure
