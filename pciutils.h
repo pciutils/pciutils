@@ -29,16 +29,17 @@ int parse_generic_option(int i, struct pci_access *pacc, char *optarg);
 #define GENOPT_INTEL
 #define GENHELP_INTEL
 #endif
-#ifdef PCI_HAVE_PM_DUMP
+#if defined(PCI_HAVE_PM_DUMP) && !defined(PCIUTILS_SETPCI)
 #define GENOPT_DUMP "F:"
-#define GENHELP_DUMP "-F <file>\tRead configuration data from given file\n"
+#define GENHELP_DUMP "-F <file>\tRead PCI configuration dump from a given file\n"
 #else
 #define GENOPT_DUMP
 #define GENHELP_DUMP
 #endif
 
 #define GENERIC_OPTIONS "A:GO:" GENOPT_INTEL GENOPT_DUMP
-#define GENERIC_HELP GENHELP_INTEL GENHELP_DUMP \
+#define GENERIC_HELP \
 	"-A <method>\tUse the specified PCI access method (see `-A help' for a list)\n" \
+	"-O <par>=<val>\tSet PCI access parameter (see `-O help' for a list)\n" \
 	"-G\t\tEnable PCI access debugging\n" \
-	"-O <par>=<val>\tSet PCI access parameter (see `-O help' for a list)\n"
+	GENHELP_INTEL GENHELP_DUMP

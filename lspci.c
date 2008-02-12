@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#define PCIUTILS_LSPCI
 #include "pciutils.h"
 
 /* Options */
@@ -36,7 +37,22 @@ static char options[] = "nvbxs:d:ti:mgp:qkMDQ" GENERIC_OPTIONS ;
 static char help_msg[] =
 "Usage: lspci [<switches>]\n"
 "\n"
-"-v\t\tBe verbose\n"
+"Basic display modes:\n"
+"-mm\t\tProduce machine-readable output (single -m for an obsolete format)\n"
+"-t\t\tShow bus tree\n"
+"\n"
+"Display options:\n"
+"-v\t\tBe verbose (-vv for very verbose)\n"
+#ifdef PCI_OS_LINUX
+"-k\t\tShow kernel drivers handling each device\n"
+#endif
+"-x\t\tShow hex-dump of the standard part of the config space\n"
+"-xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n"
+"-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n"
+"-b\t\tBus-centric view (addresses and IRQ's as seen by the bus)\n"
+"-D\t\tAlways show domain numbers\n"
+"\n"
+"Resolving of device ID's to names:\n"
 "-n\t\tShow numeric ID's\n"
 "-nn\t\tShow both textual and numeric ID's (names & numbers)\n"
 #ifdef PCI_USE_DNS
@@ -44,21 +60,19 @@ static char help_msg[] =
 "-qq\t\tAs above, but re-query locally cached entries\n"
 "-Q\t\tQuery the PCI ID database for all ID's via DNS\n"
 #endif
-"-b\t\tBus-centric view (PCI addresses and IRQ's instead of those seen by the CPU)\n"
-"-x\t\tShow hex-dump of the standard portion of config space\n"
-"-xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n"
-"-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n"
+"\n"
+"Selection of devices:\n"
 "-s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n"
-"-d [<vendor>]:[<device>]\tShow only selected devices\n"
-"-t\t\tShow bus tree\n"
-"-m\t\tProduce machine-readable output\n"
+"-d [<vendor>]:[<device>]\t\t\tShow only devices with specified ID's\n"
+"\n"
+"Other options:\n"
 "-i <file>\tUse specified ID database instead of %s\n"
 #ifdef PCI_OS_LINUX
-"-k\t\tShow kernel drivers handling each device\n"
 "-p <file>\tLook up kernel modules in a given file instead of default modules.pcimap\n"
 #endif
-"-D\t\tAlways show domain numbers\n"
 "-M\t\tEnable `bus mapping' mode (dangerous; root only)\n"
+"\n"
+"PCI access options:\n"
 GENERIC_HELP
 ;
 
@@ -2727,9 +2741,11 @@ main(int argc, char **argv)
       case 'p':
 	opt_pcimap = optarg;
 	break;
+#ifdef PCI_OS_LINUX
       case 'k':
 	opt_kernel++;
 	break;
+#endif
       case 'M':
 	opt_map_mode++;
 	break;
