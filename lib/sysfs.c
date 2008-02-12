@@ -250,7 +250,8 @@ static void sysfs_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_linux_sysfs = {
-  "Linux-sysfs",
+  "linux-sysfs",
+  "The sys filesystem on Linux",
   sysfs_config,
   sysfs_detect,
   sysfs_init,

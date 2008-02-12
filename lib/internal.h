@@ -11,6 +11,7 @@
 
 struct pci_methods {
   char *name;
+  char *help;
   void (*config)(struct pci_access *);
   int (*detect)(struct pci_access *);
   void (*init)(struct pci_access *);

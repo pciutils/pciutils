@@ -187,7 +187,8 @@ proc_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_linux_proc = {
-  "Linux-proc",
+  "linux-proc",
+  "The proc file system on Linux",
   proc_config,
   proc_detect,
   proc_init,

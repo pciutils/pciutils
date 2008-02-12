@@ -154,7 +154,8 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_fbsd_device = {
-  "FreeBSD-device",
+  "fbsd-device",
+  "FreeBSD /dev/pci device",
   fbsd_config,
   fbsd_detect,
   fbsd_init,

@@ -136,7 +136,8 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_obsd_device = {
-  "OpenBSD-device",
+  "obsd-device",
+  "/dev/pci on OpenBSD",
   obsd_config,
   obsd_detect,
   obsd_init,

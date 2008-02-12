@@ -141,7 +141,8 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_nbsd_libpci = {
-  "NetBSD-libpci",
+  "nbsd-libpci",
+  "NetBSD libpci",
   nbsd_config,
   nbsd_detect,
   nbsd_init,

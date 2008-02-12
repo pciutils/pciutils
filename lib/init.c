@@ -123,6 +123,28 @@ pci_null_debug(char *msg UNUSED, ...)
 {
 }
 
+int
+pci_lookup_method(char *name)
+{
+  int i;
+
+  for (i=0; i<PCI_ACCESS_MAX; i++)
+    if (pci_methods[i] && !strcmp(pci_methods[i]->name, name))
+      return i;
+  return -1;
+}
+
+char *
+pci_get_method_name(int index)
+{
+  if (index < 0 || index >= PCI_ACCESS_MAX)
+    return NULL;
+  else if (!pci_methods[index])
+    return "";
+  else
+    return pci_methods[index]->name;
+}
+
 struct pci_access *
 pci_alloc(void)
 {

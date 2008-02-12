@@ -259,7 +259,8 @@ aix_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_aix_device = {
-  "AIX-device",
+  "aix-device",
+  "AIX /dev/pci[0-n]",
   NULL,
   aix_detect,
   aix_init,

@@ -81,6 +81,10 @@ void pci_scan_bus(struct pci_access *acc);
 struct pci_dev *pci_get_dev(struct pci_access *acc, int domain, int bus, int dev, int func); /* Raw access to specified device */
 void pci_free_dev(struct pci_dev *);
 
+/* Names of access methods */
+int pci_lookup_method(char *name);	/* Returns -1 if not found */
+char *pci_get_method_name(int index);	/* Returns "" if unavailable, NULL if index out of range */
+
 /*
  *	Named parameters
  */
