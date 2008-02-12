@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Internal Stuff
  *
- *	Copyright (c) 1997--2004 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -31,9 +31,12 @@ int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 
 void *pci_malloc(struct pci_access *, int);
 void pci_mfree(void *);
+char *pci_strdup(struct pci_access *a, char *s);
 
 struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
+
+void pci_define_param(struct pci_access *acc, char *param, char *val);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
 	pm_fbsd_device, pm_aix_device, pm_nbsd_libpci, pm_obsd_device,

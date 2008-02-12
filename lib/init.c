@@ -92,6 +92,15 @@ pci_mfree(void *x)
     free(x);
 }
 
+char *
+pci_strdup(struct pci_access *a, char *s)
+{
+  int len = strlen(s) + 1;
+  char *t = pci_malloc(a, len);
+  memcpy(t, s, len);
+  return t;
+}
+
 static void
 pci_generic_error(char *msg, ...)
 {
@@ -128,6 +137,70 @@ pci_generic_debug(char *msg, ...)
 static void
 pci_null_debug(char *msg UNUSED, ...)
 {
+}
+
+char *
+pci_get_param(struct pci_access *acc, char *param)
+{
+  struct pci_param *p;
+
+  for (p=acc->params; p; p=p->next)
+    if (!strcmp(p->param, param))
+      return p->value;
+  return NULL;
+}
+
+void
+pci_define_param(struct pci_access *acc, char *param, char *value)
+{
+  struct pci_param *p = pci_malloc(acc, sizeof(*p));
+
+  p->next = acc->params;
+  acc->params = p;
+  p->param = param;
+  p->value = value;
+  p->value_malloced = 0;
+}
+
+int
+pci_set_param(struct pci_access *acc, char *param, char *value)
+{
+  struct pci_param *p;
+
+  for (p=acc->params; p; p=p->next)
+    if (!strcmp(p->param, param))
+      {
+	if (p->value_malloced)
+	  pci_mfree(p->value);
+	p->value_malloced = 1;
+	p->value = pci_strdup(acc, value);
+	return 0;
+      }
+  return -1;
+}
+
+static void
+pci_free_params(struct pci_access *acc)
+{
+  struct pci_param *p;
+
+  while (p = acc->params)
+    {
+      acc->params = p->next;
+      if (p->value_malloced)
+	pci_mfree(p->value);
+      pci_mfree(p);
+    }
+}
+
+struct pci_param *
+pci_walk_params(struct pci_access *acc, struct pci_param *prev)
+{
+  /* So far, the params form a simple linked list, but this can change in the future */
+  if (!prev)
+    return acc->params;
+  else
+    return prev->next;
 }
 
 void
@@ -184,9 +257,9 @@ pci_cleanup(struct pci_access *a)
   if (a->methods)
     a->methods->cleanup(a);
   pci_free_name_list(a);
+  pci_free_params(a);
   pci_set_name_list_path(a, NULL, 0);
   pci_set_net_domain(a, NULL, 0);
   pci_set_id_cache(a, NULL, 0);
   pci_mfree(a);
 }
-

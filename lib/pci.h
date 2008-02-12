@@ -65,6 +65,7 @@ struct pci_access {
 
   /* Fields used internally: */
   struct pci_methods *methods;
+  struct pci_param *params;
   struct id_entry **id_hash;		/* names.c */
   struct id_bucket *current_id_bucket;
   int id_load_failed;
@@ -84,6 +85,22 @@ void pci_cleanup(struct pci_access *);
 void pci_scan_bus(struct pci_access *acc);
 struct pci_dev *pci_get_dev(struct pci_access *acc, int domain, int bus, int dev, int func); /* Raw access to specified device */
 void pci_free_dev(struct pci_dev *);
+
+/*
+ *	Named parameters
+ */
+
+struct pci_param {
+  struct pci_param *next;		/* Please use pci_walk_params() for traversing the list */
+  char *param;				/* Name of the parameter */
+  char *value;				/* Value of the parameter */
+  int value_malloced;			/* used internally */
+};
+
+char *pci_get_param(struct pci_access *acc, char *param);
+int pci_set_param(struct pci_access *acc, char *param, char *value);	/* 0 on success, -1 if no such parameter */
+/* To traverse the list, call pci_walk_params repeatedly, first with prev=NULL, and do not modify the parameters during traversal. */
+struct pci_param *pci_walk_params(struct pci_access *acc, struct pci_param *prev);
 
 /*
  *	Devices

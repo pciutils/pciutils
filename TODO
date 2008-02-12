@@ -6,6 +6,7 @@ DNS mode:
 - check handling of network errors
 - try to avoid libresolv.a
 - replace "Unknown device" with "Device"
+- check the logic around id_load_failed
 
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)
