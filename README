@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -71,6 +71,9 @@ If you are missing names for any of your devices or you just want to stay
 on the bleeding edge, download the most recent pci.ids file from
 http://pciids.sf.net/ (e.g., by running the update-ids utility).
 
+Alternatively, you can use `lspci -q' to query the central database
+for new entries via network.
+
 If your devices still appear as unknown, please send us their ID's and
 names, the detailed instructions for submissions are listed on the
 sf.net web page.
@@ -91,9 +94,10 @@ There is also a public GIT tree at:
 
 5. Using the library
 ~~~~~~~~~~~~~~~~~~~~
-There is still no documentation for the library, if you want to use it
-in your programs, please follow the comments in lib/pci.h and in the
-example program lib/example.c.
+So far, there is only a little documentation for the library except for the
+general introduction in the pcilib(7) man page. If you want to use the
+library in your programs, please follow the comments in lib/pci.h and in
+the example program lib/example.c.
 
 
 6. Feedback
