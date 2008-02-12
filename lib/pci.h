@@ -52,9 +52,9 @@ struct pci_access {
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */
-  void (*error)(char *msg, ...);	/* Write error message and quit */
-  void (*warning)(char *msg, ...);	/* Write a warning message */
-  void (*debug)(char *msg, ...);	/* Write a debugging message */
+  void (*error)(char *msg, ...) PCI_PRINTF(1,2);	/* Write error message and quit */
+  void (*warning)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a warning message */
+  void (*debug)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a debugging message */
 
   struct pci_dev *devices;		/* Devices found on this bus */
 

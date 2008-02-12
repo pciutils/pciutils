@@ -17,7 +17,7 @@
 
 extern const char program_name[];
 
-void die(char *msg, ...) NONRET;
+void die(char *msg, ...) NONRET PCI_PRINTF(1,2);
 void *xmalloc(unsigned int howmuch);
 void *xrealloc(void *ptr, unsigned int howmuch);
 int parse_generic_option(int i, struct pci_access *pacc, char *optarg);

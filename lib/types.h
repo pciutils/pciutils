@@ -57,3 +57,9 @@ typedef u32 pciaddr_t;
 #else
 #define PCIIRQ_FMT "%d"
 #endif
+
+#ifdef __GNUC__
+#define PCI_PRINTF(x,y) __attribute__((format(printf, x, y)))
+#else
+#define PCI_PRINTF(x,y)
+#endif

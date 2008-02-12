@@ -246,7 +246,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x00, 0, NULL }
 };
 
-static void NONRET
+static void NONRET PCI_PRINTF(1,2)
 usage(char *msg, ...)
 {
   va_list args;
