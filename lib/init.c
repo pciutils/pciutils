@@ -59,25 +59,6 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #endif
 };
 
-struct pci_access *
-pci_alloc(void)
-{
-  struct pci_access *a = malloc(sizeof(struct pci_access));
-  int i;
-
-  memset(a, 0, sizeof(*a));
-  pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
-#ifdef PCI_USE_DNS
-  pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
-  pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
-  a->id_lookup_mode = PCI_LOOKUP_CACHE;
-#endif
-  for(i=0; i<PCI_ACCESS_MAX; i++)
-    if (pci_methods[i] && pci_methods[i]->config)
-      pci_methods[i]->config(a);
-  return a;
-}
-
 void *
 pci_malloc(struct pci_access *a, int size)
 {
@@ -142,78 +123,23 @@ pci_null_debug(char *msg UNUSED, ...)
 {
 }
 
-char *
-pci_get_param(struct pci_access *acc, char *param)
+struct pci_access *
+pci_alloc(void)
 {
-  struct pci_param *p;
+  struct pci_access *a = malloc(sizeof(struct pci_access));
+  int i;
 
-  for (p=acc->params; p; p=p->next)
-    if (!strcmp(p->param, param))
-      return p->value;
-  return NULL;
-}
-
-void
-pci_define_param(struct pci_access *acc, char *param, char *value, char *help)
-{
-  struct pci_param *p = pci_malloc(acc, sizeof(*p));
-
-  p->next = acc->params;
-  acc->params = p;
-  p->param = param;
-  p->value = value;
-  p->value_malloced = 0;
-  p->help = help;
-}
-
-int
-pci_set_param_internal(struct pci_access *acc, char *param, char *value, int copy)
-{
-  struct pci_param *p;
-
-  for (p=acc->params; p; p=p->next)
-    if (!strcmp(p->param, param))
-      {
-	if (p->value_malloced)
-	  pci_mfree(p->value);
-	p->value_malloced = copy;
-	if (copy)
-	  p->value = pci_strdup(acc, value);
-	else
-	  p->value = value;
-	return 0;
-      }
-  return -1;
-}
-
-int
-pci_set_param(struct pci_access *acc, char *param, char *value)
-{
-  return pci_set_param_internal(acc, param, value, 1);
-}
-
-static void
-pci_free_params(struct pci_access *acc)
-{
-  struct pci_param *p;
-
-  while (p = acc->params)
-    {
-      acc->params = p->next;
-      if (p->value_malloced)
-	pci_mfree(p->value);
-      pci_mfree(p);
-    }
-}
-
-struct pci_param *
-pci_walk_params(struct pci_access *acc, struct pci_param *prev)
-{
-  /* So far, the params form a simple linked list, but this can change in the future */
-  if (!prev)
-    return acc->params;
-  else
-    return prev->next;
+  memset(a, 0, sizeof(*a));
+  pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
+#ifdef PCI_USE_DNS
+  pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
+  pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
+  a->id_lookup_mode = PCI_LOOKUP_CACHE;
+#endif
+  for(i=0; i<PCI_ACCESS_MAX; i++)
+    if (pci_methods[i] && pci_methods[i]->config)
+      pci_methods[i]->config(a);
+  return a;
 }
 
 void

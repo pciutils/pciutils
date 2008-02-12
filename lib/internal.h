@@ -38,6 +38,7 @@ int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);
 int pci_set_param_internal(struct pci_access *acc, char *param, char *val, int copy);
+void pci_free_params(struct pci_access *acc);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
 	pm_fbsd_device, pm_aix_device, pm_nbsd_libpci, pm_obsd_device,
