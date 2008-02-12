@@ -44,6 +44,28 @@ xrealloc(void *ptr, unsigned int howmuch)
   return p;
 }
 
+static void
+set_pci_option(struct pci_access *pacc, char *arg)
+{
+  if (!strcmp(arg, "help"))
+    {
+      struct pci_param *p;
+      printf("Known PCI access parameters:\n\n");
+      for (p=NULL; p=pci_walk_params(pacc, p);)
+	printf("%-20s %s (%s)\n", p->param, p->help, p->value);
+      exit(0);
+    }
+  else
+    {
+      char *sep = strchr(arg, '=');
+      if (!sep)
+	die("Invalid PCI access parameter syntax: %s", arg);
+      *sep++ = 0;
+      if (pci_set_param(pacc, arg, sep) < 0)
+	die("Unrecognized PCI access parameter: %s", arg);
+    }
+}
+
 int
 parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 {
@@ -73,6 +95,9 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 #endif
     case 'G':
       pacc->debugging++;
+      break;
+    case 'O':
+      set_pci_option(pacc, optarg);
       break;
     default:
       return 0;
