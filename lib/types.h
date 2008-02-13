@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Types and Format Strings
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -15,7 +15,7 @@
 typedef BYTE u8;
 typedef WORD u16;
 typedef DWORD u32;
-#elif defined(PCI_HAVE_STDINT_H)
+#elif defined(PCI_HAVE_STDINT_H) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 #include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
