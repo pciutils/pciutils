@@ -85,6 +85,7 @@ uninstall: all
 	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
+	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
 
 pci.ids.gz: pci.ids
 	gzip -9 <$< >$@
