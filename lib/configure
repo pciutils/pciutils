@@ -122,7 +122,7 @@ echo_n "Checking for zlib support... "
 if [ "$zlib" = yes -o "$zlib" = no ] ; then
 	echo "$zlib (set manually)"
 else
-	if [ -f /usr/include/zlib.h ] ; then
+	if [ -f /usr/include/zlib.h -o -f /usr/local/include/zlib.h ] ; then
 		zlib=yes
 	else
 		zlib=no
