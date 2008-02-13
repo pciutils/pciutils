@@ -21,6 +21,7 @@
 char
 *pci_id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
 {
+  static int resolver_inited;
   char name[256], dnsname[256], txt[256], *domain;
   byte answer[4096];
   const byte *data;
@@ -61,7 +62,11 @@ char
   sprintf(dnsname, "%s.%s", name, domain);
 
   a->debug("Resolving %s\n", dnsname);
-  res_init();
+  if (!resolver_inited)
+    {
+      resolver_inited = 1;
+      res_init();
+    }
   res = res_query(dnsname, ns_c_in, ns_t_txt, answer, sizeof(answer));
   if (res < 0)
     {
