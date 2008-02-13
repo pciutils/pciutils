@@ -18,6 +18,133 @@
 #include <arpa/nameser.h>
 #include <resolv.h>
 
+/*
+ * Unfortunately, there are no portable functions for DNS RR parsing,
+ * so we will do the bit shuffling with our own bare hands.
+ */
+
+#define GET16(x) do { if (p+2 > end) goto err; x = (p[0] << 8) | p[1]; p += 2; } while (0)
+#define GET32(x) do { if (p+4 > end) goto err; x = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]; p += 4; } while (0)
+
+enum dns_section {
+  DNS_SEC_QUESTION,
+  DNS_SEC_ANSWER,
+  DNS_SEC_AUTHORITY,
+  DNS_SEC_ADDITIONAL,
+  DNS_NUM_SECTIONS
+};
+
+struct dns_state {
+  u16 counts[DNS_NUM_SECTIONS];
+  u8 *sections[DNS_NUM_SECTIONS+1];
+  u8 *sec_ptr, *sec_end;
+
+  /* Result of dns_parse_rr(): */
+  u16 rr_type;
+  u16 rr_class;
+  u32 rr_ttl;
+  u16 rr_len;
+  u8 *rr_data;
+};
+
+static u8 *
+dns_skip_name(u8 *p, u8 *end)
+{
+  while (p < end)
+    {
+      unsigned int x = *p++;
+      if (!x)
+	return p;
+      switch (x & 0xc0)
+	{
+	case 0:		/* Uncompressed: x = length */
+	  p += x;
+	  break;
+	case 0xc0:	/* Indirection: 1 byte more for offset */
+	  p++;
+	  return (p < end) ? p : NULL;
+	default:	/* RFU */
+	  return NULL;
+	}
+    }
+  return NULL;
+}
+
+static int
+dns_parse_packet(struct dns_state *s, u8 *p, unsigned int plen)
+{
+  u8 *end = p + plen;
+  unsigned int i, j, x, len;
+
+#if 0
+  /* Dump the packet */
+  for (i=0; i<plen; i++)
+    {
+      if (!(i%16)) printf("%04x:", i);
+      printf(" %02x", p[i]);
+      if ((i%16)==15 || i==plen-1) putchar('\n');
+    }
+#endif
+
+  GET32(x);				/* ID and flags are ignored */
+  for (i=0; i<DNS_NUM_SECTIONS; i++)
+    GET16(s->counts[i]);
+  for (i=0; i<DNS_NUM_SECTIONS; i++)
+    {
+      s->sections[i] = p;
+      for (j=0; j < s->counts[i]; j++)
+	{
+	  p = dns_skip_name(p, end);	/* Name */
+	  if (!p)
+	    goto err;
+	  GET32(x);			/* Type and class */
+	  if (i != DNS_SEC_QUESTION)
+	    {
+	      GET32(x);			/* TTL */
+	      GET16(len);		/* Length of data */
+	      p += len;
+	      if (p > end)
+		goto err;
+	    }
+	}
+    }
+  s->sections[i] = p;
+  return 0;
+
+err:
+  return -1;
+}
+
+static void
+dns_init_section(struct dns_state *s, int i)
+{
+  s->sec_ptr = s->sections[i];
+  s->sec_end = s->sections[i+1];
+}
+
+static int
+dns_parse_rr(struct dns_state *s)
+{
+  byte *p = s->sec_ptr;
+  byte *end = s->sec_end;
+
+  if (p == end)
+    return 0;
+  p = dns_skip_name(p, end);
+  if (!p)
+    goto err;
+  GET16(s->rr_type);
+  GET16(s->rr_class);
+  GET32(s->rr_ttl);
+  GET16(s->rr_len);
+  s->rr_data = p;
+  s->sec_ptr = p + s->rr_len;
+  return 1;
+
+err:
+  return -1;
+}
+
 char
 *pci_id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
 {
@@ -25,9 +152,8 @@ char
   char name[256], dnsname[256], txt[256], *domain;
   byte answer[4096];
   const byte *data;
-  int res, i, j, dlen;
-  ns_msg m;
-  ns_rr rr;
+  int res, j, dlen;
+  struct dns_state ds;
 
   domain = pci_get_param(a, "net.domain");
   if (!domain || !domain[0])
@@ -73,25 +199,28 @@ char
       a->debug("\tfailed, h_errno=%d\n", _res.res_h_errno);
       return NULL;
     }
-  if (ns_initparse(answer, res, &m) < 0)
+  if (dns_parse_packet(&ds, answer, res) < 0)
     {
-      a->debug("\tinitparse failed\n");
+      a->debug("\tMalformed DNS packet received\n");
       return NULL;
     }
-  for (i=0; ns_parserr(&m, ns_s_an, i, &rr) >= 0; i++)
+  dns_init_section(&ds, DNS_SEC_ANSWER);
+  while (dns_parse_rr(&ds) > 0)
     {
-      a->debug("\tanswer %d (class %d, type %d)\n", i, ns_rr_class(rr), ns_rr_type(rr));
-      if (ns_rr_class(rr) != ns_c_in || ns_rr_type(rr) != ns_t_txt)
-	continue;
-      data = ns_rr_rdata(rr);
-      dlen = ns_rr_rdlen(rr);
+      if (ds.rr_class != ns_c_in || ds.rr_type != ns_t_txt)
+	{
+	  a->debug("\tUnexpected RR in answer: class %d, type %d\n", ds.rr_class, ds.rr_type);
+	  continue;
+	}
+      data = ds.rr_data;
+      dlen = ds.rr_len;
       j = 0;
       while (j < dlen && j+1+data[j] <= dlen)
 	{
 	  memcpy(txt, &data[j+1], data[j]);
 	  txt[data[j]] = 0;
 	  j += 1+data[j];
-	  a->debug("\t\t%s\n", txt);
+	  a->debug("\t\"%s\"\n", txt);
 	  if (txt[0] == 'i' && txt[1] == '=')
 	    return strdup(txt+2);
 	}
