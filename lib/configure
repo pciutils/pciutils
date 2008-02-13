@@ -39,7 +39,7 @@ c=config.h
 m=config.mk
 echo >$c "#define PCI_ARCH_`echo $cpu | tr '[a-z]' '[A-Z]'`"
 echo >>$c "#define PCI_OS_`echo $sys | tr '[a-z]' '[A-Z]'`"
-rm -f $m
+echo >$m 'LDLIBS='
 
 echo_n "Looking for access methods..."
 
@@ -58,6 +58,7 @@ case $sys in
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$c '#define PCI_USE_DNS'
+		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	sunos)
 		case $cpu in
@@ -71,18 +72,21 @@ case $sys in
 		esac
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		echo >>$c '#define PCI_USE_DNS'
+		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	freebsd)
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
 		echo >>$c '#define PCI_USE_DNS'
+		echo >>$m 'LDLIBS+=-lresolv'
 		;;
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
 		echo >>$c '#define PCI_USE_DNS'
+		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	aix)
 		echo_n " aix-device"
@@ -97,12 +101,13 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$m 'PCILIB=lib/libpciutils.a'
-		echo >>$m 'LDLIBS+=-lpci'
+		echo >>$m 'LDLIBS+=-lpci -lresolv'
 		;;
     	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		echo >>$c '#define PCI_USE_DNS'
+		echo >>$m 'LDLIBS+=-lresolv'
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"

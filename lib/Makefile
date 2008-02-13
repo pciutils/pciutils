@@ -59,7 +59,7 @@ $(PCILIBPC): $(PCILIBPC).in
 		-e 's,@LIBDIR@,$(LIBDIR),' \
 		-e 's,@IDSDIR@,$(IDSDIR),' \
 		-e 's,@VERSION@,$(VERSION),' \
-		-e 's,@LIBZ@,$(LIBZ),'
+		-e 's,@LDLIBS@,$(LDLIBS),'
 
 init.o: init.c $(INCL)
 access.o: access.c $(INCL)

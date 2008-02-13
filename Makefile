@@ -42,8 +42,8 @@ force:
 lib/config.h lib/config.mk:
 	cd lib && ./configure "$(IDSDIR)" "$(VERSION)" "$(HOST)" "$(RELEASE)" "$(ZLIB)"
 
-lspci: lspci.o common.o $(PCILIB) /usr/lib/libresolv.a
-setpci: setpci.o common.o $(PCILIB) /usr/lib/libresolv.a
+lspci: lspci.o common.o $(PCILIB)
+setpci: setpci.o common.o $(PCILIB)
 
 lspci.o: lspci.c pciutils.h $(PCIINC)
 setpci.o: setpci.c pciutils.h $(PCIINC)
