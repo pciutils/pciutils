@@ -36,19 +36,19 @@ enum dns_section {
 
 struct dns_state {
   u16 counts[DNS_NUM_SECTIONS];
-  u8 *sections[DNS_NUM_SECTIONS+1];
-  u8 *sec_ptr, *sec_end;
+  byte *sections[DNS_NUM_SECTIONS+1];
+  byte *sec_ptr, *sec_end;
 
   /* Result of dns_parse_rr(): */
   u16 rr_type;
   u16 rr_class;
   u32 rr_ttl;
   u16 rr_len;
-  u8 *rr_data;
+  byte *rr_data;
 };
 
-static u8 *
-dns_skip_name(u8 *p, u8 *end)
+static byte *
+dns_skip_name(byte *p, byte *end)
 {
   while (p < end)
     {
@@ -71,9 +71,9 @@ dns_skip_name(u8 *p, u8 *end)
 }
 
 static int
-dns_parse_packet(struct dns_state *s, u8 *p, unsigned int plen)
+dns_parse_packet(struct dns_state *s, byte *p, unsigned int plen)
 {
-  u8 *end = p + plen;
+  byte *end = p + plen;
   unsigned int i, j, x, len;
 
 #if 0
