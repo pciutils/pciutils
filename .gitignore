@@ -1,6 +1,6 @@
 *.a
 *.o
-*.8
+*.[0-9]
 lspci
 setpci
 update-pciids
