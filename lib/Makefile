@@ -82,5 +82,3 @@ names-net.o: names-net.c $(INCL) names.h
 names-parse.o: names-parse.c $(INCL) names.h
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
-
-example: example.c $(PCILIB)

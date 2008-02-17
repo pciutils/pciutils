@@ -50,7 +50,7 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
 
-all: lib/$(PCILIB) lspci setpci lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCILIB) lspci setpci example lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
 
 lib/$(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -71,6 +71,10 @@ update-pciids: update-pciids.sh
 	sed <$< >$@ "s@^DEST=.*@DEST=$(IDSDIR)/$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@"
 	chmod +x $@
 
+# The example of use of libpci
+example: example.o lib/$(PCILIB)
+example.o: example.c $(PCIINC)
+
 %: %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
@@ -79,7 +83,7 @@ update-pciids: update-pciids.sh
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci setpci lib/config.* lib/example *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.*
+	rm -f update-pciids lspci setpci example lib/config.* *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.*
 	rm -rf maint/dist
 
 distclean: clean

@@ -117,7 +117,7 @@ There is also a public GIT tree at:
 So far, there is only a little documentation for the library except for the
 general introduction in the pcilib(7) man page. If you want to use the
 library in your programs, please follow the comments in lib/pci.h and in
-the example program lib/example.c.
+the example program example.c.
 
 
 6. Feedback
