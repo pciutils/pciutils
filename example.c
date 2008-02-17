@@ -23,8 +23,8 @@ int main(void)
     {
       pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	/* Fill in header info we need */
       c = pci_read_byte(dev, PCI_INTERRUPT_PIN);				/* Read config register directly */
-      printf("%02x:%02x.%d vendor=%04x device=%04x class=%04x irq=%d (pin %d) base0=%lx\n",
-	     dev->bus, dev->dev, dev->func, dev->vendor_id, dev->device_id,
+      printf("%04x:%02x:%02x.%d vendor=%04x device=%04x class=%04x irq=%d (pin %d) base0=%lx\n",
+	     dev->domain, dev->bus, dev->dev, dev->func, dev->vendor_id, dev->device_id,
 	     dev->device_class, dev->irq, c, (long) dev->base_addr[0]);
     }
   pci_cleanup(pacc);		/* Close everything */
