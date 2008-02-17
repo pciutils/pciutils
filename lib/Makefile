@@ -1,7 +1,7 @@
 # Makefile for The PCI Library
 # (c) 1999--2008 Martin Mares <mj@ucw.cz>
 
-include config.mk
+# Expects to be invoked from the top-level Makefile and uses lots of its variables.
 
 OBJS=init access generic dump names filter names-hash names-parse names-net names-cache params
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
