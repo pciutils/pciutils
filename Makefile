@@ -7,6 +7,17 @@ CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 VERSION=2.2.10-net2
 DATE=2008-02-13
 
+# Host OS and release (override if you are cross-compiling)
+HOST=
+RELEASE=
+
+# Support for compressed pci.ids (yes/no, default: detect)
+ZLIB=
+
+# Support for resolving ID's by DNS (yes/no, default: detect)
+DNS=
+
+# Installation directories
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
 SHAREDIR=$(PREFIX)/share
@@ -15,20 +26,20 @@ MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; 
 INCDIR=$(PREFIX)/include
 LIBDIR=$(PREFIX)/lib
 PKGCFDIR=$(LIBDIR)/pkgconfig
+
+# Commands
 INSTALL=install
 DIRINSTALL=install -d
+STRIP=-s
 AR=ar
 RANLIB=ranlib
+
 PCILIB=lib/libpci.a
 PCILIBPC=lib/libpci.pc
 PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
 PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
-STRIP=-s
 
 -include lib/config.mk
-
-HOST=
-RELEASE=
 
 export
 
@@ -40,7 +51,7 @@ $(PCILIB): $(PCIINC) force
 force:
 
 lib/config.h lib/config.mk:
-	cd lib && ./configure "$(IDSDIR)" "$(VERSION)" "$(HOST)" "$(RELEASE)" "$(ZLIB)"
+	cd lib && ./configure
 
 lspci: lspci.o common.o $(PCILIB)
 setpci: setpci.o common.o $(PCILIB)
@@ -90,4 +101,4 @@ uninstall: all
 pci.ids.gz: pci.ids
 	gzip -9 <$< >$@
 
-.PHONY: all clean distclean install uninstall force
+.PHONY: all clean distclean install install-lib uninstall force

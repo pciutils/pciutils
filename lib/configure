@@ -1,4 +1,6 @@
 #!/bin/sh
+# Configuration script for the PCI library
+# (c) 1998--2008 Martin Mares <mj@ucw.cz>
 
 echo_n() {
 	if [ -n "$BASH" ]
@@ -9,31 +11,34 @@ echo_n() {
 	fi
 }
 
+if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
+	echo >&2 "Please run the configure script from the top-level Makefile"
+	exit 1
+fi
+
 echo_n "Configuring libpci for your system..."
-idsdir=${1:-/usr/share}
-version=${2:-0.0}
-sys=`uname -s`
-rel=`uname -r`
-if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
-then
-	rel=`/usr/bin/oslevel`
-	proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
-	cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
-else
-	cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
+if [ -z "$HOST" ] ; then
+	sys=`uname -s`
+	rel=`uname -r`
+	if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
+	then
+		rel=`/usr/bin/oslevel`
+		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
+		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
+	else
+		cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
+	fi
+	if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
+	then
+		sys=freebsd
+	fi
+	HOST=${3:-$cpu-$sys}
 fi
-if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
-then
-	sys=freebsd
-fi
-host=${3:-$cpu-$sys}
 # CAVEAT: tr on Solaris is a bit weird and the extra [] is otherwise harmless.
-host=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)$/\1--\2/' | tr '[A-Z]' '[a-z]'`
+host=`echo $HOST | sed 's/^\([^-]*\)-\([^-]*\)$/\1--\2/' | tr '[A-Z]' '[a-z]'`
 cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
 sys=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
-rel=${4:-$rel}
 echo " $host $rel"
-zlib=$5
 
 c=config.h
 m=config.mk
@@ -58,7 +63,6 @@ case $sys in
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$c '#define PCI_USE_DNS'
-		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	sunos)
 		case $cpu in
@@ -71,22 +75,16 @@ case $sys in
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_STDINT_H'
-		echo >>$c '#define PCI_USE_DNS'
-		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	freebsd)
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
-		echo >>$c '#define PCI_USE_DNS'
-		echo >>$m 'LDLIBS+=-lresolv'
 		;;
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
-		echo >>$c '#define PCI_USE_DNS'
-		echo >>$m 'LDLIBS+=-lresolv'
 		;;
 	aix)
 		echo_n " aix-device"
@@ -97,17 +95,14 @@ case $sys in
 		;;
 	netbsd)
 		echo_n " nbsd-libpci"
-		echo >>$c '#define PCI_USE_DNS'
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$m 'PCILIB=lib/libpciutils.a'
-		echo >>$m 'LDLIBS+=-lpci -lresolv'
+		echo >>$m 'LDLIBS+=-lpci'
 		;;
     	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-		echo >>$c '#define PCI_USE_DNS'
-		echo >>$m 'LDLIBS+=-lresolv'
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
@@ -119,17 +114,17 @@ echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
 
 echo_n "Checking for zlib support... "
-if [ "$zlib" = yes -o "$zlib" = no ] ; then
-	echo "$zlib (set manually)"
+if [ "$ZLIB" = yes -o "$ZLIB" = no ] ; then
+	echo "$ZLIB (set manually)"
 else
 	if [ -f /usr/include/zlib.h -o -f /usr/local/include/zlib.h ] ; then
-		zlib=yes
+		ZLIB=yes
 	else
-		zlib=no
+		ZLIB=no
 	fi
-	echo "$zlib (auto-detected)"
+	echo "$ZLIB (auto-detected)"
 fi
-if [ "$zlib" = yes ] ; then
+if [ "$ZLIB" = yes ] ; then
 	echo >>$c '#define PCI_COMPRESSED_IDS'
 	echo >>$c '#define PCI_IDS "pci.ids.gz"'
 	echo >>$m 'LIBZ=-lz'
@@ -137,8 +132,24 @@ if [ "$zlib" = yes ] ; then
 else
 	echo >>$c '#define PCI_IDS "pci.ids"'
 fi
-echo >>$c "#define PCI_PATH_IDS_DIR \"$idsdir\""
-echo >>$c "#define PCI_ID_DOMAIN \"pci-id.ucw.cz\""
+echo >>$c "#define PCI_PATH_IDS_DIR \"$IDSDIR\""
 
-echo >>$c "#define PCILIB_VERSION \"$version\""
+echo_n "Checking for DNS support... "
+if [ "$DNS" = yes -o "$DNS" = no ] ; then
+	echo "$DNS (set manually)"
+else
+	if [ -f /usr/include/resolv.h ] ; then
+		DNS=yes
+	else
+		DNS=no
+	fi
+	echo "$DNS (auto-detected)"
+fi
+if [ "$DNS" = yes ] ; then
+	echo >>$c "#define PCI_USE_DNS"
+	echo >>$c "#define PCI_ID_DOMAIN \"pci-id.ucw.cz\""
+	echo >>$m 'LDLIBS+=-lresolv'
+fi
+
+echo >>$c "#define PCILIB_VERSION \"$VERSION\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m
