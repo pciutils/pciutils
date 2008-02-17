@@ -1,3 +1,46 @@
+2008-02-13  Martin Mares <mj@ucw.cz>
+
+	* Released as 2.2.10-net2.
+
+	* Support for resolving of PCI ID's using DNS together with a local
+	cache of resolved entries has been added. See the `-q' and `-Q' options
+	of lspci.
+
+	* The library now has a generic system of settable parameters, which
+	also include settings of the DNS resolver and cache. An `-O' option
+	has been added to lspci and setpci to allow setting of these options.
+
+	* Configuration of the access methods are now specified by the new
+	parameter system, replacing the pci_access->method_params array.
+
+	* Access methods now also have sensible names and help texts and it
+	is possible to look up method ID by a name.
+
+	* An `-A' switch has been added to both lspci and setpci, allowing to
+	select an arbitrary access method. The `-P' switch (configure proc
+	backend) has been removed as it is no longer needed and I do not know
+	any its user.
+
+	* Several source files have been split for better maintainability
+	(most notably the resolving of ID's).
+
+	* Man pages and help texts have been updated. A new man page `pcilib(7)'
+	has been added and description of library options has been moved there.
+
+	* When an unknown device ID is encountered, we print `Device <id>'
+	instead of `Unknown device <id>'. It uses less space and it also
+	should reduce the number of inexperienced users complaining that
+	the device is not supported by the OS. To lookup up OS drivers,
+	use the `-k' option.
+
+	* PCI_LIB_VERSION has been bumped to 0x020299.
+
+	* Makefile: stripping of the binaries during installation can be
+	overridden by the STRIP variable.
+	
+	* lib/types.h: We use the integer types from <stdint.h> if the
+	compiler claims C99 support.
+
 2008-02-11  Martin Mares <mj@ucw.cz>
 
 	* Released as 2.2.10.
