@@ -1,5 +1,6 @@
 *.a
 *.o
+*.so
 *.[0-9]
 lspci
 setpci

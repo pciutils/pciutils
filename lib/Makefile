@@ -3,30 +3,27 @@
 
 include config.mk
 
-OBJS=init.o access.o generic.o dump.o names.o filter.o names-hash.o names-parse.o names-net.o names-cache.o params.o
+OBJS=init access generic dump names filter names-hash names-parse names-net names-cache params
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
-PCILIB=libpci.a
-PCILIBPC=libpci.pc
-
 ifdef PCI_HAVE_PM_LINUX_SYSFS
-OBJS += sysfs.o
+OBJS += sysfs
 endif
 
 ifdef PCI_HAVE_PM_LINUX_PROC
-OBJS += proc.o
+OBJS += proc
 endif
 
 ifdef PCI_HAVE_PM_INTEL_CONF
-OBJS += i386-ports.o
+OBJS += i386-ports
 endif
 
 ifdef PCI_HAVE_PM_DUMP
-OBJS += dump.o
+OBJS += dump
 endif
 
 ifdef PCI_HAVE_PM_FBSD_DEVICE
-OBJS += fbsd-device.o
+OBJS += fbsd-device
 CFLAGS += -I/usr/src/sys
 ifdef FREEBSD_SYS
 CFLAGS += -I${FREEBSD_SYS}
@@ -34,26 +31,31 @@ endif
 endif
 
 ifdef PCI_HAVE_PM_OBSD_DEVICE
-OBJS += obsd-device.o
+OBJS += obsd-device
 endif
 
 ifdef PCI_HAVE_PM_AIX_DEVICE
-OBJS += aix-device.o
+OBJS += aix-device
 endif
 
 ifdef PCI_HAVE_PM_NBSD_LIBPCI
-OBJS += nbsd-libpci.o
-PCILIB=libpciutils.a
+OBJS += nbsd-libpci
 endif
 
 all: $(PCILIB) $(PCILIBPC)
 
-$(PCILIB): $(OBJS)
+ifeq ($(SHARED),no)
+$(PCILIB): $(addsuffix .o,$(OBJS))
 	rm -f $@
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
+else
+CFLAGS += -fPIC
+$(PCILIB): $(addsuffix .o,$(OBJS))
+	$(CC) -shared $(SONAME) -o $@ $^ $(LIB_LDLIBS)
+endif
 
-$(PCILIBPC): $(PCILIBPC).in
+$(PCILIBPC): libpci.pc.in
 	sed <$< >$@ -e 's,@PREFIX@,$(PREFIX),' \
 		-e 's,@INCDIR@,$(INCDIR),' \
 		-e 's,@LIBDIR@,$(LIBDIR),' \

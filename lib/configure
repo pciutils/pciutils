@@ -44,7 +44,7 @@ c=config.h
 m=config.mk
 echo >$c "#define PCI_ARCH_`echo $cpu | tr '[a-z]' '[A-Z]'`"
 echo >>$c "#define PCI_OS_`echo $sys | tr '[a-z]' '[A-Z]'`"
-echo >$m 'LDLIBS='
+echo >$m 'WITH_LIBS='
 
 echo_n "Looking for access methods..."
 
@@ -97,8 +97,8 @@ case $sys in
 		echo_n " nbsd-libpci"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
-		echo >>$m 'PCILIB=lib/libpciutils.a'
-		echo >>$m 'LDLIBS+=-lpci'
+		echo >>$m 'LIBNAME=libpciutils'
+		echo >>$m 'WITH_LIBS+=-lpci'
 		;;
     	gnu)
 		echo_n " i386-ports"
@@ -128,7 +128,7 @@ if [ "$ZLIB" = yes ] ; then
 	echo >>$c '#define PCI_COMPRESSED_IDS'
 	echo >>$c '#define PCI_IDS "pci.ids.gz"'
 	echo >>$m 'LIBZ=-lz'
-	echo >>$m 'LDLIBS+=$(LIBZ)'
+	echo >>$m 'WITH_LIBS+=$(LIBZ)'
 else
 	echo >>$c '#define PCI_IDS "pci.ids"'
 fi
@@ -148,8 +148,24 @@ fi
 if [ "$DNS" = yes ] ; then
 	echo >>$c "#define PCI_USE_DNS"
 	echo >>$c "#define PCI_ID_DOMAIN \"pci-id.ucw.cz\""
-	echo >>$m 'LDLIBS+=-lresolv'
+	echo >>$m 'WITH_LIBS+=-lresolv'
 fi
+
+echo "Checking whether to build a shared library... $SHARED (set manually)"
+if [ "$SHARED" = no ] ; then
+	echo >>$m 'PCILIB=$(LIBNAME).a'
+	echo >>$m 'LDLIBS=$(WITH_LIBS)'
+	echo >>$m 'LIB_LDLIBS='
+else
+	echo >>$m 'PCILIB=$(LIBNAME)-$(VERSION).so'
+	# We link the dependencies _to_ the library, so we do not need explicit deps in .pc
+	echo >>$m 'LDLIBS='
+	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
+	if [ "$SHARED" = yes ] ; then
+		echo >>$m 'SONAME=-Wl,-soname,$(LIBNAME).so$(ABI_VERSION)'
+	fi
+fi
+echo >>$m 'PCILIBPC=$(LIBNAME).pc'
 
 echo >>$c "#define PCILIB_VERSION \"$VERSION\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m

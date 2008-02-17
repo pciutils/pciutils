@@ -43,6 +43,7 @@ The utilities include:  (See manual pages for more details)
 2. Compiling and (un)installing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Just run "make" to compile the package and then "make install" to install it.
+Please note that GNU make is needed on most platforms.
 
 If you want to change the default installation location, please override
 the PREFIX variable specified in the Makefile -- e.g., you can use
@@ -52,12 +53,31 @@ will allow you to install to a different directory from the one you intend
 to eventually run it from.  This is useful for people who are packaging
 pciutils to install on other computers.
 
-The configure script will automatically enable support for a compressed
-pci.ids if you have zlib installed.  You can override its guess by using
-"make ZLIB=no" or "make ZLIB=yes".  If compressed support is enabled,
-pciutils will use pci.ids.gz in preference to pci.ids, even if the
-pci.ids file is newer.  If the pci.ids.gz file is missing, it will use
-pci.ids instead.
+There are several options which can be set in the Makefile or overridden
+when running make:
+
+  ZLIB=yes/no	Enable support for compressed pci.ids (requires zlib).
+		If it is enabled, pciutils will use pci.ids.gz in preference to
+		pci.ids, even if the pci.ids file is newer.  If the pci.ids.gz
+		file is missing, it will use pci.ids instead.  If you do not
+		specify this option, the configure script will try to guess
+		automatically based on the presence of zlib.
+
+  DNS=yes/no	Enable support for querying the central database of PCI ID's
+		using DNS.  Requires libresolv (which is available on most
+		systems as a part of the standard libraries) and tries to
+		autodetect its presence if the option is not specified.
+
+  SHARED=yes/	Build libpci as a shared library.  Requires the GNU toolchain.
+  no/local	The ABI of the shared library is intended to remain backward
+		compatible for a long time (we use symbol versioning to achieve
+		that, like GNU libc does).  The value `local' includes the
+		right directory name in the binaries, so the utilities can be
+		run without installation.  This is not recommended for any
+		production builds.
+
+"make install-lib" installs the library together with its header files
+for use by other programs.
 
 When you are bored of dumping PCI registers, just use "make uninstall".
 

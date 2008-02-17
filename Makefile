@@ -17,6 +17,12 @@ ZLIB=
 # Support for resolving ID's by DNS (yes/no, default: detect)
 DNS=
 
+# Build libpci as a shared library (yes/no; or local for testing; requires GCC)
+SHARED=no
+
+# ABI version suffix in the name of the shared library
+ABI_VERSION=.2.2.99
+
 # Installation directories
 PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
@@ -34,18 +40,19 @@ STRIP=-s
 AR=ar
 RANLIB=ranlib
 
-PCILIB=lib/libpci.a
-PCILIBPC=lib/libpci.pc
-PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
-PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
+# Base name of the library (overriden on NetBSD, which has its own libpci)
+LIBNAME=libpci
 
 -include lib/config.mk
 
+PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
+PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
+
 export
 
-all: $(PCILIB) lspci setpci lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCILIB) lspci setpci lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
 
-$(PCILIB): $(PCIINC) force
+lib/$(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
 
 force:
@@ -53,8 +60,8 @@ force:
 lib/config.h lib/config.mk:
 	cd lib && ./configure
 
-lspci: lspci.o common.o $(PCILIB)
-setpci: setpci.o common.o $(PCILIB)
+lspci: lspci.o common.o lib/$(PCILIB)
+setpci: setpci.o common.o lib/$(PCILIB)
 
 lspci.o: lspci.c pciutils.h $(PCIINC)
 setpci.o: setpci.c pciutils.h $(PCIINC)
@@ -72,7 +79,7 @@ update-pciids: update-pciids.sh
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci setpci lib/config.* lib/example *.[78] pci.ids.* lib/*.pc
+	rm -f update-pciids lspci setpci lib/config.* lib/example *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.*
 	rm -rf maint/dist
 
 distclean: clean
@@ -85,12 +92,16 @@ install: all
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -c -m 644 pcilib.7 $(DESTDIR)$(MANDIR)/man7
+ifeq ($(SHARED),yes)
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
+	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
+endif
 
-install-lib: $(PCIINC_INS) $(PCILIB) $(PCILIBPC)
+install-lib: $(PCIINC_INS) lib/$(PCILIB) lib/$(PCILIBPC)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(LIBDIR) $(DESTDIR)$(PKGCFDIR)
 	$(INSTALL) -c -m 644 $(PCIINC_INS) $(DESTDIR)$(INCDIR)/pci
-	$(INSTALL) -c -m 644 $(PCILIB) $(DESTDIR)$(LIBDIR)
-	$(INSTALL) -c -m 644 $(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
+	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
+	$(INSTALL) -c -m 644 lib/$(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
 
 uninstall: all
 	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
