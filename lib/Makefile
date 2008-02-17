@@ -50,7 +50,7 @@ $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
 else
-CFLAGS += -fPIC
+CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(CC) -shared $(SONAME) -o $@ $^ $(LIB_LDLIBS)
 endif

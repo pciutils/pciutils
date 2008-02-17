@@ -68,7 +68,7 @@ when running make:
 		systems as a part of the standard libraries) and tries to
 		autodetect its presence if the option is not specified.
 
-  SHARED=yes/	Build libpci as a shared library.  Requires the GNU toolchain.
+  SHARED=yes/	Build libpci as a shared library.  Requires GCC 4.0 or newer.
   no/local	The ABI of the shared library is intended to remain backward
 		compatible for a long time (we use symbol versioning to achieve
 		that, like GNU libc does).  The value `local' includes the

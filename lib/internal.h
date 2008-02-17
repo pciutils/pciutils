@@ -6,6 +6,10 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
+#ifdef __GNUC__
+#define PCI_ABI __attribute__((visibility("default")))
+#endif
+
 #include "pci.h"
 #include "sysdep.h"
 
