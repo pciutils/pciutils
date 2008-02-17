@@ -1,5 +1,19 @@
 2008-02-17  Martin Mares <mj@ucw.cz>
 
+	* The makefile system has been reworked. All configuration settings
+	are now passed to the configure script in environment variables,
+	allowing for easy tweaking in the top-level Makefile. All control
+	knobs are now described in the README.
+
+	* The libpci can be built as a shared library with properly restricted
+	symbol exports. Use `make SHARED=yes' to enable that or `make SHARED=local'
+	for a local testing build (with hardwired paths to the library, so that
+	it does not need installation).
+
+	* The example program has been moved from lib/example.c to the top-level
+	directory, because it should be built exactly as the other utilities
+	are. It has been also improved slightly to educate better.
+
 	* The i386-ports method is enabled on Linux/x86_64 as well.
 
 2008-02-13  Martin Mares <mj@ucw.cz>
