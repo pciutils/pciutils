@@ -52,7 +52,7 @@ case $sys in
 		echo >>$c '#define PCI_PATH_PROC_BUS_PCI "/proc/bus/pci"'
 		echo >>$c '#define PCI_PATH_SYS_BUS_PCI "/sys/bus/pci"'
 		case $cpu in
-				i386)		echo_n " i386-ports"
+				i386|x86_64)	echo_n " i386-ports"
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						;;
 		esac
