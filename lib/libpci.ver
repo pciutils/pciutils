@@ -1,0 +1,12 @@
+/* Version script for the libpci */
+
+/*
+ *  Visibility declarations in the source take precedence over this script,
+ *  so we can boldly declare pci_* as public and still keep the internal
+ *  functions properly hidden.
+ */
+
+LIBPCI_2.2.99 {
+	global: pci_*;
+	local: *;
+};
