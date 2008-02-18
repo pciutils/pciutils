@@ -99,6 +99,7 @@ install: all
 ifeq ($(SHARED),yes)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
 	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
+	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so$(ABI_VERSION)
 endif
 
 install-lib: $(PCIINC_INS) lib/$(PCILIB) lib/$(PCILIBPC)
@@ -106,12 +107,18 @@ install-lib: $(PCIINC_INS) lib/$(PCILIB) lib/$(PCILIBPC)
 	$(INSTALL) -c -m 644 $(PCIINC_INS) $(DESTDIR)$(INCDIR)/pci
 	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
 	$(INSTALL) -c -m 644 lib/$(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
+ifeq ($(SHARED),yes)
+	ln -sf $(LIBNAME).so$(ABI_VERSION) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so
+endif
 
 uninstall: all
 	rm -f $(DESTDIR)$(SBINDIR)/lspci $(DESTDIR)$(SBINDIR)/setpci $(DESTDIR)$(SBINDIR)/update-pciids
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
 	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
+ifeq ($(SHARED),yes)
+	rm -f $(DESTDIR)$(LIBDIR)/$(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so$(ABI_VERSION)
+endif
 
 pci.ids.gz: pci.ids
 	gzip -9 <$< >$@
