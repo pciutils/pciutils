@@ -157,7 +157,7 @@ if [ "$SHARED" = no ] ; then
 	echo >>$m 'LDLIBS=$(WITH_LIBS)'
 	echo >>$m 'LIB_LDLIBS='
 else
-	echo >>$m 'PCILIB=$(LIBNAME)-$(VERSION).so'
+	echo >>$m 'PCILIB=$(LIBNAME).so.$(VERSION)'
 	# We link the dependencies _to_ the library, so we do not need explicit deps in .pc
 	echo >>$m 'LDLIBS='
 	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
