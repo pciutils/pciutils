@@ -4,8 +4,8 @@
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
-VERSION=2.2.10-net2
-DATE=2008-02-13
+VERSION=2.99.1-alpha1
+DATE=2008-02-18
 
 # Host OS and release (override if you are cross-compiling)
 HOST=
@@ -21,7 +21,7 @@ DNS=
 SHARED=no
 
 # ABI version suffix in the name of the shared library
-ABI_VERSION=.2.2.99
+ABI_VERSION=.2.99
 
 # Installation directories
 PREFIX=/usr/local
