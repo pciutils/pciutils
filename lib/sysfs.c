@@ -2,7 +2,7 @@
  *	The PCI Library -- Configuration Access via /sys/bus/pci
  *
  * 	Copyright (c) 2003 Matthew Wilcox <willy@fc.hp.com>
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -25,13 +25,13 @@
 static void
 sysfs_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_SYS_BUS_PCI] = PCI_PATH_SYS_BUS_PCI;
+  pci_define_param(a, "sysfs.path", PCI_PATH_SYS_BUS_PCI, "Path to the sysfs device tree");
 }
 
 static inline char *
 sysfs_name(struct pci_access *a)
 {
-  return a->method_params[PCI_ACCESS_SYS_BUS_PCI];
+  return pci_get_param(a, "sysfs.path");
 }
 
 static int
@@ -250,7 +250,8 @@ static void sysfs_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_linux_sysfs = {
-  "Linux-sysfs",
+  "linux-sysfs",
+  "The sys filesystem on Linux",
   sysfs_config,
   sysfs_detect,
   sysfs_init,

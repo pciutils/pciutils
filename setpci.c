@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998--2006 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1998--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+#define PCIUTILS_SETPCI
 #include "pciutils.h"
 
 static int force;			/* Don't complain if no devices match */
@@ -246,7 +247,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x00, 0, NULL }
 };
 
-static void NONRET
+static void NONRET PCI_PRINTF(1,2)
 usage(char *msg, ...)
 {
   va_list args;
@@ -258,11 +259,17 @@ usage(char *msg, ...)
       fprintf(stderr, "\n\n");
     }
   fprintf(stderr,
-"Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n\
--f\t\tDon't complain if there's nothing to do\n\
--v\t\tBe verbose\n\
--D\t\tList changes, don't commit them\n"
+"Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n"
+"\n"
+"General options:\n"
+"-f\t\tDon't complain if there's nothing to do\n"
+"-v\t\tBe verbose\n"
+"-D\t\tList changes, don't commit them\n"
+"\n"
+"PCI access options:\n"
 GENERIC_HELP
+"\n"
+"Setting commands:\n"
 "<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t|\t-d [<vendor>]:[<device>]\n"
 "<reg>:\t\t<number>[.(B|W|L)]\n"

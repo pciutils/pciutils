@@ -122,12 +122,6 @@ aix_bus_number(char *name)
 
 /* Method entries */
 
-static void
-aix_config(struct pci_access *a)
-{
-  a->method_params[PCI_ACCESS_AIX_DEVICE] = NULL;
-}
-
 static int
 aix_detect(struct pci_access *a)
 {
@@ -265,8 +259,9 @@ aix_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_aix_device = {
-  "AIX-device",
-  aix_config,
+  "aix-device",
+  "AIX /dev/pci[0-n]",
+  NULL,
   aix_detect,
   aix_init,
   aix_cleanup,

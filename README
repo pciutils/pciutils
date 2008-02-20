@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -43,6 +43,7 @@ The utilities include:  (See manual pages for more details)
 2. Compiling and (un)installing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Just run "make" to compile the package and then "make install" to install it.
+Please note that GNU make is needed on most platforms.
 
 If you want to change the default installation location, please override
 the PREFIX variable specified in the Makefile -- e.g., you can use
@@ -52,12 +53,31 @@ will allow you to install to a different directory from the one you intend
 to eventually run it from.  This is useful for people who are packaging
 pciutils to install on other computers.
 
-The configure script will automatically enable support for a compressed
-pci.ids if you have zlib installed.  You can override its guess by using
-"make ZLIB=no" or "make ZLIB=yes".  If compressed support is enabled,
-pciutils will use pci.ids.gz in preference to pci.ids, even if the
-pci.ids file is newer.  If the pci.ids.gz file is missing, it will use
-pci.ids instead.
+There are several options which can be set in the Makefile or overridden
+when running make:
+
+  ZLIB=yes/no	Enable support for compressed pci.ids (requires zlib).
+		If it is enabled, pciutils will use pci.ids.gz in preference to
+		pci.ids, even if the pci.ids file is newer.  If the pci.ids.gz
+		file is missing, it will use pci.ids instead.  If you do not
+		specify this option, the configure script will try to guess
+		automatically based on the presence of zlib.
+
+  DNS=yes/no	Enable support for querying the central database of PCI ID's
+		using DNS.  Requires libresolv (which is available on most
+		systems as a part of the standard libraries) and tries to
+		autodetect its presence if the option is not specified.
+
+  SHARED=yes/	Build libpci as a shared library.  Requires GCC 4.0 or newer.
+  no/local	The ABI of the shared library is intended to remain backward
+		compatible for a long time (we use symbol versioning to achieve
+		that, like GNU libc does).  The value `local' includes the
+		right directory name in the binaries, so the utilities can be
+		run without installation.  This is not recommended for any
+		production builds.
+
+"make install-lib" installs the library together with its header files
+for use by other programs.
 
 When you are bored of dumping PCI registers, just use "make uninstall".
 
@@ -70,6 +90,9 @@ than I release new versions of this package.
 If you are missing names for any of your devices or you just want to stay
 on the bleeding edge, download the most recent pci.ids file from
 http://pciids.sf.net/ (e.g., by running the update-ids utility).
+
+Alternatively, you can use `lspci -q' to query the central database
+for new entries via network.
 
 If your devices still appear as unknown, please send us their ID's and
 names, the detailed instructions for submissions are listed on the
@@ -91,9 +114,10 @@ There is also a public GIT tree at:
 
 5. Using the library
 ~~~~~~~~~~~~~~~~~~~~
-There is still no documentation for the library, if you want to use it
-in your programs, please follow the comments in lib/pci.h and in the
-example program lib/example.c.
+So far, there is only a little documentation for the library except for the
+general introduction in the pcilib(7) man page. If you want to use the
+library in your programs, please follow the comments in lib/pci.h and in
+the example program example.c.
 
 
 6. Feedback

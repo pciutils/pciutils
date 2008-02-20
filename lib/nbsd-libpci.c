@@ -25,13 +25,13 @@
 static void
 nbsd_config(struct pci_access *a)
 {
-  a->method_params[PCI_ACCESS_NBSD_LIBPCI] = PCI_PATH_NBSD_DEVICE;
+  pci_define_param(a, "nbsd.path", PCI_PATH_NBSD_DEVICE, "Path to the NetBSD PCI device");
 }
 
 static int
 nbsd_detect(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_NBSD_LIBPCI];
+  char *name = pci_get_param(a, "nbsd.path");
 
   if (access(name, R_OK))
     {
@@ -48,7 +48,7 @@ nbsd_detect(struct pci_access *a)
 static void
 nbsd_init(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_NBSD_LIBPCI];
+  char *name = pci_get_param(a, "nbsd.path");
   int mode = a->writeable ? O_RDWR : O_RDONLY;
 
   a->fd = open(name, mode, 0);
@@ -141,7 +141,8 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_nbsd_libpci = {
-  "NetBSD-libpci",
+  "nbsd-libpci",
+  "NetBSD libpci",
   nbsd_config,
   nbsd_detect,
   nbsd_init,

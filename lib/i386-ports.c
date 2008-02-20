@@ -253,7 +253,8 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_intel_conf1 = {
-  "Intel-conf1",
+  "intel-conf1",
+  "Raw I/O port access using Intel conf1 interface",
   NULL,					/* config */
   conf1_detect,
   conf12_init,
@@ -267,7 +268,8 @@ struct pci_methods pm_intel_conf1 = {
 };
 
 struct pci_methods pm_intel_conf2 = {
-  "Intel-conf2",
+  "intel-conf2",
+  "Raw I/O port access using Intel conf2 interface",
   NULL,					/* config */
   conf2_detect,
   conf12_init,

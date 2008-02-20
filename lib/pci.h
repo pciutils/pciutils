@@ -13,7 +13,11 @@
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x020204	/* FIXME: Update */
+#define PCI_LIB_VERSION 0x029901
+
+#ifndef PCI_ABI
+#define PCI_ABI
+#endif
 
 /*
  *	PCI Access Structure
@@ -23,23 +27,22 @@ struct pci_methods;
 
 enum pci_access_type {
   /* Known access methods, remember to update access.c as well */
-  PCI_ACCESS_AUTO,			/* Autodetection (params: none) */
-  PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci (params: path) */
-  PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci (params: path) */
-  PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 (params: none) */
-  PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 (params: none) */
-  PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci (params: path) */
+  PCI_ACCESS_AUTO,			/* Autodetection */
+  PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci */
+  PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci */
+  PCI_ACCESS_I386_TYPE1,		/* i386 ports, type 1 */
+  PCI_ACCESS_I386_TYPE2,		/* i386 ports, type 2 */
+  PCI_ACCESS_FBSD_DEVICE,		/* FreeBSD /dev/pci */
   PCI_ACCESS_AIX_DEVICE,		/* /dev/pci0, /dev/bus0, etc. */
   PCI_ACCESS_NBSD_LIBPCI,		/* NetBSD libpci */
   PCI_ACCESS_OBSD_DEVICE,		/* OpenBSD /dev/pci */
-  PCI_ACCESS_DUMP,			/* Dump file (params: filename) */
+  PCI_ACCESS_DUMP,			/* Dump file */
   PCI_ACCESS_MAX
 };
 
 struct pci_access {
   /* Options you can change: */
   unsigned int method;			/* Access method */
-  char *method_params[PCI_ACCESS_MAX];	/* Parameters for the methods */
   int writeable;			/* Open in read/write mode */
   int buscentric;			/* Bus-centric view of the world */
 
@@ -48,23 +51,20 @@ struct pci_access {
   int numeric_ids;			/* Enforce PCI_LOOKUP_NUMERIC (>1 => PCI_LOOKUP_MIXED) */
 
   unsigned int id_lookup_mode;		/* pci_lookup_mode flags which are set automatically */
-  					/* Default: PCI_LOOKUP_CACHE */
-  char *id_domain;			/* DNS domain used for the lookups (use pci_set_net_domain()) */
-  int free_id_domain;			/* Set if id_domain is malloced */
-  char *id_cache_file;			/* Name of the ID cache file (use pci_set_net_cache()) */
-  int free_id_cache_file;		/* Set if id_cache_file is malloced */
+					/* Default: PCI_LOOKUP_CACHE */
 
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */
-  void (*error)(char *msg, ...);	/* Write error message and quit */
-  void (*warning)(char *msg, ...);	/* Write a warning message */
-  void (*debug)(char *msg, ...);	/* Write a debugging message */
+  void (*error)(char *msg, ...) PCI_PRINTF(1,2);	/* Write error message and quit */
+  void (*warning)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a warning message */
+  void (*debug)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a debugging message */
 
   struct pci_dev *devices;		/* Devices found on this bus */
 
   /* Fields used internally: */
   struct pci_methods *methods;
+  struct pci_param *params;
   struct id_entry **id_hash;		/* names.c */
   struct id_bucket *current_id_bucket;
   int id_load_failed;
@@ -76,14 +76,35 @@ struct pci_access {
 };
 
 /* Initialize PCI access */
-struct pci_access *pci_alloc(void);
-void pci_init(struct pci_access *);
-void pci_cleanup(struct pci_access *);
+struct pci_access *pci_alloc(void) PCI_ABI;
+void pci_init(struct pci_access *) PCI_ABI;
+void pci_cleanup(struct pci_access *) PCI_ABI;
 
 /* Scanning of devices */
-void pci_scan_bus(struct pci_access *acc);
-struct pci_dev *pci_get_dev(struct pci_access *acc, int domain, int bus, int dev, int func); /* Raw access to specified device */
-void pci_free_dev(struct pci_dev *);
+void pci_scan_bus(struct pci_access *acc) PCI_ABI;
+struct pci_dev *pci_get_dev(struct pci_access *acc, int domain, int bus, int dev, int func) PCI_ABI; /* Raw access to specified device */
+void pci_free_dev(struct pci_dev *) PCI_ABI;
+
+/* Names of access methods */
+int pci_lookup_method(char *name) PCI_ABI;	/* Returns -1 if not found */
+char *pci_get_method_name(int index) PCI_ABI;	/* Returns "" if unavailable, NULL if index out of range */
+
+/*
+ *	Named parameters
+ */
+
+struct pci_param {
+  struct pci_param *next;		/* Please use pci_walk_params() for traversing the list */
+  char *param;				/* Name of the parameter */
+  char *value;				/* Value of the parameter */
+  int value_malloced;			/* used internally */
+  char *help;				/* Explanation of the parameter */
+};
+
+char *pci_get_param(struct pci_access *acc, char *param) PCI_ABI;
+int pci_set_param(struct pci_access *acc, char *param, char *value) PCI_ABI;	/* 0 on success, -1 if no such parameter */
+/* To traverse the list, call pci_walk_params repeatedly, first with prev=NULL, and do not modify the parameters during traversal. */
+struct pci_param *pci_walk_params(struct pci_access *acc, struct pci_param *prev) PCI_ABI;
 
 /*
  *	Devices
@@ -116,16 +137,16 @@ struct pci_dev {
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
 #define PCI_ADDR_MEM_MASK (~(pciaddr_t) 0xf)
 
-u8 pci_read_byte(struct pci_dev *, int pos); /* Access to configuration space */
-u16 pci_read_word(struct pci_dev *, int pos);
-u32  pci_read_long(struct pci_dev *, int pos);
-int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len);
-int pci_write_byte(struct pci_dev *, int pos, u8 data);
-int pci_write_word(struct pci_dev *, int pos, u16 data);
-int pci_write_long(struct pci_dev *, int pos, u32 data);
-int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len);
+u8 pci_read_byte(struct pci_dev *, int pos) PCI_ABI; /* Access to configuration space */
+u16 pci_read_word(struct pci_dev *, int pos) PCI_ABI;
+u32 pci_read_long(struct pci_dev *, int pos) PCI_ABI;
+int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
+int pci_write_byte(struct pci_dev *, int pos, u8 data) PCI_ABI;
+int pci_write_word(struct pci_dev *, int pos, u16 data) PCI_ABI;
+int pci_write_long(struct pci_dev *, int pos, u32 data) PCI_ABI;
+int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 
-int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
+int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device information */
 
 #define PCI_FILL_IDENT		1
 #define PCI_FILL_IRQ		2
@@ -135,7 +156,7 @@ int pci_fill_info(struct pci_dev *, int flags); /* Fill in device information */
 #define PCI_FILL_CLASS		32
 #define PCI_FILL_RESCAN		0x10000
 
-void pci_setup_cache(struct pci_dev *, u8 *cache, int len);
+void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
 
 /*
  *	Filters
@@ -146,10 +167,10 @@ struct pci_filter {
   int vendor, device;
 };
 
-void pci_filter_init(struct pci_access *, struct pci_filter *);
-char *pci_filter_parse_slot(struct pci_filter *, char *);
-char *pci_filter_parse_id(struct pci_filter *, char *);
-int pci_filter_match(struct pci_filter *, struct pci_dev *);
+void pci_filter_init(struct pci_access *, struct pci_filter *) PCI_ABI;
+char *pci_filter_parse_slot(struct pci_filter *, char *) PCI_ABI;
+char *pci_filter_parse_id(struct pci_filter *, char *) PCI_ABI;
+int pci_filter_match(struct pci_filter *, struct pci_dev *) PCI_ABI;
 
 /*
  *	Conversion of PCI ID's to names (according to the pci.ids file)
@@ -167,14 +188,12 @@ int pci_filter_match(struct pci_filter *, struct pci_dev *);
  *	PROGIF				(classID, progif) -> programming interface
  */
 
-char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...);
+char *pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...) PCI_ABI;
 
-int pci_load_name_list(struct pci_access *a);	/* Called automatically by pci_lookup_*() when needed; returns success */
-void pci_free_name_list(struct pci_access *a);	/* Called automatically by pci_cleanup() */
-void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed);
-void pci_set_net_domain(struct pci_access *a, char *name, int to_be_freed);
-void pci_set_id_cache(struct pci_access *a, char *name, int to_be_freed);
-void pci_id_cache_flush(struct pci_access *a);
+int pci_load_name_list(struct pci_access *a) PCI_ABI;	/* Called automatically by pci_lookup_*() when needed; returns success */
+void pci_free_name_list(struct pci_access *a) PCI_ABI;	/* Called automatically by pci_cleanup() */
+void pci_set_name_list_path(struct pci_access *a, char *name, int to_be_freed) PCI_ABI;
+void pci_id_cache_flush(struct pci_access *a) PCI_ABI;
 
 enum pci_lookup_mode {
   PCI_LOOKUP_VENDOR = 1,		/* Vendor name (args: vendorID) */

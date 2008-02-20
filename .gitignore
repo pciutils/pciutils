@@ -1,7 +1,9 @@
 *.a
 *.o
-*.8
+*.so
+*.[0-9]
 lspci
 setpci
+example
 update-pciids
 pci.ids.gz

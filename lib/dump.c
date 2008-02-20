@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Reading of Bus Dumps
  *
- *	Copyright (c) 1997--2005 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -18,10 +18,17 @@ struct dump_data {
   byte data[1];
 };
 
+static void
+dump_config(struct pci_access *a)
+{
+  pci_define_param(a, "dump.name", "", "Name of the bus dump file to read from");
+}
+
 static int
 dump_detect(struct pci_access *a)
 {
-  return !!a->method_params[PCI_ACCESS_DUMP];
+  char *name = pci_get_param(a, "dump.name");
+  return name && name[0];
 }
 
 static void
@@ -49,7 +56,7 @@ dump_validate(char *s, char *fmt)
 static void
 dump_init(struct pci_access *a)
 {
-  char *name = a->method_params[PCI_ACCESS_DUMP];
+  char *name = pci_get_param(a, "dump.name");
   FILE *f;
   char buf[256];
   struct pci_dev *dev = NULL;
@@ -157,7 +164,8 @@ dump_cleanup_dev(struct pci_dev *d)
 
 struct pci_methods pm_dump = {
   "dump",
-  NULL,					/* config */
+  "Reading of register dumps (set the `dump.name' parameter)",
+  dump_config,
   dump_detect,
   dump_init,
   dump_cleanup,
