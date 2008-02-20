@@ -47,6 +47,6 @@ sub esc($) {
 
 foreach my $i (keys %ids) {
 	my $j = join(".", reverse split(/[: ]/, $i));
-	print "$j\tTXT \"i=", esc($ids{$i}), "\"\n";
-	# print "$j\tTXT \"c=", esc($comments{$i}), "\"\n"
+	print "$j.pci\tTXT \"i=", esc($ids{$i}), "\"\n";
+	# print "$j.pci\tTXT \"c=", esc($comments{$i}), "\"\n"
 }
