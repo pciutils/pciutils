@@ -154,7 +154,7 @@ sub CopyFile($$$$) {
 		close I;
 		! -x $f or chmod(0755, "$dir/$f") or die "chmod($dir/$f): $!";
 	} else {
-		`cp -a $f $dir/$f`; die if $?;
+		`cp -a "$f" "$dir/$f"`; die if $?;
 	}
 }
 
