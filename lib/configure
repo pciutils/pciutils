@@ -147,7 +147,7 @@ else
 fi
 if [ "$DNS" = yes ] ; then
 	echo >>$c "#define PCI_USE_DNS"
-	echo >>$c "#define PCI_ID_DOMAIN \"pci-id.ucw.cz\""
+	echo >>$c "#define PCI_ID_DOMAIN \"pci.id.ucw.cz\""
 	echo >>$m 'WITH_LIBS+=-lresolv'
 fi
 

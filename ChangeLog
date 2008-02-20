@@ -1,3 +1,9 @@
+2008-02-20  Martin Mares <mj@ucw.cz>
+
+	* Released as 2.99.1-alpha2.
+
+	* Changed the default domain for the DNS resolver.
+
 2008-02-18  Martin Mares <mj@ucw.cz>
 
 	* Released as 2.99.1-alpha1.
