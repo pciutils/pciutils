@@ -6,7 +6,7 @@
  *  functions properly hidden.
  */
 
-LIBPCI_2.99 {
+LIBPCI_3.0 {
 	global: pci_*;
 	local: *;
 };

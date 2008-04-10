@@ -1,3 +1,9 @@
+2008-04-10  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.0.0.
+
+	* Updated API and ABI version.
+
 2008-02-20  Martin Mares <mj@ucw.cz>
 
 	* Released as 2.99.1-alpha2.
