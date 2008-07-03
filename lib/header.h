@@ -220,6 +220,7 @@
 #define PCI_EXT_CAP_ID_VNDR	0x0b	/* Vendor specific */
 #define PCI_EXT_CAP_ID_ACS	0x0d	/* Access Controls */
 #define PCI_EXT_CAP_ID_ARI	0x0e	/* Alternative Routing-ID Interpretation */
+#define PCI_EXT_CAP_ID_SRIOV	0x10	/* Single Root I/O Virtualization */
 
 /* Power Management Registers */
 
@@ -951,6 +952,33 @@
 #define  PCI_ARI_CTRL_MFVC	0x0001	/* MFVC Function Groups Enable */
 #define  PCI_ARI_CTRL_ACS	0x0002	/* ACS Function Groups Enable */
 #define  PCI_ARI_CTRL_FG(x)	(((x) >> 4) & 7) /* Function Group */
+
+/* Single Root I/O Virtualization */
+#define PCI_IOV_CAP		0x04	/* SR-IOV Capability Register */
+#define  PCI_IOV_CAP_VFM	0x00000001 /* VF Migration Capable */
+#define  PCI_IOV_CAP_IMN(x)	((x) >> 21) /* VF Migration Interrupt Message Number */
+#define PCI_IOV_CTRL		0x08	/* SR-IOV Control Register */
+#define  PCI_IOV_CTRL_VFE	0x0001	/* VF Enable */
+#define  PCI_IOV_CTRL_VFME	0x0002	/* VF Migration Enable */
+#define  PCI_IOV_CTRL_VFMIE	0x0004	/* VF Migration Interrupt Enable */
+#define  PCI_IOV_CTRL_MSE	0x0008	/* VF MSE */
+#define  PCI_IOV_CTRL_ARI	0x0010	/* ARI Capable Hierarchy */
+#define PCI_IOV_STATUS		0x0a	/* SR-IOV Status Register */
+#define  PCI_IOV_STATUS_MS	0x0001	/* VF Migration Status */
+#define PCI_IOV_INITIALVF	0x0c	/* Number of VFs that are initially associated */
+#define PCI_IOV_TOTALVF		0x0e	/* Maximum number of VFs that could be associated */
+#define PCI_IOV_NUMVF		0x10	/* Number of VFs that are available */
+#define PCI_IOV_FDL		0x12	/* Function Dependency Link */
+#define PCI_IOV_OFFSET		0x14	/* First VF Offset */
+#define PCI_IOV_STRIDE		0x16	/* Routing ID offset from one VF to the next one */
+#define PCI_IOV_DID		0x1a	/* VF Device ID */
+#define PCI_IOV_SUPPS		0x1c	/* Supported Page Sizes */
+#define PCI_IOV_SYSPS		0x20	/* System Page Size */
+#define PCI_IOV_BAR_BASE	0x24	/* VF BAR0, VF BAR1, ... VF BAR5 */
+#define PCI_IOV_NUM_BAR		6	/* Number of VF BARs */
+#define PCI_IOV_MSAO		0x3c	/* VF Migration State Array Offset */
+#define PCI_IOV_MSA_BIR(x)	((x) & 7) /* VF Migration State BIR */
+#define PCI_IOV_MSA_OFFSET(x)	((x) & 0xfffffff8) /* VF Migration State Offset */
 
 /*
  * The PCI interface treats multi-function devices as independent

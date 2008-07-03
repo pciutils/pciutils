@@ -1578,6 +1578,49 @@ cap_ari(struct device *d, int where)
 }
 
 static void
+cap_sriov(struct device *d, int where)
+{
+  u16 b;
+  u16 w;
+  u32 l;
+
+  printf("Single Root I/O Virtualization (SR-IOV)\n");
+  if (!config_fetch(d, where + PCI_IOV_CAP, 0x3c))
+    return;
+
+  l = get_conf_long(d, where + PCI_IOV_CAP);
+  printf("\t\tIOVCap:\tMigration%c, Interrupt Message Number: %03x\n",
+	FLAG(l, PCI_IOV_CAP_VFM), PCI_IOV_CAP_IMN(l));
+  w = get_conf_word(d, where + PCI_IOV_CTRL);
+  printf("\t\tIOVCtl:\tEnable%c Migration%c Interrupt%c MSE%c ARIHierarchy%c\n",
+	FLAG(w, PCI_IOV_CTRL_VFE), FLAG(w, PCI_IOV_CTRL_VFME),
+	FLAG(w, PCI_IOV_CTRL_VFMIE), FLAG(w, PCI_IOV_CTRL_MSE),
+	FLAG(w, PCI_IOV_CTRL_ARI));
+  w = get_conf_word(d, where + PCI_IOV_STATUS);
+  printf("\t\tIOVSta:\tMigration%c\n", FLAG(w, PCI_IOV_STATUS_MS));
+  w = get_conf_word(d, where + PCI_IOV_INITIALVF);
+  printf("\t\tInitial VFs: %d, ", w);
+  w = get_conf_word(d, where + PCI_IOV_TOTALVF);
+  printf("Total VFs: %d, ", w);
+  w = get_conf_word(d, where + PCI_IOV_NUMVF);
+  printf("Number of VFs: %d, ", w);
+  b = get_conf_byte(d, where + PCI_IOV_FDL);
+  printf("Function Dependency Link: %02x\n", b);
+  w = get_conf_word(d, where + PCI_IOV_OFFSET);
+  printf("\t\tVF offset: %d, ", w);
+  w = get_conf_word(d, where + PCI_IOV_STRIDE);
+  printf("stride: %d, ", w);
+  w = get_conf_word(d, where + PCI_IOV_DID);
+  printf("Device ID: %04x\n", w);
+  l = get_conf_long(d, where + PCI_IOV_SUPPS);
+  printf("\t\tSupported Page Size: %08x, ", l);
+  l = get_conf_long(d, where + PCI_IOV_SYSPS);
+  printf("System Page Size: %08x\n", l);
+  printf("\t\tVF Migration: offset: %08x, BIR: %x\n", PCI_IOV_MSA_OFFSET(l),
+	PCI_IOV_MSA_BIR(l));
+}
+
+static void
 show_ext_caps(struct device *d)
 {
   int where = 0x100;
@@ -1637,6 +1680,9 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_ARI:
 	    cap_ari(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_SRIOV:
+	    cap_sriov(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);
