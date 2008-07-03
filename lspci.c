@@ -1038,8 +1038,6 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_DEVSTA_URD),
 	FLAG(w, PCI_EXP_DEVSTA_AUXPD),
 	FLAG(w, PCI_EXP_DEVSTA_TRPND));
-
-  /* FIXME: Second set of control/status registers is not supported yet. */
 }
 
 static char *link_speed(int speed)
@@ -1195,6 +1193,156 @@ static void cap_express_root(struct device *d, int where)
 	FLAG(w, PCI_EXP_RTSTA_PME_PENDING));
 }
 
+static const char *cap_express_dev2_timeout_range(int type)
+{
+  /* Decode Completion Timeout Ranges. */
+  switch (type)
+    {
+      case 0:
+	return "Not Supported";
+      case 1:
+	return "Range A";
+      case 2:
+	return "Range B";
+      case 3:
+	return "Range AB";
+      case 6:
+	return "Range BC";
+      case 7:
+	return "Range ABC";
+      case 14:
+	return "Range BCD";
+      case 15:
+	return "Range ABCD";
+      default:
+	return "Unknown";
+    }
+}
+
+static const char *cap_express_dev2_timeout_value(int type)
+{
+  /* Decode Completion Timeout Value. */
+  switch (type)
+    {
+      case 0:
+	return "50us to 50ms";
+      case 1:
+	return "50us to 100us";
+      case 2:
+	return "1ms to 10ms";
+      case 5:
+	return "16ms to 55ms";
+      case 6:
+	return "65ms to 210ms";
+      case 9:
+	return "260ms to 900ms";
+      case 10:
+	return "1s to 3.5s";
+      case 13:
+	return "4s to 13s";
+      case 14:
+	return "17s to 64s";
+      default:
+	return "Unknown";
+    }
+}
+
+static void cap_express_dev2(struct device *d, int where, int type)
+{
+  u32 l;
+  u16 w;
+
+  l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
+  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c",
+	cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
+	FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS));
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
+    printf(" ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
+  else
+    printf("\n");
+
+  w = get_conf_word(d, where + PCI_EXP_DEVCTL2);
+  printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c",
+	cap_express_dev2_timeout_value(PCI_EXP_DEV2_TIMEOUT_VALUE(w)),
+	FLAG(w, PCI_EXP_DEV2_TIMEOUT_DIS));
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
+    printf(" ARIFwd%c\n", FLAG(w, PCI_EXP_DEV2_ARI));
+  else
+    printf("\n");
+}
+
+static const char *cap_express_link2_speed(int type)
+{
+  switch (type)
+    {
+      case 0: /* hardwire to 0 means only the 2.5GT/s is supported */
+      case 1:
+	return "2.5GT/s";
+      case 2:
+	return "5GT/s";
+      default:
+	return "Unknown";
+    }
+}
+
+static const char *cap_express_link2_deemphasis(int type)
+{
+  switch (type)
+    {
+      case 0:
+	return "-6dB";
+      case 1:
+	return "-3.5dB";
+      default:
+	return "Unknown";
+    }
+}
+
+static const char *cap_express_link2_transmargin(int type)
+{
+  switch (type)
+    {
+      case 0:
+	return "Normal Operating Range";
+      case 1:
+	return "800-1200mV(full-swing)/400-700mV(half-swing)";
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+	return "200-400mV(full-swing)/100-200mV(half-swing)";
+      default:
+	return "Unknown";
+    }
+}
+
+static void cap_express_link2(struct device *d, int where, int type UNUSED)
+{
+  u16 w;
+
+  w = get_conf_word(d, where + PCI_EXP_LNKCTL2);
+  printf("\t\tLnkCtl2: Target Link Speed: %s, EnterCompliance%c SpeedDis%c, Selectable De-emphasis: %s\n"
+	"\t\t\t Transmit Margin: %s, EnterModifiedCompliance%c ComplianceSOS%c\n"
+	"\t\t\t Compliance De-emphasis: %s\n",
+	cap_express_link2_speed(PCI_EXP_LNKCTL2_SPEED(w)),
+	FLAG(w, PCI_EXP_LNKCTL2_CMPLNC),
+	FLAG(w, PCI_EXP_LNKCTL2_SPEED_DIS),
+	cap_express_link2_deemphasis(PCI_EXP_LNKCTL2_DEEMPHASIS(w)),
+	cap_express_link2_transmargin(PCI_EXP_LNKCTL2_MARGIN(w)),
+	FLAG(w, PCI_EXP_LNKCTL2_MOD_CMPLNC),
+	FLAG(w, PCI_EXP_LNKCTL2_CMPLNC_SOS),
+	cap_express_link2_deemphasis(PCI_EXP_LNKCTL2_COM_DEEMPHASIS(w)));
+
+  w = get_conf_word(d, where + PCI_EXP_LNKSTA2);
+  printf("\t\tLnkSta2: Current De-emphasis Level: %s\n",
+	cap_express_link2_deemphasis(PCI_EXP_LINKSTA2_DEEMPHASIS(w)));
+}
+
+static void cap_express_slot2(struct device *d UNUSED, int where UNUSED)
+{
+  /* No capabilities that require this field in PCIe rev2.0 spec. */
+}
+
 static void
 cap_express(struct device *d, int where, int cap)
 {
@@ -1257,6 +1405,20 @@ cap_express(struct device *d, int where, int cap)
     cap_express_slot(d, where);
   if (type == PCI_EXP_TYPE_ROOT_PORT)
     cap_express_root(d, where);
+
+  if ((cap & PCI_EXP_FLAGS_VERS) < 2)
+    return;
+
+  size = 16;
+  if (slot)
+    size = 24;
+  if (!config_fetch(d, where + PCI_EXP_DEVCAP2, size))
+    return;
+
+  cap_express_dev2(d, where, type);
+  cap_express_link2(d, where, type);
+  if (slot)
+    cap_express_slot2(d, where);
 }
 
 static void

@@ -825,6 +825,28 @@
 #define  PCI_EXP_RTSTA_PME_REQID   0x0000ffff /* PME Requester ID */
 #define  PCI_EXP_RTSTA_PME_STATUS  0x00010000 /* PME Status */
 #define  PCI_EXP_RTSTA_PME_PENDING 0x00020000 /* PME is Pending */
+#define PCI_EXP_DEVCAP2			0x24	/* Device capabilities 2 */
+#define PCI_EXP_DEVCTL2			0x28	/* Device Control */
+#define  PCI_EXP_DEV2_TIMEOUT_RANGE(x)	((x) & 0xf) /* Completion Timeout Ranges Supported */
+#define  PCI_EXP_DEV2_TIMEOUT_VALUE(x)	((x) & 0xf) /* Completion Timeout Value */
+#define  PCI_EXP_DEV2_TIMEOUT_DIS	0x0010	/* Completion Timeout Disable Supported */
+#define  PCI_EXP_DEV2_ARI		0x0020	/* ARI Forwarding */
+#define PCI_EXP_DEVSTA2			0x2a	/* Device Status */
+#define PCI_EXP_LNKCAP2			0x2c	/* Link Capabilities */
+#define PCI_EXP_LNKCTL2			0x30	/* Link Control */
+#define  PCI_EXP_LNKCTL2_SPEED(x)	((x) & 0xf) /* Target Link Speed */
+#define  PCI_EXP_LNKCTL2_CMPLNC		0x0010	/* Enter Compliance */
+#define  PCI_EXP_LNKCTL2_SPEED_DIS	0x0020	/* Hardware Autonomous Speed Disable */
+#define  PCI_EXP_LNKCTL2_DEEMPHASIS(x)	(((x) >> 6) & 1) /* Selectable De-emphasis */
+#define  PCI_EXP_LNKCTL2_MARGIN(x)	(((x) >> 7) & 7) /* Transmit Margin */
+#define  PCI_EXP_LNKCTL2_MOD_CMPLNC	0x0400	/* Enter Modified Compliance */
+#define  PCI_EXP_LNKCTL2_CMPLNC_SOS	0x0800	/* Compliance SOS */
+#define  PCI_EXP_LNKCTL2_COM_DEEMPHASIS(x) (((x) >> 12) & 1) /* Compliance De-emphasis */
+#define PCI_EXP_LNKSTA2			0x32	/* Link Status */
+#define  PCI_EXP_LINKSTA2_DEEMPHASIS(x)	((x) & 1)	/* Current De-emphasis Level */
+#define PCI_EXP_SLTCAP2			0x34	/* Slot Capabilities */
+#define PCI_EXP_SLTCTL2			0x38	/* Slot Control */
+#define PCI_EXP_SLTSTA2			0x3a	/* Slot Status */
 
 /* MSI-X */
 #define  PCI_MSIX_ENABLE	0x8000
