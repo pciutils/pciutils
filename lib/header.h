@@ -862,8 +862,9 @@
 
 /* Advanced Error Reporting */
 #define PCI_ERR_UNCOR_STATUS	4	/* Uncorrectable Error Status */
-#define  PCI_ERR_UNC_TRAIN	0x00000001	/* Training */
+#define  PCI_ERR_UNC_TRAIN	0x00000001	/* Undefined in PCIe rev1.1 & 2.0 spec */
 #define  PCI_ERR_UNC_DLP	0x00000010	/* Data Link Protocol */
+#define  PCI_ERR_UNC_SDES	0x00000020	/* Surprise Down Error */
 #define  PCI_ERR_UNC_POISON_TLP	0x00001000	/* Poisoned TLP */
 #define  PCI_ERR_UNC_FCP	0x00002000	/* Flow Control Protocol */
 #define  PCI_ERR_UNC_COMP_TIME	0x00004000	/* Completion Timeout */
@@ -873,6 +874,7 @@
 #define  PCI_ERR_UNC_MALF_TLP	0x00040000	/* Malformed TLP */
 #define  PCI_ERR_UNC_ECRC	0x00080000	/* ECRC Error Status */
 #define  PCI_ERR_UNC_UNSUP	0x00100000	/* Unsupported Request */
+#define  PCI_ERR_UNC_ACS_VIOL	0x00200000	/* ACS Violation */
 #define PCI_ERR_UNCOR_MASK	8	/* Uncorrectable Error Mask */
 	/* Same bits as above */
 #define PCI_ERR_UNCOR_SEVER	12	/* Uncorrectable Error Severity */
@@ -883,6 +885,7 @@
 #define  PCI_ERR_COR_BAD_DLLP	0x00000080	/* Bad DLLP Status */
 #define  PCI_ERR_COR_REP_ROLL	0x00000100	/* REPLAY_NUM Rollover */
 #define  PCI_ERR_COR_REP_TIMER	0x00001000	/* Replay Timer Timeout */
+#define  PCI_ERR_COR_REP_ANFE	0x00002000	/* Advisory Non-Fatal Error */
 #define PCI_ERR_COR_MASK	20	/* Correctable Error Mask */
 	/* Same bits as above */
 #define PCI_ERR_CAP		24	/* Advanced Error Capabilities */
