@@ -1536,6 +1536,29 @@ cap_aer(struct device *d, int where)
 }
 
 static void
+cap_acs(struct device *d, int where)
+{
+  u16 w;
+
+  printf("Access Control Services\n");
+  if (!config_fetch(d, where + PCI_ACS_CAP, 4))
+    return;
+
+  w = get_conf_word(d, where + PCI_ACS_CAP);
+  printf("\t\tACSCap:\tSrcValid%c TransBlk%c ReqRedir%c CmpltRedir%c UpstreamFwd%c EgressCtrl%c "
+	"DirectTrans%c\n",
+	FLAG(w, PCI_ACS_CAP_VALID), FLAG(w, PCI_ACS_CAP_BLOCK), FLAG(w, PCI_ACS_CAP_REQ_RED),
+	FLAG(w, PCI_ACS_CAP_CMPLT_RED), FLAG(w, PCI_ACS_CAP_FORWARD), FLAG(w, PCI_ACS_CAP_EGRESS),
+	FLAG(w, PCI_ACS_CAP_TRANS));
+  w = get_conf_word(d, where + PCI_ACS_CTRL);
+  printf("\t\tACSCtl:\tSrcValid%c TransBlk%c ReqRedir%c CmpltRedir%c UpstreamFwd%c EgressCtrl%c "
+	"DirectTrans%c\n",
+	FLAG(w, PCI_ACS_CTRL_VALID), FLAG(w, PCI_ACS_CTRL_BLOCK), FLAG(w, PCI_ACS_CTRL_REQ_RED),
+	FLAG(w, PCI_ACS_CTRL_CMPLT_RED), FLAG(w, PCI_ACS_CTRL_FORWARD), FLAG(w, PCI_ACS_CTRL_EGRESS),
+	FLAG(w, PCI_ACS_CTRL_TRANS));
+}
+
+static void
 show_ext_caps(struct device *d)
 {
   int where = 0x100;
@@ -1591,7 +1614,7 @@ show_ext_caps(struct device *d)
 	    printf("Vendor Specific Information <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_ACS:
-	    printf("Access Controls <?>\n");
+	    cap_acs(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);

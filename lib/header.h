@@ -921,6 +921,26 @@
 #define PCI_PWR_CAP		12	/* Capability */
 #define  PCI_PWR_CAP_BUDGET(x)	((x) & 1)	/* Included in system budget */
 
+/* Access Control Services */
+#define PCI_ACS_CAP		0x04	/* ACS Capability Register */
+#define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
+#define PCI_ACS_CAP_BLOCK	0x0002	/* ACS Translation Blocking */
+#define PCI_ACS_CAP_REQ_RED	0x0004	/* ACS P2P Request Redirect */
+#define PCI_ACS_CAP_CMPLT_RED	0x0008	/* ACS P2P Completion Redirect */
+#define PCI_ACS_CAP_FORWARD	0x0010	/* ACS Upstream Forwarding */
+#define PCI_ACS_CAP_EGRESS	0x0020	/* ACS P2P Egress Control */
+#define PCI_ACS_CAP_TRANS	0x0040	/* ACS Direct Translated P2P */
+#define PCI_ACS_CAP_VECTOR(x)	(((x) >> 8) & 0xff) /* Egress Control Vector Size */
+#define PCI_ACS_CTRL		0x06	/* ACS Control Register */
+#define PCI_ACS_CTRL_VALID	0x0001	/* ACS Source Validation Enable */
+#define PCI_ACS_CTRL_BLOCK	0x0002	/* ACS Translation Blocking Enable */
+#define PCI_ACS_CTRL_REQ_RED	0x0004	/* ACS P2P Request Redirect Enable */
+#define PCI_ACS_CTRL_CMPLT_RED	0x0008	/* ACS P2P Completion Redirect Enable */
+#define PCI_ACS_CTRL_FORWARD	0x0010	/* ACS Upstream Forwarding Enable */
+#define PCI_ACS_CTRL_EGRESS	0x0020	/* ACS P2P Egress Control Enable */
+#define PCI_ACS_CTRL_TRANS	0x0040	/* ACS Direct Translated P2P Enable */
+#define PCI_ACS_EGRESS_CTRL	0x08	/* Egress Control Vector */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
