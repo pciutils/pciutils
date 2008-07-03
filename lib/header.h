@@ -219,6 +219,7 @@
 #define PCI_EXT_CAP_ID_RBCB	0x0a	/* Root Bridge Control Block */
 #define PCI_EXT_CAP_ID_VNDR	0x0b	/* Vendor specific */
 #define PCI_EXT_CAP_ID_ACS	0x0d	/* Access Controls */
+#define PCI_EXT_CAP_ID_ARI	0x0e	/* Alternative Routing-ID Interpretation */
 
 /* Power Management Registers */
 
@@ -940,6 +941,16 @@
 #define PCI_ACS_CTRL_EGRESS	0x0020	/* ACS P2P Egress Control Enable */
 #define PCI_ACS_CTRL_TRANS	0x0040	/* ACS Direct Translated P2P Enable */
 #define PCI_ACS_EGRESS_CTRL	0x08	/* Egress Control Vector */
+
+/* Alternative Routing-ID Interpretation */
+#define PCI_ARI_CAP		0x04	/* ARI Capability Register */
+#define  PCI_ARI_CAP_MFVC	0x0001	/* MFVC Function Groups Capability */
+#define  PCI_ARI_CAP_ACS	0x0002	/* ACS Function Groups Capability */
+#define  PCI_ARI_CAP_NFN(x)	(((x) >> 8) & 0xff) /* Next Function Number */
+#define PCI_ARI_CTRL		0x06	/* ARI Control Register */
+#define  PCI_ARI_CTRL_MFVC	0x0001	/* MFVC Function Groups Enable */
+#define  PCI_ARI_CTRL_ACS	0x0002	/* ACS Function Groups Enable */
+#define  PCI_ARI_CTRL_FG(x)	(((x) >> 4) & 7) /* Function Group */
 
 /*
  * The PCI interface treats multi-function devices as independent

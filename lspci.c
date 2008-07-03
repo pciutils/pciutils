@@ -1559,6 +1559,25 @@ cap_acs(struct device *d, int where)
 }
 
 static void
+cap_ari(struct device *d, int where)
+{
+  u16 w;
+
+  printf("Alternative Routing-ID Interpretation (ARI)\n");
+  if (!config_fetch(d, where + PCI_ARI_CAP, 4))
+    return;
+
+  w = get_conf_word(d, where + PCI_ARI_CAP);
+  printf("\t\tARICap:\tMFVC%c ACS%c, Next Function: %d\n",
+	FLAG(w, PCI_ARI_CAP_MFVC), FLAG(w, PCI_ARI_CAP_ACS),
+	PCI_ARI_CAP_NFN(w));
+  w = get_conf_word(d, where + PCI_ARI_CTRL);
+  printf("\t\tARICtl:\tMFVC%c ACS%c, Function Group: %d\n",
+	FLAG(w, PCI_ARI_CTRL_MFVC), FLAG(w, PCI_ARI_CTRL_ACS),
+	PCI_ARI_CTRL_FG(w));
+}
+
+static void
 show_ext_caps(struct device *d)
 {
   int where = 0x100;
@@ -1615,6 +1634,9 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_ACS:
 	    cap_acs(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_ARI:
+	    cap_ari(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);
