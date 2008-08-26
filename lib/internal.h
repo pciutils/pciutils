@@ -6,7 +6,9 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#ifdef __GNUC__
+#include "config.h"
+
+#ifdef PCI_SHARED_LIB
 #define PCI_ABI __attribute__((visibility("default")))
 #endif
 

@@ -42,6 +42,7 @@ echo " $host $rel"
 
 c=config.h
 m=config.mk
+echo >$c '#define PCI_CONFIG_H'
 echo >$c "#define PCI_ARCH_`echo $cpu | tr '[a-z]' '[A-Z]'`"
 echo >>$c "#define PCI_OS_`echo $sys | tr '[a-z]' '[A-Z]'`"
 echo >$m 'WITH_LIBS='
@@ -164,6 +165,7 @@ else
 	# We link the dependencies _to_ the library, so we do not need explicit deps in .pc
 	echo >>$m 'LDLIBS='
 	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
+	echo >>$c '#define PCI_SHARED_LIB'
 	if [ "$SHARED" = yes ] ; then
 		echo >>$m 'SONAME=-Wl,-soname,$(LIBNAME).so$(ABI_VERSION)'
 	fi

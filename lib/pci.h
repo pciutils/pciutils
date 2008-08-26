@@ -9,7 +9,10 @@
 #ifndef _PCI_LIB_H
 #define _PCI_LIB_H
 
+#ifndef PCI_CONFIG_H
 #include "config.h"
+#endif
+
 #include "header.h"
 #include "types.h"
 
