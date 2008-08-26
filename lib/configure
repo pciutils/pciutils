@@ -47,6 +47,7 @@ echo >>$c "#define PCI_OS_`echo $sys | tr '[a-z]' '[A-Z]'`"
 echo >$m 'WITH_LIBS='
 
 echo_n "Looking for access methods..."
+LIBRESOLV=-lresolv
 
 case $sys in
 	linux*)
@@ -79,11 +80,13 @@ case $sys in
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
+		LIBRESOLV=
 		;;
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
+		LIBRESOLV=
 		;;
 	aix)
 		echo_n " aix-device"
@@ -98,6 +101,7 @@ case $sys in
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$m 'LIBNAME=libpciutils'
 		echo >>$m 'WITH_LIBS+=-lpci'
+		LIBRESOLV=
 		;;
     	gnu)
 		echo_n " i386-ports"
@@ -147,7 +151,7 @@ fi
 if [ "$DNS" = yes ] ; then
 	echo >>$c "#define PCI_USE_DNS"
 	echo >>$c "#define PCI_ID_DOMAIN \"pci.id.ucw.cz\""
-	echo >>$m 'WITH_LIBS+=-lresolv'
+	echo >>$m "WITH_LIBS+=$LIBRESOLV"
 fi
 
 echo "Checking whether to build a shared library... $SHARED (set manually)"
