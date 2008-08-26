@@ -62,7 +62,6 @@ case $sys in
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
-		echo >>$c '#define PCI_USE_DNS'
 		;;
 	sunos)
 		case $cpu in
