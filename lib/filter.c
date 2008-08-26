@@ -90,14 +90,14 @@ pci_filter_parse_id(struct pci_filter *f, char *str)
   if (str[0] && strcmp(str, "*"))
     {
       long int x = strtol(str, &e, 16);
-      if ((e && *e) || (x < 0 || x >= 0xffff))
+      if ((e && *e) || (x < 0 || x > 0xffff))
 	return "Invalid vendor ID";
       f->vendor = x;
     }
   if (s[0] && strcmp(s, "*"))
     {
       long int x = strtol(s, &e, 16);
-      if ((e && *e) || (x < 0 || x >= 0xffff))
+      if ((e && *e) || (x < 0 || x > 0xffff))
 	return "Invalid device ID";
       f->device = x;
     }
