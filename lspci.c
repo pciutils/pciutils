@@ -922,11 +922,11 @@ cap_msi(struct device *d, int where, int cap)
   u32 t;
   u16 w;
 
-  printf("Message Signalled Interrupts: Mask%c 64bit%c Queue=%d/%d Enable%c\n",
+  printf("Message Signalled Interrupts: Mask%c 64bit%c Count=%d/%d Enable%c\n",
          FLAG(cap, PCI_MSI_FLAGS_MASK_BIT),
 	 FLAG(cap, PCI_MSI_FLAGS_64BIT),
-	 (cap & PCI_MSI_FLAGS_QSIZE) >> 4,
-	 (cap & PCI_MSI_FLAGS_QMASK) >> 1,
+	 1 << ((cap & PCI_MSI_FLAGS_QSIZE) >> 4),
+	 1 << ((cap & PCI_MSI_FLAGS_QMASK) >> 1),
 	 FLAG(cap, PCI_MSI_FLAGS_ENABLE));
   if (verbose < 2)
     return;
