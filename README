@@ -23,6 +23,7 @@ In runs on the following systems:
 	Aix		(via /dev/pci and odmget)
 	GNU Hurd	(direct port access)
 	Windows		(direct port access)
+	CYGWIN		(direct port access)
 
 It should be very easy to add support for other systems as well (volunteers
 wanted; if you want to try that, I'll be very glad to see the patches and

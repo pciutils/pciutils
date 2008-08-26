@@ -32,6 +32,10 @@ if [ -z "$HOST" ] ; then
 	then
 		sys=freebsd
 	fi
+	if [ "$sys" = "CYGWIN_NT-5.1" ]
+	then
+		sys=cygwin
+	fi
 	HOST=${3:-$cpu-$sys}
 fi
 # CAVEAT: tr on Solaris is a bit weird and the extra [] is otherwise harmless.
@@ -107,6 +111,11 @@ case $sys in
     	gnu)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		;;
+	cygwin)
+		echo_n " i386-ports"
+		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		echo >>$m 'LDLIBS+=-lioperm'
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"

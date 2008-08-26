@@ -20,6 +20,8 @@
 #include "i386-io-sunos.h"
 #elif defined(PCI_OS_WINDOWS)
 #include "i386-io-windows.h"
+#elif defined(PCI_OS_CYGWIN)
+#include "i386-io-cygwin.h"
 #else
 #error Do not know how to access I/O ports on this OS.
 #endif

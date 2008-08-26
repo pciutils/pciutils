@@ -66,7 +66,7 @@ $(PCILIBPC): libpci.pc.in
 init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 params.o: params.c $(INCL)
-i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h
+i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
 proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
