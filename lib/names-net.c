@@ -17,6 +17,7 @@
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <resolv.h>
+#include <netdb.h>
 
 /*
  * Unfortunately, there are no portable functions for DNS RR parsing,
@@ -196,7 +197,7 @@ char
   res = res_query(dnsname, ns_c_in, ns_t_txt, answer, sizeof(answer));
   if (res < 0)
     {
-      a->debug("\tfailed, h_errno=%d\n", _res.res_h_errno);
+      a->debug("\tfailed, h_errno=%d\n", h_errno);
       return NULL;
     }
   if (dns_parse_packet(&ds, answer, res) < 0)
