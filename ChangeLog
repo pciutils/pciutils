@@ -1,3 +1,31 @@
+2008-09-11  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.0.1.
+
+	* Updated pci.ids to the most recent snapshot.
+
+	* Added a Cygwin port. Patch by Christopher Voltz, ported to the
+	current tree by Martin Mares.
+
+	* Worked around compatibility problems with various default settings
+	of wget (we have to set --no-timestamping explicitly). Thanks to Ville
+	Skytta for pointing that out.
+
+	* Fixed printing of MSI capabilities. Thanks to Matthew Wilcox for
+	a patch.
+
+	* Added decoding of several PCI-X capabilities: device/link/slot 2,
+	Advanced Error Reporting, Access Control Services, Alternative Routing-ID,
+	Single Root I/O Virtualization. Thanks to Yu Zhao for patches.
+
+	* Fixed bug in filters which caused them to refuse vendor/device ID 0xffff.
+
+	* README: The linux-pci mailing list has moved to linux-pci@vger.kernel.org.
+
+	* Fixed several build problems: builds without PCI_USE_DNS on Linux
+	and with PCI_USE_DNS on Solaris and *BSD. Static library mode also
+	compiles again on old versions of GCC.
+
 2008-04-10  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.0.0.
