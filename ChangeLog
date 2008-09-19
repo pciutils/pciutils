@@ -1,3 +1,10 @@
+2008-09-19  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.0.2.
+
+	* Fixed a minor bug in the configure script, which caused warnings
+	about redefinition of symbols during compilation.
+
 2008-09-11  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.0.1.

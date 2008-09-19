@@ -47,7 +47,7 @@ echo " $host $rel"
 c=config.h
 m=config.mk
 echo >$c '#define PCI_CONFIG_H'
-echo >$c "#define PCI_ARCH_`echo $cpu | tr '[a-z]' '[A-Z]'`"
+echo >>$c "#define PCI_ARCH_`echo $cpu | tr '[a-z]' '[A-Z]'`"
 echo >>$c "#define PCI_OS_`echo $sys | tr '[a-z]' '[A-Z]'`"
 echo >$m 'WITH_LIBS='
 
