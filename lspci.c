@@ -288,6 +288,25 @@ show_slot_name(struct device *d)
 }
 
 static void
+get_subid(struct device *d, word *subvp, word *subdp)
+{
+  byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+
+  if (htype == PCI_HEADER_TYPE_NORMAL)
+    {
+      *subvp = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
+      *subdp = get_conf_word(d, PCI_SUBSYSTEM_ID);
+    }
+  else if (htype == PCI_HEADER_TYPE_CARDBUS && d->config_cached >= 128)
+    {
+      *subvp = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+      *subdp = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
+    }
+  else
+    *subvp = *subdp = 0xffff;
+}
+
+static void
 show_terse(struct device *d)
 {
   int c;
@@ -320,25 +339,19 @@ show_terse(struct device *d)
 	}
     }
   putchar('\n');
-}
 
-static void
-get_subid(struct device *d, word *subvp, word *subdp)
-{
-  byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+  if (verbose || opt_kernel)
+    {
+      word subsys_v, subsys_d;
+      char ssnamebuf[256];
 
-  if (htype == PCI_HEADER_TYPE_NORMAL)
-    {
-      *subvp = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
-      *subdp = get_conf_word(d, PCI_SUBSYSTEM_ID);
+      get_subid(d, &subsys_v, &subsys_d);
+      if (subsys_v && subsys_v != 0xffff)
+	printf("\tSubsystem: %s\n",
+		pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
+			PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
+			p->vendor_id, p->device_id, subsys_v, subsys_d));
     }
-  else if (htype == PCI_HEADER_TYPE_CARDBUS && d->config_cached >= 128)
-    {
-      *subvp = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-      *subdp = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
-    }
-  else
-    *subvp = *subdp = 0xffff;
 }
 
 /*** Capabilities ***/
@@ -2311,8 +2324,6 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   unsigned int irq = p->irq;
-  word subsys_v, subsys_d;
-  char ssnamebuf[256];
 
   show_terse(d);
 
@@ -2338,13 +2349,6 @@ show_verbose(struct device *d)
       printf("\t!!! Unknown header type %02x\n", htype);
       return;
     }
-
-  get_subid(d, &subsys_v, &subsys_d);
-  if (subsys_v && subsys_v != 0xffff)
-    printf("\tSubsystem: %s\n",
-	   pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
-			   PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-			   p->vendor_id, p->device_id, subsys_v, subsys_d));
 
   if (verbose > 1)
     {
