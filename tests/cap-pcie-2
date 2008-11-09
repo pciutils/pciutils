@@ -11,7 +11,7 @@
 	Capabilities: [40] Power Management version 3
 		Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
 		Status: D0 PME-Enable- DSel=0 DScale=1 PME-
-	Capabilities: [50] Message Signalled Interrupts: Mask+ 64bit+ Queue=0/0 Enable-
+	Capabilities: [50] MSI: Mask+ 64bit+ Count=0/1 Enable-
 		Address: 0000000000000000  Data: 0000
 		Masking: 00000000  Pending: 00000000
 	Capabilities: [70] MSI-X: Enable+ Mask- TabSize=10

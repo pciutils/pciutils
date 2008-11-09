@@ -187,7 +187,7 @@
 #define  PCI_CAP_ID_AGP		0x02	/* Accelerated Graphics Port */
 #define  PCI_CAP_ID_VPD		0x03	/* Vital Product Data */
 #define  PCI_CAP_ID_SLOTID	0x04	/* Slot Identification */
-#define  PCI_CAP_ID_MSI		0x05	/* Message Signalled Interrupts */
+#define  PCI_CAP_ID_MSI		0x05	/* Message Signaled Interrupts */
 #define  PCI_CAP_ID_CHSWP	0x06	/* CompactPCI HotSwap */
 #define  PCI_CAP_ID_PCIX        0x07    /* PCI-X */
 #define  PCI_CAP_ID_HT          0x08    /* HyperTransport */
@@ -287,7 +287,7 @@
 #define  PCI_SID_ESR_FIC	0x20	/* First In Chassis Flag */
 #define PCI_SID_CHASSIS_NR	3	/* Chassis Number */
 
-/* Message Signalled Interrupts registers */
+/* Message Signaled Interrupts registers */
 
 #define PCI_MSI_FLAGS		2	/* Various flags */
 #define  PCI_MSI_FLAGS_MASK_BIT	0x100	/* interrupt masking & reporting supported */

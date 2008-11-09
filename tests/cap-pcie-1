@@ -10,7 +10,7 @@
 	BridgeCtl: Parity- SERR- NoISA- VGA- MAbort- >Reset- FastB2B-
 		PriDiscTmr- SecDiscTmr- DiscTmrStat- DiscTmrSERREn-
 	Capabilities: [40] Subsystem: Device 8086:0000
-	Capabilities: [60] Message Signalled Interrupts: Mask+ 64bit- Queue=0/1 Enable+
+	Capabilities: [60] MSI: Mask+ 64bit- Count=1/2 Enable+
 		Address: fee00000  Data: 40b0
 		Masking: 00000003  Pending: 00000000
 	Capabilities: [90] Express (v2) Root Port (Slot-), MSI 00
