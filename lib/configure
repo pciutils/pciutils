@@ -116,7 +116,7 @@ case $sys in
 	cygwin)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-		echo >>$m 'LDLIBS+=-lioperm'
+		echo >>$m 'WITH_LIBS+=-lioperm'
 		;;
         *)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
