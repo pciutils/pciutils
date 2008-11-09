@@ -571,10 +571,10 @@ cap_ht_pri(struct device *d, int where, int cmd)
   if (!config_fetch(d, where + PCI_HT_PRI_LCTR0, PCI_HT_PRI_SIZEOF - PCI_HT_PRI_LCTR0))
     return;
   rid = get_conf_byte(d, where + PCI_HT_PRI_RID);
-  if (rid < 0x23 && rid > 0x11)
+  if (rid < 0x22 && rid > 0x11)
     printf("\t\t!!! Possibly incomplete decoding\n");
 
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tCommand: BaseUnitID=%u UnitCnt=%u MastHost%c DefDir%c DUL%c\n";
   else
     fmt = "\t\tCommand: BaseUnitID=%u UnitCnt=%u MastHost%c DefDir%c\n";
@@ -585,7 +585,7 @@ cap_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(cmd, PCI_HT_PRI_CMD_DD),
 	 FLAG(cmd, PCI_HT_PRI_CMD_DUL));
   lctr0 = get_conf_word(d, where + PCI_HT_PRI_LCTR0);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Control 0: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n";
   else
     fmt = "\t\tLink Control 0: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x\n";
@@ -603,7 +603,7 @@ cap_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(lctr0, PCI_HT_LCTR_EXTCTL),
 	 FLAG(lctr0, PCI_HT_LCTR_64B));
   lcnf0 = get_conf_word(d, where + PCI_HT_PRI_LCNF0);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Config 0: MLWI=%1$s DwFcIn%5$c MLWO=%2$s DwFcOut%6$c LWI=%3$s DwFcInEn%7$c LWO=%4$s DwFcOutEn%8$c\n";
   else
     fmt = "\t\tLink Config 0: MLWI=%s MLWO=%s LWI=%s LWO=%s\n";
@@ -617,7 +617,7 @@ cap_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(lcnf0, PCI_HT_LCNF_DFIE),
 	 FLAG(lcnf0, PCI_HT_LCNF_DFOE));
   lctr1 = get_conf_word(d, where + PCI_HT_PRI_LCTR1);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Control 1: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n";
   else
     fmt = "\t\tLink Control 1: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x\n";
@@ -635,7 +635,7 @@ cap_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(lctr1, PCI_HT_LCTR_EXTCTL),
 	 FLAG(lctr1, PCI_HT_LCTR_64B));
   lcnf1 = get_conf_word(d, where + PCI_HT_PRI_LCNF1);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Config 1: MLWI=%1$s DwFcIn%5$c MLWO=%2$s DwFcOut%6$c LWI=%3$s DwFcInEn%7$c LWO=%4$s DwFcOutEn%8$c\n";
   else
     fmt = "\t\tLink Config 1: MLWI=%s MLWO=%s LWI=%s LWO=%s\n";
@@ -650,7 +650,7 @@ cap_ht_pri(struct device *d, int where, int cmd)
 	 FLAG(lcnf1, PCI_HT_LCNF_DFOE));
   printf("\t\tRevision ID: %u.%02u\n",
 	 (rid & PCI_HT_RID_MAJ) >> 5, (rid & PCI_HT_RID_MIN));
-  if (rid < 0x23)
+  if (rid < 0x22)
     return;
   lfrer0 = get_conf_byte(d, where + PCI_HT_PRI_LFRER0);
   printf("\t\tLink Frequency 0: %s\n", ht_link_freq(lfrer0 & PCI_HT_LFRER_FREQ));
@@ -739,10 +739,10 @@ cap_ht_sec(struct device *d, int where, int cmd)
   if (!config_fetch(d, where + PCI_HT_SEC_LCTR, PCI_HT_SEC_SIZEOF - PCI_HT_SEC_LCTR))
     return;
   rid = get_conf_byte(d, where + PCI_HT_SEC_RID);
-  if (rid < 0x23 && rid > 0x11)
+  if (rid < 0x22 && rid > 0x11)
     printf("\t\t!!! Possibly incomplete decoding\n");
 
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tCommand: WarmRst%c DblEnd%c DevNum=%u ChainSide%c HostHide%c Slave%c <EOCErr%c DUL%c\n";
   else
     fmt = "\t\tCommand: WarmRst%c DblEnd%c\n";
@@ -756,7 +756,7 @@ cap_ht_sec(struct device *d, int where, int cmd)
 	 FLAG(cmd, PCI_HT_SEC_CMD_HIECE),
 	 FLAG(cmd, PCI_HT_SEC_CMD_DUL));
   lctr = get_conf_word(d, where + PCI_HT_SEC_LCTR);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Control: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x IsocEn%c LSEn%c ExtCTL%c 64b%c\n";
   else
     fmt = "\t\tLink Control: CFlE%c CST%c CFE%c <LkFail%c Init%c EOC%c TXO%c <CRCErr=%x\n";
@@ -774,7 +774,7 @@ cap_ht_sec(struct device *d, int where, int cmd)
 	 FLAG(lctr, PCI_HT_LCTR_EXTCTL),
 	 FLAG(lctr, PCI_HT_LCTR_64B));
   lcnf = get_conf_word(d, where + PCI_HT_SEC_LCNF);
-  if (rid >= 0x23)
+  if (rid >= 0x22)
     fmt = "\t\tLink Config: MLWI=%1$s DwFcIn%5$c MLWO=%2$s DwFcOut%6$c LWI=%3$s DwFcInEn%7$c LWO=%4$s DwFcOutEn%8$c\n";
   else
     fmt = "\t\tLink Config: MLWI=%s MLWO=%s LWI=%s LWO=%s\n";
@@ -789,7 +789,7 @@ cap_ht_sec(struct device *d, int where, int cmd)
 	 FLAG(lcnf, PCI_HT_LCNF_DFOE));
   printf("\t\tRevision ID: %u.%02u\n",
 	 (rid & PCI_HT_RID_MAJ) >> 5, (rid & PCI_HT_RID_MIN));
-  if (rid < 0x23)
+  if (rid < 0x22)
     return;
   lfrer = get_conf_byte(d, where + PCI_HT_SEC_LFRER);
   printf("\t\tLink Frequency: %s\n", ht_link_freq(lfrer & PCI_HT_LFRER_FREQ));
