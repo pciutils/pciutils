@@ -15,7 +15,7 @@ while (<X>) {
 print "API version is $apiver ... <confirm> "; <STDIN>;
 
 print "Updating public GIT tree\n";
-`cg-push public`; die if $?;
+`git push --tags public`; die if $?;
 
 my $r = new UCW::Release("pciutils");
 my $ver = $r->GetVersionFromFile("Makefile", "VERSION=(.*)");
