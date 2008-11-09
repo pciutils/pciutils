@@ -1,3 +1,25 @@
+2008-11-09  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.0.3.
+
+	* `lspci -k' now displays the subsystem ID, too. This makes `-k'
+	show everything needed to identify the device and the available
+	drivers, which was called for by many users.
+
+	* Fixed spelling of MSI. Patch by Matthew Wilcox.
+
+	* Better support for cross-compilation. Thanks to Alon Bar-Lev
+	for the patch.
+
+	* Fixed printing of the AER capability. Patch by Max Asbock.
+
+	* HT 1.02 capabilities are decoded as HT 1.03. Suggested by
+	Carl-Daniel Hailfinger.
+
+	* Fixed Cygwin build. Thanks to Steve Elliott for reporting the bug.
+
+	* Updated pci.ids to the current snapshot of the database.
+
 2008-09-19  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.0.2.
