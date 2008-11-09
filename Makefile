@@ -10,6 +10,7 @@ DATE=2008-09-19
 # Host OS and release (override if you are cross-compiling)
 HOST=
 RELEASE=
+CROSS_COMPILE=
 
 # Support for compressed pci.ids (yes/no, default: detect)
 ZLIB=
@@ -37,8 +38,9 @@ PKGCFDIR=$(LIBDIR)/pkgconfig
 INSTALL=install
 DIRINSTALL=install -d
 STRIP=-s
-AR=ar
-RANLIB=ranlib
+CC=$(CROSS_COMPILE)gcc
+AR=$(CROSS_COMPILE)ar
+RANLIB=$(CROSS_COMPILE)ranlib
 
 # Base name of the library (overriden on NetBSD, which has its own libpci)
 LIBNAME=libpci
