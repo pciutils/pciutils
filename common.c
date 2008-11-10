@@ -44,6 +44,15 @@ xrealloc(void *ptr, unsigned int howmuch)
   return p;
 }
 
+char *
+xstrdup(char *str)
+{
+  int len = strlen(str) + 1;
+  char *copy = xmalloc(len);
+  memcpy(copy, str, len);
+  return copy;
+}
+
 static void
 set_pci_method(struct pci_access *pacc, char *arg)
 {
