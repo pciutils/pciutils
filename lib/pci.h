@@ -127,7 +127,6 @@ struct pci_dev {
   pciaddr_t size[6];			/* Region sizes */
   pciaddr_t rom_base_addr;		/* Expansion ROM base address */
   pciaddr_t rom_size;			/* Expansion ROM size */
-  struct pci_cap *first_cap;		/* List of capabilities */
 
   /* Fields used internally: */
   struct pci_access *access;
@@ -136,6 +135,9 @@ struct pci_dev {
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
   void *aux;				/* Auxillary data */
+
+  /* Another field set by pci_fill_info() */
+  struct pci_cap *first_cap;		/* List of capabilities */
 };
 
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
