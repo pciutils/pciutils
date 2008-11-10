@@ -220,6 +220,7 @@
 #define PCI_EXT_CAP_ID_VNDR	0x0b	/* Vendor specific */
 #define PCI_EXT_CAP_ID_ACS	0x0d	/* Access Controls */
 #define PCI_EXT_CAP_ID_ARI	0x0e	/* Alternative Routing-ID Interpretation */
+#define PCI_EXT_CAP_ID_ATS	0x0f	/* Address Translation Service */
 #define PCI_EXT_CAP_ID_SRIOV	0x10	/* Single Root I/O Virtualization */
 
 /* Power Management Registers */
@@ -952,6 +953,13 @@
 #define  PCI_ARI_CTRL_MFVC	0x0001	/* MFVC Function Groups Enable */
 #define  PCI_ARI_CTRL_ACS	0x0002	/* ACS Function Groups Enable */
 #define  PCI_ARI_CTRL_FG(x)	(((x) >> 4) & 7) /* Function Group */
+
+/* Address Translation Service */
+#define PCI_ATS_CAP		0x04	/* ATS Capability Register */
+#define  PCI_ATS_CAP_IQD(x)	((x) & 0x1f) /* Invalidate Queue Depth */
+#define PCI_ATS_CTRL		0x06	/* ATS Control Register */
+#define  PCI_ATS_CTRL_STU(x)	((x) & 0x1f) /* Smallest Translation Unit */
+#define  PCI_ATS_CTRL_ENABLE	0x80	/* ATS Enable */
 
 /* Single Root I/O Virtualization */
 #define PCI_IOV_CAP		0x04	/* SR-IOV Capability Register */

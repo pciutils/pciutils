@@ -1591,6 +1591,22 @@ cap_ari(struct device *d, int where)
 }
 
 static void
+cap_ats(struct device *d, int where)
+{
+  u16 w;
+
+  printf("Address Translation Service (ATS)\n");
+  if (!config_fetch(d, where + PCI_ATS_CAP, 4))
+    return;
+
+  w = get_conf_word(d, where + PCI_ATS_CAP);
+  printf("\t\tATSCap:\tInvalidate Queue Depth: %02x\n", PCI_ATS_CAP_IQD(w));
+  w = get_conf_word(d, where + PCI_ATS_CTRL);
+  printf("\t\tATSCtl:\tEnable%c, Smallest Translation Unit: %02x\n",
+	FLAG(w, PCI_ATS_CTRL_ENABLE), PCI_ATS_CTRL_STU(w));
+}
+
+static void
 cap_sriov(struct device *d, int where)
 {
   u16 b;
@@ -1693,6 +1709,9 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_ARI:
 	    cap_ari(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_ATS:
+	    cap_ats(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_SRIOV:
 	    cap_sriov(d, where);
