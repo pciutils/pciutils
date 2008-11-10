@@ -25,11 +25,11 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
   busmap[bus] = 1;
   t = pci_alloc_dev(a);
   t->bus = bus;
-  for(dev=0; dev<32; dev++)
+  for (dev=0; dev<32; dev++)
     {
       t->dev = dev;
       multi = 0;
-      for(t->func=0; !t->func || multi && t->func<8; t->func++)
+      for (t->func=0; !t->func || multi && t->func<8; t->func++)
 	{
 	  u32 vd = pci_read_long(t, PCI_VENDOR_ID);
 	  struct pci_dev *d;
@@ -108,7 +108,7 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	}
       if (cnt)
 	{
-	  for(i=0; i<cnt; i++)
+	  for (i=0; i<cnt; i++)
 	    {
 	      u32 x = pci_read_long(d, PCI_BASE_ADDRESS_0 + i*4);
 	      if (!x || x == (u32) ~0)

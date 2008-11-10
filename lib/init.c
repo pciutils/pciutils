@@ -158,7 +158,7 @@ pci_alloc(void)
   pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
 #endif
-  for(i=0; i<PCI_ACCESS_MAX; i++)
+  for (i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)
       pci_methods[i]->config(a);
   return a;
@@ -185,7 +185,7 @@ pci_init(struct pci_access *a)
   else
     {
       unsigned int i;
-      for(i=0; i<PCI_ACCESS_MAX; i++)
+      for (i=0; i<PCI_ACCESS_MAX; i++)
 	if (pci_methods[i])
 	  {
 	    a->debug("Trying method %d...", i);
@@ -210,7 +210,7 @@ pci_cleanup(struct pci_access *a)
 {
   struct pci_dev *d, *e;
 
-  for(d=a->devices; d; d=e)
+  for (d=a->devices; d; d=e)
     {
       e = d->next;
       pci_free_dev(d);

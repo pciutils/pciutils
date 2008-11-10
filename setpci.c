@@ -46,11 +46,11 @@ select_devices(struct pci_filter *filt)
   struct pci_dev *z, **a, **b;
   int cnt = 1;
 
-  for(z=pacc->devices; z; z=z->next)
+  for (z=pacc->devices; z; z=z->next)
     if (pci_filter_match(filt, z))
       cnt++;
   a = b = xmalloc(sizeof(struct device *) * cnt);
-  for(z=pacc->devices; z; z=z->next)
+  for (z=pacc->devices; z; z=z->next)
     if (pci_filter_match(filt, z))
       *a++ = z;
   *a = NULL;
@@ -71,7 +71,7 @@ exec_op(struct op *op, struct pci_dev *dev)
   addr = op->addr;
   if (op->num_values >= 0)
     {
-      for(i=0; i<op->num_values; i++)
+      for (i=0; i<op->num_values; i++)
 	{
 	  if ((op->values[i].mask & max_values[width]) == max_values[width])
 	    {
@@ -155,7 +155,7 @@ execute(struct op *op)
     {
       pdev = vec = op->dev_vector;
       while (dev = *pdev++)
-	for(oops=op; oops && oops->dev_vector == vec; oops=oops->next)
+	for (oops=op; oops && oops->dev_vector == vec; oops=oops->next)
 	  exec_op(oops, dev);
       while (op && op->dev_vector == vec)
 	op = op->next;
@@ -414,7 +414,7 @@ static void parse_ops(int argc, char **argv, int i)
 	      *d++ = 0;
 	      if (!*d)
 		usage("Missing value");
-	      for(e=d, n=1; *e; e++)
+	      for (e=d, n=1; *e; e++)
 		if (*e == ',')
 		  n++;
 	      op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
@@ -450,7 +450,7 @@ static void parse_ops(int argc, char **argv, int i)
 	  if (f && *f)
 	    {
 	      const struct reg_name *r;
-	      for(r = pci_reg_names; r->name; r++)
+	      for (r = pci_reg_names; r->name; r++)
 		if (!strcasecmp(r->name, c))
 		  break;
 	      if (!r->name)
@@ -466,7 +466,7 @@ static void parse_ops(int argc, char **argv, int i)
 	    die("Unaligned register address!");
 	  op->addr = ll;
 	  /* read in all the values to be set */
-	  for(j=0; j<n; j++)
+	  for (j=0; j<n; j++)
 	    {
 	      e = strchr(d, ',');
 	      if (e)

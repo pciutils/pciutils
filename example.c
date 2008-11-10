@@ -20,7 +20,7 @@ int main(void)
   /* Set all options you want -- here we stick with the defaults */
   pci_init(pacc);		/* Initialize the PCI library */
   pci_scan_bus(pacc);		/* We want to get the list of devices */
-  for(dev=pacc->devices; dev; dev=dev->next)	/* Iterate over all devices */
+  for (dev=pacc->devices; dev; dev=dev->next)	/* Iterate over all devices */
     {
       pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	/* Fill in header info we need */
       c = pci_read_byte(dev, PCI_INTERRUPT_PIN);				/* Read config register directly */

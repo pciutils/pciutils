@@ -177,7 +177,7 @@ scan_devices(void)
   struct pci_dev *p;
 
   pci_scan_bus(pacc);
-  for(p=pacc->devices; p; p=p->next)
+  for (p=pacc->devices; p; p=p->next)
     if (d = scan_device(p))
       {
 	d->next = first_dev;
@@ -256,10 +256,10 @@ sort_them(void)
   struct device *d;
 
   cnt = 0;
-  for(d=first_dev; d; d=d->next)
+  for (d=first_dev; d; d=d->next)
     cnt++;
   h = index = alloca(sizeof(struct device *) * cnt);
-  for(d=first_dev; d; d=d->next)
+  for (d=first_dev; d; d=d->next)
     *h++ = d;
   qsort(index, cnt, sizeof(struct device *), compare_them);
   last_dev = &first_dev;
@@ -398,7 +398,7 @@ format_agp_rate(int rate, char *buf, int agp3)
   char *c = buf;
   int i;
 
-  for(i=0; i<=2; i++)
+  for (i=0; i<=2; i++)
     if (rate & (1 << i))
       {
 	if (c != buf)
@@ -2036,7 +2036,7 @@ show_bases(struct device *d, int cnt)
   word cmd = get_conf_word(d, PCI_COMMAND);
   int i;
 
-  for(i=0; i<cnt; i++)
+  for (i=0; i<cnt; i++)
     {
       pciaddr_t pos = p->base_addr[i];
       pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
@@ -2278,7 +2278,7 @@ show_htype2(struct device *d)
 	 get_conf_byte(d, PCI_CB_CARD_BUS),
 	 get_conf_byte(d, PCI_CB_SUBORDINATE_BUS),
 	 get_conf_byte(d, PCI_CB_LATENCY_TIMER));
-  for(i=0; i<2; i++)
+  for (i=0; i<2; i++)
     {
       int p = 8*i;
       u32 base = get_conf_long(d, PCI_CB_MEMORY_BASE_0 + p);
@@ -2288,7 +2288,7 @@ show_htype2(struct device *d)
 	       (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]",
 	       (brc & (PCI_CB_BRIDGE_CTL_PREFETCH_MEM0 << i)) ? " (prefetchable)" : "");
     }
-  for(i=0; i<2; i++)
+  for (i=0; i<2; i++)
     {
       int p = 8*i;
       u32 base = get_conf_long(d, PCI_CB_IO_BASE_0 + p);
@@ -2483,7 +2483,7 @@ show_hex_dump(struct device *d)
 	cnt = 4096;
     }
 
-  for(i=0; i<cnt; i++)
+  for (i=0; i<cnt; i++)
     {
       if (! (i & 15))
 	printf("%02x:", i);
@@ -2589,7 +2589,7 @@ show(void)
 {
   struct device *d;
 
-  for(d=first_dev; d; d=d->next)
+  for (d=first_dev; d; d=d->next)
     show_device(d);
 }
 
@@ -2618,7 +2618,7 @@ find_bus(struct bridge *b, unsigned int domain, unsigned int n)
 {
   struct bus *bus;
 
-  for(bus=b->first_bus; bus; bus=bus->sibling)
+  for (bus=b->first_bus; bus; bus=bus->sibling)
     if (bus->domain == domain && bus->number == n)
       break;
   return bus;
@@ -2646,7 +2646,7 @@ insert_dev(struct device *d, struct bridge *b)
   if (! (bus = find_bus(b, p->domain, p->bus)))
     {
       struct bridge *c;
-      for(c=b->child; c; c=c->next)
+      for (c=b->child; c; c=c->next)
 	if (c->domain == p->domain && c->secondary <= p->bus && p->bus <= c->subordinate)
           {
             insert_dev(d, c);
@@ -2672,7 +2672,7 @@ grow_tree(void)
   /* Build list of bridges */
 
   last_br = &host_bridge.chain;
-  for(d=first_dev; d; d=d->next)
+  for (d=first_dev; d; d=d->next)
     {
       word class = d->dev->device_class;
       byte ht = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
@@ -2704,11 +2704,11 @@ grow_tree(void)
 
   /* Create a bridge tree */
 
-  for(b=&host_bridge; b; b=b->chain)
+  for (b=&host_bridge; b; b=b->chain)
     {
       struct bridge *c, *best;
       best = NULL;
-      for(c=&host_bridge; c; c=c->chain)
+      for (c=&host_bridge; c; c=c->chain)
 	if (c != b && (c == &host_bridge || b->domain == c->domain) &&
 	    b->primary >= c->secondary && b->primary <= c->subordinate &&
 	    (!best || best->subordinate - best->primary > c->subordinate - c->primary))
@@ -2722,13 +2722,13 @@ grow_tree(void)
 
   /* Insert secondary bus for each bridge */
 
-  for(b=&host_bridge; b; b=b->chain)
+  for (b=&host_bridge; b; b=b->chain)
     if (!find_bus(b, b->domain, b->secondary))
       new_bus(b, b->domain, b->secondary);
 
   /* Create bus structs and link devices */
 
-  for(d=first_dev; d;)
+  for (d=first_dev; d;)
     {
       d2 = d->next;
       insert_dev(d, &host_bridge);
@@ -2742,7 +2742,7 @@ print_it(char *line, char *p)
   *p++ = '\n';
   *p = 0;
   fputs(line, stdout);
-  for(p=line; *p; p++)
+  for (p=line; *p; p++)
     if (*p == '+' || *p == '|')
       *p = '|';
     else
@@ -2759,7 +2759,7 @@ show_tree_dev(struct device *d, char *line, char *p)
   char namebuf[256];
 
   p += sprintf(p, "%02x.%x", q->dev, q->func);
-  for(b=&host_bridge; b; b=b->chain)
+  for (b=&host_bridge; b; b=b->chain)
     if (b->br_dev == d)
       {
 	if (b->secondary == b->subordinate)
@@ -2888,11 +2888,11 @@ do_map_bus(int bus)
 
   if (verbose)
     printf("Mapping bus %02x\n", bus);
-  for(dev = 0; dev < 32; dev++)
+  for (dev = 0; dev < 32; dev++)
     if (filter.slot < 0 || filter.slot == dev)
       {
 	int func_limit = 1;
-	for(func = 0; func < func_limit; func++)
+	for (func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
 	      /* XXX: Bus mapping supports only domain 0 */
@@ -2934,7 +2934,7 @@ do_map_bridges(int bus, int min, int max)
   struct bus_bridge *b;
 
   bi->guestbook = 1;
-  for(b=bi->bridges; b; b=b->next)
+  for (b=bi->bridges; b; b=b->next)
     {
       if (bus_info[b->first].guestbook)
 	b->bug = 1;
@@ -2954,10 +2954,10 @@ map_bridges(void)
   int i;
 
   printf("\nSummary of buses:\n\n");
-  for(i=0; i<256; i++)
+  for (i=0; i<256; i++)
     if (bus_info[i].exists && !bus_info[i].guestbook)
       do_map_bridges(i, 0, 255);
-  for(i=0; i<256; i++)
+  for (i=0; i<256; i++)
     {
       struct bus_info *bi = bus_info + i;
       struct bus_bridge *b = bi->via;
@@ -2972,7 +2972,7 @@ map_bridges(void)
 	  else
 	    printf("Secondary host bus (?)\n");
 	}
-      for(b=bi->bridges; b; b=b->next)
+      for (b=bi->bridges; b; b=b->next)
 	{
 	  printf("\t%02x.%d Bridge to %02x-%02x", b->dev, b->func, b->first, b->last);
 	  switch (b->bug)
@@ -3002,7 +3002,7 @@ map_the_bus(void)
   else
     {
       int bus;
-      for(bus=0; bus<256; bus++)
+      for (bus=0; bus<256; bus++)
 	do_map_bus(bus);
     }
   map_bridges();
