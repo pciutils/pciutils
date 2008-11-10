@@ -157,6 +157,8 @@ pci_generic_fill_info(struct pci_dev *d, int flags)
 	    d->rom_base_addr = u;
 	}
     }
+  if (flags & (PCI_FILL_CAPS | PCI_FILL_EXT_CAPS))
+    flags |= pci_scan_caps(d, flags);
   return flags & ~PCI_FILL_SIZES;
 }
 

@@ -3,7 +3,7 @@
 
 # Expects to be invoked from the top-level Makefile and uses lots of its variables.
 
-OBJS=init access generic dump names filter names-hash names-parse names-net names-cache params
+OBJS=init access generic dump names filter names-hash names-parse names-net names-cache params caps
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 ifdef PCI_HAVE_PM_LINUX_SYSFS

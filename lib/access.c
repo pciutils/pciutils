@@ -58,6 +58,7 @@ void pci_free_dev(struct pci_dev *d)
 {
   if (d->methods->cleanup_dev)
     d->methods->cleanup_dev(d);
+  pci_free_caps(d);
   pci_mfree(d);
 }
 
@@ -150,6 +151,7 @@ pci_fill_info(struct pci_dev *d, int flags)
     {
       flags &= ~PCI_FILL_RESCAN;
       d->known_fields = 0;
+      pci_free_caps(d);
     }
   if (flags & ~d->known_fields)
     d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
