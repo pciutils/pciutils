@@ -1,5 +1,13 @@
 - review class names
 
+Setpci:
+- error messages
+- parse errors: die vs. usage
+- auto-width
+- man page
+- update library ABI
+- extend the register table
+
 Capabilities with partial decoding:
 - PCIe 2nd set of control/status registers (have spec)
 - HyperTransport caps (have spec)
