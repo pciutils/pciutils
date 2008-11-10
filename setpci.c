@@ -33,7 +33,7 @@ struct op {
   struct pci_dev **dev_vector;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
-  int num_values;			/* Number of values to write; <0=read */
+  int num_values;			/* Number of values to write; 0=read */
   struct value values[0];
 };
 
@@ -69,7 +69,7 @@ exec_op(struct op *op, struct pci_dev *dev)
   if (verbose)
     printf("%02x:%02x.%x:%02x", dev->bus, dev->dev, dev->func, op->addr);
   addr = op->addr;
-  if (op->num_values >= 0)
+  if (op->num_values > 0)
     {
       for (i=0; i<op->num_values; i++)
 	{
@@ -294,7 +294,7 @@ parse_options(int argc, char **argv)
 
   while (i < argc && argv[i][0] == '-')
     {
-      char *c = argv[i]+1;
+      char *c = argv[i++] + 1;
       char *d = c;
       char *e;
       while (*c)
@@ -323,11 +323,8 @@ parse_options(int argc, char **argv)
 		  {
 		    if (*c)
 		      arg = c;
-		    else if (i+1 < argc)
-		      {
-			arg = argv[i+1];
-			i++;
-		      }
+		    else if (i < argc)
+		      arg = argv[i++];
 		    else
 		      usage(NULL);
 		    c = "";
@@ -341,13 +338,141 @@ parse_options(int argc, char **argv)
 	      {
 		if (c != d)
 		  usage(NULL);
-		return i;
+		return i-1;
 	      }
 	  }
-      i++;
     }
 
   return i;
+}
+
+static int parse_filter(int argc, char **argv, int i, struct pci_filter *filter)
+{
+  char *c = argv[i++];
+  char *d;
+
+  if (!c[1] || !strchr("sd", c[1]))
+    usage(NULL);
+  if (c[2])
+    d = (c[2] == '=') ? c+3 : c+2;
+  else if (i < argc)
+    d = argv[i++];
+  else
+    usage(NULL);
+  switch (c[1])
+    {
+    case 's':
+      if (d = pci_filter_parse_slot(filter, d))
+	die("-s: %s", d);
+      break;
+    case 'd':
+      if (d = pci_filter_parse_id(filter, d))
+	die("-d: %s", d);
+      break;
+    default:
+      usage(NULL);
+    }
+
+  return i;
+}
+
+static void parse_op(char *c, struct pci_dev **selected_devices)
+{
+  char *d, *e, *f;
+  int n, j;
+  struct op *op;
+  unsigned long ll;
+  unsigned int lim;
+
+  /* Look for setting of values and count how many */
+  d = strchr(c, '=');
+  n = 0;
+  if (d)
+    {
+      *d++ = 0;
+      if (!*d)
+	usage("Missing value");
+      n++;
+      for (e=d; *e; e++)
+	if (*e == ',')
+	  n++;
+    }
+
+  /* Allocate the operation */
+  op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
+  op->dev_vector = selected_devices;
+  op->num_values = n;
+
+  e = strchr(c, '.');
+  if (e)
+    {
+      *e++ = 0;
+      if (e[1])
+	usage("Missing width");
+      switch (*e & 0xdf)
+	{
+	case 'B':
+	  op->width = 1; break;
+	case 'W':
+	  op->width = 2; break;
+	case 'L':
+	  op->width = 4; break;
+	default:
+	  usage("Invalid width \"%c\"", *e);
+	}
+    }
+  else
+    op->width = 1;
+  ll = strtol(c, &f, 16);
+  if (f && *f)
+    {
+      const struct reg_name *r;
+      for (r = pci_reg_names; r->name; r++)
+	if (!strcasecmp(r->name, c))
+	  break;
+      if (!r->name)
+	usage("Unknown register \"%s\"", c);
+      if (e && op->width != r->width)
+	usage("Explicit width doesn't correspond with the named register \"%s\"", c);
+      ll = r->offset;
+      op->width = r->width;
+    }
+  if (ll > 0x1000 || ll + op->width*((n < 0) ? 1 : n) > 0x1000)
+    die("Register number out of range!");
+  if (ll & (op->width - 1))
+    die("Unaligned register address!");
+  op->addr = ll;
+  /* read in all the values to be set */
+  for (j=0; j<n; j++)
+    {
+      e = strchr(d, ',');
+      if (e)
+	*e++ = 0;
+      ll = strtoul(d, &f, 16);
+      lim = max_values[op->width];
+      if (f && *f && *f != ':')
+	usage("Invalid value \"%s\"", d);
+      if (ll > lim && ll < ~0UL - lim)
+	usage("Value \"%s\" is out of range", d);
+      op->values[j].value = ll;
+      if (f && *f == ':')
+	{
+	  d = ++f;
+	  ll = strtoul(d, &f, 16);
+	  if (f && *f)
+	    usage("Invalid mask \"%s\"", d);
+	  if (ll > lim && ll < ~0UL - lim)
+	    usage("Mask \"%s\" is out of range", d);
+	  op->values[j].mask = ll;
+	  op->values[j].value &= ll;
+	}
+      else
+	op->values[j].mask = ~0U;
+      d = e;
+    }
+  *last_op = op;
+  last_op = &op->next;
+  op->next = NULL;
 }
 
 static void parse_ops(int argc, char **argv, int i)
@@ -358,146 +483,26 @@ static void parse_ops(int argc, char **argv, int i)
 
   while (i < argc)
     {
-      char *c = argv[i];
-      char *d, *e, *f;
-      int n, j;
-      struct op *op;
-      unsigned long ll;
-      unsigned int lim;
+      char *c = argv[i++];
 
       if (*c == '-')
 	{
-	  if (!c[1] || !strchr("sd", c[1]))
-	    usage(NULL);
-	  if (c[2])
-	    d = (c[2] == '=') ? c+3 : c+2;
-	  else if (argc > 1)
-	    {
-	      argc--;
-	      argv++;
-	      d = argv[0];
-	    }
-	  else
-	    usage(NULL);
 	  if (state != STATE_GOT_FILTER)
-	    {
-	      pci_filter_init(pacc, &filter);
-	      state = STATE_GOT_FILTER;
-	    }
-	  switch (c[1])
-	    {
-	    case 's':
-	      if (d = pci_filter_parse_slot(&filter, d))
-		die("-s: %s", d);
-	      break;
-	    case 'd':
-	      if (d = pci_filter_parse_id(&filter, d))
-		die("-d: %s", d);
-	      break;
-	    default:
-	      usage(NULL);
-	    }
+	    pci_filter_init(pacc, &filter);
+	  i = parse_filter(argc, argv, i-1, &filter);
+	  state = STATE_GOT_FILTER;
 	}
-      else if (state == STATE_INIT)
-	usage(NULL);
       else
 	{
+	  if (state == STATE_INIT)
+	    usage(NULL);
 	  if (state == STATE_GOT_FILTER)
 	    selected_devices = select_devices(&filter);
 	  if (!selected_devices[0] && !force)
 	    fprintf(stderr, "setpci: Warning: No devices selected for `%s'.\n", c);
+	  parse_op(c, selected_devices);
 	  state = STATE_GOT_OP;
-	  /* look for setting of values and count how many */
-	  d = strchr(c, '=');
-	  if (d)
-	    {
-	      *d++ = 0;
-	      if (!*d)
-		usage("Missing value");
-	      for (e=d, n=1; *e; e++)
-		if (*e == ',')
-		  n++;
-	      op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
-	    }
-	  else
-	    {
-	      n = -1;
-	      op = xmalloc(sizeof(struct op));
-	    }
-	  op->dev_vector = selected_devices;
-	  op->num_values = n;
-	  e = strchr(c, '.');
-	  if (e)
-	    {
-	      *e++ = 0;
-	      if (e[1])
-		usage("Missing width");
-	      switch (*e & 0xdf)
-		{
-		case 'B':
-		  op->width = 1; break;
-		case 'W':
-		  op->width = 2; break;
-		case 'L':
-		  op->width = 4; break;
-		default:
-		  usage("Invalid width \"%c\"", *e);
-		}
-	    }
-	  else
-	    op->width = 1;
-	  ll = strtol(c, &f, 16);
-	  if (f && *f)
-	    {
-	      const struct reg_name *r;
-	      for (r = pci_reg_names; r->name; r++)
-		if (!strcasecmp(r->name, c))
-		  break;
-	      if (!r->name)
-		usage("Unknown register \"%s\"", c);
-	      if (e && op->width != r->width)
-		usage("Explicit width doesn't correspond with the named register \"%s\"", c);
-	      ll = r->offset;
-	      op->width = r->width;
-	    }
-	  if (ll > 0x1000 || ll + op->width*((n < 0) ? 1 : n) > 0x1000)
-	    die("Register number out of range!");
-	  if (ll & (op->width - 1))
-	    die("Unaligned register address!");
-	  op->addr = ll;
-	  /* read in all the values to be set */
-	  for (j=0; j<n; j++)
-	    {
-	      e = strchr(d, ',');
-	      if (e)
-		*e++ = 0;
-	      ll = strtoul(d, &f, 16);
-	      lim = max_values[op->width];
-	      if (f && *f && *f != ':')
-		usage("Invalid value \"%s\"", d);
-	      if (ll > lim && ll < ~0UL - lim)
-		usage("Value \"%s\" is out of range", d);
-	      op->values[j].value = ll;
-	      if (f && *f == ':')
-		{
-		  d = ++f;
-		  ll = strtoul(d, &f, 16);
-		  if (f && *f)
-		    usage("Invalid mask \"%s\"", d);
-		  if (ll > lim && ll < ~0UL - lim)
-		    usage("Mask \"%s\" is out of range", d);
-		  op->values[j].mask = ll;
-		  op->values[j].value &= ll;
-		}
-	      else
-		op->values[j].mask = ~0U;
-	      d = e;
-	    }
-	  *last_op = op;
-	  last_op = &op->next;
-	  op->next = NULL;
 	}
-      i++;
     }
   if (state == STATE_INIT)
     usage("No operation specified");
