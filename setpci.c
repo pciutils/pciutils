@@ -280,33 +280,28 @@ GENERIC_HELP
   exit(1);
 }
 
-int
-main(int argc, char **argv)
+static int
+parse_options(int argc, char **argv)
 {
-  enum { STATE_INIT, STATE_GOT_FILTER, STATE_GOT_OP } state = STATE_INIT;
-  struct pci_filter filter;
-  struct pci_dev **selected_devices = NULL;
-  char *opts = GENERIC_OPTIONS ;
+  char *opts = GENERIC_OPTIONS;
+  int i=1;
 
   if (argc == 2 && !strcmp(argv[1], "--version"))
     {
       puts("setpci version " PCIUTILS_VERSION);
       return 0;
     }
-  argc--;
-  argv++;
 
-  pacc = pci_alloc();
-  pacc->error = die;
-
-  while (argc && argv[0][0] == '-')
+  while (i < argc && argv[i][0] == '-')
     {
-      char *c = argv[0]+1;
+      char *c = argv[i]+1;
       char *d = c;
       char *e;
       while (*c)
 	switch (*c)
 	  {
+	  case 0:
+	    break;
 	  case 'v':
 	    verbose++;
 	    c++;
@@ -319,8 +314,6 @@ main(int argc, char **argv)
 	    demo_mode++;
 	    c++;
 	    break;
-	  case 0:
-	    break;
 	  default:
 	    if (e = strchr(opts, *c))
 	      {
@@ -330,10 +323,10 @@ main(int argc, char **argv)
 		  {
 		    if (*c)
 		      arg = c;
-		    else if (argc > 1)
+		    else if (i+1 < argc)
 		      {
-			arg = argv[1];
-			argc--; argv++;
+			arg = argv[i+1];
+			i++;
 		      }
 		    else
 		      usage(NULL);
@@ -348,22 +341,26 @@ main(int argc, char **argv)
 	      {
 		if (c != d)
 		  usage(NULL);
-		goto next;
+		return i;
 	      }
 	  }
-      argc--;
-      argv++;
+      i++;
     }
-next:
 
-  pci_init(pacc);
-  pci_scan_bus(pacc);
+  return i;
+}
 
-  while (argc)
+static void parse_ops(int argc, char **argv, int i)
+{
+  enum { STATE_INIT, STATE_GOT_FILTER, STATE_GOT_OP } state = STATE_INIT;
+  struct pci_filter filter;
+  struct pci_dev **selected_devices = NULL;
+
+  while (i < argc)
     {
-      char *c = argv[0];
+      char *c = argv[i];
       char *d, *e, *f;
-      int n, i;
+      int n, j;
       struct op *op;
       unsigned long ll;
       unsigned int lim;
@@ -469,7 +466,7 @@ next:
 	    die("Unaligned register address!");
 	  op->addr = ll;
 	  /* read in all the values to be set */
-	  for(i=0; i<n; i++)
+	  for(j=0; j<n; j++)
 	    {
 	      e = strchr(d, ',');
 	      if (e)
@@ -480,7 +477,7 @@ next:
 		usage("Invalid value \"%s\"", d);
 	      if (ll > lim && ll < ~0UL - lim)
 		usage("Value \"%s\" is out of range", d);
-	      op->values[i].value = ll;
+	      op->values[j].value = ll;
 	      if (f && *f == ':')
 		{
 		  d = ++f;
@@ -489,23 +486,36 @@ next:
 		    usage("Invalid mask \"%s\"", d);
 		  if (ll > lim && ll < ~0UL - lim)
 		    usage("Mask \"%s\" is out of range", d);
-		  op->values[i].mask = ll;
-		  op->values[i].value &= ll;
+		  op->values[j].mask = ll;
+		  op->values[j].value &= ll;
 		}
 	      else
-		op->values[i].mask = ~0U;
+		op->values[j].mask = ~0U;
 	      d = e;
 	    }
 	  *last_op = op;
 	  last_op = &op->next;
 	  op->next = NULL;
 	}
-      argc--;
-      argv++;
+      i++;
     }
   if (state == STATE_INIT)
     usage("No operation specified");
+}
 
+int
+main(int argc, char **argv)
+{
+  int i;
+
+  pacc = pci_alloc();
+  pacc->error = die;
+  i = parse_options(argc, argv);
+
+  pci_init(pacc);
+  pci_scan_bus(pacc);
+
+  parse_ops(argc, argv, i);
   scan_ops(first_op);
   execute(first_op);
 
