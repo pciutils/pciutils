@@ -42,14 +42,21 @@ or not.
 `Demo mode' -- don't write anything to the configuration registers.
 It's useful to try
 .B setpci -vD
-to see what your complex sequence of
+to verify that your complex sequence of
 .B setpci
-operations does before you actually execute it.
+operations does what you think it should do.
 .TP
 .B --version
-Shows
+Show
 .I setpci
 version. This option should be used stand-alone.
+.TP
+.B --help
+Show detailed help on available options. This option should be used stand-alone.
+.TP
+.B --dumpregs
+Show a list of all known PCI registers and capabilities. This option should be
+used stand-alone.
 
 .SS PCI access options
 .PP
@@ -85,119 +92,86 @@ Before each sequence of operations you need to select which devices you wish tha
 operation to affect.
 .TP
 .B -s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]
-Show only devices in the specified domain (in case your machine has several host bridges,
+Consider only devices in the specified domain (in case your machine has several host bridges,
 they can either share a common bus number space or each of them can address a PCI domain
 of its own; domains are numbered from 0 to ffff), bus (0 to ff), slot (0 to 1f) and function (0 to 7).
 Each component of the device address can be omitted or set to "*", both meaning "any value". All numbers are
 hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of device 0
-on any bus, "0.3" selects third function of device 0 on all buses and ".4" shows only
+on any bus, "0.3" selects third function of device 0 on all buses and ".4" matches only
 the fourth function of each device.
 .TP
 .B -d [<vendor>]:[<device>]
 Select devices with specified vendor and device ID. Both ID's are given in
 hexadecimal and may be omitted or given as "*", both meaning "any value".
+.PP
+When
+.B -s
+and
+.B -d
+are combined, only devices that match both criteria are selected. When multiple
+options of the same kind are specified, the rightmost one overrides the others.
 
 .SH OPERATIONS
 .PP
-To query value of a configuration register, just name it (either by typing its name or
-by typing register address with optional
-.BR .B ,
-.B .W
-or
-.B .L
-suffix specifying register width as byte, word or longword).
-.PP
-To set a register, write
-.BR reg = values
-where
-.B reg
-is the same as you would use to query the register and
-.B values
-is a comma-separated list of values you want to write starting with the given
-address. Each value to be written can be specified either as a hexadecimal number
-or as a
-.BR bits : mask
-pair which causes the bits corresponding to binary ones in the
-.B mask
-to be changed to values of the corresponding bits in the
-.B bits
-.
+There are two kinds of operations: reads and writes. To read a register, just specify
+its name. Writes have the form
+.IR name = value , value ...
+where each
+.I value
+is either a hexadecimal number or an expression of type
+.IR data : mask
+where both
+.I data
+and
+.I mask
+are hexdecimal numbers. In the latter case, only the bits corresponding to binary
+ones in the \fImask\fP are changed (technically, this is a read-modify-write operation).
 
-.SH REGISTER NAMES
 .PP
-.B setpci
-knows the following configuration register names. See PCI bus specifications for their precise
-meaning or consult
-.B header.h
-or
-.B /usr/include/linux/pci.h
-for a couple of comments.
+There are several ways how to identity a register:
+.IP \(bu
+Tell its address in hexadecimal.
+.IP \(bu
+Spell its name. Setpci knows the names of all registers in the standard configuration
+headers. Use `\fBsetpci --dumpregs\fP' to get the complete list.
+See PCI bus specifications for the precise meaning of these registers or consult
+\fBheader.h\fP or \fB/usr/include/pci/pci.h\fP for a brief sketch.
+.IP \(bu
+If the register is a part of a PCI capability, you can specify the name of the
+capability to get the address of its first register. See the names starting with
+`CAP_' or `ECAP_' in the \fB--dumpregs\fP output.
+.IP \(bu
+If the name of the capability is not known to \fBsetpci\fP, you can refer to it
+by its number in the form CAP\fBid\fP or ECAP\fBid\fP, where \fBid\fP is the numeric
+identifier of the capability in hexadecimal.
+.IP \(bu
+Each of the previous formats can be followed by \fB+offset\fP to add an offset
+(a hex number) to the address. This feature can be useful for addressing of registers
+living within a capability, or to modify parts of standard registers.
+\IP \(bu
+Finally, you should append a width specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP to choose
+how many bytes (1, 2, or 4) should be transferred. The width can be omitted if you are
+accessing a named register whose width is well known.
+
 .PP
-.nf
-VENDOR_ID
-DEVICE_ID
-COMMAND
-STATUS
-REVISION
-CLASS_PROG
-CLASS_DEVICE
-CACHE_LINE_SIZE
-LATENCY_TIMER
-HEADER_TYPE
-BIST
-BASE_ADDRESS_0
-BASE_ADDRESS_1
-BASE_ADDRESS_2
-BASE_ADDRESS_3
-BASE_ADDRESS_4
-BASE_ADDRESS_5
-CARDBUS_CIS
-SUBSYSTEM_VENDOR_ID
-SUBSYSTEM_ID
-ROM_ADDRESS
-INTERRUPT_LINE
-INTERRUPT_PIN
-MIN_GNT
-MAX_LAT
-PRIMARY_BUS
-SECONDARY_BUS
-SUBORDINATE_BUS
-SEC_LATENCY_TIMER
-IO_BASE
-IO_LIMIT
-SEC_STATUS
-MEMORY_BASE
-MEMORY_LIMIT
-PREF_MEMORY_BASE
-PREF_MEMORY_LIMIT
-PREF_BASE_UPPER32
-PREF_LIMIT_UPPER32
-IO_BASE_UPPER16
-IO_LIMIT_UPPER16
-BRIDGE_ROM_ADDRESS
-BRIDGE_CONTROL
-CB_CARDBUS_BASE
-CB_CAPABILITIES
-CB_SEC_STATUS
-CB_BUS_NUMBER
-CB_CARDBUS_NUMBER
-CB_SUBORDINATE_BUS
-CB_CARDBUS_LATENCY
-CB_MEMORY_BASE_0
-CB_MEMORY_LIMIT_0
-CB_MEMORY_BASE_1
-CB_MEMORY_LIMIT_1
-CB_IO_BASE_0
-CB_IO_BASE_0_HI
-CB_IO_LIMIT_0
-CB_IO_LIMIT_0_HI
-CB_IO_BASE_1
-CB_IO_BASE_1_HI
-CB_IO_LIMIT_1
-CB_IO_LIMIT_1_HI
-CB_SUBSYSTEM_VENDOR_ID
-CB_SUBSYSTEM_ID
-CB_LEGACY_MODE_BASE
+All names of registers and width specifiers are case-insensitive.
+
+.SH
+EXAMPLES
+
+.IP COMMAND
+asks for the word-sized command register.
+.IP 4.w
+is a numeric address of the same register.
+.IP COMMAND.l
+asks for a 32-bit word starting at the location of the command register,
+i.e., the command and status registers together.
+.IP VENDOR_ID+1.b
+specifies the upper byte of the vendor ID register (remember, PCI is little-endian).
+.IP CAP_PM+2.w
+corresponds to the second word of the power management capability.
+.IP ECAP108.l
+asks for the first 32-bit word of the extended capability with ID 0x108.
 
 .SH SEE ALSO
 .BR lspci (8),
