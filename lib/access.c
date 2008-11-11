@@ -145,7 +145,7 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 int
-pci_fill_info(struct pci_dev *d, int flags)
+pci_fill_info_v31(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)
     {
@@ -157,6 +157,12 @@ pci_fill_info(struct pci_dev *d, int flags)
     d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
   return d->known_fields;
 }
+
+/* In version 3.1, pci_fill_info got new flags => versioned alias */
+STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v31(d,flags));
+DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v31);
+SYMBOL_VERSION(pci_fill_info_v30, pci_fill_info@LIBPCI_3.0);
+SYMBOL_VERSION(pci_fill_info_v31, pci_fill_info@@LIBPCI_3.1);
 
 void
 pci_setup_cache(struct pci_dev *d, byte *cache, int len)

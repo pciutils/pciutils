@@ -2,8 +2,6 @@
 
 Setpci:
 - auto-width
-- man page
-- update library ABI
 - extend the register table
 
 Capabilities with partial decoding:

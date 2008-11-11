@@ -10,6 +10,13 @@
 
 #ifdef PCI_SHARED_LIB
 #define PCI_ABI __attribute__((visibility("default")))
+#define STATIC_ALIAS(_decl, _for)
+#define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
+#define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
+#else
+#define STATIC_ALIAS(_decl, _for) _decl { return _for; }
+#define DEFINE_ALIAS(_decl, _for)
+#define SYMBOL_VERSION(_int, _ext)
 #endif
 
 #include "pci.h"
@@ -45,6 +52,9 @@ char *pci_strdup(struct pci_access *a, char *s);
 /* access.c */
 struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
+
+int pci_fill_info_v30(struct pci_dev *, int flags) PCI_ABI;
+int pci_fill_info_v31(struct pci_dev *, int flags) PCI_ABI;
 
 /* params.c */
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);

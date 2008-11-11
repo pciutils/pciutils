@@ -7,6 +7,42 @@
  */
 
 LIBPCI_3.0 {
-	global: pci_*;
+	global:
+		pci_alloc;
+		pci_cleanup;
+		pci_fill_info;
+		pci_filter_init;
+		pci_filter_match;
+		pci_filter_parse_id;
+		pci_filter_parse_slot;
+		pci_free_dev;
+		pci_free_name_list;
+		pci_get_dev;
+		pci_get_method_name;
+		pci_get_param;
+		pci_id_cache_flush;
+		pci_init;
+		pci_load_name_list;
+		pci_lookup_method;
+		pci_lookup_name;
+		pci_read_block;
+		pci_read_byte;
+		pci_read_long;
+		pci_read_word;
+		pci_scan_bus;
+		pci_set_name_list_path;
+		pci_set_param;
+		pci_setup_cache;
+		pci_walk_params;
+		pci_write_block;
+		pci_write_byte;
+		pci_write_long;
+		pci_write_word;
 	local: *;
+};
+
+LIBPCI_3.1 {
+	global:
+		pci_fill_info;
+		pci_find_cap;
 };

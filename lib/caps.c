@@ -106,7 +106,7 @@ pci_find_cap(struct pci_dev *d, unsigned int id, unsigned int type)
 {
   struct pci_cap *c;
 
-  pci_fill_info(d, ((type == PCI_CAP_NORMAL) ? PCI_FILL_CAPS : PCI_FILL_EXT_CAPS));
+  pci_fill_info_v31(d, ((type == PCI_CAP_NORMAL) ? PCI_FILL_CAPS : PCI_FILL_EXT_CAPS));
   for (c=d->first_cap; c; c=c->next)
     if (c->type == type && c->id == id)
       return c;
