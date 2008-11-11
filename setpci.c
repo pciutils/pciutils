@@ -61,47 +61,54 @@ select_devices(struct pci_filter *filt)
 }
 
 static void
+trace(const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  if (verbose)
+    vprintf(fmt, args);
+  va_end(args);
+}
+
+static void
 exec_op(struct op *op, struct pci_dev *dev)
 {
-  char *formats[] = { NULL, "%02x", "%04x", NULL, "%08x" };
-  char *mask_formats[] = { NULL, "%02x->(%02x:%02x)->%02x", "%04x->(%04x:%04x)->%04x", NULL, "%08x->(%08x:%08x)->%08x" };
+  const char * const formats[] = { NULL, " %02x", " %04x", NULL, " %08x" };
+  const char * const mask_formats[] = { NULL, " %02x->(%02x:%02x)->%02x", " %04x->(%04x:%04x)->%04x", NULL, " %08x->(%08x:%08x)->%08x" };
   unsigned int i, x, y;
   int addr = 0;
   int width = op->width;
+  char slot[16];
 
-  if (verbose)
-    printf("%02x:%02x.%x", dev->bus, dev->dev, dev->func);
+  sprintf(slot, "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
+  trace("%s", slot);
   if (op->cap_type)
     {
       struct pci_cap *cap;
-      if (verbose)
-	printf(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x)" : "(ecap %04x)"), op->cap_id);
+      trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x)" : "(ecap %04x)"), op->cap_id);
       cap = pci_find_cap(dev, op->cap_id, op->cap_type);
       if (cap)
 	addr = cap->addr;
       else
-	{
-	  /* FIXME: Report the error properly */
-	  die("Capability %04x not found", op->cap_id);
-	}
+	die("%s: %s %04x not found", slot, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"), op->cap_id);
     }
   addr += op->addr;
-  if (verbose)
-    printf(":%02x", addr);
+  trace(":%02x", addr);
+
+  /* We have already checked it when parsing, but addressing relative to capabilities can change the address. */
+  if (addr & (width-1))
+    die("%s: Unaligned access of width %d to register %04x", slot, width, addr);
+  if (addr + width > 0x1000)
+    die("%s: Access of width %d to register %04x out of range", slot, width, addr);
+
   if (op->num_values)
     {
       for (i=0; i<op->num_values; i++)
 	{
-	  if (addr + width > 0x1000)
-	    die("Out of range");	/* FIXME */
 	  if ((op->values[i].mask & max_values[width]) == max_values[width])
 	    {
 	      x = op->values[i].value;
-	      if (verbose)
-		{
-		  putchar(' ');
-		  printf(formats[width], op->values[i].value);
-		}
+	      trace(formats[width], op->values[i].value);
 	    }
 	  else
 	    {
@@ -118,11 +125,7 @@ exec_op(struct op *op, struct pci_dev *dev)
 		  break;
 		}
 	      x = (y & ~op->values[i].mask) | op->values[i].value;
-	      if (verbose)
-		{
-		  putchar(' ');
-		  printf(mask_formats[width], y, op->values[i].value, op->values[i].mask, x);
-		}
+	      trace(mask_formats[width], y, op->values[i].value, op->values[i].mask, x);
 	    }
 	  if (!demo_mode)
 	    {
@@ -141,15 +144,11 @@ exec_op(struct op *op, struct pci_dev *dev)
 	    }
 	  addr += width;
 	}
-      if (verbose)
-	putchar('\n');
+      trace("\n");
     }
   else
     {
-      if (verbose)
-	printf(" = ");
-      if (addr + width > 0x1000)
-	die("Out of range");	/* FIXME */
+      trace(" = ");
       switch (width)
 	{
 	case 1:
@@ -162,7 +161,7 @@ exec_op(struct op *op, struct pci_dev *dev)
 	  x = pci_read_long(dev, addr);
 	  break;
 	}
-      printf(formats[width], x);
+      printf(formats[width]+1, x);
       putchar('\n');
     }
 }
