@@ -187,6 +187,8 @@ execute(struct op *op)
 static void
 scan_ops(struct op *op)
 {
+  if (demo_mode)
+    return;
   while (op)
     {
       if (op->num_values)
