@@ -32,7 +32,8 @@ struct value {
 struct op {
   struct op *next;
   struct pci_dev **dev_vector;
-  unsigned int cap;			/* Capability: 0=none, 10000-100ff=normal, 20000-2ffff=extended */
+  u16 cap_type;				/* PCI_CAP_xxx or 0 */
+  u16 cap_id;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
   unsigned int num_values;		/* Number of values to write; 0=read */
@@ -70,27 +71,18 @@ exec_op(struct op *op, struct pci_dev *dev)
 
   if (verbose)
     printf("%02x:%02x.%x", dev->bus, dev->dev, dev->func);
-  if (op->cap)
+  if (op->cap_type)
     {
       struct pci_cap *cap;
-      if (op->cap < 0x20000)
-	{
-	  if (verbose)
-	    printf("(cap %02x)", op->cap - 0x10000);
-	  cap = pci_find_cap(dev, op->cap - 0x10000, PCI_CAP_NORMAL);
-	}
-      else
-	{
-	  if (verbose)
-	    printf("(ecap %04x)", op->cap - 0x20000);
-	  cap = pci_find_cap(dev, op->cap - 0x20000, PCI_CAP_EXTENDED);
-	}
+      if (verbose)
+	printf(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x)" : "(ecap %04x)"), op->cap_id);
+      cap = pci_find_cap(dev, op->cap_id, op->cap_type);
       if (cap)
 	addr = cap->addr;
       else
 	{
 	  /* FIXME: Report the error properly */
-	  die("Capability %08x not found", op->cap);
+	  die("Capability %04x not found", op->cap_id);
 	}
     }
   addr += op->addr;
@@ -504,15 +496,23 @@ static int parse_x32(char *c, char **stopp, unsigned int *resp)
 static void parse_register(struct op *op, char *base)
 {
   const struct reg_name *r;
+  unsigned int cap;
 
+  op->cap_type = op->cap_id = 0;
   if (parse_x32(base, NULL, &op->addr) > 0)
-    {
-      op->cap = 0;
-      return;
-    }
+    return;
   else if (r = parse_reg_name(base))
     {
-      op->cap = r->cap;
+      switch (r->cap & 0xff0000)
+	{
+	case 0x10000:
+	  op->cap_type = PCI_CAP_NORMAL;
+	  break;
+	case 0x20000:
+	  op->cap_type = PCI_CAP_EXTENDED;
+	  break;
+	}
+      op->cap_id = r->cap & 0xffff;
       op->addr = r->offset;
       if (r->width && !op->width)
 	op->width = r->width;
@@ -520,18 +520,20 @@ static void parse_register(struct op *op, char *base)
     }
   else if (!strncasecmp(base, "CAP", 3))
     {
-      if (parse_x32(base+3, NULL, &op->cap) > 0 && op->cap < 0x100)
+      if (parse_x32(base+3, NULL, &cap) > 0 && cap < 0x100)
 	{
-	  op->cap += 0x10000;
+	  op->cap_type = PCI_CAP_NORMAL;
+	  op->cap_id = cap;
 	  op->addr = 0;
 	  return;
 	}
     }
   else if (!strncasecmp(base, "ECAP", 4))
     {
-      if (parse_x32(base+4, NULL, &op->cap) > 0 && op->cap < 0x1000)
+      if (parse_x32(base+4, NULL, &cap) > 0 && cap < 0x1000)
 	{
-	  op->cap += 0x20000;
+	  op->cap_type = PCI_CAP_EXTENDED;
+	  op->cap_id = cap;
 	  op->addr = 0;
 	  return;
 	}
