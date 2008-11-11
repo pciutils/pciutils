@@ -81,19 +81,19 @@ exec_op(struct op *op, struct pci_dev *dev)
   char slot[16];
 
   sprintf(slot, "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
-  trace("%s", slot);
+  trace("%s ", slot);
   if (op->cap_type)
     {
       struct pci_cap *cap;
-      trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x)" : "(ecap %04x)"), op->cap_id);
       cap = pci_find_cap(dev, op->cap_id, op->cap_type);
       if (cap)
 	addr = cap->addr;
       else
 	die("%s: %s %04x not found", slot, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"), op->cap_id);
+      trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x @%02x) " : "(ecap %04x @%03x) "), op->cap_id, addr);
     }
   addr += op->addr;
-  trace(":%02x", addr);
+  trace("@%02x", addr);
 
   /* We have already checked it when parsing, but addressing relative to capabilities can change the address. */
   if (addr & (width-1))
