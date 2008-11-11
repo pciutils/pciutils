@@ -60,7 +60,7 @@ select_devices(struct pci_filter *filt)
   return b;
 }
 
-static void
+static void PCI_PRINTF(1,2)
 trace(const char *fmt, ...)
 {
   va_list args;
