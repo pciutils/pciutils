@@ -1,8 +1,6 @@
 - review class names
 
 Setpci:
-- error messages
-- parse errors: die vs. usage
 - auto-width
 - man page
 - update library ABI

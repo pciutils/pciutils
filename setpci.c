@@ -323,17 +323,9 @@ dump_registers(void)
     }
 }
 
-static void NONRET PCI_PRINTF(1,2)
-usage(char *msg, ...)
+static void NONRET
+usage(void)
 {
-  va_list args;
-  va_start(args, msg);
-  if (msg)
-    {
-      fprintf(stderr, "setpci: ");
-      vfprintf(stderr, msg, args);
-      fprintf(stderr, "\n\n");
-    }
   fprintf(stderr,
 "Usage: setpci [<options>] (<device>+ <reg>[=<values>]*)*\n"
 "\n"
@@ -357,23 +349,34 @@ GENERIC_HELP
 "<values>:\t<value>[,<value>...]\n"
 "<value>:\t<hex>\n"
 "\t\t<hex>:<mask>\n");
+  exit(0);
+}
+
+static void NONRET PCI_PRINTF(1,2)
+parse_err(const char *msg, ...)
+{
+  va_list args;
+  va_start(args, msg);
+  fprintf(stderr, "setpci: ");
+  vfprintf(stderr, msg, args);
+  fprintf(stderr, ".\nTry `setpci --help' for more information.\n");
   exit(1);
 }
 
 static int
 parse_options(int argc, char **argv)
 {
-  char *opts = GENERIC_OPTIONS;
+  const char opts[] = GENERIC_OPTIONS;
   int i=1;
 
-  if (argc == 2 && !strcmp(argv[1], "--version"))
+  if (argc == 2)
     {
-      puts("setpci version " PCIUTILS_VERSION);
-      exit(0);
-    }
-  if (argc == 2 && !strcmp(argv[1], "--dumpregs"))
-    {
-      dump_registers();
+      if (!strcmp(argv[1], "--help"))
+	usage();
+      if (!strcmp(argv[1], "--version"))
+	puts("setpci version " PCIUTILS_VERSION);
+      if (!strcmp(argv[1], "--dumpregs"))
+	dump_registers();
       exit(0);
     }
 
@@ -411,18 +414,18 @@ parse_options(int argc, char **argv)
 		    else if (i < argc)
 		      arg = argv[i++];
 		    else
-		      usage(NULL);
+		      parse_err("Option -%c requires an argument", *e);
 		    c = "";
 		  }
 		else
 		  arg = NULL;
 		if (!parse_generic_option(*e, pacc, arg))
-		  usage(NULL);
+		  parse_err("Unable to parse option -%c", *e);
 	      }
 	    else
 	      {
 		if (c != d)
-		  usage(NULL);
+		  parse_err("Invalid or misplaced option -%c", *c);
 		return i-1;
 	      }
 	  }
@@ -437,25 +440,25 @@ static int parse_filter(int argc, char **argv, int i, struct pci_filter *filter)
   char *d;
 
   if (!c[1] || !strchr("sd", c[1]))
-    usage(NULL);
+    parse_err("Invalid option -%c", c[1]);
   if (c[2])
     d = (c[2] == '=') ? c+3 : c+2;
   else if (i < argc)
     d = argv[i++];
   else
-    usage(NULL);
+    parse_err("Option -%c requires an argument", c[1]);
   switch (c[1])
     {
     case 's':
       if (d = pci_filter_parse_slot(filter, d))
-	die("-s: %s", d);
+	parse_err("Unable to parse filter -s %s", d);
       break;
     case 'd':
       if (d = pci_filter_parse_id(filter, d))
-	die("-d: %s", d);
+	parse_err("Unable to parse filter -d %s", d);
       break;
     default:
-      usage(NULL);
+      parse_err("Unknown filter option -%c", c[1]);
     }
 
   return i;
@@ -539,7 +542,7 @@ static void parse_register(struct op *op, char *base)
 	  return;
 	}
     }
-  usage("Unknown register \"%s\"", base);
+  parse_err("Unknown register \"%s\"", base);
 }
 
 static void parse_op(char *c, struct pci_dev **selected_devices)
@@ -563,7 +566,7 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
   if (value)
     {
       if (!*value)
-	usage("Missing value");
+	parse_err("Missing value");
       n++;
       for (e=value; *e; e++)
 	if (*e == ',')
@@ -579,7 +582,7 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
   if (width)
     {
       if (width[1])
-	usage("Invalid width \"%s\"", width);
+	parse_err("Invalid width \"%s\"", width);
       switch (*width & 0xdf)
 	{
 	case 'B':
@@ -589,7 +592,7 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
 	case 'L':
 	  op->width = 4; break;
 	default:
-	  usage("Invalid width \"%c\"", *width);
+	  parse_err("Invalid width \"%c\"", *width);
 	}
     }
   else
@@ -598,22 +601,22 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
   /* Find the register */
   parse_register(op, base);
   if (!op->width)
-    usage("Missing width");
+    parse_err("Missing width");
 
   /* Add offset */
   if (offset)
     {
       unsigned int off;
       if (parse_x32(offset, NULL, &off) <= 0 || off >= 0x1000)
-	die("Invalid offset \"%s\"", offset);
+	parse_err("Invalid offset \"%s\"", offset);
       op->addr += off;
     }
 
   /* Check range */
   if (op->addr >= 0x1000 || op->addr + op->width*(n ? n : 1) > 0x1000)
-    die("Register number out of range!");
+    parse_err("Register number %02x out of range", op->addr);
   if (op->addr & (op->width - 1))
-    die("Unaligned register address!");
+    parse_err("Unaligned register address %02x", op->addr);
 
   /* Parse the values */
   for (j=0; j<n; j++)
@@ -623,17 +626,17 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
       if (e)
 	*e++ = 0;
       if (parse_x32(value, &f, &ll) < 0 || *f && *f != ':')
-	usage("Invalid value \"%s\"", value);
+	parse_err("Invalid value \"%s\"", value);
       lim = max_values[op->width];
       if (ll > lim && ll < ~0UL - lim)
-	usage("Value \"%s\" is out of range", value);
+	parse_err("Value \"%s\" is out of range", value);
       op->values[j].value = ll;
       if (*f == ':')
 	{
 	  if (parse_x32(f+1, NULL, &ll) <= 0)
-	    usage("Invalid mask \"%s\"", f+1);
+	    parse_err("Invalid mask \"%s\"", f+1);
 	  if (ll > lim && ll < ~0UL - lim)
-	    usage("Mask \"%s\" is out of range", f+1);
+	    parse_err("Mask \"%s\" is out of range", f+1);
 	  op->values[j].mask = ll;
 	  op->values[j].value &= ll;
 	}
@@ -667,17 +670,17 @@ static void parse_ops(int argc, char **argv, int i)
       else
 	{
 	  if (state == STATE_INIT)
-	    usage(NULL);
+	    parse_err("Filter specification expected");
 	  if (state == STATE_GOT_FILTER)
 	    selected_devices = select_devices(&filter);
 	  if (!selected_devices[0] && !force)
-	    fprintf(stderr, "setpci: Warning: No devices selected for `%s'.\n", c);
+	    fprintf(stderr, "setpci: Warning: No devices selected for \"%s\".\n", c);
 	  parse_op(c, selected_devices);
 	  state = STATE_GOT_OP;
 	}
     }
   if (state == STATE_INIT)
-    usage("No operation specified");
+    parse_err("No operation specified");
 }
 
 int
