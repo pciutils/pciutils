@@ -177,8 +177,8 @@ struct pci_cap {
   unsigned int addr;			/* Position in the config space */
 };
 
-#define PCI_CAP_NORMAL		0	/* Traditional PCI capabilities */
-#define PCI_CAP_EXTENDED	1	/* PCIe extended capabilities */
+#define PCI_CAP_NORMAL		1	/* Traditional PCI capabilities */
+#define PCI_CAP_EXTENDED	2	/* PCIe extended capabilities */
 
 struct pci_cap *pci_find_cap(struct pci_dev *, unsigned int id, unsigned int type) PCI_ABI;
 
