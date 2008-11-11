@@ -312,6 +312,24 @@ static const struct reg_name pci_reg_names[] = {
   {       0,    0, 0, NULL }
 };
 
+static void
+dump_registers(void)
+{
+  const struct reg_name *r;
+
+  printf("cap pos w name\n");
+  for (r = pci_reg_names; r->name; r++)
+    {
+      if (r->cap >= 0x20000)
+	printf("%04x", r->cap - 0x20000);
+      else if (r->cap)
+	printf("  %02x", r->cap - 0x10000);
+      else
+	printf("    ");
+      printf(" %02x %c %s\n", r->offset, "-BW?L"[r->width], r->name);
+    }
+}
+
 static void NONRET PCI_PRINTF(1,2)
 usage(char *msg, ...)
 {
@@ -330,6 +348,7 @@ usage(char *msg, ...)
 "-f\t\tDon't complain if there's nothing to do\n"
 "-v\t\tBe verbose\n"
 "-D\t\tList changes, don't commit them\n"
+"--dumpregs\tDump all known register names and exit\n"
 "\n"
 "PCI access options:\n"
 GENERIC_HELP
@@ -357,6 +376,11 @@ parse_options(int argc, char **argv)
   if (argc == 2 && !strcmp(argv[1], "--version"))
     {
       puts("setpci version " PCIUTILS_VERSION);
+      exit(0);
+    }
+  if (argc == 2 && !strcmp(argv[1], "--dumpregs"))
+    {
+      dump_registers();
       exit(0);
     }
 
