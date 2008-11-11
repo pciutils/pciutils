@@ -357,7 +357,7 @@ parse_options(int argc, char **argv)
   if (argc == 2 && !strcmp(argv[1], "--version"))
     {
       puts("setpci version " PCIUTILS_VERSION);
-      return 0;
+      exit(0);
     }
 
   while (i < argc && argv[i][0] == '-')
