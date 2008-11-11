@@ -374,10 +374,15 @@ parse_options(int argc, char **argv)
       if (!strcmp(argv[1], "--help"))
 	usage();
       if (!strcmp(argv[1], "--version"))
-	puts("setpci version " PCIUTILS_VERSION);
+	{
+	  puts("setpci version " PCIUTILS_VERSION);
+	  exit(0);
+	}
       if (!strcmp(argv[1], "--dumpregs"))
-	dump_registers();
-      exit(0);
+	{
+	  dump_registers();
+	  exit(0);
+	}
     }
 
   while (i < argc && argv[i][0] == '-')
