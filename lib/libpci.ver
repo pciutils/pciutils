@@ -45,4 +45,5 @@ LIBPCI_3.1 {
 	global:
 		pci_fill_info;
 		pci_find_cap;
+		pci_read_vpd;
 };

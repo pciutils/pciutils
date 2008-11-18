@@ -164,6 +164,7 @@ struct pci_methods pm_fbsd_device = {
   pci_generic_fill_info,
   fbsd_read,
   fbsd_write,
+  NULL,                                 /* read_vpd */
   NULL,                                 /* dev_init */
   NULL                                  /* dev_cleanup */
 };

@@ -146,6 +146,7 @@ struct pci_methods pm_obsd_device = {
   pci_generic_fill_info,
   obsd_read,
   obsd_write,
+  NULL,                                 /* read_vpd */
   NULL,                                 /* dev_init */
   NULL                                  /* dev_cleanup */
 };

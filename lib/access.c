@@ -103,6 +103,12 @@ pci_read_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->read(d, pos, buf, len);
 }
 
+int
+pci_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  return d->methods->read_vpd ? d->methods->read_vpd(d, pos, buf, len) : 0;
+}
+
 static inline int
 pci_write_data(struct pci_dev *d, void *buf, int pos, int len)
 {

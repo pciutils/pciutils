@@ -33,6 +33,7 @@ struct pci_methods {
   int (*fill_info)(struct pci_dev *, int flags);
   int (*read)(struct pci_dev *, int pos, byte *buf, int len);
   int (*write)(struct pci_dev *, int pos, byte *buf, int len);
+  int (*read_vpd)(struct pci_dev *, int pos, byte *buf, int len);
   void (*init_dev)(struct pci_dev *);
   void (*cleanup_dev)(struct pci_dev *);
 };

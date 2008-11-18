@@ -260,6 +260,7 @@ struct pci_methods pm_linux_sysfs = {
   pci_generic_fill_info,
   sysfs_read,
   sysfs_write,
+  NULL,					/* read_vpd */
   NULL,					/* init_dev */
   sysfs_cleanup_dev
 };

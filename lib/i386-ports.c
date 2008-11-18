@@ -265,6 +265,7 @@ struct pci_methods pm_intel_conf1 = {
   pci_generic_fill_info,
   conf1_read,
   conf1_write,
+  NULL,					/* read_vpd */
   NULL,					/* init_dev */
   NULL					/* cleanup_dev */
 };
@@ -280,6 +281,7 @@ struct pci_methods pm_intel_conf2 = {
   pci_generic_fill_info,
   conf2_read,
   conf2_write,
+  NULL,					/* read_vpd */
   NULL,					/* init_dev */
   NULL					/* cleanup_dev */
 };

@@ -197,6 +197,7 @@ struct pci_methods pm_linux_proc = {
   pci_generic_fill_info,
   proc_read,
   proc_write,
+  NULL,					/* read_vpd */
   NULL,					/* init_dev */
   proc_cleanup_dev
 };

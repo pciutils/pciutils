@@ -173,6 +173,7 @@ struct pci_methods pm_dump = {
   pci_generic_fill_info,
   dump_read,
   dump_write,
+  NULL,					/* read_vpd */
   NULL,					/* init_dev */
   dump_cleanup_dev
 };
