@@ -72,10 +72,11 @@ struct pci_access {
   struct id_bucket *current_id_bucket;
   int id_load_failed;
   int id_cache_status;			/* 0=not read, 1=read, 2=dirty */
-  int fd;				/* proc: fd */
-  int fd_rw;				/* proc: fd opened read-write */
-  struct pci_dev *cached_dev;		/* proc: device the fd is for */
-  int fd_pos;				/* proc: current position */
+  int fd;				/* proc/sys: fd for config space */
+  int fd_rw;				/* proc/sys: fd opened read-write */
+  int fd_pos;				/* proc/sys: current position */
+  int fd_vpd;				/* sys: fd for VPD */
+  struct pci_dev *cached_dev;		/* proc/sys: device the fds are for */
 };
 
 /* Initialize PCI access */

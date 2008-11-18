@@ -177,30 +177,48 @@ static void sysfs_scan(struct pci_access *a)
   closedir(dir);
 }
 
+/* Intent of the sysfs_setup() caller */
+enum
+  {
+    SETUP_READ_CONFIG = 0,
+    SETUP_WRITE_CONFIG = 1,
+    SETUP_READ_VPD = 2
+  };
+
 static int
-sysfs_setup(struct pci_dev *d, int rw)
+sysfs_setup(struct pci_dev *d, int intent)
 {
   struct pci_access *a = d->access;
+  char namebuf[OBJNAMELEN];
 
-  if (a->cached_dev != d || a->fd_rw < rw)
+  if (a->cached_dev != d || intent == SETUP_WRITE_CONFIG && !a->fd_rw)
     {
-      char namebuf[OBJNAMELEN];
       if (a->fd >= 0)
 	close(a->fd);
       sysfs_obj_name(d, "config", namebuf);
-      a->fd_rw = a->writeable || rw;
+      a->fd_rw = a->writeable || intent == SETUP_WRITE_CONFIG;
       a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
       if (a->fd < 0)
 	a->warning("Cannot open %s", namebuf);
-      a->cached_dev = d;
       a->fd_pos = 0;
     }
-  return a->fd;
+
+  if (a->cached_dev != d)
+    {
+      if (a->fd_vpd >= 0)
+	close(a->fd_vpd);
+      sysfs_obj_name(d, "vpd", namebuf);
+      a->fd_vpd = open(namebuf, O_RDONLY);
+      /* No warning on error; vpd may be absent or accessible only to root */
+    }
+
+  a->cached_dev = d;
+  return intent == SETUP_READ_VPD ? a->fd_vpd : a->fd;
 }
 
 static int sysfs_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  int fd = sysfs_setup(d, 0);
+  int fd = sysfs_setup(d, SETUP_READ_CONFIG);
   int res;
 
   if (fd < 0)
@@ -218,7 +236,7 @@ static int sysfs_read(struct pci_dev *d, int pos, byte *buf, int len)
 
 static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  int fd = sysfs_setup(d, 1);
+  int fd = sysfs_setup(d, SETUP_WRITE_CONFIG);
   int res;
 
   if (fd < 0)
@@ -236,6 +254,37 @@ static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
     }
   return 1;
 }
+
+#ifdef PCI_HAVE_DO_READ
+
+/* pread() is not available and do_read() only works for a single fd, so we
+ * cannot implement read_vpd properly. */
+static int sysfs_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  return 0;
+}
+
+#else /* !PCI_HAVE_DO_READ */
+
+static int sysfs_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  int fd = sysfs_setup(d, SETUP_READ_VPD);
+  int res;
+
+  if (fd < 0)
+    return 0;
+  res = pread(fd, buf, len, pos);
+  if (res < 0)
+    {
+      d->access->warning("sysfs_read_vpd: read failed: %s", strerror(errno));
+      return 0;
+    }
+  else if (res != len)
+    return 0;
+  return 1;
+}
+
+#endif /* PCI_HAVE_DO_READ */
 
 static void sysfs_cleanup_dev(struct pci_dev *d)
 {
@@ -260,7 +309,7 @@ struct pci_methods pm_linux_sysfs = {
   pci_generic_fill_info,
   sysfs_read,
   sysfs_write,
-  NULL,					/* read_vpd */
+  sysfs_read_vpd,
   NULL,					/* init_dev */
   sysfs_cleanup_dev
 };
