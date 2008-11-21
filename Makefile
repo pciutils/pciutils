@@ -62,10 +62,18 @@ force:
 lib/config.h lib/config.mk:
 	cd lib && ./configure
 
-lspci: lspci.o common.o lib/$(PCILIB)
+lspci: lspci.o ls-vpd.o ls-caps.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o common.o lib/$(PCILIB)
 setpci: setpci.o common.o lib/$(PCILIB)
 
-lspci.o: lspci.c pciutils.h $(PCIINC)
+LSPCIINC=lspci.h pciutils.h $(PCIINC)
+lspci.o: lspci.c $(LSPCIINC)
+ls-vpd.o: ls-vpd.c $(LSPCIINC)
+ls-caps.o: ls-caps.c $(LSPCIINC)
+ls-ecaps.o: ls-ecaps.c $(LSPCIINC)
+ls-kernel.o: ls-kernel.c $(LSPCIINC)
+ls-tree.o: ls-tree.c $(LSPCIINC)
+ls-map.o: ls-map.c $(LSPCIINC)
+
 setpci.o: setpci.c pciutils.h $(PCIINC)
 common.o: common.c pciutils.h $(PCIINC)
 
