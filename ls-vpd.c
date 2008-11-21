@@ -44,6 +44,8 @@ cap_vpd(struct device *d)
   byte csum = 0;
 
   printf("Vital Product Data\n");
+  if (verbose < 2)
+    return;
 
   while (res_addr <= PCI_VPD_ADDR_MASK)
     {
