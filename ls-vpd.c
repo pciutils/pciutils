@@ -52,6 +52,8 @@ print_vpd_string(const byte *buf, word len)
       byte ch = *buf++;
       if (ch == '\\')
         printf("\\\\");
+      else if (!ch && !len)
+        ;  /* Cards with null-terminated strings have been observed */
       else if (ch < 32 || ch == 127)
         printf("\\x%02x", ch);
       else
