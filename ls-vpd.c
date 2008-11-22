@@ -4,6 +4,7 @@
  *	Copyright (c) 2008 Solarflare Communications
  *
  *	Written by Ben Hutchings <bhutchings@solarflare.com>
+ *	Improved by Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -11,6 +12,37 @@
 #include <stdio.h>
 
 #include "lspci.h"
+
+/*
+ *  The list of all known VPD items and their formats.
+ *  Technically, this belongs to the pci.ids file, but the VPD does not seem
+ *  to be developed any longer, so we have chosen the easier way.
+ */
+
+enum vpd_format {
+  F_BINARY,
+  F_TEXT,
+  F_RESVD,
+  F_RDWR,
+};
+
+static const struct vpd_item {
+  byte id1, id2;
+  byte format;
+  const char *name;
+} vpd_items[] = {
+  { 'C','P', F_BINARY,	"Extended capability" },
+  { 'E','C', F_TEXT,	"Engineering changes" },
+  { 'M','N', F_BINARY,	"Manufacture ID" },
+  { 'P','N', F_TEXT,	"Part number" },
+  { 'R','V', F_RESVD,	"Reserved" },
+  { 'R','W', F_RDWR,	"Read-write area" },
+  { 'S','N', F_TEXT,	"Serial number" },
+  { 'Y','A', F_TEXT,	"Asset tag" },
+  { 'V', 0 , F_TEXT,	"Vendor specific" },
+  { 'Y', 0 , F_TEXT,	"System specific" },
+  {  0,  0 , F_BINARY,	NULL }
+};
 
 static void
 print_vpd_string(const byte *buf, word len)
@@ -24,6 +56,18 @@ print_vpd_string(const byte *buf, word len)
         printf("\\x%02x", ch);
       else
         putchar(ch);
+    }
+}
+
+static void
+print_vpd_binary(const byte *buf, word len)
+{
+  int i;
+  for (i = 0; i < len; i++)
+    {
+      if (i)
+        putchar(' ');
+      printf("%02x", buf[i]);
     }
 }
 
@@ -41,7 +85,7 @@ void
 cap_vpd(struct device *d)
 {
   word res_addr = 0, res_len, part_pos, part_len;
-  byte key[2], buf[256];
+  byte buf[256];
   byte tag;
   byte csum = 0;
 
@@ -102,52 +146,53 @@ cap_vpd(struct device *d)
 	  while (part_pos + 3 <= res_len)
 	    {
 	      word read_len;
+	      const struct vpd_item *item;
+	      struct vpd_item unknown_item;
 
 	      if (!read_vpd(d, res_addr + part_pos, buf, 3, &csum))
 		break;
 	      part_pos += 3;
-	      key[0] = buf[0];
-	      key[1] = buf[1];
 	      part_len = buf[2];
 	      if (part_len > res_len - part_pos)
 		break;
 
+	      /* Is this item known? */
+	      for (item=vpd_items; item->id1 && item->id1 != buf[0] ||
+				   item->id2 && item->id2 != buf[1]; item++)
+		;
+	      if (!item->id1 && !item->id2)
+	        {
+		  unknown_item.id1 = buf[0];
+		  unknown_item.id2 = buf[1];
+		  unknown_item.format = F_BINARY;
+		  unknown_item.name = "Unknown";
+		  item = &unknown_item;
+	        }
+
 	      /* Only read the first byte of the RV field because the
 	       * remaining bytes are not included in the checksum. */
-	      read_len = (key[0] == 'R' && key[1] == 'V') ? 1 : part_len;
+	      read_len = (item->format == F_RESVD) ? 1 : part_len;
 	      if (!read_vpd(d, res_addr + part_pos, buf, read_len, &csum))
 		break;
 
-	      if ((key[0] == 'E' && key[1] == 'C') ||
-		  (key[0] == 'P' && key[1] == 'N') ||
-		  (key[0] == 'S' && key[1] == 'N') ||
-		  key[0] == 'V' ||
-		  key[0] == 'Y')
-		{
-		  /* Alphanumeric content */
-		  printf("\t\t\t%c%c: ", key[0], key[1]);
+	      printf("\t\t\t[%c%c] %s: ", item->id1, item->id2, item->name);
+
+	      switch (item->format)
+	        {
+		case F_TEXT:
 		  print_vpd_string(buf, part_len);
 		  printf("\n");
-		}
-	      else if (key[0] == 'R' && key[1] == 'V')
-		{
-		  /* Reserved and checksum */
-		  printf("\t\t\tRV: checksum %s, %d byte(s) reserved\n",
-			 csum ? "bad" : "good", part_len - 1);
-		}
-	      else if (key[0] == 'R' && key[1] == 'W')
-		{
-		  /* Read-write area */
-		  printf("\t\t\tRW: %d byte(s) free\n", part_len);
-		}
-	      else
-		{
-		  /* Binary or unknown content */
-		  int i;
-		  printf("\t\t\t%c%c:", key[0], key[1]);
-		  for (i = 0; i < part_len; i++)
-		    printf(" %02x", buf[i]);
+		  break;
+		case F_BINARY:
+		  print_vpd_binary(buf, part_len);
 		  printf("\n");
+		  break;
+		case F_RESVD:
+		  printf("checksum %s, %d byte(s) reserved\n", csum ? "bad" : "good", part_len - 1);
+		  break;
+		case F_RDWR:
+		  printf("%d byte(s) free\n", part_len);
+		  break;
 		}
 
 	      part_pos += part_len;
