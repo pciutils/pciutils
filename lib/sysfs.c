@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Configuration Access via /sys/bus/pci
  *
- * 	Copyright (c) 2003 Matthew Wilcox <willy@fc.hp.com>
+ *	Copyright (c) 2003 Matthew Wilcox <matthew@wil.cx>
  *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
