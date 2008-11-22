@@ -1,7 +1,9 @@
 /*
  *	The PCI Utilities -- Show Vital Product Data
  *
- *	Copyright (c) 2008 Ben Hutchings <bhutchings@solarflare.com>
+ *	Copyright (c) 2008 Solarflare Communications
+ *
+ *	Written by Ben Hutchings <bhutchings@solarflare.com>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
