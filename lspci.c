@@ -140,7 +140,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_PHYS_SLOT);
   return d;
 }
 
@@ -685,6 +685,9 @@ show_verbose(struct device *d)
       return;
     }
 
+  if (p->phy_slot)
+    printf("\tPhysical Slot: %s\n", p->phy_slot);
+
   if (verbose > 1)
     {
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
@@ -850,6 +853,8 @@ show_machine(struct device *d)
 	  printf("SDevice:\t%s\n",
 		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
 	}
+      if (p->phy_slot)
+	printf("PhySlot:\t%s\n", p->phy_slot);
       if (c = get_conf_byte(d, PCI_REVISION_ID))
 	printf("Rev:\t%02x\n", c);
       if (c = get_conf_byte(d, PCI_CLASS_PROG))

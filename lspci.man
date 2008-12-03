@@ -286,6 +286,10 @@ Name of the subsystem vendor (optional).
 Name of the subsystem (optional).
 
 .TP
+.B PhySlot
+The physical slot where the device resides (optional, Linux only).
+
+.TP
 .B Rev
 Revision number (optional).
 

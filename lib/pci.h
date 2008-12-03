@@ -129,6 +129,7 @@ struct pci_dev {
   pciaddr_t rom_base_addr;		/* Expansion ROM base address */
   pciaddr_t rom_size;			/* Expansion ROM size */
   struct pci_cap *first_cap;		/* List of capabilities */
+  char *phy_slot;			/* Physical slot */
 
   /* Fields used internally: */
   struct pci_access *access;
@@ -162,6 +163,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_CLASS		32
 #define PCI_FILL_CAPS		64
 #define PCI_FILL_EXT_CAPS	128
+#define PCI_FILL_PHYS_SLOT	256
 #define PCI_FILL_RESCAN		0x10000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;

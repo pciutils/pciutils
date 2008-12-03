@@ -177,6 +177,68 @@ static void sysfs_scan(struct pci_access *a)
   closedir(dir);
 }
 
+static void
+sysfs_fill_slots(struct pci_dev *d)
+{
+  struct pci_access *a = d->access;
+  char dirname[1024];
+  DIR *dir;
+  struct dirent *entry;
+  int n;
+
+  n = snprintf(dirname, sizeof(dirname), "%s/slots", sysfs_name(a));
+  if (n < 0 || n >= (int) sizeof(dirname))
+    a->error("Directory name too long");
+  dir = opendir(dirname);
+  if (!dir)
+    a->error("Cannot open %s", dirname);
+  while ((entry = readdir(dir)))
+    {
+      char namebuf[OBJNAMELEN], buf[16];
+      FILE *file;
+      unsigned int dom, bus, dev;
+      struct pci_dev *pd;
+      int n = snprintf(namebuf, OBJNAMELEN, "%s/%s/%s", dirname, entry->d_name, "address");
+
+      /* ".", ".." or a special non-device perhaps */
+      if (entry->d_name[0] == '.')
+	continue;
+
+      if (n < 0 || n >= OBJNAMELEN)
+	d->access->error("File name too long");
+      file = fopen(namebuf, "r");
+      if (!file)
+	a->error("Cannot open %s: %s", namebuf, strerror(errno));
+      if (!fgets(buf, sizeof(buf), file))
+	break;
+      if (sscanf(buf, "%x:%x:%x", &dom, &bus, &dev) < 3)
+	a->error("sysfs_scan: Couldn't parse entry address %s", buf);
+      for (pd = a->devices; pd; pd = pd->next)
+	{
+	  if (dom == pd->domain && bus == pd->bus && dev == pd->dev && !pd->phy_slot)
+	    {
+	      pd->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
+	      sprintf(pd->phy_slot, "%s", entry->d_name);
+	    }
+	  pd->known_fields |= PCI_FILL_PHYS_SLOT;
+	}
+      fclose(file);
+    }
+  closedir(dir);
+}
+
+static int
+sysfs_fill_info(struct pci_dev *d, int flags)
+{
+  int ret;
+
+  ret = pci_generic_fill_info(d, flags);
+  if (flags & PCI_FILL_PHYS_SLOT && !(d->known_fields & PCI_FILL_PHYS_SLOT))
+    sysfs_fill_slots(d);
+
+  return ret;
+}
+
 /* Intent of the sysfs_setup() caller */
 enum
   {
@@ -306,7 +368,7 @@ struct pci_methods pm_linux_sysfs = {
   sysfs_init,
   sysfs_cleanup,
   sysfs_scan,
-  pci_generic_fill_info,
+  sysfs_fill_info,
   sysfs_read,
   sysfs_write,
   sysfs_read_vpd,
