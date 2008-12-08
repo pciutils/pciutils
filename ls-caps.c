@@ -752,7 +752,7 @@ static void cap_express_link(struct device *d, int where, int type)
 	aspm_support((t & PCI_EXP_LNKCAP_ASPM) >> 10),
 	latency_l0s((t & PCI_EXP_LNKCAP_L0S) >> 12),
 	latency_l1((t & PCI_EXP_LNKCAP_L1) >> 15));
-  printf("\t\t\tClockPM%c Suprise%c LLActRep%c BwNot%c\n",
+  printf("\t\t\tClockPM%c Surprise%c LLActRep%c BwNot%c\n",
 	FLAG(t, PCI_EXP_LNKCAP_CLOCKPM),
 	FLAG(t, PCI_EXP_LNKCAP_SURPRISE),
 	FLAG(t, PCI_EXP_LNKCAP_DLLA),
