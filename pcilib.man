@@ -22,7 +22,8 @@ The
 .B /sys
 filesystem on Linux 2.6 and newer. The standard header of the config space is available
 to all users, the rest only to root. Supports extended configuration space, PCI domains,
-VPD (from Linux 2.6.26) and information on attached kernel drivers.
+VPD (from Linux 2.6.26), physical slots (also since Linux 2.6.26) and information on attached
+kernel drivers.
 .TP
 .B linux-proc
 The
