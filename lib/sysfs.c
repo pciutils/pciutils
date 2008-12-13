@@ -178,9 +178,8 @@ static void sysfs_scan(struct pci_access *a)
 }
 
 static void
-sysfs_fill_slots(struct pci_dev *d)
+sysfs_fill_slots(struct pci_access *a)
 {
-  struct pci_access *a = d->access;
   char dirname[1024];
   DIR *dir;
   struct dirent *entry;
@@ -191,36 +190,40 @@ sysfs_fill_slots(struct pci_dev *d)
     a->error("Directory name too long");
   dir = opendir(dirname);
   if (!dir)
-    a->error("Cannot open %s", dirname);
-  while ((entry = readdir(dir)))
+    return;
+
+  while (entry = readdir(dir))
     {
       char namebuf[OBJNAMELEN], buf[16];
       FILE *file;
       unsigned int dom, bus, dev;
-      struct pci_dev *pd;
-      int n = snprintf(namebuf, OBJNAMELEN, "%s/%s/%s", dirname, entry->d_name, "address");
+      struct pci_dev *d;
 
       /* ".", ".." or a special non-device perhaps */
       if (entry->d_name[0] == '.')
 	continue;
 
+      n = snprintf(namebuf, OBJNAMELEN, "%s/%s/%s", dirname, entry->d_name, "address");
       if (n < 0 || n >= OBJNAMELEN)
-	d->access->error("File name too long");
+	a->error("File name too long");
       file = fopen(namebuf, "r");
       if (!file)
-	a->error("Cannot open %s: %s", namebuf, strerror(errno));
-      if (!fgets(buf, sizeof(buf), file))
-	break;
-      if (sscanf(buf, "%x:%x:%x", &dom, &bus, &dev) < 3)
-	a->error("sysfs_scan: Couldn't parse entry address %s", buf);
-      for (pd = a->devices; pd; pd = pd->next)
 	{
-	  if (dom == pd->domain && bus == pd->bus && dev == pd->dev && !pd->phy_slot)
-	    {
-	      pd->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
-	      strcpy(pd->phy_slot, entry->d_name);
-	    }
-	  pd->known_fields |= PCI_FILL_PHYS_SLOT;
+	  a->warning("sysfs_fill_slots: Cannot open %s: %s", namebuf, strerror(errno));
+	  continue;
+	}
+
+      if (!fgets(buf, sizeof(buf), file) || sscanf(buf, "%x:%x:%x", &dom, &bus, &dev) < 3)
+	a->warning("sysfs_fill_slots: Couldn't parse entry address %s", buf);
+      else
+	{
+	  for (d = a->devices; d; d = d->next)
+	    if (dom == d->domain && bus == d->bus && dev == d->dev && !d->phy_slot)
+	      {
+		d->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
+		strcpy(d->phy_slot, entry->d_name);
+		break;
+	      }
 	}
       fclose(file);
     }
@@ -230,13 +233,14 @@ sysfs_fill_slots(struct pci_dev *d)
 static int
 sysfs_fill_info(struct pci_dev *d, int flags)
 {
-  int ret;
-
-  ret = pci_generic_fill_info(d, flags);
-  if (flags & PCI_FILL_PHYS_SLOT && !(d->known_fields & PCI_FILL_PHYS_SLOT))
-    sysfs_fill_slots(d);
-
-  return ret;
+  if ((flags & PCI_FILL_PHYS_SLOT) && !(d->known_fields & PCI_FILL_PHYS_SLOT))
+    {
+      struct pci_dev *pd;
+      sysfs_fill_slots(d->access);
+      for (pd = d->access->devices; pd; pd = pd->next)
+	pd->known_fields |= PCI_FILL_PHYS_SLOT;
+    }
+  return pci_generic_fill_info(d, flags);
 }
 
 /* Intent of the sysfs_setup() caller */
