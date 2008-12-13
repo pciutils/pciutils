@@ -1,3 +1,33 @@
+2008-12-13  Martin Mares <mj@ucw.cz>
+
+	* The source code of lspci has been split to multiple files, hopefully
+	making it easier to maintain.
+
+	* The library and lspci now know about physical slot names. So far,
+	they are provided by the sysfs back-end only. Thanks go to Alex Chiang.
+
+	* When a device has the VPD (Vital Product Data) capability and the
+	VPD data are supplied by the OS, they are decoded and printed in the
+	verbose mode. This currently works only on Linux with the sysfs
+	back-end. Thanks to Ben Hutchings of Solarflare for the patch.
+
+	* `setpci --version' now works properly.
+
+	* `setpci --dumpregs' prints a table of all known name of
+	registers and capabilities. This replaces the table of registers
+	in the setpci man page.
+
+	* The dry-run mode of setpci gives better feedback.
+
+	* The setpci utility is now able to address registers stored in PCI
+	capabilities (actually it allows a more general form of relative
+	addressing).
+
+	* The library has gained functions for working with PCI capabilities.
+
+	* Address Translation Services capability is now decoded. Patch by
+	Yu Zhao.
+
 2008-11-09  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.0.3.
