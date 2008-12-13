@@ -50,16 +50,29 @@ static void
 sysfs_init(struct pci_access *a)
 {
   a->fd = -1;
+  a->fd_vpd = -1;
 }
 
 static void
-sysfs_cleanup(struct pci_access *a)
+sysfs_flush_cache(struct pci_access *a)
 {
   if (a->fd >= 0)
     {
       close(a->fd);
       a->fd = -1;
     }
+  if (a->fd_vpd >= 0)
+    {
+      close(a->fd_vpd);
+      a->fd_vpd = -1;
+    }
+  a->cached_dev = NULL;
+}
+
+static void
+sysfs_cleanup(struct pci_access *a)
+{
+  sysfs_flush_cache(a);
 }
 
 #define OBJNAMELEN 1024
@@ -257,29 +270,30 @@ sysfs_setup(struct pci_dev *d, int intent)
   struct pci_access *a = d->access;
   char namebuf[OBJNAMELEN];
 
-  if (a->cached_dev != d || intent == SETUP_WRITE_CONFIG && !a->fd_rw)
+  if (a->cached_dev != d || (intent == SETUP_WRITE_CONFIG && !a->fd_rw))
     {
-      if (a->fd >= 0)
-	close(a->fd);
-      sysfs_obj_name(d, "config", namebuf);
-      a->fd_rw = a->writeable || intent == SETUP_WRITE_CONFIG;
-      a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
-      if (a->fd < 0)
-	a->warning("Cannot open %s", namebuf);
-      a->fd_pos = 0;
+      sysfs_flush_cache(a);
+      a->cached_dev = d;
     }
 
-  if (a->cached_dev != d)
+  if (intent == SETUP_READ_VPD)
     {
-      if (a->fd_vpd >= 0)
-	close(a->fd_vpd);
-      sysfs_obj_name(d, "vpd", namebuf);
-      a->fd_vpd = open(namebuf, O_RDONLY);
-      /* No warning on error; vpd may be absent or accessible only to root */
+      if (a->fd_vpd < 0)
+	{
+	  sysfs_obj_name(d, "vpd", namebuf);
+	  a->fd_vpd = open(namebuf, O_RDONLY);
+	  /* No warning on error; vpd may be absent or accessible only to root */
+	}
+      return a->fd_vpd;
     }
 
-  a->cached_dev = d;
-  return intent == SETUP_READ_VPD ? a->fd_vpd : a->fd;
+  sysfs_obj_name(d, "config", namebuf);
+  a->fd_rw = a->writeable || intent == SETUP_WRITE_CONFIG;
+  a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
+  if (a->fd < 0)
+    a->warning("Cannot open %s", namebuf);
+  a->fd_pos = 0;
+  return a->fd;
 }
 
 static int sysfs_read(struct pci_dev *d, int pos, byte *buf, int len)
@@ -357,11 +371,7 @@ static void sysfs_cleanup_dev(struct pci_dev *d)
   struct pci_access *a = d->access;
 
   if (a->cached_dev == d)
-    {
-      a->cached_dev = NULL;
-      close(a->fd);
-      a->fd = -1;
-    }
+    sysfs_flush_cache(a);
 }
 
 struct pci_methods pm_linux_sysfs = {
