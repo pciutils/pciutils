@@ -218,7 +218,7 @@ sysfs_fill_slots(struct pci_dev *d)
 	  if (dom == pd->domain && bus == pd->bus && dev == pd->dev && !pd->phy_slot)
 	    {
 	      pd->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
-	      sprintf(pd->phy_slot, "%s", entry->d_name);
+	      strcpy(pd->phy_slot, entry->d_name);
 	    }
 	  pd->known_fields |= PCI_FILL_PHYS_SLOT;
 	}
