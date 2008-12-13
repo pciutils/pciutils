@@ -287,12 +287,15 @@ sysfs_setup(struct pci_dev *d, int intent)
       return a->fd_vpd;
     }
 
-  sysfs_obj_name(d, "config", namebuf);
-  a->fd_rw = a->writeable || intent == SETUP_WRITE_CONFIG;
-  a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
   if (a->fd < 0)
-    a->warning("Cannot open %s", namebuf);
-  a->fd_pos = 0;
+    {
+      sysfs_obj_name(d, "config", namebuf);
+      a->fd_rw = a->writeable || intent == SETUP_WRITE_CONFIG;
+      a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
+      if (a->fd < 0)
+	a->warning("Cannot open %s", namebuf);
+      a->fd_pos = 0;
+    }
   return a->fd;
 }
 
