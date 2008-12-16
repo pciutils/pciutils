@@ -166,6 +166,7 @@ cap_sriov(struct device *d, int where)
   printf("\t\tSupported Page Size: %08x, ", l);
   l = get_conf_long(d, where + PCI_IOV_SYSPS);
   printf("System Page Size: %08x\n", l);
+  l = get_conf_long(d, where + PCI_IOV_MSAO);
   printf("\t\tVF Migration: offset: %08x, BIR: %x\n", PCI_IOV_MSA_OFFSET(l),
 	PCI_IOV_MSA_BIR(l));
 }
