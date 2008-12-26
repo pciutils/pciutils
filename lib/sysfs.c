@@ -120,23 +120,24 @@ sysfs_get_resources(struct pci_dev *d)
     a->error("Cannot open %s: %s", namebuf, strerror(errno));
   for (i = 0; i < 7; i++)
     {
-      unsigned long long start, end, size;
+      unsigned long long start, end, size, flags;
       if (!fgets(buf, sizeof(buf), file))
 	break;
-      if (sscanf(buf, "%llx %llx", &start, &end) != 2)
+      if (sscanf(buf, "%llx %llx %llx", &start, &end, &flags) != 3)
 	a->error("Syntax error in %s", namebuf);
       if (start)
 	size = end - start + 1;
       else
 	size = 0;
+      flags &= PCI_ADDR_FLAG_MASK;
       if (i < 6)
 	{
-	  d->base_addr[i] = start;
+	  d->base_addr[i] = start | flags;
 	  d->size[i] = size;
 	}
       else
 	{
-	  d->rom_base_addr = start;
+	  d->rom_base_addr = start | flags;
 	  d->rom_size = size;
 	}
     }

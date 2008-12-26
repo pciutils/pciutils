@@ -142,6 +142,7 @@ struct pci_dev {
 
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
 #define PCI_ADDR_MEM_MASK (~(pciaddr_t) 0xf)
+#define PCI_ADDR_FLAG_MASK 0xf
 
 u8 pci_read_byte(struct pci_dev *, int pos) PCI_ABI; /* Access to configuration space */
 u16 pci_read_word(struct pci_dev *, int pos) PCI_ABI;
