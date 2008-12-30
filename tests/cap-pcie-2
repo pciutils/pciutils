@@ -1,17 +1,18 @@
-09:00.0 Class 0200: Device 8086:10c9 (rev 01)
+01:00.0 Ethernet controller: Intel Corporation Device 10c9 (rev 01)
+	Subsystem: Intel Corporation Device a03c
 	Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
 	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
 	Latency: 0, Cache Line Size: 64 bytes
 	Interrupt: pin A routed to IRQ 16
-	Region 0: Memory at b1a60000 (32-bit, non-prefetchable) [size=128K]
-	Region 1: Memory at b1a40000 (32-bit, non-prefetchable) [size=128K]
-	Region 2: I/O ports at 2020 [size=32]
-	Region 3: Memory at b1b04000 (32-bit, non-prefetchable) [size=16K]
-	Expansion ROM at f7f00000 [disabled] [size=128K]
+	Region 0: Memory at e0800000 (32-bit, non-prefetchable) [size=128K]
+	Region 1: Memory at e0000000 (32-bit, non-prefetchable) [size=4M]
+	Region 2: I/O ports at 1020 [size=32]
+	Region 3: Memory at e0840000 (32-bit, non-prefetchable) [size=16K]
+	Expansion ROM at c7800000 [disabled] [size=4M]
 	Capabilities: [40] Power Management version 3
 		Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
 		Status: D0 PME-Enable- DSel=0 DScale=1 PME-
-	Capabilities: [50] MSI: Mask+ 64bit+ Count=0/1 Enable-
+	Capabilities: [50] MSI: Mask+ 64bit+ Count=1/1 Enable-
 		Address: 0000000000000000  Data: 0000
 		Masking: 00000000  Pending: 00000000
 	Capabilities: [70] MSI-X: Enable+ Mask- TabSize=10
@@ -24,9 +25,9 @@
 			RlxdOrd+ ExtTag- PhantFunc- AuxPwr- NoSnoop+ FLReset-
 			MaxPayload 256 bytes, MaxReadReq 512 bytes
 		DevSta:	CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr+ TransPend-
-		LnkCap:	Port #2, Speed 2.5GT/s, Width x4, ASPM L0s L1, Latency L0 <4us, L1 <64us
-			ClockPM- Surprise- LLActRep- BwNot-
-		LnkCtl:	ASPM Disabled; RCB 64 bytes Disabled- Retrain- CommClk+
+		LnkCap:	Port #0, Speed 2.5GT/s, Width x4, ASPM L0s L1, Latency L0 <4us, L1 <64us
+			ClockPM- Suprise- LLActRep- BwNot-
+		LnkCtl:	ASPM L1 Enabled; RCB 64 bytes Disabled- Retrain- CommClk+
 			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
 		LnkSta:	Speed 2.5GT/s, Width x4, TrErr- Train- SlotClk+ DLActive- BWMgmt- ABWMgmt-
 		DevCap2: Completion Timeout: Range ABCD, TimeoutDis+
@@ -36,38 +37,37 @@
 			 Compliance De-emphasis: -6dB
 		LnkSta2: Current De-emphasis Level: -6dB
 	Capabilities: [100] Advanced Error Reporting
-		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSVoil-
-		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSVoil-
-		UESvrt:	DLP+ SDES- TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSVoil-
+		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+		UESvrt:	DLP+ SDES- TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
 		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
-		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
+		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
 		AERCap:	First Error Pointer: 00, GenCap- CGenEn- ChkCap- ChkEn-
-	Capabilities: [140] Device Serial Number 4c-17-12-ff-ff-21-1b-00
+	Capabilities: [140] Device Serial Number e0-46-2b-ff-ff-21-1b-00
 	Capabilities: [150] Alternative Routing-ID Interpretation (ARI)
 		ARICap:	MFVC- ACS-, Next Function: 1
 		ARICtl:	MFVC- ACS-, Function Group: 0
 	Capabilities: [160] Single Root I/O Virtualization (SR-IOV)
 		IOVCap:	Migration-, Interrupt Message Number: 000
-		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy+
+		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy-
 		IOVSta:	Migration-
-		Initial VFs: 8, Total VFs: 8, Number of VFs: 4, Function Dependency Link: 00
-		VF offset: 128, stride: 2, Device ID: 10ca
+		Initial VFs: 8, Total VFs: 8, Number of VFs: 1, Function Dependency Link: 00
+		VF offset: 384, stride: 2, Device ID: 10ca
 		Supported Page Size: 00000553, System Page Size: 00000001
-		VF Migration: offset: 00000000, BIR: 1
+		VF Migration: offset: 00000000, BIR: 0
 	Kernel driver in use: igb
-	Kernel modules: ipmi_si
 00: 86 80 c9 10 07 04 10 00 01 00 00 02 10 00 80 00
-10: 00 00 a6 b1 00 00 a4 b1 21 20 00 00 00 40 b0 b1
-20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-30: 00 00 fe ff 40 00 00 00 00 00 00 00 0b 01 00 00
+10: 00 00 80 e0 00 00 00 e0 21 10 00 00 00 00 84 e0
+20: 00 00 00 00 00 00 00 00 00 00 00 00 86 80 3c a0
+30: 00 00 80 c7 40 00 00 00 00 00 00 00 0b 01 00 00
 40: 01 50 23 c8 00 20 00 1a 00 00 00 00 00 00 00 00
 50: 05 70 80 01 00 00 00 00 00 00 00 00 00 00 00 00
 60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 70: 11 a0 09 80 03 00 00 00 03 20 00 00 00 00 00 00
 80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-a0: 10 00 02 00 c2 8c 00 10 30 28 19 00 41 6c 03 02
-b0: 40 00 41 10 00 00 00 00 00 00 00 00 00 00 00 00
+a0: 10 00 02 00 c2 8c 00 10 30 28 19 00 41 6c 03 00
+b0: 42 00 41 10 00 00 00 00 00 00 00 00 00 00 00 00
 c0: 00 00 00 00 1f 00 00 00 00 00 00 00 00 00 00 00
 d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 e0: 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -76,12 +76,12 @@ f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 110: 00 20 00 00 00 20 00 00 00 00 00 00 00 00 00 00
 120: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 130: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-140: 03 00 01 15 4c 17 12 ff ff 21 1b 00 00 00 00 00
+140: 03 00 01 15 e0 46 2b ff ff 21 1b 00 00 00 00 00
 150: 0e 00 01 16 00 01 00 00 00 00 00 00 00 00 00 00
-160: 10 00 01 00 00 00 00 00 19 00 00 00 08 00 08 00
-170: 04 00 00 00 80 00 02 00 00 00 ca 10 53 05 00 00
-180: 01 00 00 00 04 00 a8 b1 00 00 00 00 00 00 00 00
-190: 04 00 a9 b1 00 00 00 00 00 00 00 00 00 00 00 00
+160: 10 00 01 00 00 00 00 00 09 00 00 00 08 00 08 00
+170: 01 00 00 00 80 01 02 00 00 00 ca 10 53 05 00 00
+180: 01 00 00 00 04 00 84 d2 00 00 00 00 00 00 00 00
+190: 04 00 86 d2 00 00 00 00 00 00 00 00 00 00 00 00
 1a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 1b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 1c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
