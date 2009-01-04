@@ -17,7 +17,6 @@
 /* Options */
 
 int verbose;				/* Show detailed information */
-static int opt_buscentric;		/* Show bus addresses/IRQ's instead of CPU-visible ones */
 static int opt_hex;			/* Show contents of config space as hexadecimal numbers */
 struct pci_filter filter;		/* Device filter */
 static int opt_tree;			/* Show bus tree */
@@ -402,15 +401,6 @@ show_bases(struct device *d, int cnt)
 		{
 		  i++;
 		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-		  if (opt_buscentric)
-		    {
-		      u32 y = a & 0xffffffff;
-		      if (a || z)
-			printf("%08x%08x", z, y);
-		      else
-			printf("<unassigned>");
-		      done = 1;
-		    }
 		}
 	    }
 	  if (!done)
@@ -943,7 +933,6 @@ main(int argc, char **argv)
 	break;
       case 'b':
 	pacc->buscentric = 1;
-	opt_buscentric = 1;
 	break;
       case 's':
 	if (msg = pci_filter_parse_slot(&filter, optarg))
