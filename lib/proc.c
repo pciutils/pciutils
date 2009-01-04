@@ -97,10 +97,10 @@ proc_scan(struct pci_access *a)
       d->func = PCI_FUNC(dfn & 0xff);
       d->vendor_id = vend >> 16U;
       d->device_id = vend & 0xffff;
-      known = PCI_FILL_IDENT;
+      known = 0;
       if (!a->buscentric)
 	{
-	  known |= PCI_FILL_IRQ | PCI_FILL_BASES;
+	  known |= PCI_FILL_IDENT | PCI_FILL_IRQ | PCI_FILL_BASES;
 	  if (cnt >= 10)
 	    known |= PCI_FILL_ROM_BASE;
 	  if (cnt >= 17)
