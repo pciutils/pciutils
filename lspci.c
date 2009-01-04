@@ -350,6 +350,7 @@ show_bases(struct device *d, int cnt)
   struct pci_dev *p = d->dev;
   word cmd = get_conf_word(d, PCI_COMMAND);
   int i;
+  int virtual = 0;
 
   for (i=0; i<cnt; i++)
     {
@@ -368,6 +369,7 @@ show_bases(struct device *d, int cnt)
 	{
 	  printf("[virtual] ");
 	  flg = pos;
+	  virtual = 1;
 	}
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
 	{
@@ -379,7 +381,7 @@ show_bases(struct device *d, int cnt)
 	    printf("<ignored>");
 	  else
 	    printf("<unassigned>");
-	  if (!(cmd & PCI_COMMAND_IO))
+	  if (!virtual && !(cmd & PCI_COMMAND_IO))
 	    printf(" [disabled]");
 	}
       else
@@ -415,7 +417,7 @@ show_bases(struct device *d, int cnt)
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
 		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
-	  if (!(cmd & PCI_COMMAND_MEMORY))
+	  if (!virtual && !(cmd & PCI_COMMAND_MEMORY))
 	    printf(" [disabled]");
 	}
       show_size(len);
@@ -431,6 +433,7 @@ show_rom(struct device *d, int reg)
   pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
   u32 flg = get_conf_long(d, reg);
   word cmd = get_conf_word(d, PCI_COMMAND);
+  int virtual = 0;
 
   if (!rom && !flg && !len)
     return;
@@ -439,6 +442,7 @@ show_rom(struct device *d, int reg)
     {
       printf("[virtual] ");
       flg = rom;
+      virtual = 1;
     }
   printf("Expansion ROM at ");
   if (rom & PCI_ROM_ADDRESS_MASK)
@@ -449,7 +453,7 @@ show_rom(struct device *d, int reg)
     printf("<unassigned>");
   if (!(flg & PCI_ROM_ADDRESS_ENABLE))
     printf(" [disabled]");
-  else if (!(cmd & PCI_COMMAND_MEMORY))
+  else if (!virtual && !(cmd & PCI_COMMAND_MEMORY))
     printf(" [disabled by cmd]");
   show_size(len);
   putchar('\n');
