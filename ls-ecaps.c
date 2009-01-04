@@ -30,6 +30,9 @@ cap_aer(struct device *d, int where)
   u32 l;
 
   printf("Advanced Error Reporting\n");
+  if (verbose < 2)
+    return;
+
   if (!config_fetch(d, where + PCI_ERR_UNCOR_STATUS, 24))
     return;
 
@@ -75,6 +78,9 @@ cap_acs(struct device *d, int where)
   u16 w;
 
   printf("Access Control Services\n");
+  if (verbose < 2)
+    return;
+
   if (!config_fetch(d, where + PCI_ACS_CAP, 4))
     return;
 
@@ -98,6 +104,9 @@ cap_ari(struct device *d, int where)
   u16 w;
 
   printf("Alternative Routing-ID Interpretation (ARI)\n");
+  if (verbose < 2)
+    return;
+
   if (!config_fetch(d, where + PCI_ARI_CAP, 4))
     return;
 
@@ -117,6 +126,9 @@ cap_ats(struct device *d, int where)
   u16 w;
 
   printf("Address Translation Service (ATS)\n");
+  if (verbose < 2)
+    return;
+
   if (!config_fetch(d, where + PCI_ATS_CAP, 4))
     return;
 
@@ -135,6 +147,9 @@ cap_sriov(struct device *d, int where)
   u32 l;
 
   printf("Single Root I/O Virtualization (SR-IOV)\n");
+  if (verbose < 2)
+    return;
+
   if (!config_fetch(d, where + PCI_IOV_CAP, 0x3c))
     return;
 
