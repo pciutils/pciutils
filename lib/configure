@@ -32,7 +32,7 @@ if [ -z "$HOST" ] ; then
 	then
 		sys=freebsd
 	fi
-	if [ "$sys" = "CYGWIN_NT-5.1" ]
+	if [ "$sys" = "CYGWIN_NT-5.1" -o "$sys" = "CYGWIN_NT-6.0" ]
 	then
 		sys=cygwin
 	fi
