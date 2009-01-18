@@ -1,3 +1,19 @@
+2009-01-18  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.0.
+
+	* The Cygwin backend now works on Windows Vista. Thanks to Jonathan
+	Kotta.
+
+	* Fixed a bug in decoding of the SR-IOV capability. Patch by Yu Zhao.
+
+	* Details of some PCIe capabilities are displayed only with -vv.
+
+	* When a BAR is reported by the OS, but not by the device (i.e.,
+	it is marked as [virtual] in lspci), the [disabled] flag is
+	suppressed, because it does not make sense in such cases.
+	Patch by Yu Zhao.
+
 2008-12-13  Martin Mares <mj@ucw.cz>
 
 	* The source code of lspci has been split to multiple files, hopefully
