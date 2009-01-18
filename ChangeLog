@@ -2,6 +2,8 @@
 
 	* Released as 3.1.0.
 
+	* Updated pci.ids to the current snapshot of the database.
+
 	* The Cygwin backend now works on Windows Vista. Thanks to Jonathan
 	Kotta.
 
