@@ -31,7 +31,7 @@
 
 	* `setpci --version' now works properly.
 
-	* `setpci --dumpregs' prints a table of all known name of
+	* `setpci --dumpregs' prints a table of all known names of
 	registers and capabilities. This replaces the table of registers
 	in the setpci man page.
 
