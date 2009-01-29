@@ -52,7 +52,7 @@ $(PCILIB): $(addsuffix .o,$(OBJS))
 else
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
-	$(CC) -shared $(SONAME) -Wl,--version-script=libpci.ver -o $@ $^ $(LIB_LDLIBS)
+	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,--version-script=libpci.ver -o $@ $^ $(LIB_LDLIBS)
 endif
 
 $(PCILIBPC): libpci.pc.in
