@@ -1,6 +1,9 @@
 #!/bin/sh
 # Configuration script for the PCI library
-# (c) 1998--2008 Martin Mares <mj@ucw.cz>
+# (c) 1998--2009 Martin Mares <mj@ucw.cz>
+
+LC_ALL=C
+export LC_ALL
 
 echo_n() {
 	if [ -n "$BASH" ]
