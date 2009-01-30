@@ -630,13 +630,13 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
       e = strchr(value, ',');
       if (e)
 	*e++ = 0;
-      if (parse_x32(value, &f, &ll) < 0 || *f && *f != ':')
+      if (parse_x32(value, &f, &ll) < 0 || f && *f != ':')
 	parse_err("Invalid value \"%s\"", value);
       lim = max_values[op->width];
       if (ll > lim && ll < ~0UL - lim)
 	parse_err("Value \"%s\" is out of range", value);
       op->values[j].value = ll;
-      if (*f == ':')
+      if (f && *f == ':')
 	{
 	  if (parse_x32(f+1, NULL, &ll) <= 0)
 	    parse_err("Invalid mask \"%s\"", f+1);
