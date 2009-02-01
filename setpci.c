@@ -499,7 +499,11 @@ static int parse_x32(char *c, char **stopp, unsigned int *resp)
       return 0;
     }
   else
-    return 1;
+    {
+      if (stopp)
+	*stopp = NULL;
+      return 1;
+    }
 }
 
 static void parse_register(struct op *op, char *base)
