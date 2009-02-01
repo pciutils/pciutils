@@ -1,3 +1,9 @@
+2009-02-01  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.2.
+
+	* Fixed another silly bug in the command-line parser of setpci.
+
 2009-01-30  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.1.
