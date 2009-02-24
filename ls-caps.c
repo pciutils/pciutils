@@ -34,8 +34,9 @@ cap_pm(struct device *d, int where, int cap)
   if (!config_fetch(d, where + PCI_PM_CTRL, PCI_PM_SIZEOF - PCI_PM_CTRL))
     return;
   t = get_conf_word(d, where + PCI_PM_CTRL);
-  printf("\t\tStatus: D%d PME-Enable%c DSel=%d DScale=%d PME%c\n",
+  printf("\t\tStatus: D%d NoSoftRst%c PME-Enable%c DSel=%d DScale=%d PME%c\n",
 	 t & PCI_PM_CTRL_STATE_MASK,
+	 FLAG(t, PCI_PM_CTRL_NO_SOFT_RST),
 	 FLAG(t, PCI_PM_CTRL_PME_ENABLE),
 	 (t & PCI_PM_CTRL_DATA_SEL_MASK) >> 9,
 	 (t & PCI_PM_CTRL_DATA_SCALE_MASK) >> 13,
