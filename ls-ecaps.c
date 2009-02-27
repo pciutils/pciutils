@@ -20,8 +20,8 @@ cap_dsn(struct device *d, int where)
   t1 = get_conf_long(d, where + 4);
   t2 = get_conf_long(d, where + 8);
   printf("Device Serial Number %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x\n",
-	t1 & 0xff, (t1 >> 8) & 0xff, (t1 >> 16) & 0xff, t1 >> 24,
-	t2 & 0xff, (t2 >> 8) & 0xff, (t2 >> 16) & 0xff, t2 >> 24);
+	t2 >> 24, (t2 >> 16) & 0xff, (t2 >> 8) & 0xff, t2 & 0xff,
+	t1 >> 24, (t1 >> 16) & 0xff, (t1 >> 8) & 0xff, t1 & 0xff);
 }
 
 static void
