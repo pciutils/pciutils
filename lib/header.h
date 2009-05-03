@@ -862,7 +862,7 @@
 /* MSI-X */
 #define  PCI_MSIX_ENABLE	0x8000
 #define  PCI_MSIX_MASK		0x4000
-#define  PCI_MSIX_TABSIZE	0x03ff
+#define  PCI_MSIX_TABSIZE	0x07ff
 #define PCI_MSIX_TABLE		4
 #define PCI_MSIX_PBA		8
 #define  PCI_MSIX_BIR		0x7
