@@ -591,12 +591,12 @@ cap_msi(struct device *d, int where, int cap)
   u32 t;
   u16 w;
 
-  printf("MSI: Mask%c 64bit%c Count=%d/%d Enable%c\n",
-         FLAG(cap, PCI_MSI_FLAGS_MASK_BIT),
-	 FLAG(cap, PCI_MSI_FLAGS_64BIT),
+  printf("MSI: Enable%c Count=%d/%d Maskable%c 64bit%c\n",
+	 FLAG(cap, PCI_MSI_FLAGS_ENABLE),
 	 1 << ((cap & PCI_MSI_FLAGS_QSIZE) >> 4),
 	 1 << ((cap & PCI_MSI_FLAGS_QMASK) >> 1),
-	 FLAG(cap, PCI_MSI_FLAGS_ENABLE));
+	 FLAG(cap, PCI_MSI_FLAGS_MASK_BIT),
+	 FLAG(cap, PCI_MSI_FLAGS_64BIT));
   if (verbose < 2)
     return;
   is64 = cap & PCI_MSI_FLAGS_64BIT;
@@ -1095,10 +1095,10 @@ cap_msix(struct device *d, int where, int cap)
 {
   u32 off;
 
-  printf("MSI-X: Enable%c Mask%c TabSize=%d\n",
+  printf("MSI-X: Enable%c Count=%d Masked%c\n",
 	 FLAG(cap, PCI_MSIX_ENABLE),
-	 FLAG(cap, PCI_MSIX_MASK),
-	 (cap & PCI_MSIX_TABSIZE) + 1);
+	 (cap & PCI_MSIX_TABSIZE) + 1,
+	 FLAG(cap, PCI_MSIX_MASK));
   if (verbose < 2 || !config_fetch(d, where + PCI_MSIX_TABLE, 8))
     return;
 
