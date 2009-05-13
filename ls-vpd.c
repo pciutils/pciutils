@@ -198,7 +198,7 @@ cap_vpd(struct device *d)
 	default:
 	  printf("\t\tUnknown %s resource type %02x\n",
 		 (tag & 0x80) ? "large" : "small", tag & ~0x80);
-	  break;
+	  return;
 	}
 
       res_addr += res_len;
