@@ -1146,6 +1146,24 @@ cap_debug_port(int cap)
   printf("Debug port: BAR=%d offset=%04x\n", bar, pos);
 }
 
+static void
+cap_af(struct device *d, int where)
+{
+  u8 reg;
+
+  printf("PCI Advanced Features\n");
+  if (verbose < 2 || !config_fetch(d, where + PCI_AF_CAP, 3))
+    return;
+
+  reg = get_conf_byte(d, where + PCI_AF_CAP);
+  printf("\t\tAFCap: TP%c FLR%c\n", FLAG(reg, PCI_AF_CAP_TP),
+	 FLAG(reg, PCI_AF_CAP_FLR));
+  reg = get_conf_byte(d, where + PCI_AF_CTRL);
+  printf("\t\tAFCtrl: FLR%c\n", FLAG(reg, PCI_AF_CTRL_FLR));
+  reg = get_conf_byte(d, where + PCI_AF_STATUS);
+  printf("\t\tAFStatus: TP%c\n", FLAG(reg, PCI_AF_STATUS_TP));
+}
+
 void
 show_caps(struct device *d)
 {
@@ -1238,7 +1256,7 @@ show_caps(struct device *d)
 	      printf("SATA HBA <?>\n");
 	      break;
 	    case PCI_CAP_ID_AF:
-	      printf("PCIe advanced features <?>\n");
+	      cap_af(d, where);
 	      break;
 	    default:
 	      printf("#%02x [%04x]\n", id, cap);

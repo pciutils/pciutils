@@ -871,6 +871,15 @@
 #define PCI_SSVID_VENDOR	4
 #define PCI_SSVID_DEVICE	6
 
+/* PCI Advanced Features */
+#define PCI_AF_CAP		3
+#define  PCI_AF_CAP_TP		0x01
+#define  PCI_AF_CAP_FLR		0x02
+#define PCI_AF_CTRL		4
+#define  PCI_AF_CTRL_FLR	0x01
+#define PCI_AF_STATUS		5
+#define  PCI_AF_STATUS_TP	0x01
+
 /* Advanced Error Reporting */
 #define PCI_ERR_UNCOR_STATUS	4	/* Uncorrectable Error Status */
 #define  PCI_ERR_UNC_TRAIN	0x00000001	/* Undefined in PCIe rev1.1 & 2.0 spec */
