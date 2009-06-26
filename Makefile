@@ -131,6 +131,6 @@ ifeq ($(SHARED),yes)
 endif
 
 pci.ids.gz: pci.ids
-	gzip -9 <$< >$@
+	gzip -9n <$< >$@
 
 .PHONY: all clean distclean install install-lib uninstall force
