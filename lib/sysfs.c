@@ -221,11 +221,13 @@ sysfs_fill_slots(struct pci_access *a)
       if (n < 0 || n >= OBJNAMELEN)
 	a->error("File name too long");
       file = fopen(namebuf, "r");
+      /*
+       * Old versions of Linux had a fakephp which didn't have an 'address'
+       * file.  There's no useful information to be gleaned from these
+       * devices, pretend they're not there.
+       */
       if (!file)
-	{
-	  a->warning("sysfs_fill_slots: Cannot open %s: %s", namebuf, strerror(errno));
-	  continue;
-	}
+	continue;
 
       if (!fgets(buf, sizeof(buf), file) || sscanf(buf, "%x:%x:%x", &dom, &bus, &dev) < 3)
 	a->warning("sysfs_fill_slots: Couldn't parse entry address %s", buf);
