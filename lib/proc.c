@@ -131,6 +131,15 @@ proc_setup(struct pci_dev *d, int rw)
       a->fd_rw = a->writeable || rw;
       a->fd = open(buf, a->fd_rw ? O_RDWR : O_RDONLY);
       if (a->fd < 0)
+	{
+	  e = snprintf(buf, sizeof(buf), "%s/%04x:%02x/%02x.%d",
+		       pci_get_param(a, "proc.path"),
+		       d->domain, d->bus, d->dev, d->func);
+	  if (e < 0 || e >= (int) sizeof(buf))
+	    a->error("File name too long");
+	  a->fd = open(buf, a->fd_rw ? O_RDWR : O_RDONLY);
+	}
+      if (a->fd < 0)
 	a->warning("Cannot open %s", buf);
       a->cached_dev = d;
       a->fd_pos = 0;
