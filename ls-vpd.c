@@ -41,7 +41,7 @@ static const struct vpd_item {
   { 'Y','A', F_TEXT,	"Asset tag" },
   { 'V', 0 , F_TEXT,	"Vendor specific" },
   { 'Y', 0 , F_TEXT,	"System specific" },
-  {  0,  0 , F_BINARY,	NULL }
+  {  0,  0 , F_BINARY,	"Unknown" }
 };
 
 static void
@@ -149,27 +149,21 @@ cap_vpd(struct device *d)
 	    {
 	      word read_len;
 	      const struct vpd_item *item;
-	      struct vpd_item unknown_item;
+	      byte id1, id2;
 
 	      if (!read_vpd(d, res_addr + part_pos, buf, 3, &csum))
 		break;
 	      part_pos += 3;
+	      id1 = buf[0];
+	      id2 = buf[1];
 	      part_len = buf[2];
 	      if (part_len > res_len - part_pos)
 		break;
 
 	      /* Is this item known? */
-	      for (item=vpd_items; item->id1 && item->id1 != buf[0] ||
-				   item->id2 && item->id2 != buf[1]; item++)
+	      for (item=vpd_items; item->id1 && item->id1 != id1 ||
+				   item->id2 && item->id2 != id2; item++)
 		;
-	      if (!item->id1 && !item->id2)
-	        {
-		  unknown_item.id1 = buf[0];
-		  unknown_item.id2 = buf[1];
-		  unknown_item.format = F_BINARY;
-		  unknown_item.name = "Unknown";
-		  item = &unknown_item;
-	        }
 
 	      /* Only read the first byte of the RV field because the
 	       * remaining bytes are not included in the checksum. */
@@ -177,7 +171,7 @@ cap_vpd(struct device *d)
 	      if (!read_vpd(d, res_addr + part_pos, buf, read_len, &csum))
 		break;
 
-	      printf("\t\t\t[%c%c] %s: ", item->id1, item->id2, item->name);
+	      printf("\t\t\t[%c%c] %s: ", id1, id2, item->name);
 
 	      switch (item->format)
 	        {
