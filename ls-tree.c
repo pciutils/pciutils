@@ -179,9 +179,9 @@ show_tree_dev(struct device *d, char *line, char *p)
     if (b->br_dev == d)
       {
 	if (b->secondary == b->subordinate)
-	  p += sprintf(p, "-[%04x:%02x]-", b->domain, b->secondary);
+	  p += sprintf(p, "-[%02x]-", b->secondary);
 	else
-	  p += sprintf(p, "-[%04x:%02x-%02x]-", b->domain, b->secondary, b->subordinate);
+	  p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
         show_tree_bridge(b, line, p);
         return;
       }
