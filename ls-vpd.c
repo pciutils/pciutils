@@ -196,7 +196,7 @@ cap_vpd(struct device *d)
 	  break;
 
 	default:
-	  printf("\t\tUnknown %s resource type %02x\n",
+	  printf("\t\tUnknown %s resource type %02x, will not decode more.\n",
 		 (tag & 0x80) ? "large" : "small", tag & ~0x80);
 	  return;
 	}
