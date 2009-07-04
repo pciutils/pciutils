@@ -158,10 +158,9 @@ Applies only to Linux systems with recent enough module tools.
 .TP
 .B -M
 Invoke bus mapping mode which performs a thorough scan of all PCI devices, including
-those behind misconfigured bridges etc. This option is available only to root and it
-gives meaningful results only if combined with direct hardware access mode (otherwise
-the results are identical to normal listing modes, modulo bugs in lspci). Please note
-that the bus mapper doesn't support PCI domains and scans only domain 0.
+those behind misconfigured bridges, etc. This option gives meaningful results only
+with a direct hardware access mode, which usually requires root privileges.
+Please note that the bus mapper only scans PCI domain 0.
 .TP
 .B --version
 Shows
