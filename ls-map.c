@@ -164,6 +164,7 @@ void
 map_the_bus(void)
 {
   if (pacc->method == PCI_ACCESS_PROC_BUS_PCI ||
+      pacc->method == PCI_ACCESS_SYS_BUS_PCI ||
       pacc->method == PCI_ACCESS_DUMP)
     printf("WARNING: Bus mapping can be reliable only with direct hardware access enabled.\n\n");
   bus_info = xmalloc(sizeof(struct bus_info) * 256);
