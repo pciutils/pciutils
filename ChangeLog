@@ -1,3 +1,43 @@
+2009-07-04  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.3.
+
+	* Updated pci.ids to the current snapshot of the database.
+
+	* The VPD parser now reports unknown and vendor-defined items
+	properly. It also stops on any item in unknown format, avoiding long
+	output on bogus VPD data. Thanks to Ben Hutchings and Matthew Wilcox.
+
+	* The MSI-X table size now matches the spec. Thanks to Michael S.
+	Tsirkin.
+
+	* The Power Management capability now includes the soft reset bit.
+	Thanks to Yu Zhao.
+
+	* Decoding of the Advanced Features capability has been added.
+	Thanks to Yu Zhao.
+
+	* The whole package compiles on GNU/kFreeBSD again.
+
+	The following patches have been contributed by Matthew Wilcox:
+
+	* The procfs back-end is able to cope with /proc/bus/pci
+	containing names with domains, which occur on sparc64 and
+	possibly other architectures due to a kernel bug.
+
+	* The sysfs back-end no longer complains when a slot address
+	is missing, which happens with old versions of Linux fakephp.
+
+	* The Device Serial Number capability is printed in the right
+	byte order.
+
+	* The MSI and MSI-X capabilities are printed in a prettier way.
+
+	* The tree output mode (`lspci -t') shows domain numbers only
+	at the root, which makes the output more compact.
+
+	* Updated documentation on the bus mapping mode (`lspci -M').
+
 2009-02-01  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.2.
