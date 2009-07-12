@@ -182,28 +182,32 @@ cap_sriov(struct device *d, int where)
   printf("\t\tSupported Page Size: %08x, ", l);
   l = get_conf_long(d, where + PCI_IOV_SYSPS);
   printf("System Page Size: %08x\n", l);
-  for (i=0; i<PCI_IOV_NUM_BAR; i++) {
-    pciaddr_t addr;
-    int type;
-    u32 h;
-    l = get_conf_long(d, where + PCI_IOV_BAR_BASE + (i*4));
-    if (l == 0xffffffff)
-      l = 0;
-    if (!l)
-      continue;
-    printf("\t\tRegion %d: Memory at ", i);
-    addr = l & PCI_ADDR_MEM_MASK;
-    type = l & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
-    if (type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
-       i++;
-       h = get_conf_long(d, where + PCI_IOV_BAR_BASE + (i*4));
-       addr |= (pciaddr_t)h<<32;
+
+  for (i=0; i < PCI_IOV_NUM_BAR; i++)
+    {
+      pciaddr_t addr;
+      int type;
+      u32 h;
+      l = get_conf_long(d, where + PCI_IOV_BAR_BASE + 4*i);
+      if (l == 0xffffffff)
+	l = 0;
+      if (!l)
+	continue;
+      printf("\t\tRegion %d: Memory at ", i);
+      addr = l & PCI_ADDR_MEM_MASK;
+      type = l & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
+      if (type == PCI_BASE_ADDRESS_MEM_TYPE_64)
+	{
+	  i++;
+	  h = get_conf_long(d, where + PCI_IOV_BAR_BASE + (i*4));
+	  addr |= (pciaddr_t)h<<32;
+	}
+      printf(PCIADDR_T_FMT, addr);
+      printf(" (%s-bit, %sprefetchable)\n",
+	(type == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32" : "64",
+	(l & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
     }
-    printf(PCIADDR_T_FMT, addr);
-    printf(" (%s-bit, %sprefetchable)\n",
-           (type == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32" : "64",
-           (l & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
-  }
+
   l = get_conf_long(d, where + PCI_IOV_MSAO);
   printf("\t\tVF Migration: offset: %08x, BIR: %x\n", PCI_IOV_MSA_OFFSET(l),
 	PCI_IOV_MSA_BIR(l));
