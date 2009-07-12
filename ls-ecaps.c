@@ -185,7 +185,7 @@ cap_sriov(struct device *d, int where)
 
   for (i=0; i < PCI_IOV_NUM_BAR; i++)
     {
-      pciaddr_t addr;
+      u32 addr;
       int type;
       u32 h;
       l = get_conf_long(d, where + PCI_IOV_BAR_BASE + 4*i);
@@ -200,10 +200,10 @@ cap_sriov(struct device *d, int where)
 	{
 	  i++;
 	  h = get_conf_long(d, where + PCI_IOV_BAR_BASE + (i*4));
-	  addr |= (pciaddr_t)h<<32;
+	  printf("%08x", h);
 	}
-      printf(PCIADDR_T_FMT, addr);
-      printf(" (%s-bit, %sprefetchable)\n",
+      printf("%08x (%s-bit, %sprefetchable)\n",
+	addr,
 	(type == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32" : "64",
 	(l & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
     }
