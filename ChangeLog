@@ -1,3 +1,19 @@
+2009-08-14  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.4 (sorry that I have missed 22/7 and released
+	it later :-))
+
+	* Updated pci.ids to the today's snapshot of the database.
+
+	* Fixed memory and file descriptor leak in the dump back-end.
+	
+	* The SR-IOV capability decoder now prints the VF BAR's.
+	Patch by Chris Wright, cleaned up by me.
+
+	* On request of certain company's lawyers, we now include a copy
+	of the GPL with our package. It seems that the pciutils are getting
+	mature if the most important bug of the month was this one ;-)
+
 2009-07-04  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.3.
