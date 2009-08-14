@@ -1,7 +1,7 @@
 2009-08-14  Martin Mares <mj@ucw.cz>
 
-	* Released as 3.1.4 (sorry that I have missed 22/7 and released
-	it later :-))
+	* Released as 3.1.4.
+	  (sorry that I have missed 22/7 and released it later :-))
 
 	* Updated pci.ids to the today's snapshot of the database.
 
