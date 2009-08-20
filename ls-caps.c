@@ -798,7 +798,7 @@ static void cap_express_slot(struct device *d, int where)
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_SLTCAP);
-  printf("\t\tSltCap:\tAttnBtn%c PwrCtrl%c MRL%c AttnInd%c PwrInd%c HotPlug%c Surpise%c\n",
+  printf("\t\tSltCap:\tAttnBtn%c PwrCtrl%c MRL%c AttnInd%c PwrInd%c HotPlug%c Surprise%c\n",
 	FLAG(t, PCI_EXP_SLTCAP_ATNB),
 	FLAG(t, PCI_EXP_SLTCAP_PWRC),
 	FLAG(t, PCI_EXP_SLTCAP_MRL),
