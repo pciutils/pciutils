@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2009.07.04
-#	Date:    2009-07-04 18:08:58
+#	Version: 2009.08.14
+#	Date:    2009-08-14 14:32:03
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pciids.sf.net/.
@@ -1518,12 +1518,16 @@
 	9489  M96 XT [Mobility FireGL V5725]
 	9490  RV730XT [Radeon HD 4670]
 		174b e880  Radeon HD 4670 512MB DDR3
+	9491  M96 CSP [ATI RADEON E4690]
 	9495  HD 4650
+		1002 9495  RV730 XT [PowerColor Radeon HD4670 AGP 1GB DDR]
 	9498  RV730 PRO [Radeon HD 4650]
 	949f  RV730 [FirePro V5700]
 	94a0  Mobility Radeon HD 4830 [M97]
 	94a1  [M97 XT] Mobility Radeon HD 4860
+	94a3  M97 GL [ATI FirePro M7740]
 	94b3  Radeon HD 4770 [RV740]
+	94b4  RV740 LE [ATI Radeon HD 4700 Series]
 	94c1  RV610 [Radeon HD 2400 XT]
 		1028 0211  Optiplex 755
 		1028 0d02  Optiplex 755
@@ -3938,7 +3942,7 @@
 		108e a001  Ultra IIe on Blade 100 motherboard
 	a801  Schizo Fireplane-PCI bus bridge module [pcisch]
 	abba  Cassini 10/100/1000
-	abcd  Multithreaded 10 Gigabit Ethernet Network Controller
+	abcd  Multithreaded 10-Gigabit Ethernet Network Controller
 	c416  Sun Fire System/System Controller Interface chip [sbbc]
 108f  Systemsoft
 1090  Compro Computer Services, Inc.
@@ -4435,6 +4439,7 @@
 		1517 000f  ECDR-GC314-PMC Receiver
 		1885 0700  Tsunami FPGA PMC with Altera Stratix S40
 		1885 0701  Tsunami FPGA PMC with Altera Stratix S30
+	a100  Blackmagic Design DeckLink
 	bb04  B&B 3PCIOSD1A Isolated PCI Serial
 	c001  CronyxOmega-PCI (8-port RS232)
 10b6  Madge Networks
@@ -7652,12 +7657,13 @@
 1136  Momentum Data Systems
 	0002  PCI-JTAG
 1137  Cisco Systems Inc
-	0023  PCIe Upstream Port Bridge
-	0041  PCIe Downstream Port Bridge
-	0043  10G Ethernet NIC
-		1137 0048  Mezzanine
-	0045  FCoE HBA
-		1137 0048  Mezzanine
+	0023  81 VIC PCIe Upstream Port
+	0040  VIC PCIe Upstream Port
+	0041  VIC PCIe Downstream Port
+	0043  VIC Ethernet NIC
+		1137 0048  M81KR Mezzanine
+	0045  VIC FCoE HBA
+		1137 0048  M81KR Mezzanine
 1138  Ziatech Corporation
 	8905  8905 [STD 32 Bridge]
 1139  Dynamic Pictures, Inc
@@ -10232,6 +10238,7 @@
 	0020  7955 Security Processor
 	0026  8155 Security Processor
 	002e  9630 Compression Processor
+	0037  DS4100 Secure Multi-Gigabit Server Adapter with Compression
 13a4  Rascom Inc
 13a5  Audio Digital Imaging Inc
 13a6  Videonics Inc
@@ -11017,7 +11024,7 @@
 		103c 7059  NC382T PCI Express Dual Port Multifunction Gigabit Server Adapter
 		10a9 8027  Quad port Gigabit Ethernet Controller
 	163a  NetXtreme II BCM5709S Gigabit Ethernet
-		1028 027b  PowerEdge M610 Broadcom NetXtreme II BCM5709S
+		1028 027b  PowerEdge M805 Broadcom NetXtreme II BCM5709S
 		1028 029c  PowerEdge M710 BCM5709S Gigabit Ethernet
 		103c 171d  NC382m Dual Port 1GbE Multifunction BL-c Adapter
 		103c 7056  NC382i Integrated Quad Port PCI Express Gigabit Server Adapter
@@ -11115,11 +11122,11 @@
 		103c 7038  NC373i Integrated Multifunction Gigabit Server Adapter
 		103c 7045  NC374m PCI Express Dual Port Multifunction Gigabit Server Adapter
 	164d  NetXtreme BCM5702FE Gigabit Ethernet
-	164e  NetXtreme II BCM57710 10Gigabit PCIe [Everest]
+	164e  NetXtreme II BCM57710 10-Gigabit PCIe [Everest]
 		103c 171c  NC532m Dual Port 10GbE Multifunction BL-C Adapter
 		103c 7058  NC532i Dual Port 10GbE Multifunction BL-C Adapter
-	164f  NetXtreme II BCM57711 10Gigabit PCIe
-	1650  NetXtreme II BCM57711E 10Gigabit PCIe
+	164f  NetXtreme II BCM57711 10-Gigabit PCIe
+	1650  NetXtreme II BCM57711E 10-Gigabit PCIe
 		103c 171c  NC532m Dual Port 10GbE Multifunction BL-C Adapter
 		103c 7058  NC532i Dual Port 10GbE Multifunction BL-C Adapter
 	1653  NetXtreme BCM5705 Gigabit Ethernet
@@ -11201,6 +11208,7 @@
 	1681  NetXtreme BCM5761 Gigabit Ethernet PCIe
 	1684  NetXtreme BCM5764M Gigabit Ethernet PCIe
 	1690  NetXtreme BCM57760 Gigabit Ethernet PCIe
+	1691  NetLink BCM57788 Gigabit Ethernet PCIe
 	1692  NetLink BCM57780 Gigabit Ethernet PCIe
 	1693  NetLink BCM5787M Gigabit Ethernet PCI Express
 		1025 0121  Aspire 5920G
@@ -11712,6 +11720,7 @@
 		0070 8010  Hauppauge WinTV HVR-1400 ExpressCard
 		1461 c039  AVerTV Hybrid Express (A577)
 		18ac db78  FusionHDTV DVB-T Dual Express
+	8880  Hauppauge Inc. HDPVR-1250 model 1196
 14f2  MOBILITY Electronics
 	0120  EV1000 bridge
 	0121  EV1000 Parallel port
@@ -12066,9 +12075,12 @@
 	6340  MT25408 [ConnectX VPI - IB SDR / 10GigE]
 	634a  MT25418 [ConnectX VPI PCIe 2.0 2.5GT/s - IB DDR / 10GigE]
 	6368  MT25448 [ConnectX EN 10GigE, PCIe 2.0 2.5GT/s]
+	6372  MT25408 [ConnectX EN 10GigE 10GBaseT, PCIe 2.0 2.5GT/s]
 	6732  MT26418 [ConnectX VPI PCIe 2.0 5GT/s - IB DDR / 10GigE]
 	673c  MT26428 [ConnectX VPI PCIe 2.0 5GT/s - IB QDR / 10GigE]
+	6746  MT25408 [ConnectX EN 40GigE PCIe 2.0 5GT/s]
 	6750  MT26448 [ConnectX EN 10GigE, PCIe 2.0 5GT/s]
+	675a  MT25408 [ConnectX EN 10GigE 10GBaseT, PCIe Gen2 5GT/s]
 	6764  MT26468 [ConnectX EN 10GigE, PCIe 2.0 5GT/s]
 15b4  CCI/TRIAD
 15b5  Cimetrics Inc
@@ -12222,6 +12234,7 @@
 1641  MKNet Corp.
 1657  Brocade Communications Systems, Inc.
 	0013  425 4Gb/825 8Gb PCIe Dual port FC HBA
+	0014  BR-1020 FC/FCOE 10GB Eth / FC over Eth
 	0017  415 4Gb/815 8Gb PCIe FC HBA
 # Same Device_ID used for 410 (1port) and 420 (2 port) HBAs.
 	0646  Brocade 400 4Gb PCIe FC HBA
@@ -12425,6 +12438,7 @@
 	5603  PMC-VSX95 Reconfigurable Virtex-5 FPGA with plug-in I/O
 	5604  PMC-VLX155 Reconfigurable Virtex-5 FPGA with plug-in I/O
 	5605  PMC-VFX70 Reconfigurable Virtex-5 FPGA with plug-in I/O
+	5606  PMC-VLX155-1M Reconfigurable Virtex-5 FPGA with plug-in I/O
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
 16df  PIKA Technologies Inc.
@@ -12456,7 +12470,7 @@
 	7174  VSC7174 PCI/PCI-X Serial ATA Host Bus Controller
 172a  Accelerated Encryption
 	13c8  AEP SureWare Runner 1000V3
-1734  Fujitsu Siemens Computers
+1734  Fujitsu Technology Solutions
 	1078  Amilo Pro v2010
 	1085  Celsius M450
 	1098  Amilo L 1310G
@@ -12579,16 +12593,37 @@
 	1260  ARC-1260 16-Port PCI-Express to SATA RAID Controller
 	1280  ARC-1231 12-Port PCI-Express to SATA RAID Controller
 	1680  ARC-1680 8 port PCIe/PCI-X to SAS/SATA II RAID Controller
-17d5  S2io Inc.
-	5731  Xframe 10GbE PCI-X
-	5732  Xframe II 10GbE [Hercules]
-	5831  Xframe 10 Gigabit Ethernet PCI-X
+# Nee S2io Inc.
+17d5  Neterion Inc.
+	5731  Xframe 10-Gigabit Ethernet PCI-X
+	5732  Xframe II 10-Gigabit Ethernet PCI-X 2.0
+	5831  Xframe 10-Gigabit Ethernet PCI-X
 		103c 12d5  PCI-X 133MHz 10GbE SR Fiber
-		10a9 8020  Single Port 10 Gigabit Ethernet (PCI-X, Fiber)
-		10a9 8024  Single Port 10 Gigabit Ethernet (PCI-X, Fiber)
-	5832  Xframe II 10Gbps Ethernet
+		10a9 8020  Single Port 10-Gigabit Ethernet (PCI-X, Fiber)
+		10a9 8024  Single Port 10-Gigabit Ethernet (PCI-X, Fiber)
+	5832  Xframe II 10-Gigabit Ethernet PCI-X 2.0
 		103c 1337  PCI-X 266MHz 10GigE SR [AD385A]
-		10a9 8021  Single Port 10 Gigabit Ethernet II (PCI-X, Fiber)
+		10a9 8021  Single Port 10-Gigabit Ethernet II (PCI-X, Fiber)
+		17d5 6020  Xframe II SR
+		17d5 6021  Xframe II SR, Low Profile
+		17d5 6022  Xframe E SR
+		17d5 6420  Xframe II LR
+		17d5 6421  Xframe II LR, Low Profile
+		17d5 6422  Xframe E LR
+		17d5 6c20  Xframe II CX4
+		17d5 6c21  Xframe II CX4, Low Profile
+		17d5 6c22  Xframe E CX4
+	5833  X3100 Series 10 Gigabit Ethernet PCIe
+		17d5 6030  X3110 Single Port SR
+		17d5 6031  X3120 Dual Port SR
+		17d5 6430  X3110 Single Port LR
+		17d5 6431  X3120 Dual Port LR
+		17d5 7030  X3110 Single Port LRM
+		17d5 7031  X3120 Dual Port LRM
+		17d5 7430  X3110 Single Port 10GBase-T
+		17d5 7431  X3120 Dual Port 10GBase-T
+		17d5 7830  X3110 Single Port 10GBase-CR
+		17d5 7831  X3120 Dual Port 10GBase-CR
 17db  Cray Inc
 	0101  XT Series [Seastar] 3D Toroidal Router
 17de  KWorld Computer Co. Ltd.
@@ -12767,11 +12802,29 @@
 	0001  OSCI [Octal Serial Communication Interface]
 18eb  Advance Multimedia Internet Technology, Inc.
 18ec  Cesnet, z.s.p.o.
+	6d05  ML555
+		18ec 0100  NIC (ethernet interfaces)
+		18ec 0200  NIC (szedata2) 4x1G
+		18ec 0201  NIC (szedata2) 2x10G
+		18ec 0300  NIFIC (szedata2) 4x1G
+		18ec 0302  NIFIC (szedata2) 2x10G
+		18ec 4200  Flexible FlowMon (szedata2) 1x10G
+		18ec ff00  Testing design
+		18ec ff01  Boot design
 	c006  COMBO6
 		18ec d001  COMBO-4MTX
 		18ec d002  COMBO-4SFP
 		18ec d003  COMBO-4SFPRO
 		18ec d004  COMBO-2XFP
+	c032  COMBO-LXT110
+		18ec 0100  NIC (ethernet interfaces)
+		18ec 0200  NIC (szedata2) 4x1G
+		18ec 0201  NIC (szedata2) 2x10G
+		18ec 0300  NIFIC (szedata2) 4x1G
+		18ec 0302  NIFIC (szedata2) 2x10G
+		18ec 4200  Flexible FlowMon (szedata2) 1x10G
+		18ec ff00  Testing design
+		18ec ff01  Boot design
 	c045  COMBO6E
 	c050  COMBO-PTM
 	c058  COMBO6X
@@ -12779,8 +12832,32 @@
 		18ec d002  COMBO-4SFP
 		18ec d003  COMBO-4SFPRO
 		18ec d004  COMBO-2XFP
+	c132  COMBO-LXT155
+		18ec 0100  NIC (ethernet interfaces)
+		18ec 0200  NIC (szedata2) 4x1G
+		18ec 0201  NIC (szedata2) 2x10G
+		18ec 0300  NIFIC (szedata2) 4x1G
+		18ec 0302  NIFIC (szedata2) 2x10G
+		18ec 4200  Flexible FlowMon (szedata2) 1x10G
+		18ec ff00  Testing design
+		18ec ff01  Boot design
+	c232  COMBO-FXT100
+		18ec 0100  NIC (ethernet interfaces)
+		18ec 0200  NIC (szedata2) 4x1G
+		18ec 0201  NIC (szedata2) 2x10G
+		18ec 0300  NIFIC (szedata2) 4x1G
+		18ec 0302  NIFIC (szedata2) 2x10G
+		18ec 4200  Flexible FlowMon (szedata2) 1x10G
+		18ec ff00  Testing design
+		18ec ff01  Boot design
 18ee  Chenming Mold Ind. Corp.
 18f1  Spectrum GmbH
+18f4  Napatech A/S
+	0051  NT20-X Capture Card
+	0061  NT20E Capture Card
+	0071  NT4E Capture Card
+	0081  NT4E 8-port Expansion Card
+	0091  NT20X Capture Card [New Rev]
 18f6  NextIO
 	1000  [Nexsis] Switch Virtual P2P PCIe Bridge
 	1050  [Nexsis] Switch Virtual P2P PCI Bridge
@@ -12867,6 +12944,7 @@
 	0001  AHA36x-PCIX
 	0363  AHA363-PCIe
 	0364  AHA364-PCIe
+	0367  AHA367-PCIe
 1942  ClearSpeed Technology plc
 	e511  Advance X620 accelerator card
 	e521  Advance e620 accelerator card
@@ -12924,7 +13002,7 @@
 	a003  PWRficient SMBus Controller
 	a004  PWRficient 16550 UART
 	a005  PWRficient Gigabit Ethernet
-	a006  PWRficient 10Gigabit Ethernet
+	a006  PWRficient 10-Gigabit Ethernet
 	a007  PWRficient DMA Controller
 	a008  PWRficient LPC/Localbus Interface
 	a009  PWRficient L2 Cache
@@ -12994,6 +13072,9 @@
 	0700  Emulex OneConnect 10Gb NIC
 	0702  Emulex OneConnect 10Gb iSCSI Initiator
 	0704  Emulex OneConnect 10Gb FCoE Initiator
+	0710  Emulex OneConnect 10Gb NIC (be3)
+	0712  Emulex OneConnect 10Gb iSCSI Initiator (be3)
+	0714  Emulex OneConnect 10Gb FCoE Initiator (be3)
 19a8  DAQDATA GmbH
 19ac  Kasten Chase Applied Research
 	0001  ACA2400 Crypto Accelerator
@@ -13056,7 +13137,7 @@
 1a77  Lightfleet Corporation
 1a78  Virident Systems Inc.
 1a84  Commex Technologies
-	0001  Vulcan SP HT6210 10 Gigabit Ethernet (rev 02)
+	0001  Vulcan SP HT6210 10-Gigabit Ethernet (rev 02)
 1a88  MEN Mikro Elektronik
 	4d45  Multifunction IP core
 1a8c  Verigy Pte. Ltd.
@@ -13119,9 +13200,9 @@
 	000d  IBA6110 InfiniBand HCA
 	0010  IBA6120 InfiniBand HCA
 1fc9  Tehuti Networks Ltd.
-	3009  10 Giga TOE SmartNIC
-	3010  10 Giga TOE SmartNIC
-	3014  10 Giga TOE SmartNIC 2-Port
+	3009  10-Giga TOE SmartNIC
+	3010  10-Giga TOE SmartNIC
+	3014  10-Giga TOE SmartNIC 2-Port
 1fce  Cognio Inc.
 	0001  Spectrum Analyzer PC Card (SAgE)
 1fd4  SUNIX Co., Ltd.
@@ -13171,6 +13252,7 @@
 		3388 8012  VXPro II Chipset PCI to ISA Bridge
 	8013  VXPro II IDE
 		3388 8013  VXPro II Chipset EIDE Controller
+	a103  Blackmagic Design DeckLink HD Pro
 3411  Quantum Designs (H.K.) Inc
 3442  Bihl+Wiedemann GmbH
 	1783  AS-i 3.0 cPCI Master
@@ -13246,17 +13328,17 @@
 4033  Addtron Technology Co, Inc.
 	1360  RTL8139 Ethernet
 4040  NetXen Incorporated
-	0001  NXB-10GXSR 10 Gigabit Ethernet PCIe Adapter with SR-XFP optical interface
-		103c 7047  NC510F PCIe 10 Gigabit Server Adapter
-	0002  NXB-10GCX4 10 Gigabit Ethernet PCIe Adapter with CX4 copper interface
-		103c 7048  NC510c PCIe 10Gigabit Server Adapter
+	0001  NXB-10GXSR 10-Gigabit Ethernet PCIe Adapter with SR-XFP optical interface
+		103c 7047  NC510F PCIe 10-Gigabit Server Adapter
+	0002  NXB-10GCX4 10-Gigabit Ethernet PCIe Adapter with CX4 copper interface
+		103c 7048  NC510c PCIe 10-Gigabit Server Adapter
 	0003  NXB-4GCU Quad Gigabit Ethernet PCIe Adapter with 1000-BASE-T interface
-	0004  BladeCenter-H 10 Gigabit Ethernet High Speed Daughter Card
+	0004  BladeCenter-H 10-Gigabit Ethernet High Speed Daughter Card
 	0005  NetXen Dual Port 10GbE Multifunction Adapter for c-Class
 		103c 170e  NC512m Dual Port 10GbE Multifunction BL-C Adapter
 	0024  XG Mgmt
 	0025  XG Mgmt
-	0100  NX3031 Multifunction 1/10 Gigabit Server Adapter
+	0100  NX3031 Multifunction 1/10-Gigabit Server Adapter
 		103c 171b  NC522m Dual Port 10GbE Multifunction BL-c Adapter
 		103c 3251  NC375i 1G w/NC524SFP 10G Module
 		103c 705a  NC375i Integrated Quad Port Multifunction Gigabit Server Adapter
@@ -13344,16 +13426,68 @@
 4468  Bridgeport machines
 4594  Cogetec Informatique Inc
 45fb  Baldor Electric Company
+4624  Budker Institute of Nuclear Physics
+	adc1  ADC200ME High speed ADC
+	de01  DL200ME High resolution delay line PCI based card
+	de02  DL200ME Middle resolution delay line PCI based card
 4680  Umax Computer Corp
 4843  Hercules Computer Technology Inc
 4916  RedCreek Communications Inc
 	1960  RedCreek PCI adapter
 4943  Growth Networks
 494f  ACCES I/O Products, Inc.
-	0c60  PCI-DIO-48
-	0e60  PCI-DIO-48S
-	10e8  LPCI-COM-8SM
+	0520  PCI-IDO-48
+	0920  PCI-IDI-48
+	0c50  PCI-DIO-24H
+	0c51  PCI-DIO-24D
+	0c60  PCI-DIO-48(H)
+	0c68  PCI-DIO-72
+	0c70  PCI-DIO-96
+	0c78  PCI-DIO-120
+	0dc8  PCI-IDIO-16
+	0e50  PCI-DIO-24S
+	0e51  PCI-DIO-24H(C)
+	0e52  PCI-DIO-24D(C)
+	0e60  PCI-DIO-48S(H)
+	0e61  P104-DIO-24S
+	0f00  PCI-IIRO-8
+	0f01  LPCI-IIRO-8
+	0f08  PCI-IIRO-16
+	1050  PCI-422/485-2
+	1058  PCI-COM422/4
+	1059  PCI-COM485/4
+	1068  PCI-COM422/8
+	1069  PCI-COM485/8
+	1088  PCI-COM232/1
+	1090  PCI-COM232/2
+	10a8  P104-COM232-8
+	10c9  PCI-COM-1S
+	10d0  PCI-COM2S
+	10e8  PCI-COM-8SM
+	1148  PCI-ICM-1S
+	1150  PCI-ICM-2S
+	1158  PCI-ICM422/4
+	1159  PCI-ICM485/4
+	1250  PCI-WDG-2S
+	12d0  PCI-WDG-IMPAC
 	22c0  PCI-WDG-CSM
+	2c50  PCI-DIO-96CT
+	2c58  PCI-DIO-96C3
+	5ed0  PCI-DAC
+	6c90  PCI-DA12-2
+	6c98  PCI-DA12-4
+	6ca0  PCI-DA12-6
+	6ca8  PCI-DA12-8
+	6ca9  PCI-DA12-8V
+	6cb0  PCI-DA12-16
+	6cb1  PCI-DA12-16V
+	8ef0  P104-FAS16-16
+	aca8  PCI-AI12-16
+	aca9  PCI-AI12-16A
+	eca8  PCI-AIO12-16
+	eca9  PCI-A12-16
+	ecaa  PCI-A12-16A
+	ece8  PCI-A16-16
 4978  Axil Computer Inc
 4a14  NetVin
 	5000  NV5000SC
@@ -14036,19 +14170,19 @@
 	10c3  82562GT-2 10/100 Network Connection
 	10c4  82562GT 10/100 Network Connection
 	10c5  82562G 10/100 Network Connection
-	10c6  82598EB 10 Gigabit AF Dual Port Network Connection
-		8086 a05f  10 Gigabit XF SR Dual Port Server Adapter
-		8086 a15f  10 Gigabit XF SR Dual Port Server Adapter
-	10c7  82598EB 10 Gigabit AF Network Connection
-		1014 037f  10 Gigabit XF SR Server Adapter
-		1014 0380  10 Gigabit XF LR Server Adapter
-		8086 a05f  10 Gigabit XF SR Server Adapter
-		8086 a15f  10 Gigabit XF SR Server Adapter
-		8086 a16f  10 Gigabit XF SR Server Adapter
-	10c8  82598EB 10 Gigabit AT Network Connection
-		8086 a10c  10 Gigabit AT Server Adapter
-		8086 a11c  10 Gigabit AT Server Adapter
-		8086 a12c  10 Gigabit AT Server Adapter
+	10c6  82598EB 10-Gigabit AF Dual Port Network Connection
+		8086 a05f  10-Gigabit XF SR Dual Port Server Adapter
+		8086 a15f  10-Gigabit XF SR Dual Port Server Adapter
+	10c7  82598EB 10-Gigabit AF Network Connection
+		1014 037f  10-Gigabit XF SR Server Adapter
+		1014 0380  10-Gigabit XF LR Server Adapter
+		8086 a05f  10-Gigabit XF SR Server Adapter
+		8086 a15f  10-Gigabit XF SR Server Adapter
+		8086 a16f  10-Gigabit XF SR Server Adapter
+	10c8  82598EB 10-Gigabit AT Network Connection
+		8086 a10c  10-Gigabit AT Server Adapter
+		8086 a11c  10-Gigabit AT Server Adapter
+		8086 a12c  10-Gigabit AT Server Adapter
 	10c9  82576 Gigabit Network Connection
 		103c 31ef  NC362i Integrated Dual port Gigabit Server Adapter
 		103c 323f  NC362i Integrated Dual port Gigabit Server Adapter
@@ -14073,10 +14207,10 @@
 	10da  82571EB Quad Port Gigabit Mezzanine Adapter
 		103c 1717  NC364m Quad Port 1GbE BL-c Adapter
 	10db  82598EB 10-Gigabit Dual Port Network Connection
-	10dd  82598EB 10 Gigabit AT CX4 Network Connection
+	10dd  82598EB 10-Gigabit AT CX4 Network Connection
 	10de  82567LM-3 Gigabit Network Connection
 	10df  82567LF-3 Gigabit Network Connection
-	10e1  82598EB 10 Gigabit AF Dual Port Network Connection
+	10e1  82598EB 10-Gigabit AF Dual Port Network Connection
 		8086 a15f  10-Gigabit SR Dual Port Express Module
 	10e2  82575GB Gigabit Network Connection
 		8086 10e2  Gigabit VT Quad Port Server Adapter
@@ -14092,28 +14226,28 @@
 	10ea  82577LM Gigabit Network Connection
 	10eb  82577LC Gigabit Network Connection
 	10ec  82598EB 10-Gigabit AT CX4 Network Connection
-		8086 a01f  10 Gigabit CX4 Dual Port Server Adapter
-		8086 a11f  10 Gigabit CX4 Dual Port Server Adapter
+		8086 a01f  10-Gigabit CX4 Dual Port Server Adapter
+		8086 a11f  10-Gigabit CX4 Dual Port Server Adapter
 	10ef  82578DM Gigabit Network Connection
 	10f0  82578DC Gigabit Network Connection
 	10f1  82598EB 10-Gigabit AF Dual Port Network Connection
 		8086 a20f  10-Gigabit AF DA Dual Port Server Adapter
 		8086 a21f  10-Gigabit AF DA Dual Port Server Adapter
 	10f4  82598EB 10-Gigabit AF Network Connection
-		8086 106f  10 Gigabit XF LR Server Adapter
+		8086 106f  10-Gigabit XF LR Server Adapter
 		8086 a06f  10-Gigabit XF LR Server Adapter
 	10f5  82567LM Gigabit Network Connection
 	10f6  82574L Gigabit Network Connection
-	10f7  82599EB 10 Gigabit KX4 Network Connection
+	10f7  82599EB 10-Gigabit KX4 Network Connection
 		8086 000d  Ethernet Mezzanine Adapter X520-KX4-2
-	10fb  82599EB 10 Gigabit Network Connection
+	10fb  82599EB 10-Gigabit Network Connection
 		108e 7b11  Ethernet Server Adapter X520-2
 		8086 0002  Ethernet Server Adapter X520-DA2
 		8086 0003  Ethernet Server Adapter X520-2
 		8086 0006  Ethernet Server Adapter X520-1
 		8086 000a  Ethernet Server Adapter X520-1
 		8086 000c  Ethernet Server Adapter X520-2
-	10fc  82599EB 10 Gigabit Dual Port Network Connection
+	10fc  82599EB 10-Gigabit Dual Port Network Connection
 	10fe  82552 10/100 Network Connection
 	1107  PRO/1000 MF Server Adapter (LX)
 	1130  82815 815 Chipset Host Bridge and Memory Controller Hub
@@ -14335,6 +14469,10 @@
 	1462  82870P2 P64H2 Hot Plug Controller
 	1508  82598EB Gigabit BX Network Connection
 	150a  82576NS Gigabit Network Connection
+	150b  82598EB 10-Gigabit AT2 Server Adapter
+		8086 a10c  82598EB 10-Gigabit AT2 Server Adapter
+		8086 a11c  82598EB 10-Gigabit AT2 Server Adapter
+		8086 a12c  82598EB 10-Gigabit AT2 Server Adapter
 	150c  82583V Gigabit Network Connection
 	1960  80960RP (i960RP) Microprocessor
 		101e 0431  MegaRAID 431 RAID Controller

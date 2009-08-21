@@ -238,7 +238,6 @@ sysfs_fill_slots(struct pci_access *a)
 	      {
 		d->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
 		strcpy(d->phy_slot, entry->d_name);
-		break;
 	      }
 	}
       fclose(file);

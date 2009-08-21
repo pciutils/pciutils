@@ -70,7 +70,10 @@ dump_init(struct pci_access *a)
     {
       char *z = strchr(buf, '\n');
       if (!z)
-	a->error("dump: line too long or unterminated");
+	{
+	  fclose(f);
+	  a->error("dump: line too long or unterminated");
+	}
       *z-- = 0;
       if (z >= buf && *z == '\r')
 	*z-- = 0;
@@ -95,7 +98,10 @@ dump_init(struct pci_access *a)
 		 sscanf(z, "%x", &j) == 1 && j < 256)
 	    {
 	      if (i >= 4096)
-		a->error("dump: At most 4096 bytes of config space are supported");
+		{
+		  fclose(f);
+		  a->error("dump: At most 4096 bytes of config space are supported");
+		}
 	      if (i >= dd->allocated)	/* Need to re-allocate the buffer */
 		{
 		  dump_alloc_data(dev, 4096);
@@ -111,9 +117,13 @@ dump_init(struct pci_access *a)
 		z++;
 	    }
 	  if (*z)
-	    a->error("dump: Malformed line");
+	    {
+	      fclose(f);
+	      a->error("dump: Malformed line");
+	    }
 	}
     }
+  fclose(f);
 }
 
 static void
