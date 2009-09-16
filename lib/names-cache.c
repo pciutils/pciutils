@@ -1,10 +1,15 @@
 /*
  *	The PCI Library -- ID to Name Cache
  *
- *	Copyright (c) 2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 2008--2009 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
+
+#include "internal.h"
+#include "names.h"
+
+#ifdef PCI_USE_DNS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,11 +18,6 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <unistd.h>
-
-#include "internal.h"
-#include "names.h"
-
-#ifdef PCI_USE_DNS
 
 static const char cache_version[] = "#PCI-CACHE-1.0";
 
