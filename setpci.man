@@ -124,7 +124,7 @@ where both
 .I data
 and
 .I mask
-are hexdecimal numbers. In the latter case, only the bits corresponding to binary
+are hexadecimal numbers. In the latter case, only the bits corresponding to binary
 ones in the \fImask\fP are changed (technically, this is a read-modify-write operation).
 
 .PP
