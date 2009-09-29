@@ -96,8 +96,8 @@ pci_free_caps(struct pci_dev *d)
 
   while (cap = d->first_cap)
     {
-      d->first_cap = cap;
-      pci_mfree(d);
+      d->first_cap = cap->next;
+      pci_mfree(cap);
     }
 }
 
