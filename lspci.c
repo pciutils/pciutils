@@ -330,18 +330,16 @@ show_terse(struct device *d)
 static void
 show_size(pciaddr_t x)
 {
+  static const char suffix[][4] = { "", "KiB", "MiB", "GiB", "TiB" };
+  unsigned i;
   if (!x)
     return;
-  printf(" [size=");
-  if (x < 1024)
-    printf("%d", (int) x);
-  else if (x < 1048576)
-    printf("%dK", (int)(x / 1024));
-  else if (x < 0x80000000)
-    printf("%dM", (int)(x / 1048576));
-  else
-    printf(PCIADDR_T_FMT, x);
-  putchar(']');
+  for (i = 0; i < (sizeof(suffix) / sizeof(*suffix) - 1); i++) {
+    if (x < 1024)
+      break;
+    x /= 1024;
+  }
+  printf(" [size=%u%s]", (unsigned)x, suffix[i]);
 }
 
 static void
