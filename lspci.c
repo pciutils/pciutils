@@ -330,7 +330,7 @@ show_terse(struct device *d)
 static void
 show_size(pciaddr_t x)
 {
-  static const char suffix[][4] = { "", "KiB", "MiB", "GiB", "TiB" };
+  static const char suffix[][2] = { "", "K", "M", "G", "T" };
   unsigned i;
   if (!x)
     return;
