@@ -284,6 +284,6 @@ show_ext_caps(struct device *d)
 	    printf("#%02x\n", id);
 	    break;
 	}
-      where = header >> 20;
+      where = (header >> 20) & ~3;
     } while (where);
 }
