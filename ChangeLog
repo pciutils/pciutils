@@ -1,3 +1,25 @@
+2010-01-19  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.5.
+
+	* Updated pci.ids to the today's snapshot of the database.
+
+	* When scanning extended capabilities, properly mask the lowest 2 bits,
+	  which are currently reserved. This avoids unaligned access errors on
+	  broken hardware (see tests/broken-ecaps).
+
+	* Large bar sizes are displayed in human-readable format (with units).
+	  Thanks to Matthew Wilcox.
+
+	* Physical slot information is displayed correctly for multi-function cards.
+	  Fixed by Matthew Wilcox.
+
+	* Fixed a couple of typos everywhere.
+
+	* Library: Fixed bugs in freeing of capabilities.
+
+	* Windows back-end compiles again.
+
 2009-08-14  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.4.
