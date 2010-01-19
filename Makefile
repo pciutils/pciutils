@@ -1,5 +1,5 @@
 # Makefile for The PCI Utilities
-# (c) 1998--2009 Martin Mares <mj@ucw.cz>
+# (c) 1998--2010 Martin Mares <mj@ucw.cz>
 
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
