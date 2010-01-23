@@ -221,9 +221,10 @@ cap_vc(struct device *d, int where)
   int evc_cnt;
   int arb_table_pos;
   int i, j;
-  static const char ref_clocks[4][6] = { "100ns", "?1", "?2", "?3" };
-  static const char arb_selects[8][7] = { "Fixed", "WRR32", "WRR64", "WRR128", "?4", "?5", "?6", "?7" };
-  static const char vc_arb_selects[8][8] = { "Fixed", "WRR32", "WRR64", "WRR128", "TWRR128", "WRR256", "?6", "?7" };
+  static const char ref_clocks[][6] = { "100ns" };
+  static const char arb_selects[][7] = { "Fixed", "WRR32", "WRR64", "WRR128" };
+  static const char vc_arb_selects[][8] = { "Fixed", "WRR32", "WRR64", "WRR128", "TWRR128", "WRR256" };
+  char buf[8];
 
   printf("Virtual Channel\n");
   if (verbose < 2)
@@ -237,20 +238,20 @@ cap_vc(struct device *d, int where)
   ctrl = get_conf_word(d, where + PCI_VC_PORT_CTRL);
   status = get_conf_word(d, where + PCI_VC_PORT_STATUS);
 
-  evc_cnt = cr1 & 7;
+  evc_cnt = BITS(cr1, 0, 3);
   printf("\t\tCaps:\tLPEVC=%d RefClk=%s PATEntrySize=%d\n",
-    (cr1 >> 4) & 7,
-    ref_clocks[(cr1 >> 8) & 3],
-    (cr1 >> 10) & 3);
+    BITS(cr1, 4, 3),
+    TABLE(ref_clocks, BITS(cr1, 8, 2), buf),
+    BITS(cr1, 10, 2));
 
   printf("\t\tArb:\t");
   for (i=0; i<8; i++)
     if (arb_selects[i][0] != '?' || cr2 & (1 << i))
       printf("%s%c ", arb_selects[i], FLAG(cr2, 1 << i));
-  arb_table_pos = (cr2 >> 24) & 0xff;
+  arb_table_pos = BITS(cr2, 24, 8);
   printf("TableOffset=%x\n", arb_table_pos);
 
-  printf("\t\tCtrl:\tArbSelect=%s\n", arb_selects[(ctrl >> 1) & 7]);
+  printf("\t\tCtrl:\tArbSelect=%s\n", TABLE(arb_selects, BITS(ctrl, 1, 3), buf));
   printf("\t\tStatus:\tInProgress%c\n", FLAG(status, 1));
 
   if (arb_table_pos)
@@ -273,10 +274,10 @@ cap_vc(struct device *d, int where)
       rctrl = get_conf_long(d, pos+4);
       rstatus = get_conf_word(d, pos+8);
 
-      pat_pos = (rcap >> 24) & 0xff;
+      pat_pos = BITS(rcap, 24, 8);
       printf("Caps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
 	pat_pos,
-	((rcap >> 16) & 0x3f) + 1,
+	BITS(rcap, 16, 6) + 1,
 	FLAG(rcap, 1 << 15));
 
       printf("\t\t\tArb:");
@@ -286,9 +287,9 @@ cap_vc(struct device *d, int where)
 
       printf("\n\t\t\tCtrl:\tEnable%c ID=%d ArbSelect=%s TC/VC=%02x\n",
 	FLAG(rctrl, 1 << 31),
-	(rctrl >> 24) & 7,
-	vc_arb_selects[(rctrl >> 17) & 7],
-	rctrl & 0xff);
+	BITS(rctrl, 24, 3),
+	TABLE(vc_arb_selects, BITS(rctrl, 17, 3), buf),
+	BITS(rctrl, 0, 8));
 
       printf("\t\t\tStatus:\tNegoPending%c InProgress%c\n",
 	FLAG(rstatus, 2),
