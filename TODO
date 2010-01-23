@@ -13,7 +13,7 @@ Capabilities with no decoding:
 - CompactPCI central resource control
 - AGP3
 - Secure device
-- Power Budgeting (ext'd)
+- Power Budgeting (ext'd, needs write access to enumerate)
 - Root Complex * (ext'd)
 - Multi-Function Virtual Channel (ext'd)
 - Root Bridge Control Block (ext'd)
