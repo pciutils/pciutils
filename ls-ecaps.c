@@ -213,6 +213,92 @@ cap_sriov(struct device *d, int where)
 	PCI_IOV_MSA_BIR(l));
 }
 
+static void
+cap_vc(struct device *d, int where)
+{
+  u32 cr1, cr2;
+  u16 ctrl, status;
+  int evc_cnt;
+  int arb_table_pos;
+  int i, j;
+  static const char ref_clocks[4][6] = { "100ns", "?1", "?2", "?3" };
+  static const char arb_selects[8][7] = { "Fixed", "WRR32", "WRR64", "WRR128", "?4", "?5", "?6", "?7" };
+  static const char vc_arb_selects[8][8] = { "Fixed", "WRR32", "WRR64", "WRR128", "TWRR128", "WRR256", "?6", "?7" };
+
+  printf("Virtual Channel\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + 4, 0x1c - 4))
+    return;
+
+  cr1 = get_conf_long(d, where + PCI_VC_PORT_REG1);
+  cr2 = get_conf_long(d, where + PCI_VC_PORT_REG2);
+  ctrl = get_conf_word(d, where + PCI_VC_PORT_CTRL);
+  status = get_conf_word(d, where + PCI_VC_PORT_STATUS);
+
+  evc_cnt = cr1 & 7;
+  printf("\t\tCaps:\tLPEVC=%d RefClk=%s PATEntrySize=%d\n",
+    (cr1 >> 4) & 7,
+    ref_clocks[(cr1 >> 8) & 3],
+    (cr1 >> 10) & 3);
+
+  printf("\t\tArb:\t");
+  for (i=0; i<8; i++)
+    if (arb_selects[i][0] != '?' || cr2 & (1 << i))
+      printf("%s%c ", arb_selects[i], FLAG(cr2, 1 << i));
+  arb_table_pos = (cr2 >> 24) & 0xff;
+  printf("TableOffset=%x\n", arb_table_pos);
+
+  printf("\t\tCtrl:\tArbSelect=%s\n", arb_selects[(ctrl >> 1) & 7]);
+  printf("\t\tStatus:\tInProgress%c\n", FLAG(status, 1));
+
+  if (arb_table_pos)
+    printf("\t\tPort Arbitration Table <?>\n");
+
+  for (i=0; i<=evc_cnt; i++)
+    {
+      int pos = where + PCI_VC_RES_CAP + 12*i;
+      u32 rcap, rctrl;
+      u16 rstatus;
+      int pat_pos;
+
+      if (!config_fetch(d, pos, 12))
+	{
+	  printf("VC%d <unreadable>\n", i);
+	  continue;
+	}
+      rcap = get_conf_long(d, pos);
+      rctrl = get_conf_long(d, pos+4);
+      rstatus = get_conf_word(d, pos+8);
+
+      pat_pos = (rcap >> 24) & 0xff;
+      printf("\t\tVC%d:\tCaps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
+	i,
+	pat_pos,
+	((rcap >> 16) & 0x3f) + 1,
+	FLAG(rcap, 1 << 15));
+
+      printf("\t\t\tArb:");
+      for (j=0; j<8; j++)
+	if (vc_arb_selects[j][0] != '?' || rcap & (1 << j))
+	  printf("%c%s%c", (j ? ' ' : '\t'), vc_arb_selects[j], FLAG(rcap, 1 << j));
+
+      printf("\n\t\t\tCtrl:\tEnable%c ID=%d ArbSelect=%s TC/VC=%02x\n",
+	FLAG(rctrl, 1 << 31),
+	(rctrl >> 24) & 7,
+	vc_arb_selects[(rctrl >> 17) & 7],
+	rctrl & 0xff);
+
+      printf("\t\t\tStatus:\tNegoPending%c InProgress%c\n",
+	FLAG(rstatus, 2),
+	FLAG(rstatus, 1));
+
+      if (pat_pos)
+	printf("\t\t\tPort Arbitration Table <?>\n");
+    }
+}
+
 void
 show_ext_caps(struct device *d)
 {
@@ -222,7 +308,7 @@ show_ext_caps(struct device *d)
   do
     {
       u32 header;
-      int id;
+      int id, version;
 
       if (!config_fetch(d, where, 4))
 	break;
@@ -230,7 +316,11 @@ show_ext_caps(struct device *d)
       if (!header)
 	break;
       id = header & 0xffff;
-      printf("\tCapabilities: [%03x] ", where);
+      version = (header >> 16) & 0xf;
+      printf("\tCapabilities: [%03x", where);
+      if (verbose > 1)
+	printf(" v%d", version);
+      printf("] ");
       if (been_there[where]++)
 	{
 	  printf("<chain looped>\n");
@@ -242,7 +332,8 @@ show_ext_caps(struct device *d)
 	    cap_aer(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_VC:
-	    printf("Virtual Channel <?>\n");
+	  case PCI_EXT_CAP_ID_VC2:
+	    cap_vc(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_DSN:
 	    cap_dsn(d, where);

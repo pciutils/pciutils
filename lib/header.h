@@ -216,6 +216,7 @@
 #define PCI_EXT_CAP_ID_RCILINK	0x06	/* Root Complex Internal Link Declaration */
 #define PCI_EXT_CAP_ID_RCECOLL	0x07	/* Root Complex Event Collector */
 #define PCI_EXT_CAP_ID_MFVC	0x08	/* Multi-Function Virtual Channel */
+#define PCI_EXT_CAP_ID_VC2	0x09	/* Virtual Channel (2nd ID) */
 #define PCI_EXT_CAP_ID_RBCB	0x0a	/* Root Bridge Control Block */
 #define PCI_EXT_CAP_ID_VNDR	0x0b	/* Vendor specific */
 #define PCI_EXT_CAP_ID_ACS	0x0d	/* Access Controls */
