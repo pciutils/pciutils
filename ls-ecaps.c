@@ -362,6 +362,25 @@ cap_rclink(struct device *d, int where)
     }
 }
 
+static void
+cap_evendor(struct device *d, int where)
+{
+  u32 hdr;
+
+  printf("Vendor Specific Information: ");
+  if (!config_fetch(d, where + PCI_EVNDR_HEADER, 4))
+    {
+      printf("<unreadable>\n");
+      return;
+    }
+
+  hdr = get_conf_long(d, where + PCI_EVNDR_HEADER);
+  printf("ID=%04x Rev=%d Len=%03x <?>\n",
+    BITS(hdr, 0, 16),
+    BITS(hdr, 16, 4),
+    BITS(hdr, 20, 12));
+}
+
 void
 show_ext_caps(struct device *d)
 {
@@ -420,7 +439,7 @@ show_ext_caps(struct device *d)
 	    printf("Root Bridge Control Block <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_VNDR:
-	    printf("Vendor Specific Information <?>\n");
+	    cap_evendor(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_ACS:
 	    cap_acs(d, where);

@@ -710,6 +710,9 @@
 #define PCI_HT_RM_CNT1		10	/* Retry Count 1 Register */
 #define PCI_HT_RM_SIZEOF	12
 
+/* Vendor-Specific Capability (see PCI_EVNDR_xxx for the PCIe version) */
+#define PCI_VNDR_LENGTH		2	/* Length byte */
+
 /* PCI Express */
 #define PCI_EXP_FLAGS		0x2	/* Capabilities register */
 #define PCI_EXP_FLAGS_VERS	0x000f	/* Capability version */
@@ -948,6 +951,10 @@
 #define  PCI_RCLINK_LINK_DESC	0	/* Link Entry: Description */
 #define  PCI_RCLINK_LINK_ADDR	8	/* Link Entry: Address (64-bit) */
 #define  PCI_RCLINK_LINK_SIZE	16	/* Link Entry: sizeof */
+
+/* PCIe Vendor-Specific Capability */
+#define PCI_EVNDR_HEADER	4	/* Vendor-Specific Header */
+#define PCI_EVNDR_REGISTERS	8	/* Vendor-Specific Registers */
 
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
