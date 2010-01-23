@@ -9,20 +9,14 @@ Capabilities with partial decoding:
 - HyperTransport caps (have spec)
 
 Capabilities with no decoding:
-- VPD (have spec)
 - CompactPCI hot-swap
 - CompactPCI central resource control
 - AGP3
 - Secure device
-- SATA HBA (have spec)
-- Advanced features (have spec)
-- Advanced Error Reporting (ext'd)
-- Virtual Channel (ext'd)
 - Power Budgeting (ext'd)
 - Root Complex * (ext'd)
 - Multi-Function Virtual Channel (ext'd)
 - Root Bridge Control Block (ext'd)
-- Access Controls (ext'd)
 
 PCIIDS:
 - delete old DB at SF
