@@ -52,7 +52,11 @@ byte get_conf_byte(struct device *d, unsigned int pos);
 
 void get_subid(struct device *d, word *subvp, word *subdp);
 
+/* Useful macros for decoding of bits and bit fields */
+
 #define FLAG(x,y) ((x & y) ? '+' : '-')
+#define BITS(x,at,width) (((x) >> (at)) & ((1 << (width)) - 1))
+#define TABLE(tab,x,buf) ((x) < sizeof(tab)/sizeof((tab)[0]) ? (tab)[x] : (sprintf((buf), "??%d", (x)), (buf)))
 
 /* ls-vpd.c */
 
