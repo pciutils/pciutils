@@ -263,9 +263,10 @@ cap_vc(struct device *d, int where)
       u16 rstatus;
       int pat_pos;
 
+      printf("\t\tVC%d:\t", i);
       if (!config_fetch(d, pos, 12))
 	{
-	  printf("VC%d <unreadable>\n", i);
+	  printf("<unreadable>\n");
 	  continue;
 	}
       rcap = get_conf_long(d, pos);
@@ -273,8 +274,7 @@ cap_vc(struct device *d, int where)
       rstatus = get_conf_word(d, pos+8);
 
       pat_pos = (rcap >> 24) & 0xff;
-      printf("\t\tVC%d:\tCaps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
-	i,
+      printf("Caps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
 	pat_pos,
 	((rcap >> 16) & 0x3f) + 1,
 	FLAG(rcap, 1 << 15));
@@ -296,6 +296,68 @@ cap_vc(struct device *d, int where)
 
       if (pat_pos)
 	printf("\t\t\tPort Arbitration Table <?>\n");
+    }
+}
+
+static void
+cap_rclink(struct device *d, int where)
+{
+  u32 esd;
+  int num_links;
+  int i;
+  static const char elt_types[][9] = { "Config", "Egress", "Internal" };
+  char buf[8];
+
+  printf("Root Complex Link\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + 4, PCI_RCLINK_LINK1 - 4))
+    return;
+
+  esd = get_conf_long(d, where + PCI_RCLINK_ESD);
+  num_links = BITS(esd, 8, 8);
+  printf("\t\tDesc:\tPortNumber=%02x ComponentID=%02x EltType=%s\n",
+    BITS(esd, 24, 8),
+    BITS(esd, 16, 8),
+    TABLE(elt_types, BITS(esd, 0, 8), buf));
+
+  for (i=0; i<num_links; i++)
+    {
+      int pos = where + PCI_RCLINK_LINK1 + i*PCI_RCLINK_LINK_SIZE;
+      u32 desc;
+      u32 addr_lo, addr_hi;
+
+      printf("\t\tLink%d:\t", i);
+      if (!config_fetch(d, pos, PCI_RCLINK_LINK_SIZE))
+	{
+	  printf("<unreadable>\n");
+	  return;
+	}
+      desc = get_conf_long(d, pos + PCI_RCLINK_LINK_DESC);
+      addr_lo = get_conf_long(d, pos + PCI_RCLINK_LINK_ADDR);
+      addr_hi = get_conf_long(d, pos + PCI_RCLINK_LINK_ADDR + 4);
+
+      printf("Desc:\tTargetPort=%02x TargetComponent=%02x AssocRCRB%c LinkType=%s LinkValid%c\n",
+	BITS(desc, 24, 8),
+	BITS(desc, 16, 8),
+	FLAG(desc, 4),
+	((desc & 2) ? "Config" : "MemMapped"),
+	FLAG(desc, 1));
+
+      if (desc & 2)
+	{
+	  int n = addr_lo & 7;
+	  if (!n)
+	    n = 8;
+	  printf("\t\t\tAddr:\t%02x:%02x.%d  CfgSpace=%08x%08x\n",
+	    BITS(addr_lo, 20, n),
+	    BITS(addr_lo, 15, 5),
+	    BITS(addr_lo, 12, 3),
+	    addr_hi, addr_lo);
+	}
+      else
+	printf("\t\t\tAddr:\t%08x%08x\n", addr_hi, addr_lo);
     }
 }
 
@@ -342,7 +404,7 @@ show_ext_caps(struct device *d)
 	    printf("Power Budgeting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_RCLINK:
-	    printf("Root Complex Link <?>\n");
+	    cap_rclink(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_RCILINK:
 	    printf("Root Complex Internal Link <?>\n");

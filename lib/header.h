@@ -942,6 +942,13 @@
 #define PCI_PWR_CAP		12	/* Capability */
 #define  PCI_PWR_CAP_BUDGET(x)	((x) & 1)	/* Included in system budget */
 
+/* Root Complex Link */
+#define PCI_RCLINK_ESD		4	/* Element Self Description */
+#define PCI_RCLINK_LINK1	16	/* First Link Entry */
+#define  PCI_RCLINK_LINK_DESC	0	/* Link Entry: Description */
+#define  PCI_RCLINK_LINK_ADDR	8	/* Link Entry: Address (64-bit) */
+#define  PCI_RCLINK_LINK_SIZE	16	/* Link Entry: sizeof */
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
