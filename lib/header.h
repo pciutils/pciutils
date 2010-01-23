@@ -224,6 +224,8 @@
 #define PCI_EXT_CAP_ID_ATS	0x0f	/* Address Translation Service */
 #define PCI_EXT_CAP_ID_SRIOV	0x10	/* Single Root I/O Virtualization */
 
+/*** Definitions of capabilities ***/
+
 /* Power Management Registers */
 
 #define  PCI_PM_CAP_VER_MASK	0x0007	/* Version (2=PM1.1) */
@@ -883,6 +885,12 @@
 #define  PCI_AF_CTRL_FLR	0x01
 #define PCI_AF_STATUS		5
 #define  PCI_AF_STATUS_TP	0x01
+
+/* SATA Host Bus Adapter */
+#define PCI_SATA_HBA_BARS	4
+#define PCI_SATA_HBA_REG0	8
+
+/*** Definitions of extended capabilities ***/
 
 /* Advanced Error Reporting */
 #define PCI_ERR_UNCOR_STATUS	4	/* Uncorrectable Error Status */

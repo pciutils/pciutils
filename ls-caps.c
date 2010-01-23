@@ -1164,6 +1164,29 @@ cap_af(struct device *d, int where)
   printf("\t\tAFStatus: TP%c\n", FLAG(reg, PCI_AF_STATUS_TP));
 }
 
+static void
+cap_sata_hba(struct device *d, int where, int cap)
+{
+  u32 bars;
+  int bar;
+
+  printf("SATA HBA v%d.%d", BITS(cap, 4, 4), BITS(cap, 0, 4));
+  if (verbose < 2 || !config_fetch(d, where + PCI_SATA_HBA_BARS, 4))
+    {
+      printf("\n");
+      return;
+    }
+
+  bars = get_conf_long(d, where + PCI_SATA_HBA_BARS);
+  bar = BITS(bars, 0, 4);
+  if (bar >= 4 && bar <= 9)
+    printf(" BAR%d Offset=%08x\n", bar - 4, BITS(bars, 4, 20));
+  else if (bar == 15)
+    printf(" InCfgSpace\n");
+  else
+    printf(" BAR??%d\n", bar);
+}
+
 void
 show_caps(struct device *d)
 {
@@ -1253,7 +1276,7 @@ show_caps(struct device *d)
 	      cap_msix(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_SATA:
-	      printf("SATA HBA <?>\n");
+	      cap_sata_hba(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_AF:
 	      cap_af(d, where);
