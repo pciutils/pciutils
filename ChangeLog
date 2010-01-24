@@ -1,3 +1,12 @@
+2010-01-24  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.6.
+
+	* More capabilities decoded: Virtual Channel (except arbitration
+	tables), Root Complex Link, Vendor-Specific (header only), SATA HBA.
+
+	* All extended capabilities have their version displayed (-vv or more).
+
 2010-01-19  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.5.
