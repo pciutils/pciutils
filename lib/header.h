@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- PCI Header Structure (based on <linux/pci.h>)
  *
- *	Copyright (c) 1997--2007 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2010 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
