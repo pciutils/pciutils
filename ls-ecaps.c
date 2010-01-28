@@ -222,8 +222,8 @@ cap_vc(struct device *d, int where)
   int arb_table_pos;
   int i, j;
   static const char ref_clocks[][6] = { "100ns" };
-  static const char arb_selects[][7] = { "Fixed", "WRR32", "WRR64", "WRR128" };
-  static const char vc_arb_selects[][8] = { "Fixed", "WRR32", "WRR64", "WRR128", "TWRR128", "WRR256" };
+  static const char arb_selects[8][7] = { "Fixed", "WRR32", "WRR64", "WRR128", "??4", "??5", "??6", "??7" };
+  static const char vc_arb_selects[8][8] = { "Fixed", "WRR32", "WRR64", "WRR128", "TWRR128", "WRR256", "??6", "??7" };
   char buf[8];
 
   printf("Virtual Channel\n");
