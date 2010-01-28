@@ -674,7 +674,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(t, PCI_EXP_DEVCAP_RBE),
 	FLAG(t, PCI_EXP_DEVCAP_FLRESET));
   if (type == PCI_EXP_TYPE_UPSTREAM)
-    printf("SlotPowerLimit %fW",
+    printf("SlotPowerLimit %.3fW",
 	power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18,
 		    (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26));
   printf("\n");
@@ -806,7 +806,7 @@ static void cap_express_slot(struct device *d, int where)
 	FLAG(t, PCI_EXP_SLTCAP_PWRI),
 	FLAG(t, PCI_EXP_SLTCAP_HPC),
 	FLAG(t, PCI_EXP_SLTCAP_HPS));
-  printf("\t\t\tSlot #%3x, PowerLimit %f; Interlock%c NoCompl%c\n",
+  printf("\t\t\tSlot #%d, PowerLimit %.3fW; Interlock%c NoCompl%c\n",
 	t >> 19,
 	power_limit((t & PCI_EXP_SLTCAP_PWR_VAL) >> 7, (t & PCI_EXP_SLTCAP_PWR_SCL) >> 15),
 	FLAG(t, PCI_EXP_SLTCAP_INTERLOCK),
