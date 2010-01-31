@@ -1,3 +1,10 @@
+2010-01-31  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.7.
+
+	* Minor improvements and bug fixes in decoding of the Virtual Channel
+	capability.
+
 2010-01-24  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.6.
