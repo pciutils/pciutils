@@ -239,23 +239,25 @@ cap_vc(struct device *d, int where)
   status = get_conf_word(d, where + PCI_VC_PORT_STATUS);
 
   evc_cnt = BITS(cr1, 0, 3);
-  printf("\t\tCaps:\tLPEVC=%d RefClk=%s PATEntrySize=%d\n",
+  printf("\t\tCaps:\tLPEVC=%d RefClk=%s PATEntryBits=%d\n",
     BITS(cr1, 4, 3),
     TABLE(ref_clocks, BITS(cr1, 8, 2), buf),
-    BITS(cr1, 10, 2));
+    1 << BITS(cr1, 10, 2));
 
-  printf("\t\tArb:\t");
+  printf("\t\tArb:");
   for (i=0; i<8; i++)
     if (arb_selects[i][0] != '?' || cr2 & (1 << i))
-      printf("%s%c ", arb_selects[i], FLAG(cr2, 1 << i));
+      printf("%c%s%c", (i ? ' ' : '\t'), arb_selects[i], FLAG(cr2, 1 << i));
   arb_table_pos = BITS(cr2, 24, 8);
-  printf("TableOffset=%x\n", arb_table_pos);
 
-  printf("\t\tCtrl:\tArbSelect=%s\n", TABLE(arb_selects, BITS(ctrl, 1, 3), buf));
+  printf("\n\t\tCtrl:\tArbSelect=%s\n", TABLE(arb_selects, BITS(ctrl, 1, 3), buf));
   printf("\t\tStatus:\tInProgress%c\n", FLAG(status, 1));
 
   if (arb_table_pos)
-    printf("\t\tPort Arbitration Table <?>\n");
+    {
+      arb_table_pos = where + 16*arb_table_pos;
+      printf("\t\tPort Arbitration Table [%x] <?>\n", arb_table_pos);
+    }
 
   for (i=0; i<=evc_cnt; i++)
     {
