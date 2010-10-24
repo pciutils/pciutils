@@ -15,7 +15,7 @@ if ! touch ${DEST} >/dev/null 2>&1 ; then
 	exit 1
 fi
 
-if [ -n "$PCI_COMPRESSED_IDS" ] ; then
+if [ "$PCI_COMPRESSED_IDS" -eq 1 ] ; then
 	DECOMP="cat"
 	SRC="$SRC.gz"
 	GREP=zgrep
