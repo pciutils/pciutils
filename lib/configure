@@ -30,7 +30,7 @@ if [ -z "$HOST" ] ; then
 		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
 		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
 	else
-		cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/'`
+		cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/;s/^BePC$/i386/;s/^BeMac$/powerpc/;s/^BeBox$/powerpc/'`
 	fi
 	if [ "$sys" = "GNU/kFreeBSD" -o "$sys" = "DragonFly" ]
 	then
@@ -124,7 +124,15 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		echo >>$m 'WITH_LIBS+=-lioperm'
 		;;
-        *)
+	beos|haiku)
+		case $cpu in
+				i?86|x86_64)	echo_n " i386-ports"
+						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+						;;
+		esac
+		echo >>$c '#define PCI_HAVE_STDINT_H'
+		;;
+	*)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
 		exit 1
 		;;

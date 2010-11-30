@@ -33,11 +33,11 @@ to all users, the rest only to root.
 .TP
 .B intel-conf1
 Direct hardware access via Intel configuration mechanism 1. Available on i386 and compatibles
-on Linux, Solaris/x86, GNU Hurd and Windows. Requires root privileges.
+on Linux, Solaris/x86, GNU Hurd, Windows, BeOS and Haiku. Requires root privileges.
 .TP
 .B intel-conf2
 Direct hardware access via Intel configuration mechanism 2. Available on i386 and compatibles
-on Linux, Solaris/x86, GNU Hurd and Windows. Requires root privileges. Warning: This method
+on Linux, Solaris/x86, GNU Hurd, Windows, BeOS and Haiku. Requires root privileges. Warning: This method
 is able to address only the first 16 devices on any bus and it seems to be very
 unreliable in many cases.
 .TP

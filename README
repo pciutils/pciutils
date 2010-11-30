@@ -24,6 +24,8 @@ In runs on the following systems:
 	GNU Hurd	(direct port access)
 	Windows		(direct port access)
 	CYGWIN		(direct port access)
+	BeOS		(via syscalls)
+	Haiku		(via /dev/misc/poke)
 
 It should be very easy to add support for other systems as well (volunteers
 wanted; if you want to try that, I'll be very glad to see the patches and
