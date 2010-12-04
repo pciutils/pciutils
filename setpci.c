@@ -482,11 +482,12 @@ static const struct reg_name *parse_reg_name(char *name)
 static int parse_x32(char *c, char **stopp, unsigned int *resp)
 {
   char *stop;
+  unsigned long int l;
 
   if (!*c)
     return -1;
   errno = 0;
-  unsigned long int l = strtoul(c, &stop, 16);
+  l = strtoul(c, &stop, 16);
   if (errno)
     return -1;
   if ((l & ~0U) != l)
