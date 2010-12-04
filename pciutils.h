@@ -11,6 +11,8 @@
 
 #ifdef PCI_OS_WINDOWS
 #include "compat/getopt.h"
+#else
+#include <unistd.h>
 #endif
 
 #define PCIUTILS_VERSION PCILIB_VERSION
