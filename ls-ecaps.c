@@ -12,6 +12,71 @@
 #include "lspci.h"
 
 static void
+cap_tph(struct device *d, int where)
+{
+  u32 tph_cap;
+  printf("Transaction Processing Hints\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_TPH_CAPABILITIES, 4))
+    return;
+
+  tph_cap = get_conf_long(d, where + PCI_TPH_CAPABILITIES);
+
+  if (tph_cap & PCI_TPH_INTVEC_SUP)
+    printf("\t\tInterrupt vector mode supported\n");
+  if (tph_cap & PCI_TPH_DEV_SUP)
+    printf("\t\tDevice specific mode supported\n");
+  if (tph_cap & PCI_TPH_EXT_REQ_SUP)
+    printf("\t\tExtended requester support\n");
+
+  switch (tph_cap & PCI_TPH_ST_LOC_MASK) {
+  case PCI_TPH_ST_NONE:
+    printf("\t\tNo steering table available\n");
+    break;
+  case PCI_TPH_ST_CAP:
+    printf("\t\tSteering table in TPH capability structure\n");
+    break;
+  case PCI_TPH_ST_MSIX:
+    printf("\t\tSteering table in MSI-X table\n");
+    break;
+  default:
+    printf("\t\tReserved steering table location\n");
+    break;
+  }
+}
+
+static u32
+cap_ltr_scale(u8 scale)
+{
+  return 1 << (scale * 5);
+}
+
+static void
+cap_ltr(struct device *d, int where)
+{
+  u32 scale;
+  u16 snoop, nosnoop;
+  printf("Latency Tolerance Reporting\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_LTR_MAX_SNOOP, 4))
+    return;
+
+  snoop = get_conf_word(d, where + PCI_LTR_MAX_SNOOP);
+  scale = cap_ltr_scale((snoop >> PCI_LTR_SCALE_SHIFT) & PCI_LTR_SCALE_MASK);
+  printf("\t\tMax snoop latency: %lldns\n",
+	 ((unsigned long long)snoop & PCI_LTR_VALUE_MASK) * scale);
+
+  nosnoop = get_conf_word(d, where + PCI_LTR_MAX_NOSNOOP);
+  scale = cap_ltr_scale((nosnoop >> PCI_LTR_SCALE_SHIFT) & PCI_LTR_SCALE_MASK);
+  printf("\t\tMax no snoop latency: %lldns\n",
+	 ((unsigned long long)nosnoop & PCI_LTR_VALUE_MASK) * scale);
+}
+
+static void
 cap_dsn(struct device *d, int where)
 {
   u32 t1, t2;
@@ -454,6 +519,12 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_SRIOV:
 	    cap_sriov(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_TPH:
+	    cap_tph(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_LTR:
+	    cap_ltr(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);
