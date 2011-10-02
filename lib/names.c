@@ -69,10 +69,11 @@ format_name(char *buf, int size, int flags, char *name, char *num, char *unknown
     res = snprintf(buf, size, "%s", name);
   else
     res = snprintf(buf, size, "%s [%s]", name, num);
-  if (res < 0 || res >= size)
+  if (res >= size && size >= 4)
+    buf[size-2] = buf[size-3] = buf[size-4] = '.';
+  else if (res < 0 || res >= size)
     return "<pci_lookup_name: buffer too small>";
-  else
-    return buf;
+  return buf;
 }
 
 static char *
@@ -101,10 +102,11 @@ format_name_pair(char *buf, int size, int flags, char *v, char *d, char *num)
       else /* v && !d */
 	res = snprintf(buf, size, "%s Device %s", v, num+5);
     }
-  if (res < 0 || res >= size)
+  if (res >= size && size >= 4)
+    buf[size-2] = buf[size-3] = buf[size-4] = '.';
+  else if (res < 0 || res >= size)
     return "<pci_lookup_name: buffer too small>";
-  else
-    return buf;
+  return buf;
 }
 
 char *
