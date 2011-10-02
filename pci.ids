@@ -2,7 +2,7 @@
 #	List of PCI ID's
 #
 #	Version: 2011.10.02
-#	Date:    2011-10-02 11:20:58
+#	Date:    2011-10-02 12:58:51
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pciids.sf.net/.
@@ -20232,7 +20232,7 @@ C 0c  Serial bus controller
 		10  OHCI
 	01  ACCESS Bus
 	02  SSA
-	03  USB Controller
+	03  USB controller
 		00  UHCI
 		10  OHCI
 		20  EHCI
