@@ -151,7 +151,7 @@ living within a capability, or to modify parts of standard registers.
 \IP \(bu
 Finally, you should append a width specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP to choose
 how many bytes (1, 2, or 4) should be transferred. The width can be omitted if you are
-accessing a named register whose width is well known.
+referring to a register by its name and the width of the register is well known.
 
 .PP
 All names of registers and width specifiers are case-insensitive.
