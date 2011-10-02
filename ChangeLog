@@ -1,3 +1,22 @@
+2011-10-02  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.8.
+
+	* More capabilities: Transaction Processing Hints, Latency Tolerance
+	Reporting. Thanks to Jesse Barnes.
+
+	* Added BeOS and Haiku ports. Contributed by Francois Revol.
+
+	* pciutils.pc now uses Libs.private properly.
+
+	* When we format a name and it does not fit in the buffer, we truncate
+	it instead of returning "buffer too small" instead. This works on all
+	platforms with sane (i.e., C99-compatible) snprintf().
+
+	* Various minor bug fixes.
+
+	* Updated pci.ids to the today's snapshot of the database.
+
 2010-01-31  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.7.
