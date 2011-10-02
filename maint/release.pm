@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # A simple system for making software releases
-# (c) 2003--2006 Martin Mares <mj@ucw.cz>
+# (c) 2003--2011 Martin Mares <mj@ucw.cz>
 
 package UCW::Release;
 use strict;
@@ -34,7 +34,8 @@ sub new($$) {
 		"do_test" => 1,
 		"do_patch" => 1,
 		"diff_against" => "",
-		"do_upload" => 1
+		"do_upload" => 1,
+		"do_sign" => 1,
 	};
 	bless $s;
 	return $s;
@@ -198,6 +199,14 @@ sub GenPackage($) {
 	`cd $dd && tar cz${tarvv}f $pkg.tar.gz $pkg >&2`; die if $?;
 	push @{$s->{"distfiles"}}, "$dd/$pkg.tar.gz";
 
+	if ($s->{'do_sign'}) {
+		print "Signing package\n";
+		system "gpg", "--armor", "--detach-sig", "$dd/$pkg.tar.gz";
+		die if $?;
+		rename "$dd/$pkg.tar.gz.asc", "$dd/$pkg.tar.gz.sign" or die "No signature produced!?\n";
+		push @{$s->{"distfiles"}}, "$dd/$pkg.tar.gz.sign";
+	}
+
 	my $adir = $s->{"archivedir"};
 	my $afile = "$adir/$pkg.tar.gz";
 	print "Archiving to $afile\n";
@@ -223,8 +232,9 @@ sub ParseOptions($) {
 		"test!" => \$s->{"do_test"},
 		"patch!" => \$s->{"do_patch"},
 		"diff-against=s" => \$s->{"diff_against"},
-		"upload!" => \$s->{"do_upload"}
-	) || die "Syntax: release [--verbose] [--test] [--nopatch] [--diff-against=<version>] [--noupload]";
+		"upload!" => \$s->{"do_upload"},
+		"sign!" => \$s->{"do_sign"},
+	) || die "Syntax: release [--verbose] [--test] [--nopatch] [--diff-against=<version>] [--noupload] [--nosign]";
 }
 
 sub Test($) {
