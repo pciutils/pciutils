@@ -148,7 +148,7 @@ identifier of the capability in hexadecimal.
 Each of the previous formats can be followed by \fB+offset\fP to add an offset
 (a hex number) to the address. This feature can be useful for addressing of registers
 living within a capability, or to modify parts of standard registers.
-\IP \(bu
+.IP \(bu
 Finally, you should append a width specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP to choose
 how many bytes (1, 2, or 4) should be transferred. The width can be omitted if you are
 referring to a register by its name and the width of the register is well known.
