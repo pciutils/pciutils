@@ -717,6 +717,8 @@ static char *link_speed(int speed)
 	return "2.5GT/s";
       case 2:
 	return "5GT/s";
+      case 3:
+	return "8GT/s";
       default:
 	return "unknown";
     }
@@ -728,6 +730,8 @@ static char *aspm_support(int code)
     {
       case 1:
 	return "L0s";
+      case 2:
+	return "L1";
       case 3:
 	return "L0s L1";
       default:
@@ -949,6 +953,8 @@ static const char *cap_express_link2_speed(int type)
 	return "2.5GT/s";
       case 2:
 	return "5GT/s";
+      case 3:
+	return "8GT/s";
       default:
 	return "Unknown";
     }
@@ -1003,8 +1009,14 @@ static void cap_express_link2(struct device *d, int where, int type UNUSED)
 	cap_express_link2_deemphasis(PCI_EXP_LNKCTL2_COM_DEEMPHASIS(w)));
 
   w = get_conf_word(d, where + PCI_EXP_LNKSTA2);
-  printf("\t\tLnkSta2: Current De-emphasis Level: %s\n",
-	cap_express_link2_deemphasis(PCI_EXP_LINKSTA2_DEEMPHASIS(w)));
+  printf("\t\tLnkSta2: Current De-emphasis Level: %s, EqualizationComplete%c, EqualizationPhase1%c\n"
+	"\t\t\t EqualizationPhase2%c, EqualizationPhase3%c, LinkEqualizationRequest%c\n",
+	cap_express_link2_deemphasis(PCI_EXP_LINKSTA2_DEEMPHASIS(w)),
+	FLAG(w, PCI_EXP_LINKSTA2_EQU_COMP),
+	FLAG(w, PCI_EXP_LINKSTA2_EQU_PHASE1),
+	FLAG(w, PCI_EXP_LINKSTA2_EQU_PHASE2),
+	FLAG(w, PCI_EXP_LINKSTA2_EQU_PHASE3),
+	FLAG(w, PCI_EXP_LINKSTA2_EQU_REQ));
 }
 
 static void cap_express_slot2(struct device *d UNUSED, int where UNUSED)

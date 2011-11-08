@@ -860,9 +860,14 @@
 #define  PCI_EXP_LNKCTL2_MARGIN(x)	(((x) >> 7) & 7) /* Transmit Margin */
 #define  PCI_EXP_LNKCTL2_MOD_CMPLNC	0x0400	/* Enter Modified Compliance */
 #define  PCI_EXP_LNKCTL2_CMPLNC_SOS	0x0800	/* Compliance SOS */
-#define  PCI_EXP_LNKCTL2_COM_DEEMPHASIS(x) (((x) >> 12) & 1) /* Compliance De-emphasis */
+#define  PCI_EXP_LNKCTL2_COM_DEEMPHASIS(x) (((x) >> 12) & 0xf) /* Compliance De-emphasis */
 #define PCI_EXP_LNKSTA2			0x32	/* Link Status */
 #define  PCI_EXP_LINKSTA2_DEEMPHASIS(x)	((x) & 1)	/* Current De-emphasis Level */
+#define  PCI_EXP_LINKSTA2_EQU_COMP	0x02	/* Equalization Complete */
+#define  PCI_EXP_LINKSTA2_EQU_PHASE1	0x04	/* Equalization Phase 1 Successful */
+#define  PCI_EXP_LINKSTA2_EQU_PHASE2	0x08	/* Equalization Phase 2 Successful */
+#define  PCI_EXP_LINKSTA2_EQU_PHASE3	0x10	/* Equalization Phase 3 Successful */
+#define  PCI_EXP_LINKSTA2_EQU_REQ	0x20	/* Link Equalization Request */
 #define PCI_EXP_SLTCAP2			0x34	/* Slot Capabilities */
 #define PCI_EXP_SLTCTL2			0x38	/* Slot Control */
 #define PCI_EXP_SLTSTA2			0x3a	/* Slot Status */
