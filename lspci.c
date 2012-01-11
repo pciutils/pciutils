@@ -590,7 +590,8 @@ show_htype2(struct device *d)
       int p = 8*i;
       u32 base = get_conf_long(d, PCI_CB_MEMORY_BASE_0 + p);
       u32 limit = get_conf_long(d, PCI_CB_MEMORY_LIMIT_0 + p);
-      if (limit > base || verb)
+      limit = limit + 0xfff;
+      if (base <= limit || verb)
 	printf("\tMemory window %d: %08x-%08x%s%s\n", i, base, limit,
 	       (cmd & PCI_COMMAND_MEMORY) ? "" : " [disabled]",
 	       (brc & (PCI_CB_BRIDGE_CTL_PREFETCH_MEM0 << i)) ? " (prefetchable)" : "");
