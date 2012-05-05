@@ -339,7 +339,7 @@ cap_vc(struct device *d, int where)
 	}
       rcap = get_conf_long(d, pos);
       rctrl = get_conf_long(d, pos+4);
-      rstatus = get_conf_word(d, pos+8);
+      rstatus = get_conf_word(d, pos+10);
 
       pat_pos = BITS(rcap, 24, 8);
       printf("Caps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
