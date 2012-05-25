@@ -125,7 +125,7 @@ sysfs_get_resources(struct pci_dev *d)
 	break;
       if (sscanf(buf, "%llx %llx %llx", &start, &end, &flags) != 3)
 	a->error("Syntax error in %s", namebuf);
-      if (start)
+      if (end > start)
 	size = end - start + 1;
       else
 	size = 0;

@@ -372,7 +372,7 @@ show_bases(struct device *d, int cnt)
 	{
 	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
 	  printf("I/O ports at ");
-	  if (a)
+	  if (a || (cmd & PCI_COMMAND_IO))
 	    printf(PCIADDR_PORT_FMT, a);
 	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
 	    printf("<ignored>");
