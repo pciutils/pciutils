@@ -920,24 +920,60 @@ static const char *cap_express_dev2_timeout_value(int type)
     }
 }
 
+static const char *cap_express_devcap2_obff(int obff)
+{
+  switch (obff)
+    {
+      case 1:
+        return "Via message";
+      case 2:
+        return "Via WAKE#";
+      case 3:
+        return "Via message/WAKE#";
+      default:
+        return "Not Supported";
+    }
+}
+
+static const char *cap_express_devctl2_obff(int obff)
+{
+  switch (obff)
+    {
+      case 0:
+        return "Disabled";
+      case 1:
+        return "Via message A";
+      case 2:
+        return "Via message B";
+      case 3:
+        return "Via WAKE#";
+      default:
+        return "Unknown";
+    }
+}
+
 static void cap_express_dev2(struct device *d, int where, int type)
 {
   u32 l;
   u16 w;
 
   l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
-  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c",
+  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
 	cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
-	FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS));
+	FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS),
+	FLAG(l, PCI_EXP_DEVCAP2_LTR),
+	cap_express_devcap2_obff(PCI_EXP_DEVCAP2_OBFF(l)));
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
     printf(" ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
   else
     printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL2);
-  printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c",
+  printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
 	cap_express_dev2_timeout_value(PCI_EXP_DEV2_TIMEOUT_VALUE(w)),
-	FLAG(w, PCI_EXP_DEV2_TIMEOUT_DIS));
+	FLAG(w, PCI_EXP_DEV2_TIMEOUT_DIS),
+	FLAG(w, PCI_EXP_DEV2_LTR),
+	cap_express_devctl2_obff(PCI_EXP_DEV2_OBFF(w)));
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
     printf(" ARIFwd%c\n", FLAG(w, PCI_EXP_DEV2_ARI));
   else
