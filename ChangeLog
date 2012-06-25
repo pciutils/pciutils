@@ -1,3 +1,13 @@
+2012-06-25  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.1.10.
+
+	* Decoding of LTR/OBFF in PCIe capabilities.
+
+	* Various minor bug fixes.
+
+	* Updated pci.ids to the today's snapshot of the database.
+
 2012-01-14  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.9.
