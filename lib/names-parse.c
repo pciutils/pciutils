@@ -30,7 +30,7 @@ static pci_file pci_open(struct pci_access *a)
   if (result)
     return result;
   len = strlen(a->id_file_name);
-  if (len >= 3 && memcmp(a->id_file_name + len - 3, ".gz", 3) != 0)
+  if (len < 3 || memcmp(a->id_file_name + len - 3, ".gz", 3) != 0)
     return result;
   new_name = malloc(len - 2);
   memcpy(new_name, a->id_file_name, len - 3);
