@@ -7,5 +7,5 @@ Name: libpci
 Description: libpci
 Version: @VERSION@
 Libs: -L${libdir} -lpci
-Libs.private: @LDLIBS@
+Libs.private: @LDLIBS@ @WITH_LIBS@
 Cflags: -I${includedir}
