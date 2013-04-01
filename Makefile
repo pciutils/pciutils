@@ -1,5 +1,5 @@
 # Makefile for The PCI Utilities
-# (c) 1998--2012 Martin Mares <mj@ucw.cz>
+# (c) 1998--2013 Martin Mares <mj@ucw.cz>
 
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
@@ -20,6 +20,9 @@ DNS=
 
 # Build libpci as a shared library (yes/no; or local for testing; requires GCC)
 SHARED=no
+
+# Use libkmod to resolve kernel modules on Linux (yes/no, default: detect)
+LIBKMOD=
 
 # ABI version suffix in the name of the shared library
 # (as we use proper symbol versioning, this seldom needs changing)
@@ -77,6 +80,9 @@ ls-map.o: ls-map.c $(LSPCIINC)
 
 setpci.o: setpci.c pciutils.h $(PCIINC)
 common.o: common.c pciutils.h $(PCIINC)
+
+lspci: LDLIBS+=$(LIBKMOD_LIBS)
+ls-kernel.o: CFLAGS+=$(LIBKMOD_CFLAGS)
 
 update-pciids: update-pciids.sh
 	sed <$< >$@ "s@^DEST=.*@DEST=$(IDSDIR)/$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@"

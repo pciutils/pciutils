@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Kernel Drivers
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2013 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -16,6 +16,94 @@
 
 #include <sys/utsname.h>
 
+#ifdef PCI_USE_LIBKMOD
+
+#include <libkmod.h>
+
+static struct kmod_ctx *kmod_ctx;
+
+static int
+show_kernel_init(void)
+{
+  static int show_kernel_inited = -1;
+  if (show_kernel_inited >= 0)
+    return show_kernel_inited;
+
+  struct utsname uts;
+  if (uname(&uts) < 0)
+    die("uname() failed: %m");
+  char *name = alloca(64 + strlen(uts.release));
+  sprintf(name, "/lib/modules/%s", uts.release);
+
+  kmod_ctx = kmod_new(name, NULL);
+  if (!kmod_ctx)
+    {
+      fprintf(stderr, "lspci: Unable to initialize libkmod context\n");
+      goto failed;
+    }
+
+  int err;
+  if ((err = kmod_load_resources(kmod_ctx)) < 0)
+    {
+      fprintf(stderr, "lspci: Unable to load libkmod resources: error %d\n", err);
+      goto failed;
+    }
+
+  show_kernel_inited = 1;
+  return 1;
+
+failed:
+  show_kernel_inited = 0;
+  return 0;
+}
+
+void
+show_kernel_cleanup(void)
+{
+  if (kmod_ctx)
+    kmod_unref(kmod_ctx);
+}
+
+static const char *next_module(struct device *d)
+{
+  static struct kmod_list *klist, *kcurrent;
+  static struct kmod_module *kmodule;
+
+  if (kmodule)
+    {
+      kmod_module_unref(kmodule);
+      kmodule = NULL;
+    }
+
+  if (!klist)
+    {
+      pci_fill_info(d->dev, PCI_FILL_MODULE_ALIAS);
+      if (!d->dev->module_alias)
+	return NULL;
+      int err = kmod_module_new_from_lookup(kmod_ctx, d->dev->module_alias, &klist);
+      if (err < 0)
+	{
+	  fprintf(stderr, "lspci: libkmod lookup failed: error %d\n", err);
+	  return NULL;
+	}
+      kcurrent = klist;
+    }
+  else
+    kcurrent = kmod_list_next(klist, kcurrent);
+
+  if (kcurrent)
+    {
+      kmodule = kmod_module_get_module(kcurrent);
+      return kmod_module_get_name(kmodule);
+    }
+
+  kmod_module_unref_list(klist);
+  klist = NULL;
+  return NULL;
+}
+
+#else
+
 struct pcimap_entry {
   struct pcimap_entry *next;
   unsigned int vendor, device;
@@ -26,8 +114,8 @@ struct pcimap_entry {
 
 static struct pcimap_entry *pcimap_head;
 
-static void
-load_pcimap(void)
+static int
+show_kernel_init(void)
 {
   static int tried_pcimap;
   struct utsname uts;
@@ -35,7 +123,7 @@ load_pcimap(void)
   FILE *f;
 
   if (tried_pcimap)
-    return;
+    return 1;
   tried_pcimap = 1;
 
   if (name = opt_pcimap)
@@ -52,7 +140,7 @@ load_pcimap(void)
       sprintf(name, "/lib/modules/%s/modules.pcimap", uts.release);
       f = fopen(name, "r");
       if (!f)
-	return;
+	return 1;
     }
 
   while (fgets(line, sizeof(line), f))
@@ -84,6 +172,8 @@ load_pcimap(void)
       strcpy(e->module, line);
     }
   fclose(f);
+
+  return 1;
 }
 
 static int
@@ -103,6 +193,35 @@ match_pcimap(struct device *d, struct pcimap_entry *e)
     (class & e->class_mask) == e->class;
 #undef MATCH
 }
+
+static const char *next_module(struct device *d)
+{
+  static struct pcimap_entry *current, *last_printed;
+
+  if (!current)
+    {
+      current = pcimap_head;
+      last_printed = NULL;
+    }
+  else
+    current = current->next;
+
+  while (current)
+    {
+      if (match_pcimap(d, current) && (!last_printed || strcmp(last_printed->module, current->module)))
+	return current->module;
+      current = current->next;
+    }
+
+  return NULL;
+}
+
+void
+show_kernel_cleanup(void)
+{
+}
+
+#endif
 
 #define DRIVER_BUF_SIZE 1024
 
@@ -142,20 +261,18 @@ void
 show_kernel(struct device *d)
 {
   char buf[DRIVER_BUF_SIZE];
-  char *driver;
-  struct pcimap_entry *e, *last = NULL;
+  const char *driver, *module;
 
   if (driver = find_driver(d, buf))
     printf("\tKernel driver in use: %s\n", driver);
 
-  load_pcimap();
-  for (e=pcimap_head; e; e=e->next)
-    if (match_pcimap(d, e) && (!last || strcmp(last->module, e->module)))
-      {
-	printf("%s %s", (last ? "," : "\tKernel modules:"), e->module);
-	last = e;
-      }
-  if (last)
+  if (!show_kernel_init())
+    return;
+
+  int cnt = 0;
+  while (module = next_module(d))
+    printf("%s %s", (cnt++ ? "," : "\tKernel modules:"), module);
+  if (cnt)
     putchar('\n');
 }
 
@@ -163,19 +280,16 @@ void
 show_kernel_machine(struct device *d)
 {
   char buf[DRIVER_BUF_SIZE];
-  char *driver;
-  struct pcimap_entry *e, *last = NULL;
+  const char *driver, *module;
 
   if (driver = find_driver(d, buf))
     printf("Driver:\t%s\n", driver);
 
-  load_pcimap();
-  for (e=pcimap_head; e; e=e->next)
-    if (match_pcimap(d, e) && (!last || strcmp(last->module, e->module)))
-      {
-	printf("Module:\t%s\n", e->module);
-	last = e;
-      }
+  if (!show_kernel_init())
+    return;
+
+  while (module = next_module(d))
+    printf("Module:\t%s\n", module);
 }
 
 #else
@@ -187,6 +301,11 @@ show_kernel(struct device *d UNUSED)
 
 void
 show_kernel_machine(struct device *d UNUSED)
+{
+}
+
+void
+show_kernel_cleanup(void)
 {
 }
 

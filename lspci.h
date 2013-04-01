@@ -74,6 +74,7 @@ void show_ext_caps(struct device *d);
 
 void show_kernel_machine(struct device *d UNUSED);
 void show_kernel(struct device *d UNUSED);
+void show_kernel_cleanup(void);
 
 /* ls-tree.c */
 

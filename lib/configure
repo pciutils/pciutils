@@ -1,6 +1,6 @@
 #!/bin/sh
 # Configuration script for the PCI library
-# (c) 1998--2009 Martin Mares <mj@ucw.cz>
+# (c) 1998--2013 Martin Mares <mj@ucw.cz>
 
 LC_ALL=C
 export LC_ALL
@@ -177,6 +177,37 @@ if [ "$DNS" = yes ] ; then
 	echo >>$c "#define PCI_USE_DNS"
 	echo >>$c "#define PCI_ID_DOMAIN \"pci.id.ucw.cz\""
 	echo >>$m "WITH_LIBS+=$LIBRESOLV"
+fi
+
+if [ "$sys" = linux ] ; then
+	echo_n "Checking for libkmod... "
+	LIBKMOD_DETECTED=
+	if [ "$LIBKMOD" != no ] ; then
+		if ! which pkg-config >/dev/null ; then
+			echo_n "(pkg-config not found) "
+		elif pkg-config libkmod ; then
+			LIBKMOD_DETECTED=1
+		fi
+	fi
+	if [ "$LIBKMOD" = yes -o "$LIBKMOD" = no ] ; then
+		echo "$LIBKMOD (set manually)"
+		if [ "$LIBKMOD" = yes -a -z "$LIBKMOD_DETECTED" ] ; then
+			echo "Requested use of libkmod, but it is not available. Giving up."
+			exit 1
+		fi
+	else
+		if [ -n "$LIBKMOD_DETECTED" ] ; then
+			LIBKMOD=yes
+		else
+			LIBKMOD=no
+		fi
+		echo "$LIBKMOD (auto-detected)"
+	fi
+	if [ "$LIBKMOD" = yes ] ; then
+		echo >>$c "#define PCI_USE_LIBKMOD"
+		echo >>$m "LIBKMOD_CFLAGS=$(pkg-config --cflags libkmod)"
+		echo >>$m "LIBKMOD_LIBS=$(pkg-config --libs libkmod)"
+	fi
 fi
 
 echo "Checking whether to build a shared library... $SHARED (set manually)"
