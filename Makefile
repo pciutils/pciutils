@@ -105,13 +105,6 @@ clean:
 
 distclean: clean
 
-install-pcilib: lib/$(PCILIB)
-	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
-	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
-
-ifeq ($(SHARED),yes)
-install: install-pcilib
-endif
 install: all
 # -c is ignored on Linux, but required on FreeBSD
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7
@@ -123,6 +116,14 @@ install: all
 ifeq ($(SHARED),yes)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so$(ABI_VERSION)
 endif
+
+ifeq ($(SHARED),yes)
+install: install-pcilib
+endif
+
+install-pcilib: lib/$(PCILIB)
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
+	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
 
 install-lib: $(PCIINC_INS) lib/$(PCILIBPC) install-pcilib
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(PKGCFDIR)
