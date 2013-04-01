@@ -182,10 +182,13 @@ fi
 if [ "$sys" = linux ] ; then
 	echo_n "Checking for libkmod... "
 	LIBKMOD_DETECTED=
+	if [ -z "$PKG_CONFIG" ] ; then
+		PKG_CONFIG=pkg-config
+	fi
 	if [ "$LIBKMOD" != no ] ; then
-		if ! which pkg-config >/dev/null ; then
-			echo_n "(pkg-config not found) "
-		elif pkg-config libkmod ; then
+		if ! which $PKG_CONFIG >/dev/null ; then
+			echo_n "($PKG_CONFIG not found) "
+		elif $PKG_CONFIG libkmod ; then
 			LIBKMOD_DETECTED=1
 		fi
 	fi
@@ -205,8 +208,8 @@ if [ "$sys" = linux ] ; then
 	fi
 	if [ "$LIBKMOD" = yes ] ; then
 		echo >>$c "#define PCI_USE_LIBKMOD"
-		echo >>$m "LIBKMOD_CFLAGS=$(pkg-config --cflags libkmod)"
-		echo >>$m "LIBKMOD_LIBS=$(pkg-config --libs libkmod)"
+		echo >>$m "LIBKMOD_CFLAGS=$($PKG_CONFIG --cflags libkmod)"
+		echo >>$m "LIBKMOD_LIBS=$($PKG_CONFIG --libs libkmod)"
 	fi
 fi
 
