@@ -85,24 +85,39 @@ sysfs_obj_name(struct pci_dev *d, char *object, char *buf)
     d->access->error("File name too long");
 }
 
+#define OBJBUFSIZE 1024
+
 static int
-sysfs_get_value(struct pci_dev *d, char *object)
+sysfs_get_string(struct pci_dev *d, char *object, char *buf, int mandatory)
 {
   struct pci_access *a = d->access;
   int fd, n;
-  char namebuf[OBJNAMELEN], buf[256];
+  char namebuf[OBJNAMELEN];
 
   sysfs_obj_name(d, object, namebuf);
   fd = open(namebuf, O_RDONLY);
   if (fd < 0)
-    a->error("Cannot open %s: %s", namebuf, strerror(errno));
-  n = read(fd, buf, sizeof(buf));
+    {
+      if (mandatory)
+	a->error("Cannot open %s: %s", namebuf, strerror(errno));
+      return 0;
+    }
+  n = read(fd, buf, OBJBUFSIZE);
   close(fd);
   if (n < 0)
     a->error("Error reading %s: %s", namebuf, strerror(errno));
-  if (n >= (int) sizeof(buf))
+  if (n >= OBJBUFSIZE)
     a->error("Value in %s too long", namebuf);
   buf[n] = 0;
+  return 1;
+}
+
+static int
+sysfs_get_value(struct pci_dev *d, char *object)
+{
+  char buf[OBJBUFSIZE];
+
+  sysfs_get_string(d, object, buf, 1);
   return strtol(buf, NULL, 0);
 }
 
@@ -235,10 +250,7 @@ sysfs_fill_slots(struct pci_access *a)
 	{
 	  for (d = a->devices; d; d = d->next)
 	    if (dom == d->domain && bus == d->bus && dev == d->dev && !d->phy_slot)
-	      {
-		d->phy_slot = pci_malloc(a, strlen(entry->d_name) + 1);
-		strcpy(d->phy_slot, entry->d_name);
-	      }
+	      d->phy_slot = pci_strdup(a, entry->d_name);
 	}
       fclose(file);
     }
@@ -255,6 +267,14 @@ sysfs_fill_info(struct pci_dev *d, int flags)
       for (pd = d->access->devices; pd; pd = pd->next)
 	pd->known_fields |= PCI_FILL_PHYS_SLOT;
     }
+
+  if ((flags & PCI_FILL_MODULE_ALIAS) && !(d->known_fields & PCI_FILL_MODULE_ALIAS))
+    {
+      char buf[OBJBUFSIZE];
+      if (sysfs_get_string(d, "modalias", buf, 0))
+	d->module_alias = pci_strdup(d->access, buf);
+    }
+
   return pci_generic_fill_info(d, flags);
 }
 

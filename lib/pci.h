@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2009 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2013 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -130,6 +130,7 @@ struct pci_dev {
   pciaddr_t rom_size;			/* Expansion ROM size */
   struct pci_cap *first_cap;		/* List of capabilities */
   char *phy_slot;			/* Physical slot */
+  char *module_alias;			/* Linux kernel module alias */
 
   /* Fields used internally: */
   struct pci_access *access;
@@ -165,6 +166,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_CAPS		64
 #define PCI_FILL_EXT_CAPS	128
 #define PCI_FILL_PHYS_SLOT	256
+#define PCI_FILL_MODULE_ALIAS	512
 #define PCI_FILL_RESCAN		0x10000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
