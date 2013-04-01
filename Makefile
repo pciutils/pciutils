@@ -22,6 +22,7 @@ DNS=
 SHARED=no
 
 # ABI version suffix in the name of the shared library
+# (as we use proper symbol versioning, this seldom needs changing)
 ABI_VERSION=.3
 
 # Installation directories

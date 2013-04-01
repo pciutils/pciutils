@@ -56,6 +56,7 @@ int pci_link_dev(struct pci_access *, struct pci_dev *);
 
 int pci_fill_info_v30(struct pci_dev *, int flags) PCI_ABI;
 int pci_fill_info_v31(struct pci_dev *, int flags) PCI_ABI;
+int pci_fill_info_v32(struct pci_dev *, int flags) PCI_ABI;
 
 /* params.c */
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);
