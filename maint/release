@@ -33,10 +33,6 @@ push @{$r->{"uploads"}}, {
 ##	},{
 ##	"url" => "scp://master.kernel.org/pub/software/utils/pciutils/" . $r->{"ALPHADIR"}
 	};
-push @{$r->{"uploads"}}, {
-	"url" => "ftp://metalab.unc.edu/incoming/linux/",
-	"filter" => '(\.tar\.gz|\.lsm)$'
-	} if $r->{"ALPHADIR"} eq "";
 $r->ParseOptions;
 $r->InitDist("maint/dist");
 my $reldir = $r->GenPackage;
