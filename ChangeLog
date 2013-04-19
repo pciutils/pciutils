@@ -1,3 +1,15 @@
+2013-04-19  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.2.0.
+
+	* On newer Linux systems, we use libkmod to look up kernel modules
+	  (modules.pcimap no longer exists.) To facilitate this, libpci
+	  is able to look up module aliases in sysfs.
+
+	* Various minor bug fixes.
+
+	* Updated pci.ids to the today's snapshot of the database.
+
 2012-06-25  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.1.10.
@@ -14,7 +26,7 @@
 
 	* Updated README.
 
-	* Whereever we mention the PCI ID database, we now refer to
+	* Wherever we mention the PCI ID database, we now refer to
 	  http://pci-ids.ucw.cz/ and the sf.net site is mentioned only
 	  as a mirror. This includes update-pciids.
 
