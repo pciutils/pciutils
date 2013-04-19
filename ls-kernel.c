@@ -196,19 +196,16 @@ match_pcimap(struct device *d, struct pcimap_entry *e)
 
 static const char *next_module(struct device *d)
 {
-  static struct pcimap_entry *current, *last_printed;
+  static struct pcimap_entry *current;
 
   if (!current)
-    {
-      current = pcimap_head;
-      last_printed = NULL;
-    }
+    current = pcimap_head;
   else
     current = current->next;
 
   while (current)
     {
-      if (match_pcimap(d, current) && (!last_printed || strcmp(last_printed->module, current->module)))
+      if (match_pcimap(d, current))
 	return current->module;
       current = current->next;
     }
@@ -257,6 +254,25 @@ find_driver(struct device *d, char *buf)
     return buf;
 }
 
+static const char *
+next_module_filtered(struct device *d)
+{
+  static char prev_module[256];
+  const char *module;
+
+  while (module = next_module(d))
+    {
+      if (strcmp(module, prev_module))
+	{
+	  strncpy(prev_module, module, sizeof(prev_module));
+	  prev_module[sizeof(prev_module) - 1] = 0;
+	  return module;
+	}
+    }
+  prev_module[0] = 0;
+  return NULL;
+}
+
 void
 show_kernel(struct device *d)
 {
@@ -270,7 +286,7 @@ show_kernel(struct device *d)
     return;
 
   int cnt = 0;
-  while (module = next_module(d))
+  while (module = next_module_filtered(d))
     printf("%s %s", (cnt++ ? "," : "\tKernel modules:"), module);
   if (cnt)
     putchar('\n');
@@ -288,7 +304,7 @@ show_kernel_machine(struct device *d)
   if (!show_kernel_init())
     return;
 
-  while (module = next_module(d))
+  while (module = next_module_filtered(d))
     printf("Module:\t%s\n", module);
 }
 
