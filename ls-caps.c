@@ -1242,13 +1242,13 @@ cap_sata_hba(struct device *d, int where, int cap)
 }
 
 void
-show_caps(struct device *d)
+show_caps(struct device *d, int where)
 {
   int can_have_ext_caps = 0;
 
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
-      int where = get_conf_byte(d, PCI_CAPABILITY_LIST) & ~3;
+      where = get_conf_byte(d, where) & ~3;
       byte been_there[256];
       memset(been_there, 0, 256);
       while (where)

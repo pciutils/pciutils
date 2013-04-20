@@ -461,7 +461,7 @@ show_htype0(struct device *d)
 {
   show_bases(d, 6);
   show_rom(d, PCI_ROM_ADDRESS);
-  show_caps(d);
+  show_caps(d, PCI_CAPABILITY_LIST);
 }
 
 static void
@@ -567,7 +567,7 @@ show_htype1(struct device *d)
 	FLAG(brc, PCI_BRIDGE_CTL_DISCARD_TIMER_SERR_EN));
     }
 
-  show_caps(d);
+  show_caps(d, PCI_CAPABILITY_LIST);
 }
 
 static void
@@ -635,6 +635,7 @@ show_htype2(struct device *d)
   exca = get_conf_word(d, PCI_CB_LEGACY_MODE_BASE);
   if (exca)
     printf("\t16-bit legacy interface ports at %04x\n", exca);
+  show_caps(d, PCI_CB_CAPABILITY_LIST);
 }
 
 static void

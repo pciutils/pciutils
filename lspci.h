@@ -64,7 +64,7 @@ void cap_vpd(struct device *d);
 
 /* ls-caps.c */
 
-void show_caps(struct device *d);
+void show_caps(struct device *d, int where);
 
 /* ls-ecaps.c */
 
