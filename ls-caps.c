@@ -728,6 +728,8 @@ static char *aspm_support(int code)
 {
   switch (code)
     {
+      case 0:
+        return "not supported";
       case 1:
 	return "L0s";
       case 2:
