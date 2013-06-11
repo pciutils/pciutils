@@ -467,7 +467,7 @@ cap_l1pm(struct device *d, int where)
 
   l1_cap = get_conf_long(d, where + 4);
   printf("\t\tL1SubCap: ");
-  printf("PCI-PM_L1.2%c, PCI-PM_L1.1%c, ASPM_L1.2%c, ASPM_L1.1%c, L1_PM_Substates%c\n",
+  printf("PCI-PM_L1.2%c PCI-PM_L1.1%c ASPM_L1.2%c ASPM_L1.1%c L1_PM_Substates%c\n",
     FLAG(l1_cap, 1),
     FLAG(l1_cap, 2),
     FLAG(l1_cap, 4),
@@ -476,7 +476,7 @@ cap_l1pm(struct device *d, int where)
 
   if (BITS(l1_cap, 0, 1) || BITS(l1_cap, 2, 1))
     {
-      printf("\t\t\t  PortCommonModeRestoreTime=%dus, ",
+      printf("\t\t\t  PortCommonModeRestoreTime=%dus ",
 	BITS(l1_cap, 8,8));
 
       power_on_scale = BITS(l1_cap, 16, 2);
