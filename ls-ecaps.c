@@ -448,6 +448,58 @@ cap_evendor(struct device *d, int where)
     BITS(hdr, 20, 12));
 }
 
+static void
+cap_l1pm(struct device *d, int where)
+{
+  u32 l1_cap;
+  int power_on_scale;
+
+  printf("L1 PM Substates\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + 4, 4))
+    {
+      printf("\t\t<unreadable>\n");
+      return;
+    }
+
+  l1_cap = get_conf_long(d, where + 4);
+  printf("\t\tL1SubCap: ");
+  printf("PCI-PM_L1.2%c, PCI-PM_L1.1%c, ASPM_L1.2%c, ASPM_L1.1%c, L1_PM_Substates%c\n",
+    FLAG(l1_cap, 1),
+    FLAG(l1_cap, 2),
+    FLAG(l1_cap, 4),
+    FLAG(l1_cap, 8),
+    FLAG(l1_cap, 16));
+
+  if (BITS(l1_cap, 0, 1) || BITS(l1_cap, 2, 1))
+    {
+      printf("\t\t\t  PortCommonModeRestoreTime=%dus, ",
+	BITS(l1_cap, 8,8));
+
+      power_on_scale = BITS(l1_cap, 16, 2);
+
+      printf("PortTPowerOnTime=");
+      switch (power_on_scale)
+	{
+	  case 0:
+	    printf("%dus\n", BITS(l1_cap, 19, 5) * 2);
+	    break;
+	  case 1:
+	    printf("%dus\n", BITS(l1_cap, 19, 5) * 10);
+	    break;
+	  case 2:
+	    printf("%dus\n", BITS(l1_cap, 19, 5) * 100);
+	    break;
+	  default:
+	    printf("<error>\n");
+	    break;
+	}
+    }
+}
+
 void
 show_ext_caps(struct device *d)
 {
@@ -525,6 +577,9 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_LTR:
 	    cap_ltr(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_L1PM:
+	    cap_l1pm(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);
