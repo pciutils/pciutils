@@ -1074,6 +1074,7 @@ cap_express(struct device *d, int where, int cap)
   int type = (cap & PCI_EXP_FLAGS_TYPE) >> 4;
   int size;
   int slot = 0;
+  int link = 1;
 
   printf("Express ");
   if (verbose >= 2)
@@ -1104,9 +1105,11 @@ cap_express(struct device *d, int where, int cap)
       printf("PCI/PCI-X to PCI-Express Bridge");
       break;
     case PCI_EXP_TYPE_ROOT_INT_EP:
+      link = 0;
       printf("Root Complex Integrated Endpoint");
       break;
     case PCI_EXP_TYPE_ROOT_EC:
+      link = 0;
       printf("Root Complex Event Collector");
       break;
     default:
@@ -1125,7 +1128,8 @@ cap_express(struct device *d, int where, int cap)
     return;
 
   cap_express_dev(d, where, type);
-  cap_express_link(d, where, type);
+  if (link)
+    cap_express_link(d, where, type);
   if (slot)
     cap_express_slot(d, where);
   if (type == PCI_EXP_TYPE_ROOT_PORT)
@@ -1141,7 +1145,8 @@ cap_express(struct device *d, int where, int cap)
     return;
 
   cap_express_dev2(d, where, type);
-  cap_express_link2(d, where, type);
+  if (link)
+    cap_express_link2(d, where, type);
   if (slot)
     cap_express_slot2(d, where);
 }
