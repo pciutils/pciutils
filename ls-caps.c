@@ -696,7 +696,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_DEVCTL_PHANTOM),
 	FLAG(w, PCI_EXP_DEVCTL_AUX_PME),
 	FLAG(w, PCI_EXP_DEVCTL_NOSNOOP));
-  if (type == PCI_EXP_TYPE_PCI_BRIDGE || type == PCI_EXP_TYPE_PCIE_BRIDGE)
+  if (type == PCI_EXP_TYPE_PCI_BRIDGE)
     printf(" BrConfRtry%c", FLAG(w, PCI_EXP_DEVCTL_BCRE));
   if (((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END)) &&
       (t & PCI_EXP_DEVCAP_FLRESET))
@@ -1105,7 +1105,7 @@ cap_express(struct device *d, int where, int cap)
       printf("Downstream Port (Slot%c)", FLAG(cap, PCI_EXP_FLAGS_SLOT));
       break;
     case PCI_EXP_TYPE_PCI_BRIDGE:
-      printf("PCI/PCI-X Bridge");
+      printf("PCI-Express to PCI/PCI-X Bridge");
       break;
     case PCI_EXP_TYPE_PCIE_BRIDGE:
       printf("PCI/PCI-X to PCI-Express Bridge");
