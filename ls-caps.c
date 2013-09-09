@@ -659,11 +659,14 @@ static void cap_express_dev(struct device *d, int where, int type)
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_DEVCAP);
-  printf("\t\tDevCap:\tMaxPayload %d bytes, PhantFunc %d, Latency L0s %s, L1 %s\n",
+  printf("\t\tDevCap:\tMaxPayload %d bytes, PhantFunc %d",
 	128 << (t & PCI_EXP_DEVCAP_PAYLOAD),
-	(1 << ((t & PCI_EXP_DEVCAP_PHANTOM) >> 3)) - 1,
+	(1 << ((t & PCI_EXP_DEVCAP_PHANTOM) >> 3)) - 1);
+  if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END))
+    printf(", Latency L0s %s, L1 %s",
 	latency_l0s((t & PCI_EXP_DEVCAP_L0S) >> 6),
 	latency_l1((t & PCI_EXP_DEVCAP_L1) >> 9));
+  printf("\n");
   printf("\t\t\tExtTag%c", FLAG(t, PCI_EXP_DEVCAP_EXT_TAG));
   if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END) ||
       (type == PCI_EXP_TYPE_UPSTREAM) || (type == PCI_EXP_TYPE_PCI_BRIDGE))
