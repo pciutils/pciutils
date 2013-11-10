@@ -226,6 +226,7 @@ sysfs_fill_slots(struct pci_access *a)
       char namebuf[OBJNAMELEN], buf[16];
       FILE *file;
       unsigned int dom, bus, dev;
+      int res = 0;
       struct pci_dev *d;
 
       /* ".", ".." or a special non-device perhaps */
@@ -244,8 +245,16 @@ sysfs_fill_slots(struct pci_access *a)
       if (!file)
 	continue;
 
-      if (!fgets(buf, sizeof(buf), file) || sscanf(buf, "%x:%x:%x", &dom, &bus, &dev) < 3)
-	a->warning("sysfs_fill_slots: Couldn't parse entry address %s", buf);
+      if (!fgets(buf, sizeof(buf), file) || (res = sscanf(buf, "%x:%x:%x", &dom, &bus, &dev)) < 3)
+	{
+	  /*
+	   * In some cases, the slot is not tied to a specific device before
+	   * a card gets inserted. This happens for example on IBM pSeries
+	   * and we need not warn about it.
+	   */
+	  if (res != 2)
+	    a->warning("sysfs_fill_slots: Couldn't parse entry address %s", buf);
+	}
       else
 	{
 	  for (d = a->devices; d; d = d->next)
