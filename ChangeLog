@@ -1,3 +1,19 @@
+2013-11-10  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.2.1.
+
+	* CardBus bridge capabilities are displayed.
+
+	* PCIe L1 PM substates are decoded.
+
+	* Various bugs were fixed in decoding of PCIe capabilities.
+
+	* The sysfs back-end does not spit out unnecessary warnings when
+	  empty slots report only a partial device address. This actually
+	  happens on IBM pSeries.
+
+	* Updated pci.ids to the today's snapshot of the database.
+
 2013-04-19  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.2.0.
