@@ -38,7 +38,7 @@ map_bridge(struct bus_info *bi, struct device *d, int np, int ns, int nl)
   b->func = p->func;
   b->first = get_conf_byte(d, ns);
   b->last = get_conf_byte(d, nl);
-  printf("## %02x.%02x:%d is a bridge from %02x to %02x-%02x\n",
+  printf("## %02x:%02x.%d is a bridge from %02x to %02x-%02x\n",
 	 p->bus, p->dev, p->func, b->this, b->first, b->last);
   if (b->this != p->bus)
     printf("!!! Bridge points to invalid primary bus.\n");
