@@ -1261,8 +1261,8 @@ show_caps(struct device *d, int where)
 
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
-      where = get_conf_byte(d, where) & ~3;
       byte been_there[256];
+      where = get_conf_byte(d, where) & ~3;
       memset(been_there, 0, 256);
       while (where)
 	{
