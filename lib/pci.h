@@ -131,6 +131,7 @@ struct pci_dev {
   struct pci_cap *first_cap;		/* List of capabilities */
   char *phy_slot;			/* Physical slot */
   char *module_alias;			/* Linux kernel module alias */
+  char *label;				/* Device name as exported by BIOS */
 
   /* Fields used internally: */
   struct pci_access *access;

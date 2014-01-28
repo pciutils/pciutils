@@ -60,6 +60,7 @@ void pci_free_dev(struct pci_dev *d)
     d->methods->cleanup_dev(d);
   pci_free_caps(d);
   pci_mfree(d->module_alias);
+  pci_mfree(d->label);
   pci_mfree(d->phy_slot);
   pci_mfree(d);
 }

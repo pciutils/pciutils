@@ -315,6 +315,8 @@ show_terse(struct device *d)
       word subsys_v, subsys_d;
       char ssnamebuf[256];
 
+      if (p->label)
+        printf("\tDeviceName: %s", p->label);
       get_subid(d, &subsys_v, &subsys_d);
       if (subsys_v && subsys_v != 0xffff)
 	printf("\tSubsystem: %s\n",
