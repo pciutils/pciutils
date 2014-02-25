@@ -778,6 +778,7 @@
 #define  PCI_EXP_LNKCAP_SURPRISE 0x80000 /* Surprise Down Error Reporting */
 #define  PCI_EXP_LNKCAP_DLLA	0x100000 /* Data Link Layer Active Reporting */
 #define  PCI_EXP_LNKCAP_LBNC	0x200000 /* Link Bandwidth Notification Capability */
+#define  PCI_EXP_LNKCAP_AOC 	0x400000 /* ASPM Optionality Compliance */
 #define  PCI_EXP_LNKCAP_PORT	0xff000000 /* Port Number */
 #define PCI_EXP_LNKCTL		0x10	/* Link Control */
 #define  PCI_EXP_LNKCTL_ASPM	0x0003	/* ASPM Control */
