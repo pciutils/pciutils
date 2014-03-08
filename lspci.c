@@ -668,7 +668,7 @@ show_verbose(struct device *d)
     case PCI_HEADER_TYPE_BRIDGE:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
-      irq = int_pin = min_gnt = max_lat = 0;
+      min_gnt = max_lat = 0;
       break;
     case PCI_HEADER_TYPE_CARDBUS:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
