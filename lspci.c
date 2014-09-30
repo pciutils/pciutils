@@ -60,7 +60,7 @@ static char help_msg[] =
 "\n"
 "Selection of devices:\n"
 "-s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]\tShow only devices in selected slots\n"
-"-d [<vendor>]:[<device>]\t\t\tShow only devices with specified ID's\n"
+"-d [<vendor>]:[<device>][:<class>]\t\tShow only devices with specified ID's\n"
 "\n"
 "Other options:\n"
 "-i <file>\tUse specified ID database instead of %s\n"

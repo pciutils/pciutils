@@ -135,9 +135,10 @@ hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of 
 on any bus, "0.3" selects third function of device 0 on all buses and ".4" shows only
 the fourth function of each device.
 .TP
-.B -d [<vendor>]:[<device>]
-Show only devices with specified vendor and device ID. Both ID's are given in
-hexadecimal and may be omitted or given as "*", both meaning "any value".
+.B -d [<vendor>]:[<device>][:<class>]
+Show only devices with specified vendor, device and class ID. The ID's are
+given in hexadecimal and may be omitted or given as "*", both meaning
+"any value".
 
 .SS Other options
 .TP

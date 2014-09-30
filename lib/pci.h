@@ -198,7 +198,7 @@ struct pci_cap *pci_find_cap(struct pci_dev *, unsigned int id, unsigned int typ
 
 struct pci_filter {
   int domain, bus, slot, func;			/* -1 = ANY */
-  int vendor, device;
+  int vendor, device, class;
 };
 
 void pci_filter_init(struct pci_access *, struct pci_filter *) PCI_ABI;
