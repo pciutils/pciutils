@@ -10,7 +10,11 @@
 
 #ifdef PCI_SHARED_LIB
 #define PCI_ABI __attribute__((visibility("default")))
+#ifdef __APPLE__
+#define STATIC_ALIAS(_decl, _for) _decl { return _for; }
+#else
 #define STATIC_ALIAS(_decl, _for)
+#endif
 #define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
 #define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
 #else

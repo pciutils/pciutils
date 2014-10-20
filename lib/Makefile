@@ -56,7 +56,11 @@ $(PCILIB): $(addsuffix .o,$(OBJS))
 else
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
+ ifdef PCI_HAVE_PM_DARWIN_DEVICE
+	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,-install_name,$(LIBDIR)/$(PCILIB) -o $@ $^ $(LIB_LDLIBS)
+ else
 	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,--version-script=libpci.ver -o $@ $^ $(LIB_LDLIBS)
+ endif
 endif
 
 $(PCILIBPC): libpci.pc.in
