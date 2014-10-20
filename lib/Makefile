@@ -42,6 +42,10 @@ ifdef PCI_HAVE_PM_NBSD_LIBPCI
 OBJS += nbsd-libpci
 endif
 
+ifdef PCI_HAVE_PM_DARWIN_DEVICE
+OBJS += darwin-device
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)

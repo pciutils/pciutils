@@ -100,6 +100,14 @@ case $sys in
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
 		LIBRESOLV=
 		;;
+
+        darwin)
+	        echo_n " darwin-device"
+		echo >>$c '#define PCI_HAVE_PM_DARWIN_DEVICE'
+		echo >>$m 'WITH_LIBS+=-lresolv -framework CoreFoundation -framework IOKit'
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		LIBRESOLV=
+		;;
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'
