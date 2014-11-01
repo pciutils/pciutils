@@ -9,3 +9,13 @@ from http://www.internals.com/.
 
 However, you need to use win32/config.{h,mk} instead of the automatically
 generated lib/config.{h,mk} as lib/configure does not run on Windows.
+
+================================================================================
+BEWARE: The current implementation pokes I/O ports to access the PCI devices
+directly. This leads to several problems: some devices are invisible, extended
+PCIe configuration space is not available, and there are many potential race
+conditions. Instead, libpci should use the proper Windows drivers.
+
+Unfortunately, the Windows port currently lacks a maintainer. If you are willing
+to step up and fix the issues, please let me know.  -- Martin Mares
+================================================================================

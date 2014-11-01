@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2012 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -22,7 +22,7 @@ In runs on the following systems:
 	Solaris/i386	(direct port access)
 	Aix		(via /dev/pci and odmget)
 	GNU Hurd	(direct port access)
-	Windows		(direct port access)
+	Windows		(direct port access, see README.Windows for caveats)
 	CYGWIN		(direct port access)
 	BeOS		(via syscalls)
 	Haiku		(via /dev/misc/poke)
@@ -100,6 +100,9 @@ for new entries via network.
 
 The pci.ids file is also mirrored at http://pciids.sourceforge.net/
 
+On Linux systems with a recent enough version of libudev, UDEV's HWDB
+database is consulted when pci.ids lacks the device.
+
 
 4. Getting new versions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,7 +114,6 @@ The tarball can be downloaded at the following places:
 
 	ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/
 	ftp://ftp.kernel.org/pub/software/utils/pciutils/ (expect a couple of hours delay)
-	ftp://metalab.unc.edu/pub/Linux/hardware/ (expect a couple of days delay)
 
 There is also a public GIT tree at:
 
