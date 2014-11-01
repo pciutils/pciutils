@@ -43,7 +43,7 @@ OBJS += nbsd-libpci
 endif
 
 ifdef PCI_HAVE_PM_DARWIN_DEVICE
-OBJS += darwin-device
+OBJS += darwin
 endif
 
 all: $(PCILIB) $(PCILIBPC)
