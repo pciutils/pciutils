@@ -169,6 +169,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_EXT_CAPS	128
 #define PCI_FILL_PHYS_SLOT	256
 #define PCI_FILL_MODULE_ALIAS	512
+#define PCI_FILL_LABEL		1024
 #define PCI_FILL_RESCAN		0x10000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;

@@ -161,7 +161,7 @@ sysfs_get_resources(struct pci_dev *d)
 
 static void sysfs_scan(struct pci_access *a)
 {
-  char dirname[1024], buf[OBJBUFSIZE];
+  char dirname[1024];
   DIR *dir;
   struct dirent *entry;
   int n;
@@ -199,9 +199,6 @@ static void sysfs_scan(struct pci_access *a)
 	  d->vendor_id = sysfs_get_value(d, "vendor");
 	  d->device_id = sysfs_get_value(d, "device");
 	  d->device_class = sysfs_get_value(d, "class") >> 8;
-	  if (sysfs_get_string(d, "label", buf, 0))
-	    d->label = pci_strdup(d->access, buf);
-
 	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES;
 	}
       pci_link_dev(a, d);
@@ -285,6 +282,13 @@ sysfs_fill_info(struct pci_dev *d, int flags)
       char buf[OBJBUFSIZE];
       if (sysfs_get_string(d, "modalias", buf, 0))
 	d->module_alias = pci_strdup(d->access, buf);
+    }
+
+  if ((flags & PCI_FILL_LABEL) && !(d->known_fields & PCI_FILL_LABEL))
+    {
+      char buf[OBJBUFSIZE];
+      if (sysfs_get_string(d, "label", buf, 0))
+	d->label = pci_strdup(d->access, buf);
     }
 
   return pci_generic_fill_info(d, flags);
