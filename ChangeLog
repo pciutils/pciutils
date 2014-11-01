@@ -19,7 +19,7 @@
 	* Released as 3.2.0.
 
 	* On newer Linux systems, we use libkmod to look up kernel modules
-	  (modules.pcimap no longer exists.) To facilitate this, libpci
+	  (modules.pcimap no longer exists). To facilitate this, libpci
 	  is able to look up module aliases in sysfs.
 
 	* Various minor bug fixes.
