@@ -170,13 +170,11 @@ pci_fill_info_v32(struct pci_dev *d, int flags)
 /* In version 3.1, pci_fill_info got new flags => versioned alias */
 /* In version 3.2, the same has happened */
 STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v32(d, flags));
-#ifndef __APPLE__
 DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v32);
 DEFINE_ALIAS(int pci_fill_info_v31(struct pci_dev *d, int flags), pci_fill_info_v32);
 SYMBOL_VERSION(pci_fill_info_v30, pci_fill_info@LIBPCI_3.0);
 SYMBOL_VERSION(pci_fill_info_v31, pci_fill_info@LIBPCI_3.1);
 SYMBOL_VERSION(pci_fill_info_v32, pci_fill_info@@LIBPCI_3.2);
-#endif
 
 void
 pci_setup_cache(struct pci_dev *d, byte *cache, int len)

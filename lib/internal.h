@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Internal Stuff
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -11,12 +11,14 @@
 #ifdef PCI_SHARED_LIB
 #define PCI_ABI __attribute__((visibility("default")))
 #ifdef __APPLE__
-#define STATIC_ALIAS(_decl, _for) _decl { return _for; }
-#else
-#define STATIC_ALIAS(_decl, _for)
-#endif
+#define STATIC_ALIAS(_decl, _for) _decl PCI_ABI { return _for; }
 #define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
 #define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
+#else
+#define STATIC_ALIAS(_decl, _for)
+#define DEFINE_ALIAS(_decl, _for)
+#define SYMBOL_VERSION(_int, _ext)
+#endif
 #else
 #define STATIC_ALIAS(_decl, _for) _decl { return _for; }
 #define DEFINE_ALIAS(_decl, _for)
