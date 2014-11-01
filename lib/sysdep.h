@@ -40,13 +40,21 @@ typedef u16 word;
 
 #ifdef PCI_OS_SUNOS
 #include <sys/byteorder.h>
+#if defined(__i386) && defined(LITTLE_ENDIAN)
+# define BYTE_ORDER LITTLE_ENDIAN
+#elif defined(__sparc) && defined(BIG_ENDIAN)
+# define BYTE_ORDER BIG_ENDIAN
+#else
 #define BIG_ENDIAN 4321
+#endif
+#ifndef BYTE_ORDER
 #ifdef _LITTLE_ENDIAN
 #define BYTE_ORDER 1234
 #else
 #define BYTE_ORDER 4321
 #endif
-#endif
+#endif /* BYTE_ORDER */
+#endif /* PCI_OS_SUNOS */
 
 #ifdef PCI_OS_WINDOWS
 #ifdef __MINGW32__
