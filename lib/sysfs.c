@@ -161,7 +161,7 @@ sysfs_get_resources(struct pci_dev *d)
 
 static void sysfs_scan(struct pci_access *a)
 {
-  char dirname[1024];
+  char dirname[1024], buf[OBJBUFSIZE];
   DIR *dir;
   struct dirent *entry;
   int n;
@@ -199,7 +199,6 @@ static void sysfs_scan(struct pci_access *a)
 	  d->vendor_id = sysfs_get_value(d, "vendor");
 	  d->device_id = sysfs_get_value(d, "device");
 	  d->device_class = sysfs_get_value(d, "class") >> 8;
-	  char buf[1024];
 	  if (sysfs_get_string(d, "label", buf, 0))
 	    d->label = pci_strdup(d->access, buf);
 
