@@ -153,7 +153,7 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->write(d, pos, buf, len);
 }
 
-int
+int VERSIONED
 pci_fill_info_v32(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)

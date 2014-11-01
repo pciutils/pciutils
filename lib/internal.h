@@ -10,6 +10,10 @@
 
 #ifdef PCI_SHARED_LIB
 #define PCI_ABI __attribute__((visibility("default")))
+// Functions, which are bound to externally visible symbols by the versioning
+// mechanism, have to be declared as VERSIONED. Otherwise, GCC with global
+// optimizations is happy to optimize them away, leading to linker failures.
+#define VERSIONED __attribute__((used))
 #ifdef __APPLE__
 #define STATIC_ALIAS(_decl, _for) _decl PCI_ABI { return _for; }
 #define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
@@ -20,6 +24,7 @@
 #define SYMBOL_VERSION(_int, _ext)
 #endif
 #else
+#define VERSIONED
 #define STATIC_ALIAS(_decl, _for) _decl { return _for; }
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
