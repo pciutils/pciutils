@@ -117,7 +117,7 @@
 	* Updated pci.ids to the today's snapshot of the database.
 
 	* Fixed memory and file descriptor leak in the dump back-end.
-	
+
 	* The SR-IOV capability decoder now prints the VF BAR's.
 	Patch by Chris Wright, cleaned up by me.
 
@@ -359,7 +359,7 @@
 
 	* Makefile: stripping of the binaries during installation can be
 	overridden by the STRIP variable.
-	
+
 	* lib/types.h: We use the integer types from <stdint.h> if the
 	compiler claims C99 support.
 

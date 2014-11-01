@@ -82,9 +82,9 @@ darwin_detect(struct pci_access *a)
 	io_connect_t           connect;
 	kern_return_t          status;
 
-	service = IOServiceGetMatchingService(kIOMasterPortDefault, 
+	service = IOServiceGetMatchingService(kIOMasterPortDefault,
 																					IOServiceMatching("AppleACPIPlatformExpert"));
-	if (service) 
+	if (service)
 	{
 		status = IOServiceOpen(service, mach_task_self(), 0, &connect);
 		IOObjectRelease(service);
