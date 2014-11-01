@@ -59,7 +59,7 @@ int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 /* init.c */
 void *pci_malloc(struct pci_access *, int);
 void pci_mfree(void *);
-char *pci_strdup(struct pci_access *a, char *s);
+char *pci_strdup(struct pci_access *a, const char *s);
 
 /* access.c */
 struct pci_dev *pci_alloc_dev(struct pci_access *);

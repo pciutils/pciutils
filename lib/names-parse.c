@@ -238,6 +238,7 @@ pci_free_name_list(struct pci_access *a)
 {
   pci_id_cache_flush(a);
   pci_id_hash_free(a);
+  pci_id_hwdb_free(a);
   a->id_load_failed = 0;
 }
 

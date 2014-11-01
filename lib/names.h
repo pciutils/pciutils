@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -33,6 +33,7 @@ enum id_entry_src {
   SRC_UNKNOWN,
   SRC_CACHE,
   SRC_NET,
+  SRC_HWDB,
   SRC_LOCAL,
 };
 
@@ -67,3 +68,8 @@ void pci_id_hash_free(struct pci_access *a);
 /* names-dns.c */
 
 char *pci_id_net_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4);
+
+/* names-hwdb.c */
+
+char *pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4);
+void pci_id_hwdb_free(struct pci_access *a);

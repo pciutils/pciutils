@@ -82,7 +82,7 @@ pci_mfree(void *x)
 }
 
 char *
-pci_strdup(struct pci_access *a, char *s)
+pci_strdup(struct pci_access *a, const char *s)
 {
   int len = strlen(s) + 1;
   char *t = pci_malloc(a, len);
@@ -162,6 +162,9 @@ pci_alloc(void)
   pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
   pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
+#endif
+#ifdef PCI_HAVE_HWDB
+  pci_define_param(a, "hwdb.disable", "0", "Do not look up names in UDEV's HWDB if non-zero");
 #endif
   for (i=0; i<PCI_ACCESS_MAX; i++)
     if (pci_methods[i] && pci_methods[i]->config)

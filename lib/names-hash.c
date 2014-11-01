@@ -11,11 +11,6 @@
 #include "internal.h"
 #include "names.h"
 
-#ifdef PCI_HAVE_HWDB
-#include <libudev.h>
-#include <stdio.h>
-#endif
-
 struct id_bucket {
   struct id_bucket *next;
   unsigned int full;
@@ -91,58 +86,8 @@ char
 *pci_id_lookup(struct pci_access *a, int flags, int cat, int id1, int id2, int id3, int id4)
 {
   struct id_entry *n, *best;
-  u32 id12, id34;
-
-#ifdef PCI_HAVE_HWDB
-  if (!(flags & PCI_LOOKUP_SKIP_LOCAL))
-    {
-      char modalias[64];
-      const char *key = NULL;
-      struct udev *udev = udev_new();
-      struct udev_hwdb *hwdb = udev_hwdb_new(udev);
-      struct udev_list_entry *entry;
-
-      switch(cat)
-        {
-        case ID_VENDOR:
-          sprintf(modalias, "pci:v%08X*", id1);
-          key = "ID_VENDOR_FROM_DATABASE";
-          break;
-        case ID_DEVICE:
-          sprintf(modalias, "pci:v%08Xd%08X*", id1, id2);
-          key = "ID_MODEL_FROM_DATABASE";
-          break;
-        case ID_SUBSYSTEM:
-          sprintf(modalias, "pci:v%08Xd%08Xsv%08Xsd%08X*", id1, id2, id3, id4);
-          key = "ID_MODEL_FROM_DATABASE";
-          break;
-        case ID_GEN_SUBSYSTEM:
-          sprintf(modalias, "pci:v*d*sv%08Xsd%08X*", id1, id2);
-          key = "ID_MODEL_FROM_DATABASE";
-          break;
-        case ID_CLASS:
-          sprintf(modalias, "pci:v*d*sv*sd*bc%02X*", id1);
-          key = "ID_PCI_CLASS_FROM_DATABASE";
-          break;
-        case ID_SUBCLASS:
-          sprintf(modalias, "pci:v*d*sv*sd*bc%02Xsc%02X*", id1, id2);
-          key = "ID_PCI_SUBCLASS_FROM_DATABASE";
-          break;
-        case ID_PROGIF:
-          sprintf(modalias, "pci:v*d*sv*sd*bc%02Xsc%02Xi%02X*", id1, id2, id3);
-          key = "ID_PCI_INTERFACE_FROM_DATABASE";
-          break;
-        }
-
-      if (key)
-          udev_list_entry_foreach(entry, udev_hwdb_get_properties_list_entry(hwdb, modalias, 0))
-              if (strcmp(udev_list_entry_get_name(entry), key) == 0)
-                return udev_list_entry_get_value(entry);
-    }
-#endif
-
-  id12 = id_pair(id1, id2);
-  id34 = id_pair(id3, id4);
+  u32 id12 = id_pair(id1, id2);
+  u32 id34 = id_pair(id3, id4);
 
   if (a->id_hash)
     {
@@ -157,6 +102,8 @@ char
 	  if (n->src == SRC_NET && !(flags & PCI_LOOKUP_NETWORK))
 	    continue;
 	  if (n->src == SRC_CACHE && !(flags & PCI_LOOKUP_CACHE))
+	    continue;
+	  if (n->src == SRC_HWDB && (flags & (PCI_LOOKUP_SKIP_LOCAL | PCI_LOOKUP_NO_HWDB)))
 	    continue;
 	  if (!best || best->src < n->src)
 	    best = n;

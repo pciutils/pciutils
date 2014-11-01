@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2013 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -73,6 +73,8 @@ struct pci_access {
   struct id_bucket *current_id_bucket;
   int id_load_failed;
   int id_cache_status;			/* 0=not read, 1=read, 2=dirty */
+  struct udev *id_udev;			/* names-hwdb.c */
+  struct udev_hwdb *id_udev_hwdb;
   int fd;				/* proc/sys: fd for config space */
   int fd_rw;				/* proc/sys: fd opened read-write */
   int fd_pos;				/* proc/sys: current position */
@@ -240,6 +242,7 @@ enum pci_lookup_mode {
   PCI_LOOKUP_SKIP_LOCAL = 0x100000,	/* Do not consult local database */
   PCI_LOOKUP_CACHE = 0x200000,		/* Consult the local cache before using DNS */
   PCI_LOOKUP_REFRESH_CACHE = 0x400000,	/* Forget all previously cached entries, but still allow updating the cache */
+  PCI_LOOKUP_NO_HWDB = 0x800000,	/* Do not ask udev's hwdb */
 };
 
 #endif

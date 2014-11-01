@@ -1,9 +1,9 @@
 # Makefile for The PCI Library
-# (c) 1999--2008 Martin Mares <mj@ucw.cz>
+# (c) 1999--2014 Martin Mares <mj@ucw.cz>
 
 # Expects to be invoked from the top-level Makefile and uses lots of its variables.
 
-OBJS=init access generic dump names filter names-hash names-parse names-net names-cache params caps
+OBJS=init access generic dump names filter names-hash names-parse names-net names-cache names-hwdb params caps
 INCL=internal.h pci.h config.h header.h sysdep.h types.h
 
 ifdef PCI_HAVE_PM_LINUX_SYSFS
@@ -88,5 +88,6 @@ names-cache.o: names-cache.c $(INCL) names.h
 names-hash.o: names-hash.c $(INCL) names.h
 names-net.o: names-net.c $(INCL) names.h
 names-parse.o: names-parse.c $(INCL) names.h
+names-hwdb.o: names-hwdb.c $(INCL) names.h
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)

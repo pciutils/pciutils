@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- ID to Name Translation
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -16,6 +16,7 @@
 static char *id_lookup(struct pci_access *a, int flags, int cat, int id1, int id2, int id3, int id4)
 {
   char *name;
+  int tried_hwdb = 0;
 
   while (!(name = pci_id_lookup(a, flags, cat, id1, id2, id3, id4)))
     {
@@ -23,6 +24,15 @@ static char *id_lookup(struct pci_access *a, int flags, int cat, int id1, int id
 	{
 	  if (pci_id_cache_load(a, flags))
 	    continue;
+	}
+      if (!tried_hwdb && !(flags & (PCI_LOOKUP_SKIP_LOCAL | PCI_LOOKUP_NO_HWDB)))
+	{
+	  tried_hwdb = 1;
+	  if (name = pci_id_hwdb_lookup(a, cat, id1, id2, id3, id4))
+	    {
+	      pci_id_insert(a, cat, id1, id2, id3, id4, name, SRC_HWDB);
+	      continue;
+	    }
 	}
       if (flags & PCI_LOOKUP_NETWORK)
         {

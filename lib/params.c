@@ -85,4 +85,3 @@ pci_walk_params(struct pci_access *acc, struct pci_param *prev)
   else
     return prev->next;
 }
-
