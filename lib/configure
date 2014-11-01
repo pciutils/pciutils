@@ -103,7 +103,7 @@ case $sys in
 		;;
 
         darwin*)
-	        echo_n " darwin-device"
+	        echo_n " darwin"
 		echo >>$c '#define PCI_HAVE_PM_DARWIN_DEVICE'
 		echo >>$m 'WITH_LIBS+=-lresolv -framework CoreFoundation -framework IOKit'
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
