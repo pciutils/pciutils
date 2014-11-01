@@ -6,11 +6,7 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
-#ifdef __GLIBC__
 #include <sys/io.h>
-#else
-#include <asm/io.h>
-#endif
 
 static int
 intel_setup_io(struct pci_access *a UNUSED)
