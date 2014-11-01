@@ -58,7 +58,7 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
   NULL,
 #endif
 #ifdef PCI_HAVE_PM_DARWIN_DEVICE
-  &pm_darwin_device,
+  &pm_darwin,
 #else
   NULL,
 #endif

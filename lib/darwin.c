@@ -194,9 +194,9 @@ darwin_write(struct pci_dev *d, int pos, byte *buf, int len)
   return 1;
 }
 
-struct pci_methods pm_darwin_device = {
-    "darwin-device",
-    "Darwin device",
+struct pci_methods pm_darwin = {
+    "darwin",
+    "Darwin",
     darwin_config,
     darwin_detect,
     darwin_init,
