@@ -13,18 +13,18 @@
 // Functions, which are bound to externally visible symbols by the versioning
 // mechanism, have to be declared as VERSIONED. Otherwise, GCC with global
 // optimizations is happy to optimize them away, leading to linker failures.
-#define VERSIONED __attribute__((used))
+#define VERSIONED_ABI __attribute__((used)) PCI_ABI
 #ifdef __APPLE__
 #define STATIC_ALIAS(_decl, _for) _decl PCI_ABI { return _for; }
-#define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
-#define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
-#else
-#define STATIC_ALIAS(_decl, _for)
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
+#else
+#define STATIC_ALIAS(_decl, _for)
+#define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
+#define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
 #endif
 #else
-#define VERSIONED
+#define VERSIONED_ABI
 #define STATIC_ALIAS(_decl, _for) _decl { return _for; }
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
@@ -65,9 +65,10 @@ char *pci_strdup(struct pci_access *a, const char *s);
 struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);
 
-int pci_fill_info_v30(struct pci_dev *, int flags) PCI_ABI;
-int pci_fill_info_v31(struct pci_dev *, int flags) PCI_ABI;
-int pci_fill_info_v32(struct pci_dev *, int flags) PCI_ABI;
+int pci_fill_info_v30(struct pci_dev *, int flags) VERSIONED_ABI;
+int pci_fill_info_v31(struct pci_dev *, int flags) VERSIONED_ABI;
+int pci_fill_info_v32(struct pci_dev *, int flags) VERSIONED_ABI;
+int pci_fill_info_v33(struct pci_dev *, int flags) VERSIONED_ABI;
 
 /* params.c */
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);

@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- User Access
  *
- *	Copyright (c) 1997--2013 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -153,8 +153,8 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->write(d, pos, buf, len);
 }
 
-int VERSIONED
-pci_fill_info_v32(struct pci_dev *d, int flags)
+int
+pci_fill_info_v33(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)
     {
@@ -168,13 +168,15 @@ pci_fill_info_v32(struct pci_dev *d, int flags)
 }
 
 /* In version 3.1, pci_fill_info got new flags => versioned alias */
-/* In version 3.2, the same has happened */
-STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v32(d, flags));
-DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v32);
-DEFINE_ALIAS(int pci_fill_info_v31(struct pci_dev *d, int flags), pci_fill_info_v32);
+/* In versions 3.2 and 3.3, the same has happened */
+STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v33(d, flags));
+DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v33);
+DEFINE_ALIAS(int pci_fill_info_v31(struct pci_dev *d, int flags), pci_fill_info_v33);
+DEFINE_ALIAS(int pci_fill_info_v32(struct pci_dev *d, int flags), pci_fill_info_v33);
 SYMBOL_VERSION(pci_fill_info_v30, pci_fill_info@LIBPCI_3.0);
 SYMBOL_VERSION(pci_fill_info_v31, pci_fill_info@LIBPCI_3.1);
-SYMBOL_VERSION(pci_fill_info_v32, pci_fill_info@@LIBPCI_3.2);
+SYMBOL_VERSION(pci_fill_info_v32, pci_fill_info@LIBPCI_3.2);
+SYMBOL_VERSION(pci_fill_info_v33, pci_fill_info@@LIBPCI_3.3);
 
 void
 pci_setup_cache(struct pci_dev *d, byte *cache, int len)
