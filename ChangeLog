@@ -1,3 +1,30 @@
+2014-11-02  Martin Mares <mj@ucw.cz>
+
+	* Device names exported by BIOS are displayed on Linux.
+
+	* On Linux systems, HWDB is used to look up device names
+	  when our ID database gives no match. (More precisely,
+	  HWDB is consulted after local pci.ids, but before using
+	  network to query online pci.ids.) Thanks to Tom Gundersen
+	  for the initial patch.
+
+	* Added experimental back-end for OS X / Darwin. Thanks to
+	  Richard Yao for providing it.
+
+	* Interrupt Pin and Interrupt Line registers are displayed
+	  for bridge devices, too.
+
+	* Several portability bugs have been fixed.
+
+	* Several typos have been fixed. Also, use of questionable
+	  constructs in man pages has been reduced.
+
+	* PCIe link capabilities now include the ASPMOptComp bit.
+
+	* The "CRS Software Visibility" bit is now decoded properly.
+
+	* Updated pci.ids to the current snapshot of the database.
+
 2013-11-10  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.2.1.
