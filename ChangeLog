@@ -11,6 +11,10 @@
 	* Added experimental back-end for OS X / Darwin. Thanks to
 	  Richard Yao for providing it.
 
+	* Filters now support matching by device class. Original
+	  patch by Matthew Wilcox, wrappers for ABI compatibility
+	  by me.
+
 	* Interrupt Pin and Interrupt Line registers are displayed
 	  for bridge devices, too.
 
