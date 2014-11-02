@@ -152,23 +152,6 @@ echo >>$m "LIBEXT="$LIBEXT
 echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
 
-echo_n "Checking for udev hwdb support... "
-if [ "$HWDB" = yes -o "$HWDB" = no ] ; then
-	echo "$HWDB (set manually)"
-else
-	if `pkg-config --atleast-version=196 libudev` ; then
-		HWDB=yes
-	else
-		HWDB=no
-	fi
-	echo "$HWDB (auto-detected)"
-fi
-if [ "$HWDB" = yes ] ; then
-	echo >>$c '#define PCI_HAVE_HWDB'
-	echo >>$m 'LIBUDEV=-ludev'
-	echo >>$m 'WITH_LIBS+=$(LIBUDEV)'
-fi
-
 echo_n "Checking for zlib support... "
 if [ "$ZLIB" = yes -o "$ZLIB" = no ] ; then
 	echo "$ZLIB (set manually)"
@@ -238,6 +221,23 @@ if [ "$sys" = linux ] ; then
 		echo >>$c "#define PCI_USE_LIBKMOD"
 		echo >>$m "LIBKMOD_CFLAGS=$($PKG_CONFIG --cflags libkmod)"
 		echo >>$m "LIBKMOD_LIBS=$($PKG_CONFIG --libs libkmod)"
+	fi
+
+	echo_n "Checking for udev hwdb support... "
+	if [ "$HWDB" = yes -o "$HWDB" = no ] ; then
+		echo "$HWDB (set manually)"
+	else
+		if `which pkg-config >/dev/null && pkg-config --atleast-version=196 libudev` ; then
+			HWDB=yes
+		else
+			HWDB=no
+		fi
+		echo "$HWDB (auto-detected)"
+	fi
+	if [ "$HWDB" = yes ] ; then
+		echo >>$c '#define PCI_HAVE_HWDB'
+		echo >>$m 'LIBUDEV=-ludev'
+		echo >>$m 'WITH_LIBS+=$(LIBUDEV)'
 	fi
 fi
 

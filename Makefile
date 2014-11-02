@@ -24,6 +24,9 @@ SHARED=no
 # Use libkmod to resolve kernel modules on Linux (yes/no, default: detect)
 LIBKMOD=
 
+# Use libudev to resolve device names using hwdb on Linux (yes/no, default: detect)
+HWDB=
+
 # ABI version suffix in the name of the shared library
 # (as we use proper symbol versioning, this seldom needs changing)
 ABI_VERSION=.3
