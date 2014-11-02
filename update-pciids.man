@@ -1,5 +1,4 @@
 .TH update-pciids 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
-.IX update-pciids
 
 .SH NAME
 update-pciids \- download new version of the PCI ID list

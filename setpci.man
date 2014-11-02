@@ -1,5 +1,4 @@
 .TH setpci 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
-.IX setpci
 .SH NAME
 setpci \- configure PCI devices
 .SH SYNOPSIS
@@ -115,7 +114,7 @@ options of the same kind are specified, the rightmost one overrides the others.
 .PP
 There are two kinds of operations: reads and writes. To read a register, just specify
 its name. Writes have the form
-.IR name = value , value ...
+.IR name = value , value ...\&
 where each
 .I value
 is either a hexadecimal number or an expression of type

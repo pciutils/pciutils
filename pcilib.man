@@ -1,5 +1,4 @@
 .TH pcilib 7 "@TODAY@" "@VERSION@" "The PCI Utilities"
-.IX pcilib
 .SH NAME
 pcilib \- a library for accessing PCI devices
 

@@ -1,5 +1,4 @@
 .TH lspci 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
-.IX lspci
 .SH NAME
 lspci \- list all PCI devices
 .SH SYNOPSIS
