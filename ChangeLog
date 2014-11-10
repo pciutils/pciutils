@@ -1,4 +1,7 @@
-2014-11-02  Martin Mares <mj@ucw.cz>
+2014-11-10  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.3.0 (celebrating a one-year anniversary of
+	  the previous version :)).
 
 	* Device names exported by BIOS are displayed on Linux.
 
