@@ -14,8 +14,8 @@ while (<X>) {
 }
 print "API version is $apiver ... <confirm> "; <STDIN>;
 
-print "Updating public GIT tree\n";
-`git push --tags public`; die if $?;
+#print "Updating public GIT tree\n";
+#`git push --tags public`; die if $?;
 
 my $r = new UCW::Release("pciutils");
 my $ver = $r->GetVersionFromFile("Makefile", "VERSION=(.*)");
@@ -43,4 +43,16 @@ if ($r->{"do_upload"}) {
 	print "Uploading pci.ids to Jabberwock\n";
 	`scp -C pci.ids pciids\@jabberwock.ucw.cz:05-pciutils.new`; die if $?;
 	`ssh pciids\@jabberwock.ucw.cz mv 05-pciutils.new origs/05-pciutils`; die if $?;
+}
+
+# Hacks for kernel.org
+print "Preparing kernel.org package\n";
+my $dd = $r->{"DISTDIR"};
+my $pkg = $r->{"PKG"};
+`gzip -d <$dd/$pkg.tar.gz >$dd/$pkg.tar`; die if $?;
+system "gpg", "--armor", "--detach-sig", "-o", "$dd/$pkg.tar.sig", "$dd/$pkg.tar"; die if $?;
+if ($r->{"do_upload"}) {
+	print "Uploading to kernel.org\n";
+	print "<confirm> "; <STDIN>;
+	system '/home/mj/tree/kup/kup', 'put', "$dd/$pkg.tar", "$dd/$pkg.tar.sig", "/pub/software/utils/pciutils/$pkg.tar.gz"; die if $?;
 }
