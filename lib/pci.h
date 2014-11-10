@@ -16,7 +16,7 @@
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x030200
+#define PCI_LIB_VERSION 0x030300
 
 #ifndef PCI_ABI
 #define PCI_ABI
