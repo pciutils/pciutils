@@ -70,6 +70,10 @@ void show_caps(struct device *d, int where);
 
 void show_ext_caps(struct device *d);
 
+/* ls-caps-vendor.c */
+
+void show_vendor_caps(struct device *d, int where, int cap);
+
 /* ls-kernel.c */
 
 void show_kernel_machine(struct device *d UNUSED);

@@ -1315,7 +1315,7 @@ show_caps(struct device *d, int where)
 	      cap_ht(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_VNDR:
-	      printf("Vendor Specific Information: Len=%02x <?>\n", BITS(cap, 0, 8));
+	      show_vendor_caps(d, where, cap);
 	      break;
 	    case PCI_CAP_ID_DBG:
 	      cap_debug_port(cap);
