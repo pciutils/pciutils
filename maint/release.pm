@@ -16,6 +16,7 @@ sub new($$) {
 		"rules" => [
 			# p=preprocess, s=subst, -=discard
 			'(^|/)(CVS|\.arch-ids|{arch}|\.git|tmp)/' => '-',
+			'\.sw[a-z]$' => '-',
 			'\.(lsm|spec)$' => 'ps',
 			'(^|/)README$' => 's'
 			],
