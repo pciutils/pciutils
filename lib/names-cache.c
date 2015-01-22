@@ -38,7 +38,7 @@ static char *get_cache_name(struct pci_access *a)
 
   buf = pci_malloc(a, strlen(pw->pw_dir) + strlen(name+1) + 1);
   sprintf(buf, "%s%s", pw->pw_dir, name+1);
-  pci_set_param_internal(a, "net.cache_name", buf, 0);
+  pci_set_param_internal(a, "net.cache_name", buf, 1);
   pci_mfree(buf);
   return pci_get_param(a, "net.cache_name");
 }
