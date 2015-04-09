@@ -2,6 +2,8 @@ How to release pciutils
 ~~~~~~~~~~~~~~~~~~~~~~~
 (a couple of hints for the forgetful maintainer)
 
+Update pci.ids.
+
 Check version numbers in Makefile and lib/pci.h.
 
 ssh-add ~/.ssh/id_korg

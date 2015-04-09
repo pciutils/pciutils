@@ -11,6 +11,8 @@
 
 	* Fixed memory leak in name cache.
 
+	* Updated pci.ids to the current snapshot of the database.
+
 2014-11-10  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.3.0.
