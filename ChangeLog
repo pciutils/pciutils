@@ -1,3 +1,16 @@
+2015-04-09  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.3.1.
+
+	* Removed hacks for backward compatibility with Linux libc5,
+	  which were breaking newer non-glibc Linux systems. Thanks
+	  to Felix Janda.
+
+	* Display VirtIO vendor-specific capability. Patch by Gerd
+	  Hoffmann.
+
+	* Fixed memory leak in name cache.
+
 2014-11-10  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.3.0.

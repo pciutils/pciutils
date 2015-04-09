@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2015 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -16,7 +16,7 @@
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x030300
+#define PCI_LIB_VERSION 0x030301
 
 #ifndef PCI_ABI
 #define PCI_ABI
