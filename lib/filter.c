@@ -163,7 +163,7 @@ pci_filter_import_v30(struct pci_filter_v30 *old, struct pci_filter *new)
 {
   new->domain = old->domain;
   new->bus = old->bus;
-  new->slot = old->bus;
+  new->slot = old->slot;
   new->func = old->func;
   new->vendor = old->vendor;
   new->device = old->device;
@@ -175,7 +175,7 @@ pci_filter_export_v30(struct pci_filter *new, struct pci_filter_v30 *old)
 {
   old->domain = new->domain;
   old->bus = new->bus;
-  old->slot = new->bus;
+  old->slot = new->slot;
   old->func = new->func;
   old->vendor = new->vendor;
   old->device = new->device;
