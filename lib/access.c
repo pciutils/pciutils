@@ -28,6 +28,7 @@ pci_alloc_dev(struct pci_access *a)
   d->access = a;
   d->methods = a->methods;
   d->hdrtype = -1;
+  d->numa_node = -1;
   if (d->methods->init_dev)
     d->methods->init_dev(d);
   return d;

@@ -757,6 +757,8 @@ show_verbose(struct device *d)
 	printf(", latency %d", latency);
       if (irq)
 	printf(", IRQ " PCIIRQ_FMT, irq);
+      if (p->numa_node != -1)
+	printf(", NUMA node %d", p->numa_node);
       putchar('\n');
     }
 

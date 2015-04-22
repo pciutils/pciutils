@@ -127,6 +127,7 @@ struct pci_dev {
   u16 vendor_id, device_id;		/* Identity of the device */
   u16 device_class;			/* PCI device class */
   int irq;				/* IRQ number */
+  int numa_node;			/* NUMA node */
   pciaddr_t base_addr[6];		/* Base addresses including flags in lower bits */
   pciaddr_t size[6];			/* Region sizes */
   pciaddr_t rom_base_addr;		/* Expansion ROM base address */

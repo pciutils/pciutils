@@ -192,6 +192,7 @@ static void sysfs_scan(struct pci_access *a)
 	{
 	  sysfs_get_resources(d);
 	  d->irq = sysfs_get_value(d, "irq");
+	  d->numa_node = sysfs_get_value(d, "numa_node");
 	  /*
 	   *  We could read these faster from the config registers, but we want to give
 	   *  the kernel a chance to fix up ID's and especially classes of broken devices.
