@@ -93,21 +93,28 @@ sysfs_get_string(struct pci_dev *d, char *object, char *buf, int mandatory)
   struct pci_access *a = d->access;
   int fd, n;
   char namebuf[OBJNAMELEN];
+  void (*warn)(char *msg, ...) = (mandatory ? a->error : a->warning);
 
   sysfs_obj_name(d, object, namebuf);
   fd = open(namebuf, O_RDONLY);
   if (fd < 0)
     {
-      if (mandatory)
-	a->error("Cannot open %s: %s", namebuf, strerror(errno));
+      if (mandatory || errno != ENOENT)
+	warn("Cannot open %s: %s", namebuf, strerror(errno));
       return 0;
     }
   n = read(fd, buf, OBJBUFSIZE);
   close(fd);
   if (n < 0)
-    a->error("Error reading %s: %s", namebuf, strerror(errno));
+    {
+      warn("Error reading %s: %s", namebuf, strerror(errno));
+      return 0;
+     }
   if (n >= OBJBUFSIZE)
-    a->error("Value in %s too long", namebuf);
+    {
+      warn("Value in %s too long", namebuf);
+      return 0;
+    }
   buf[n] = 0;
   return 1;
 }
