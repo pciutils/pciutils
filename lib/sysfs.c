@@ -200,7 +200,7 @@ static void sysfs_scan(struct pci_access *a)
 	  d->vendor_id = sysfs_get_value(d, "vendor");
 	  d->device_id = sysfs_get_value(d, "device");
 	  d->device_class = sysfs_get_value(d, "class") >> 8;
-	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES;
+	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_NUMA_NODE;
 	}
       pci_link_dev(a, d);
     }

@@ -69,6 +69,7 @@ int pci_fill_info_v30(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v31(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v32(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v33(struct pci_dev *, int flags) VERSIONED_ABI;
+int pci_fill_info_v34(struct pci_dev *, int flags) VERSIONED_ABI;
 
 /* params.c */
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);

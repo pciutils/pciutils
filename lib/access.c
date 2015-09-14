@@ -155,7 +155,7 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 int
-pci_fill_info_v33(struct pci_dev *d, int flags)
+pci_fill_info_v34(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)
     {
@@ -169,15 +169,17 @@ pci_fill_info_v33(struct pci_dev *d, int flags)
 }
 
 /* In version 3.1, pci_fill_info got new flags => versioned alias */
-/* In versions 3.2 and 3.3, the same has happened */
-STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v33(d, flags));
-DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v33);
-DEFINE_ALIAS(int pci_fill_info_v31(struct pci_dev *d, int flags), pci_fill_info_v33);
-DEFINE_ALIAS(int pci_fill_info_v32(struct pci_dev *d, int flags), pci_fill_info_v33);
+/* In versions 3.2, 3.3 and 3.4, the same has happened */
+STATIC_ALIAS(int pci_fill_info(struct pci_dev *d, int flags), pci_fill_info_v34(d, flags));
+DEFINE_ALIAS(int pci_fill_info_v30(struct pci_dev *d, int flags), pci_fill_info_v34);
+DEFINE_ALIAS(int pci_fill_info_v31(struct pci_dev *d, int flags), pci_fill_info_v34);
+DEFINE_ALIAS(int pci_fill_info_v32(struct pci_dev *d, int flags), pci_fill_info_v34);
+DEFINE_ALIAS(int pci_fill_info_v33(struct pci_dev *d, int flags), pci_fill_info_v34);
 SYMBOL_VERSION(pci_fill_info_v30, pci_fill_info@LIBPCI_3.0);
 SYMBOL_VERSION(pci_fill_info_v31, pci_fill_info@LIBPCI_3.1);
 SYMBOL_VERSION(pci_fill_info_v32, pci_fill_info@LIBPCI_3.2);
-SYMBOL_VERSION(pci_fill_info_v33, pci_fill_info@@LIBPCI_3.3);
+SYMBOL_VERSION(pci_fill_info_v33, pci_fill_info@LIBPCI_3.3);
+SYMBOL_VERSION(pci_fill_info_v34, pci_fill_info@@LIBPCI_3.4);
 
 void
 pci_setup_cache(struct pci_dev *d, byte *cache, int len)
