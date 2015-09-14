@@ -1,3 +1,16 @@
+2015-09-14  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.4.0.
+
+	* On Linux, we report NUMA nodes of devices.
+
+	* The sysfs back-end does not die on read errors
+	  of optional attributes. Instead, a warning is produced.
+
+	* Fixed several minor bugs.
+
+	* Updated pci.ids to the current snapshot of the database.
+
 2015-04-09  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.3.1.
