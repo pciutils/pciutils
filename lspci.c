@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2015 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -138,9 +138,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES |
-    PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_PHYS_SLOT | PCI_FILL_LABEL |
-    PCI_FILL_NUMA_NODE);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS);
   return d;
 }
 
@@ -655,9 +653,13 @@ show_verbose(struct device *d)
   byte cache_line = get_conf_byte(d, PCI_CACHE_LINE_SIZE);
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
-  unsigned int irq = p->irq;
+  unsigned int irq;
 
   show_terse(d);
+
+  pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
+    PCI_FILL_PHYS_SLOT | PCI_FILL_LABEL | PCI_FILL_NUMA_NODE);
+  irq = p->irq;
 
   switch (htype)
     {
@@ -838,6 +840,7 @@ show_machine(struct device *d)
 
   if (verbose)
     {
+      pci_fill_info(p, PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE);
       printf((opt_machine >= 2) ? "Slot:\t" : "Device:\t");
       show_slot_name(d);
       putchar('\n');
