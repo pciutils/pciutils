@@ -305,6 +305,10 @@ Kernel driver currently handling the device (optional, Linux only).
 Kernel module reporting that it is capable of handling the device
 (optional, Linux only).
 
+.TP
+.B NUMANode
+NUMA node this device is connected to (optional, Linux only).
+
 .P
 New tags can be added in future versions, so you should silently ignore any tags you don't recognize.
 

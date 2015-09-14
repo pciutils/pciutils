@@ -733,6 +733,8 @@ show_verbose(struct device *d)
       if (int_pin || irq)
 	printf("\tInterrupt: pin %c routed to IRQ " PCIIRQ_FMT "\n",
 	       (int_pin ? 'A' + int_pin - 1 : '?'), irq);
+      if (p->numa_node != -1)
+	printf("\tNUMA node: %d\n", p->numa_node);
     }
   else
     {
@@ -858,6 +860,8 @@ show_machine(struct device *d)
 	printf("ProgIf:\t%02x\n", c);
       if (opt_kernel)
 	show_kernel_machine(d);
+      if (p->numa_node != -1)
+	printf("NUMANode:\t%d\n", p->numa_node);
     }
   else
     {
