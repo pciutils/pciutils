@@ -113,12 +113,14 @@ sysfs_get_string(struct pci_dev *d, char *object, char *buf, int mandatory)
 }
 
 static int
-sysfs_get_value(struct pci_dev *d, char *object)
+sysfs_get_value(struct pci_dev *d, char *object, int mandatory)
 {
   char buf[OBJBUFSIZE];
 
-  sysfs_get_string(d, object, buf, 1);
-  return strtol(buf, NULL, 0);
+  if (sysfs_get_string(d, object, buf, mandatory))
+    return strtol(buf, NULL, 0);
+  else
+    return -1;
 }
 
 static void
@@ -191,16 +193,15 @@ static void sysfs_scan(struct pci_access *a)
       if (!a->buscentric)
 	{
 	  sysfs_get_resources(d);
-	  d->irq = sysfs_get_value(d, "irq");
-	  d->numa_node = sysfs_get_value(d, "numa_node");
+	  d->irq = sysfs_get_value(d, "irq", 1);
 	  /*
 	   *  We could read these faster from the config registers, but we want to give
 	   *  the kernel a chance to fix up ID's and especially classes of broken devices.
 	   */
-	  d->vendor_id = sysfs_get_value(d, "vendor");
-	  d->device_id = sysfs_get_value(d, "device");
-	  d->device_class = sysfs_get_value(d, "class") >> 8;
-	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_NUMA_NODE;
+	  d->vendor_id = sysfs_get_value(d, "vendor", 1);
+	  d->device_id = sysfs_get_value(d, "device", 1);
+	  d->device_class = sysfs_get_value(d, "class", 1) >> 8;
+	  d->known_fields = PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES;
 	}
       pci_link_dev(a, d);
     }
@@ -291,6 +292,9 @@ sysfs_fill_info(struct pci_dev *d, int flags)
       if (sysfs_get_string(d, "label", buf, 0))
 	d->label = pci_strdup(d->access, buf);
     }
+
+  if ((flags & PCI_FILL_NUMA_NODE) && !(d->known_fields & PCI_FILL_NUMA_NODE))
+    d->numa_node = sysfs_get_value(d, "numa_node", 0);
 
   return pci_generic_fill_info(d, flags);
 }
