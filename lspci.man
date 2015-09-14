@@ -126,10 +126,10 @@ Use this if you suspect that the displayed entry is wrong.
 
 .SS Options for selection of devices
 .TP
-.B -s [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]
+.B -s [[[[<domain>]:]<bus>]:][<device>][.[<func>]]
 Show only devices in the specified domain (in case your machine has several host bridges,
 they can either share a common bus number space or each of them can address a PCI domain
-of its own; domains are numbered from 0 to ffff), bus (0 to ff), slot (0 to 1f) and function (0 to 7).
+of its own; domains are numbered from 0 to ffff), bus (0 to ff), device (0 to 1f) and function (0 to 7).
 Each component of the device address can be omitted or set to "*", both meaning "any value". All numbers are
 hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of device 0
 on any bus, "0.3" selects third function of device 0 on all buses and ".4" shows only
