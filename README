@@ -98,7 +98,7 @@ and also submit new entries.
 Alternatively, you can use `lspci -q' to query the central database
 for new entries via network.
 
-The pci.ids file is also mirrored at http://pciids.sourceforge.net/
+The pci.ids file is also mirrored at https://github.com/pciutils/pciids.
 
 On Linux systems with a recent enough version of libudev, UDEV's HWDB
 database is consulted when pci.ids lacks the device.
@@ -118,6 +118,7 @@ The tarball can be downloaded at the following places:
 There is also a public GIT tree at:
 
 	git://git.kernel.org/pub/scm/utils/pciutils/pciutils.git
+	https://github.com/pciutils/pciutils
 
 
 5. Using the library
