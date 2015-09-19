@@ -14,3 +14,5 @@ git push --tags
 maint/release
 
 Update progs/pciutils at Jabberwock.
+
+Check that everything was pushed to both kernel.org and github.com.
