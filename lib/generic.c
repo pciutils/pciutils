@@ -69,9 +69,10 @@ void
 pci_generic_scan(struct pci_access *a)
 {
   byte busmap[256];
+  int basebus = strtol(pci_get_param(a, "i386.basebus"),NULL,16);
 
   memset(busmap, 0, sizeof(busmap));
-  pci_generic_scan_bus(a, busmap, 0);
+  pci_generic_scan_bus(a, busmap, basebus);
 }
 
 int

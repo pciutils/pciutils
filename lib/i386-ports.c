@@ -32,6 +32,13 @@
 
 static int conf12_io_enabled = -1;		/* -1=haven't tried, 0=failed, 1=succeeded */
 
+static void
+conf12_config(struct pci_access *a)
+{
+  pci_define_param(a, "i386.basebus", "0", "Start busnumber for scanning");
+}
+
+
 static int
 conf12_setup_io(struct pci_access *a)
 {
@@ -261,7 +268,7 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 struct pci_methods pm_intel_conf1 = {
   "intel-conf1",
   "Raw I/O port access using Intel conf1 interface",
-  NULL,					/* config */
+  conf12_config,		/* config */
   conf1_detect,
   conf12_init,
   conf12_cleanup,
@@ -277,7 +284,7 @@ struct pci_methods pm_intel_conf1 = {
 struct pci_methods pm_intel_conf2 = {
   "intel-conf2",
   "Raw I/O port access using Intel conf2 interface",
-  NULL,					/* config */
+  conf12_config,		/* config */
   conf2_detect,
   conf12_init,
   conf12_cleanup,
