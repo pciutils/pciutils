@@ -205,6 +205,54 @@ cap_ats(struct device *d, int where)
 }
 
 static void
+cap_pri(struct device *d, int where)
+{
+  u16 w;
+  u32 l;
+
+  printf("Page Request Interface (PRI)\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_PRI_CTRL, 0xc))
+    return;
+
+  w = get_conf_word(d, where + PCI_PRI_CTRL);
+  printf("\t\tPRICtl: Enable%c, Reset%c\n",
+	FLAG(w, PCI_PRI_CTRL_ENABLE), FLAG(w, PCI_PRI_CTRL_RESET));
+  w = get_conf_word(d, where + PCI_PRI_STATUS);
+  printf("\t\tPRISta: RF%c, UPRGI%c, Stopped%c\n",
+	FLAG(w, PCI_PRI_STATUS_RF), FLAG(w, PCI_PRI_STATUS_UPRGI),
+	FLAG(w, PCI_PRI_STATUS_STOPPED));
+  l = get_conf_long(d, where + PCI_PRI_MAX_REQ);
+  printf("\t\tPage Request Capacity: %08x, ", l);
+  l = get_conf_long(d, where + PCI_PRI_ALLOC_REQ);
+  printf("Page Request Allocation: %08x\n", l);
+}
+
+static void
+cap_pasid(struct device *d, int where)
+{
+  u16 w;
+
+  printf("Process Address Space ID (PASID)\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_PASID_CAP, 4))
+    return;
+
+  w = get_conf_word(d, where + PCI_PASID_CAP);
+  printf("\t\tPASIDCap: Exec%c, Priv%c, Max PASID Width: %02x\n",
+	FLAG(w, PCI_PASID_CAP_EXEC), FLAG(w, PCI_PASID_CAP_PRIV),
+	PCI_PASID_CAP_WIDTH(w));
+  w = get_conf_word(d, where + PCI_PASID_CTRL);
+  printf("\t\tPASIDCtl: Enable%c, Exec%c, Priv%c\n",
+	FLAG(w, PCI_PASID_CTRL_ENABLE), FLAG(w, PCI_PASID_CTRL_EXEC),
+	FLAG(w, PCI_PASID_CTRL_PRIV));
+}
+
+static void
 cap_sriov(struct device *d, int where)
 {
   u16 b;
@@ -572,11 +620,17 @@ show_ext_caps(struct device *d)
 	  case PCI_EXT_CAP_ID_SRIOV:
 	    cap_sriov(d, where);
 	    break;
+	  case PCI_EXT_CAP_ID_PRI:
+	    cap_pri(d, where);
+	    break;
 	  case PCI_EXT_CAP_ID_TPH:
 	    cap_tph(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_LTR:
 	    cap_ltr(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_PASID:
+	    cap_pasid(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_L1PM:
 	    cap_l1pm(d, where);

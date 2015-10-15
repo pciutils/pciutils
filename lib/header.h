@@ -224,8 +224,10 @@
 #define PCI_EXT_CAP_ID_ARI	0x0e	/* Alternative Routing-ID Interpretation */
 #define PCI_EXT_CAP_ID_ATS	0x0f	/* Address Translation Service */
 #define PCI_EXT_CAP_ID_SRIOV	0x10	/* Single Root I/O Virtualization */
+#define PCI_EXT_CAP_ID_PRI	0x13	/* Page Request Interface */
 #define PCI_EXT_CAP_ID_TPH	0x17	/* Transaction processing hints */
 #define PCI_EXT_CAP_ID_LTR	0x18	/* Latency Tolerance Reporting */
+#define PCI_EXT_CAP_ID_PASID	0x1b	/* Process Address Space ID */
 #define PCI_EXT_CAP_ID_L1PM	0x1e	/* L1 PM Substates */
 
 /*** Definitions of capabilities ***/
@@ -1042,6 +1044,17 @@
 #define PCI_IOV_MSA_BIR(x)	((x) & 7) /* VF Migration State BIR */
 #define PCI_IOV_MSA_OFFSET(x)	((x) & 0xfffffff8) /* VF Migration State Offset */
 
+/* Page Request Interface */
+#define PCI_PRI_CTRL		0x04	/* PRI Control Register */
+#define  PCI_PRI_CTRL_ENABLE	0x01	/* Enable */
+#define  PCI_PRI_CTRL_RESET	0x02	/* Reset */
+#define PCI_PRI_STATUS		0x06	/* PRI status register */
+#define  PCI_PRI_STATUS_RF	0x001	/* Response Failure */
+#define  PCI_PRI_STATUS_UPRGI	0x002	/* Unexpected PRG index */
+#define  PCI_PRI_STATUS_STOPPED	0x100	/* PRI Stopped */
+#define PCI_PRI_MAX_REQ		0x08	/* PRI max reqs supported */
+#define PCI_PRI_ALLOC_REQ	0x0c	/* PRI max reqs allowed */
+
 /* Transaction Processing Hints */
 #define PCI_TPH_CAPABILITIES	4
 #define   PCI_TPH_INTVEC_SUP	(1<<1)	/* Supports interrupt vector mode */
@@ -1060,6 +1073,15 @@
 #define   PCI_LTR_SCALE_MASK	(7)
 #define PCI_LTR_MAX_NOSNOOP	6	/* 16 bit value */
 
+/* Process Address Space ID */
+#define PCI_PASID_CAP		0x04	/* PASID feature register */
+#define  PCI_PASID_CAP_EXEC	0x02	/* Exec permissions Supported */
+#define  PCI_PASID_CAP_PRIV	0x04	/* Privilege Mode Supported */
+#define  PCI_PASID_CAP_WIDTH(x) (((x) >> 8) & 0x1f) /* Max PASID Width */
+#define PCI_PASID_CTRL		0x06	/* PASID control register */
+#define  PCI_PASID_CTRL_ENABLE	0x01	/* Enable bit */
+#define  PCI_PASID_CTRL_EXEC	0x02	/* Exec permissions Enable */
+#define  PCI_PASID_CTRL_PRIV	0x04	/* Privilege Mode Enable */
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
