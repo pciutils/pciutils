@@ -218,10 +218,10 @@ cap_pri(struct device *d, int where)
     return;
 
   w = get_conf_word(d, where + PCI_PRI_CTRL);
-  printf("\t\tPRICtl: Enable%c, Reset%c\n",
+  printf("\t\tPRICtl: Enable%c Reset%c\n",
 	FLAG(w, PCI_PRI_CTRL_ENABLE), FLAG(w, PCI_PRI_CTRL_RESET));
   w = get_conf_word(d, where + PCI_PRI_STATUS);
-  printf("\t\tPRISta: RF%c, UPRGI%c, Stopped%c\n",
+  printf("\t\tPRISta: RF%c UPRGI%c Stopped%c\n",
 	FLAG(w, PCI_PRI_STATUS_RF), FLAG(w, PCI_PRI_STATUS_UPRGI),
 	FLAG(w, PCI_PRI_STATUS_STOPPED));
   l = get_conf_long(d, where + PCI_PRI_MAX_REQ);
@@ -243,11 +243,11 @@ cap_pasid(struct device *d, int where)
     return;
 
   w = get_conf_word(d, where + PCI_PASID_CAP);
-  printf("\t\tPASIDCap: Exec%c, Priv%c, Max PASID Width: %02x\n",
+  printf("\t\tPASIDCap: Exec%c Priv%c, Max PASID Width: %02x\n",
 	FLAG(w, PCI_PASID_CAP_EXEC), FLAG(w, PCI_PASID_CAP_PRIV),
 	PCI_PASID_CAP_WIDTH(w));
   w = get_conf_word(d, where + PCI_PASID_CTRL);
-  printf("\t\tPASIDCtl: Enable%c, Exec%c, Priv%c\n",
+  printf("\t\tPASIDCtl: Enable%c Exec%c Priv%c\n",
 	FLAG(w, PCI_PASID_CTRL_ENABLE), FLAG(w, PCI_PASID_CTRL_EXEC),
 	FLAG(w, PCI_PASID_CTRL_PRIV));
 }
