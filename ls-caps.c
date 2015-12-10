@@ -678,7 +678,8 @@ static void cap_express_dev(struct device *d, int where, int type)
   if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END))
     printf(" FLReset%c",
 	FLAG(t, PCI_EXP_DEVCAP_FLRESET));
-  if (type == PCI_EXP_TYPE_UPSTREAM)
+  if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_UPSTREAM) ||
+      (type == PCI_EXP_TYPE_PCI_BRIDGE))
     printf(" SlotPowerLimit %.3fW",
 	power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18,
 		    (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26));
