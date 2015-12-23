@@ -203,6 +203,7 @@
 #define  PCI_CAP_ID_MSIX	0x11	/* MSI-X */
 #define  PCI_CAP_ID_SATA	0x12	/* Serial-ATA HBA */
 #define  PCI_CAP_ID_AF		0x13	/* Advanced features of PCI devices integrated in PCIe root cplx */
+#define  PCI_CAP_ID_EA		0x14	/* Enhanced Allocation */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
@@ -905,6 +906,13 @@
 /* SATA Host Bus Adapter */
 #define PCI_SATA_HBA_BARS	4
 #define PCI_SATA_HBA_REG0	8
+
+/* Enhanced Allocation (EA) */
+#define PCI_EA_CAP_TYPE1_SECONDARY	4
+#define PCI_EA_CAP_TYPE1_SUBORDINATE	5
+/* EA Entry header */
+#define PCI_EA_CAP_ENT_WRITABLE	0x40000000	/* Writable: 1 = RW, 0 = HwInit */
+#define PCI_EA_CAP_ENT_ENABLE	0x80000000	/* Enable for this entry */
 
 /*** Definitions of extended capabilities ***/
 
