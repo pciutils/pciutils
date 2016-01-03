@@ -1,3 +1,18 @@
+2016-01-03  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.4.1.
+
+	* New capabilities decoded: Process Address Space, Page Request
+	  Interface, Enhanced Allocation. Thanks to David Daney and
+	  David Woodhouse.
+
+	* DevCap SlotPowerLimit is now decoded for all components with
+	  upstream ports.
+
+	* Database mirror at SourceForge moved to GitHub.
+
+	* Updated pci.ids to the current snapshot of the database.
+
 2015-09-14  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.4.0.

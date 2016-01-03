@@ -1,11 +1,11 @@
 # Makefile for The PCI Utilities
-# (c) 1998--2015 Martin Mares <mj@ucw.cz>
+# (c) 1998--2016 Martin Mares <mj@ucw.cz>
 
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
-VERSION=3.4.0
-DATE=2015-09-14
+VERSION=3.4.1
+DATE=2016-01-03
 
 # Host OS and release (override if you are cross-compiling)
 HOST=
