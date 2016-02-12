@@ -129,7 +129,7 @@ pci_filter_match_v33(struct pci_filter *f, struct pci_dev *d)
     return 0;
   if (f->device >= 0 || f->vendor >= 0)
     {
-      pci_fill_info_v34(d, PCI_FILL_IDENT);
+      pci_fill_info_v35(d, PCI_FILL_IDENT);
       if ((f->device >= 0 && f->device != d->device_id) ||
 	  (f->vendor >= 0 && f->vendor != d->vendor_id))
 	return 0;

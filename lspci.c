@@ -336,7 +336,7 @@ show_size(pciaddr_t x)
   if (!x)
     return;
   for (i = 0; i < (sizeof(suffix) / sizeof(*suffix) - 1); i++) {
-    if (x < 1024)
+    if (x % 1024)
       break;
     x /= 1024;
   }
@@ -355,6 +355,7 @@ show_bases(struct device *d, int cnt)
     {
       pciaddr_t pos = p->base_addr[i];
       pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
+      pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->flags[i] : 0;
       u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
       if (flg == 0xffffffff)
 	flg = 0;
@@ -364,7 +365,9 @@ show_bases(struct device *d, int cnt)
 	printf("\tRegion %d: ", i);
       else
 	putchar('\t');
-      if (pos && !flg)			/* Reported by the OS, but not by the device */
+      if (ioflg & IORESOURCE_PCI_EA_BEI)
+	  printf("[enhanced] ");
+      else if (pos && !flg)	/* Reported by the OS, but not by the device */
 	{
 	  printf("[virtual] ");
 	  flg = pos;
@@ -430,6 +433,7 @@ show_rom(struct device *d, int reg)
   struct pci_dev *p = d->dev;
   pciaddr_t rom = p->rom_base_addr;
   pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
+  pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->rom_flags : 0;
   u32 flg = get_conf_long(d, reg);
   word cmd = get_conf_word(d, PCI_COMMAND);
   int virtual = 0;
@@ -437,7 +441,9 @@ show_rom(struct device *d, int reg)
   if (!rom && !flg && !len)
     return;
   putchar('\t');
-  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
+  if (ioflg & IORESOURCE_PCI_EA_BEI)
+      printf("[enhanced] ");
+  else if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
     {
       printf("[virtual] ");
       flg = rom;

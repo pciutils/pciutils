@@ -1236,3 +1236,7 @@
 
 #define PCI_VENDOR_ID_INTEL		0x8086
 #define PCI_VENDOR_ID_COMPAQ		0x0e11
+
+/* taken from <include/linux/ioport.h> */
+
+#define IORESOURCE_PCI_EA_BEI          (1<<5)

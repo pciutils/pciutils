@@ -136,6 +136,8 @@ struct pci_dev {
   char *module_alias;			/* Linux kernel module alias */
   char *label;				/* Device name as exported by BIOS */
   int numa_node;			/* NUMA node */
+  pciaddr_t flags[6];			/* Region IORESOURCE flags */
+  pciaddr_t rom_flags;			/* Expansion ROM IORESOURCE flags */
 
   /* Fields used internally: */
   struct pci_access *access;
@@ -174,6 +176,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_MODULE_ALIAS	0x0200
 #define PCI_FILL_LABEL		0x0400
 #define PCI_FILL_NUMA_NODE	0x0800
+#define PCI_FILL_IO_FLAGS	0x1000
 #define PCI_FILL_RESCAN		0x00010000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
