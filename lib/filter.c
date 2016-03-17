@@ -45,7 +45,7 @@ pci_filter_parse_slot_v33(struct pci_filter *f, char *str)
 	  if (str[0] && strcmp(str, "*"))
 	    {
 	      long int x = strtol(str, &e, 16);
-	      if ((e && *e) || (x < 0 || x > 0xffff))
+	      if ((e && *e) || (x < 0 || x > 0x7fffffff))
 		return "Invalid domain number";
 	      f->domain = x;
 	    }
