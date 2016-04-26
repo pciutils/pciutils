@@ -230,6 +230,7 @@
 #define PCI_EXT_CAP_ID_LTR	0x18	/* Latency Tolerance Reporting */
 #define PCI_EXT_CAP_ID_PASID	0x1b	/* Process Address Space ID */
 #define PCI_EXT_CAP_ID_L1PM	0x1e	/* L1 PM Substates */
+#define PCI_EXT_CAP_ID_DPC	0x1d	/* Downstream Port Containment */
 
 /*** Definitions of capabilities ***/
 
@@ -1090,6 +1091,31 @@
 #define  PCI_PASID_CTRL_ENABLE	0x01	/* Enable bit */
 #define  PCI_PASID_CTRL_EXEC	0x02	/* Exec permissions Enable */
 #define  PCI_PASID_CTRL_PRIV	0x04	/* Privilege Mode Enable */
+
+#define PCI_DPC_CAP		4	/* DPC Capability */
+#define  PCI_DPC_CAP_INT_MSG(x) ((x) & 0x1f)	/* DPC Interrupt Message Number */
+#define  PCI_DPC_CAP_RP_EXT	0x20		/* DPC Root Port Extentions */
+#define  PCI_DPC_CAP_TLP_BLOCK	0x40		/* DPC Poisoned TLP Egress Blocking */
+#define  PCI_DPC_CAP_SW_TRIGGER	0x80		/* DPC Software Trigger */
+#define  PCI_DPC_CAP_RP_LOG(x)	(((x) >> 8) & 0xf) /* DPC RP PIO Log Size */
+#define  PCI_DPC_CAP_DL_ACT_ERR	0x1000		/* DPC DL_Active ERR_COR Signal */
+#define PCI_DPC_CTL		6	/* DPC Control */
+#define  PCI_DPC_CTL_TRIGGER(x) ((x) & 0x3)	/* DPC Trigger Enable */
+#define  PCI_DPC_CTL_CMPL	0x4		/* DPC Completion Control */
+#define  PCI_DPC_CTL_INT	0x8		/* DPC Interrupt Enabled */
+#define  PCI_DPC_CTL_ERR_COR	0x10		/* DPC ERR_COR Enabled */
+#define  PCI_DPC_CTL_TLP	0x20		/* DPC Poisoned TLP Egress Blocking Enabled */
+#define  PCI_DPC_CTL_SW_TRIGGER	0x40		/* DPC Software Trigger */
+#define  PCI_DPC_CTL_DL_ACTIVE	0x80		/* DPC DL_Active ERR_COR Enable */
+#define PCI_DPC_STATUS		8	/* DPC STATUS */
+#define  PCI_DPC_STS_TRIGGER	0x01		/* DPC Trigger Status */
+#define  PCI_DPC_STS_REASON(x) (((x) >> 1) & 0x3) /* DPC Trigger Reason */
+#define  PCI_DPC_STS_INT	0x08		/* DPC Interrupt Status */
+#define  PCI_DPC_STS_RP_BUSY	0x10		/* DPC Root Port Busy */
+#define  PCI_DPC_STS_TRIGGER_EXT(x) (((x) >> 5) & 0x3) /* Trigger Reason Extention */
+#define  PCI_DPC_STS_PIO_FEP(x) (((x) >> 8) & 0x1f) /* DPC PIO First Error Pointer */
+#define PCI_DPC_SOURCE		10	/* DPC Source ID */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded

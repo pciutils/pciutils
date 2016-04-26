@@ -137,6 +137,37 @@ cap_aer(struct device *d, int where)
 
 }
 
+static void cap_dpc(struct device *d, int where)
+{
+  u16 l;
+
+  printf("Downstream Port Containment\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_DPC_CAP, 8))
+    return;
+
+  l = get_conf_word(d, where + PCI_DPC_CAP);
+  printf("\t\tDpcCap:\tINT Msg #%d, RPExt%c PoisonedTLP%c SwTrigger%c RP PIO Log %d, DL_ActiveErr%c\n",
+    PCI_DPC_CAP_INT_MSG(l), FLAG(l, PCI_DPC_CAP_RP_EXT), FLAG(l, PCI_DPC_CAP_TLP_BLOCK),
+    FLAG(l, PCI_DPC_CAP_SW_TRIGGER), PCI_DPC_CAP_RP_LOG(l), FLAG(l, PCI_DPC_CAP_DL_ACT_ERR));
+
+  l = get_conf_word(d, where + PCI_DPC_CTL);
+  printf("\t\tDpcCtl:\tTrigger:%x Cmpl%c INT%c ErrCor%c PoisonedTLP%c SwTrigger%c DL_ActiveErr%c\n",
+    PCI_DPC_CTL_TRIGGER(l), FLAG(l, PCI_DPC_CTL_CMPL), FLAG(l, PCI_DPC_CTL_INT),
+    FLAG(l, PCI_DPC_CTL_ERR_COR), FLAG(l, PCI_DPC_CTL_TLP), FLAG(l, PCI_DPC_CTL_SW_TRIGGER),
+    FLAG(l, PCI_DPC_CTL_DL_ACTIVE));
+
+  l = get_conf_word(d, where + PCI_DPC_STATUS);
+  printf("\t\tDpcSta:\tTrigger%c Reason:%02x INT%c RPBusy%c TriggerExt:%02x RP PIO ErrPtr:%02x\n",
+    FLAG(l, PCI_DPC_STS_TRIGGER), PCI_DPC_STS_REASON(l), FLAG(l, PCI_DPC_STS_INT),
+    FLAG(l, PCI_DPC_STS_RP_BUSY), PCI_DPC_STS_TRIGGER_EXT(l), PCI_DPC_STS_PIO_FEP(l));
+
+  l = get_conf_word(d, where + PCI_DPC_SOURCE);
+  printf("\t\tSource:\t%04x\n", l);
+}
+
 static void
 cap_acs(struct device *d, int where)
 {
@@ -579,6 +610,9 @@ show_ext_caps(struct device *d)
 	{
 	  case PCI_EXT_CAP_ID_AER:
 	    cap_aer(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_DPC:
+	    cap_dpc(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_VC:
 	  case PCI_EXT_CAP_ID_VC2:

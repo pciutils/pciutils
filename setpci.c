@@ -301,6 +301,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x2000e,	0, 0, "ECAP_ARI" },
   { 0x2000f,	0, 0, "ECAP_ATS" },
   { 0x20010,	0, 0, "ECAP_SRIOV" },
+  { 0x2001d,	0, 0, "ECAP_DPC" },
   {       0,    0, 0, NULL }
 };
 
