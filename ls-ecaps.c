@@ -548,6 +548,65 @@ cap_l1pm(struct device *d, int where)
     }
 }
 
+static void
+cap_ptm(struct device *d, int where)
+{
+  u32 buff;
+  u16 clock;
+
+  printf("Precision Time Measurement\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + 4, 8))
+    {
+      printf("\t\t<unreadable>\n");
+      return;
+    }
+
+  buff = get_conf_long(d, where + 4);
+  printf("\t\tPTMCap: ");
+  printf("Requester:%c Responder:%c Root:%c\n",
+    FLAG(buff, 0x1),
+    FLAG(buff, 0x2),
+    FLAG(buff, 0x4));
+
+  clock = BITS(buff, 8, 8);
+  printf("\t\tPTMClockGranularity: ");
+  switch (clock)
+    {
+      case 0x00:
+        printf("Unimplemented\n");
+        break;
+      case 0xff:
+        printf("Greater than 254ns\n");
+        break;
+      default:
+        printf("%huns\n", clock);
+    }
+
+  buff = get_conf_long(d, where + 8);
+  printf("\t\tPTMControl: ");
+  printf("Enabled:%c RootSelected:%c\n",
+    FLAG(buff, 0x1),
+    FLAG(buff, 0x2));
+
+  clock = BITS(buff, 8, 8);
+  printf("\t\tPTMEffectiveGranularity: ");
+  switch (clock)
+    {
+      case 0x00:
+        printf("Unknown\n");
+        break;
+      case 0xff:
+        printf("Greater than 254ns\n");
+        break;
+      default:
+        printf("%huns\n", clock);
+    }
+}
+
 void
 show_ext_caps(struct device *d)
 {
@@ -634,6 +693,9 @@ show_ext_caps(struct device *d)
 	    break;
 	  case PCI_EXT_CAP_ID_L1PM:
 	    cap_l1pm(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_PTM:
+	    cap_ptm(d, where);
 	    break;
 	  default:
 	    printf("#%02x\n", id);
