@@ -69,5 +69,6 @@ LIBPCI_3.4 {
 
 LIBPCI_3.5 {
 	global:
+		pci_init;
 		pci_fill_info;
 };

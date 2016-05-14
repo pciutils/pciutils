@@ -173,7 +173,7 @@ pci_alloc(void)
 }
 
 void
-pci_init_v34(struct pci_access *a)
+pci_init_v35(struct pci_access *a)
 {
   if (!a->error)
     a->error = pci_generic_error;
@@ -213,8 +213,8 @@ pci_init_v34(struct pci_access *a)
   a->methods->init(a);
 }
 
-STATIC_ALIAS(void pci_init(struct pci_access *a), pci_init_v34(a));
-SYMBOL_VERSION(pci_init_v34, pci_init@@LIBPCI_3.4);
+STATIC_ALIAS(void pci_init(struct pci_access *a), pci_init_v35(a));
+SYMBOL_VERSION(pci_init_v35, pci_init@@LIBPCI_3.5);
 
 void
 pci_cleanup(struct pci_access *a)
