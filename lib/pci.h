@@ -136,8 +136,8 @@ struct pci_dev {
   char *module_alias;			/* Linux kernel module alias */
   char *label;				/* Device name as exported by BIOS */
   int numa_node;			/* NUMA node */
-  pciaddr_t flags[6];			/* Region IORESOURCE flags */
-  pciaddr_t rom_flags;			/* Expansion ROM IORESOURCE flags */
+  pciaddr_t flags[6];			/* PCI_IORESOURCE_* flags for regions */
+  pciaddr_t rom_flags;			/* PCI_IORESOURCE_* flags for expansion ROM */
 
   /* Fields used internally: */
   struct pci_access *access;

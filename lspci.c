@@ -365,7 +365,7 @@ show_bases(struct device *d, int cnt)
 	printf("\tRegion %d: ", i);
       else
 	putchar('\t');
-      if (ioflg & IORESOURCE_PCI_EA_BEI)
+      if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
 	  printf("[enhanced] ");
       else if (pos && !flg)	/* Reported by the OS, but not by the device */
 	{
@@ -441,7 +441,7 @@ show_rom(struct device *d, int reg)
   if (!rom && !flg && !len)
     return;
   putchar('\t');
-  if (ioflg & IORESOURCE_PCI_EA_BEI)
+  if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
       printf("[enhanced] ");
   else if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
     {
