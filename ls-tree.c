@@ -63,7 +63,7 @@ insert_dev(struct device *d, struct bridge *b)
     {
       struct bridge *c;
       for (c=b->child; c; c=c->next)
-	if (c->domain == p->domain && c->secondary <= p->bus && p->bus <= c->subordinate)
+	if (c->domain == (unsigned)p->domain && c->secondary <= p->bus && p->bus <= c->subordinate)
           {
             insert_dev(d, c);
             return;

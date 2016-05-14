@@ -173,7 +173,7 @@ pci_alloc(void)
 }
 
 void
-pci_init(struct pci_access *a)
+pci_init_v34(struct pci_access *a)
 {
   if (!a->error)
     a->error = pci_generic_error;
@@ -212,6 +212,9 @@ pci_init(struct pci_access *a)
   a->debug("Decided to use %s\n", a->methods->name);
   a->methods->init(a);
 }
+
+STATIC_ALIAS(void pci_init(struct pci_access *a), pci_init_v34(a));
+SYMBOL_VERSION(pci_init_v34, pci_init@@LIBPCI_3.4);
 
 void
 pci_cleanup(struct pci_access *a)

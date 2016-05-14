@@ -61,6 +61,8 @@ void *pci_malloc(struct pci_access *, int);
 void pci_mfree(void *);
 char *pci_strdup(struct pci_access *a, const char *s);
 
+void pci_init_v34(struct pci_access *a) VERSIONED_ABI;
+
 /* access.c */
 struct pci_dev *pci_alloc_dev(struct pci_access *);
 int pci_link_dev(struct pci_access *, struct pci_dev *);

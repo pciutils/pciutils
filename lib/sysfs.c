@@ -196,6 +196,19 @@ static void sysfs_scan(struct pci_access *a)
       d = pci_alloc_dev(a);
       if (sscanf(entry->d_name, "%x:%x:%x.%d", &dom, &bus, &dev, &func) < 4)
 	a->error("sysfs_scan: Couldn't parse entry name %s", entry->d_name);
+
+      /* Ensure kernel provided domain that fits in a signed integer */
+      if (dom > 0x7fffffff)
+	a->error("sysfs_scan: invalid domain:%x", dom);
+
+      /*
+       * The domain value is truncated to 16 bits and stored in the pci_dev
+       * structure's legacy 16-bit domain offset for compatibility with
+       * applications compiled with libpci pre-32 bit domains. Such
+       * applications may not work as expected if they are on a machine
+       * utilizing PCI domain numbers requiring more than 16 bits.
+       */
+      d->domain_16 = dom;
       d->domain = dom;
       d->bus = bus;
       d->dev = dev;
@@ -270,7 +283,7 @@ sysfs_fill_slots(struct pci_access *a)
       else
 	{
 	  for (d = a->devices; d; d = d->next)
-	    if (dom == d->domain && bus == d->bus && dev == d->dev && !d->phy_slot)
+	    if (dom == (unsigned)d->domain && bus == d->bus && dev == d->dev && !d->phy_slot)
 	      d->phy_slot = pci_strdup(a, entry->d_name);
 	}
       fclose(file);
