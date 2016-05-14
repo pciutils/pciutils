@@ -119,7 +119,8 @@ struct pci_param *pci_walk_params(struct pci_access *acc, struct pci_param *prev
 
 struct pci_dev {
   struct pci_dev *next;			/* Next device in the chain */
-  u16 domain_16;			/* 16-bit PCI domain (host bridge) */
+  u16 domain_16;			/* 16-bit version of the PCI domain for backward compatibility */
+					/* 0xffff if the real domain doesn't fit in 16 bits */
   u8 bus, dev, func;			/* Bus inside domain, device and function */
 
   /* These fields are set by pci_fill_info() */
@@ -138,7 +139,7 @@ struct pci_dev {
   int numa_node;			/* NUMA node */
   pciaddr_t flags[6];			/* PCI_IORESOURCE_* flags for regions */
   pciaddr_t rom_flags;			/* PCI_IORESOURCE_* flags for expansion ROM */
-  int domain;				/* 32-bit PCI domain (host bridge) */
+  int domain;				/* PCI domain (host bridge) */
 
   /* Fields used internally: */
   struct pci_access *access;

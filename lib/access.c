@@ -40,6 +40,18 @@ pci_link_dev(struct pci_access *a, struct pci_dev *d)
   d->next = a->devices;
   a->devices = d;
 
+  /*
+   * Applications compiled with older versions of libpci do not expect
+   * 32-bit domain numbers. To keep them working, we keep a 16-bit
+   * version of the domain number at the previous location in struct
+   * pci_dev. This will keep backward compatibility on systems which
+   * don't require large domain numbers.
+   */
+  if (d->domain > 0xffff)
+    d->domain_16 = 0xffff;
+  else
+    d->domain_16 = d->domain;
+
   return 1;
 }
 

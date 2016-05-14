@@ -199,16 +199,8 @@ static void sysfs_scan(struct pci_access *a)
 
       /* Ensure kernel provided domain that fits in a signed integer */
       if (dom > 0x7fffffff)
-	a->error("sysfs_scan: invalid domain:%x", dom);
+	a->error("sysfs_scan: Invalid domain %x", dom);
 
-      /*
-       * The domain value is truncated to 16 bits and stored in the pci_dev
-       * structure's legacy 16-bit domain offset for compatibility with
-       * applications compiled with libpci pre-32 bit domains. Such
-       * applications may not work as expected if they are on a machine
-       * utilizing PCI domain numbers requiring more than 16 bits.
-       */
-      d->domain_16 = dom;
       d->domain = dom;
       d->bus = bus;
       d->dev = dev;
