@@ -1,3 +1,20 @@
+2016-05-19  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.0.
+
+	* New capabilities decoded: Downstream Port Containment,
+	  Precision Time Measurement. Thanks to Keith Busch and
+	  Jonathan Yong.
+
+	* Domain numbers extended to 31 bits. This will be used by the
+	  Linux kernel on some machines in near future.
+
+	* Enhanced allocation regions are now decoded on Linux.
+
+	* The NetBSD back-end supports PCIe extended configuration space.
+
+	* Updated pci.ids to the current snapshot of the database.
+
 2016-01-03  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.4.1.
