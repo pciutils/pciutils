@@ -1,3 +1,9 @@
+2016-05-22  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.1.
+
+	* Fixed symbol versioning of pci_init().
+
 2016-05-19  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.0.
