@@ -6,12 +6,7 @@ LC_ALL=C
 export LC_ALL
 
 echo_n() {
-	if [ -n "$BASH" ]
-	then
-		echo -n "$*"
-	else
-		echo "$*\c"
-	fi
+	printf '%s' "$*"
 }
 
 if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
