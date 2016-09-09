@@ -1117,6 +1117,20 @@
 #define  PCI_DPC_STS_PIO_FEP(x) (((x) >> 8) & 0x1f) /* DPC PIO First Error Pointer */
 #define PCI_DPC_SOURCE		10	/* DPC Source ID */
 
+/* L1 PM Substates Extended Capability */
+#define PCI_L1PM_SUBSTAT_CAP	0x4	/* L1 PM Substate Capability */
+#define  PCI_L1PM_SUBSTAT_CAP_PM_L12	0x1	/* PCI-PM L1.2 Supported */
+#define  PCI_L1PM_SUBSTAT_CAP_PM_L11	0x2	/* PCI-PM L1.1 Supported */
+#define  PCI_L1PM_SUBSTAT_CAP_ASPM_L12	0x4	/* ASPM L1.2 Supported */
+#define  PCI_L1PM_SUBSTAT_CAP_ASPM_L11	0x8	/* ASPM L1.1 Supported */
+#define  PCI_L1PM_SUBSTAT_CAP_L1PM_SUPP	0x16	/* L1 Pm Substates supported */
+#define PCI_L1PM_SUBSTAT_CTL1	0x8	/* L1 PM Substate Control 1 */
+#define  PCI_L1PM_SUBSTAT_CTL1_PM_L12	0x1	/* PCI-PM L1.2 Enable */
+#define  PCI_L1PM_SUBSTAT_CTL1_PM_L11	0x2	/* PCI-PM L1.1 Enable */
+#define  PCI_L1PM_SUBSTAT_CTL1_ASPM_L12	0x4	/* ASPM L1.2 Enable */
+#define  PCI_L1PM_SUBSTAT_CTL1_ASPM_L11	0x8	/* ASPM L1.1 Enable */
+#define PCI_L1PM_SUBSTAT_CTL2	0xC	/* L1 PM Substate Control 2 */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded

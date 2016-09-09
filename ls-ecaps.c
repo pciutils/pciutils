@@ -527,55 +527,93 @@ cap_evendor(struct device *d, int where)
     BITS(hdr, 20, 12));
 }
 
+static inline int l1pm_calc_pwron(int scale, int value)
+{
+  switch (scale)
+    {
+      case 0:
+	return 2 * value;
+      case 1:
+	return 10 * value;
+      case 2:
+	return 100 * value;
+    }
+  return -1;
+}
+
 static void
 cap_l1pm(struct device *d, int where)
 {
-  u32 l1_cap;
-  int power_on_scale;
+  u32 l1_cap, val, scale;
+  int time;
 
   printf("L1 PM Substates\n");
 
   if (verbose < 2)
     return;
 
-  if (!config_fetch(d, where + 4, 4))
+  if (!config_fetch(d, where + PCI_L1PM_SUBSTAT_CAP, 12))
     {
       printf("\t\t<unreadable>\n");
       return;
     }
 
-  l1_cap = get_conf_long(d, where + 4);
+  l1_cap = get_conf_long(d, where + PCI_L1PM_SUBSTAT_CAP);
   printf("\t\tL1SubCap: ");
   printf("PCI-PM_L1.2%c PCI-PM_L1.1%c ASPM_L1.2%c ASPM_L1.1%c L1_PM_Substates%c\n",
-    FLAG(l1_cap, 1),
-    FLAG(l1_cap, 2),
-    FLAG(l1_cap, 4),
-    FLAG(l1_cap, 8),
-    FLAG(l1_cap, 16));
+    FLAG(l1_cap, PCI_L1PM_SUBSTAT_CAP_PM_L12),
+    FLAG(l1_cap, PCI_L1PM_SUBSTAT_CAP_PM_L11),
+    FLAG(l1_cap, PCI_L1PM_SUBSTAT_CAP_ASPM_L12),
+    FLAG(l1_cap, PCI_L1PM_SUBSTAT_CAP_ASPM_L11),
+    FLAG(l1_cap, PCI_L1PM_SUBSTAT_CAP_L1PM_SUPP));
 
-  if (BITS(l1_cap, 0, 1) || BITS(l1_cap, 2, 1))
+  if (l1_cap & PCI_L1PM_SUBSTAT_CAP_PM_L12 ||
+      l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
     {
       printf("\t\t\t  PortCommonModeRestoreTime=%dus ",
 	BITS(l1_cap, 8,8));
 
-      power_on_scale = BITS(l1_cap, 16, 2);
+      time = l1pm_calc_pwron(BITS(l1_cap, 16, 2), BITS(l1_cap, 19, 5));
+      if (time != -1)
+	printf("PortTPowerOnTime=%dus\n", time);
+      else
+	printf("PortTPowerOnTime=<error>\n");
+    }
 
-      printf("PortTPowerOnTime=");
-      switch (power_on_scale)
-	{
-	  case 0:
-	    printf("%dus\n", BITS(l1_cap, 19, 5) * 2);
-	    break;
-	  case 1:
-	    printf("%dus\n", BITS(l1_cap, 19, 5) * 10);
-	    break;
-	  case 2:
-	    printf("%dus\n", BITS(l1_cap, 19, 5) * 100);
-	    break;
-	  default:
-	    printf("<error>\n");
-	    break;
-	}
+  val = get_conf_long(d, where + PCI_L1PM_SUBSTAT_CTL1);
+  printf("\t\tL1SubCtl1: ");
+  printf("PCI-PM_L1.2%c PCI-PM_L1.1%c ASPM_L1.2%c ASPM_L1.1%c\n",
+    FLAG(val, PCI_L1PM_SUBSTAT_CTL1_PM_L12),
+    FLAG(val, PCI_L1PM_SUBSTAT_CTL1_PM_L11),
+    FLAG(val, PCI_L1PM_SUBSTAT_CTL1_ASPM_L12),
+    FLAG(val, PCI_L1PM_SUBSTAT_CTL1_ASPM_L11));
+
+  if (l1_cap & PCI_L1PM_SUBSTAT_CAP_PM_L12 ||
+      l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
+      printf("\t\t\t   T_CommonMode=%dus ",
+	BITS(val, 8,8));
+
+  if (l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
+    {
+      scale = BITS(val, 29, 3);
+      if (scale > 5)
+	printf("LTR1.2_Threshhold=<error>\n");
+      else
+	printf("LTR1.2_Threshhold=%lldns\n",
+	       BITS(val, 16, 10) *
+	       (unsigned long long)cap_ltr_scale(scale));
+    }
+
+  val = get_conf_long(d, where + PCI_L1PM_SUBSTAT_CTL2);
+  printf("\t\tL1SubCtl2: ");
+  if (l1_cap & PCI_L1PM_SUBSTAT_CAP_PM_L12 ||
+      l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
+    {
+      time = l1pm_calc_pwron(BITS(val, 0, 2), BITS(val, 3, 5));
+      if (time != -1)
+	printf("T_PwrOn=%dus\n", time);
+      else
+	printf("T_PwrOn=<error>\n");
     }
 }
 
