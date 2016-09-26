@@ -1123,7 +1123,7 @@
 #define  PCI_L1PM_SUBSTAT_CAP_PM_L11	0x2	/* PCI-PM L1.1 Supported */
 #define  PCI_L1PM_SUBSTAT_CAP_ASPM_L12	0x4	/* ASPM L1.2 Supported */
 #define  PCI_L1PM_SUBSTAT_CAP_ASPM_L11	0x8	/* ASPM L1.1 Supported */
-#define  PCI_L1PM_SUBSTAT_CAP_L1PM_SUPP	0x16	/* L1 Pm Substates supported */
+#define  PCI_L1PM_SUBSTAT_CAP_L1PM_SUPP	0x16	/* L1 PM Substates supported */
 #define PCI_L1PM_SUBSTAT_CTL1	0x8	/* L1 PM Substate Control 1 */
 #define  PCI_L1PM_SUBSTAT_CTL1_PM_L12	0x1	/* PCI-PM L1.2 Enable */
 #define  PCI_L1PM_SUBSTAT_CTL1_PM_L11	0x2	/* PCI-PM L1.1 Enable */
