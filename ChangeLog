@@ -1,3 +1,13 @@
+2016-10-03  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.2.
+
+	* The L1 power management capability is now decoded more
+	  thoroughly. Thanks to Rajat Jain for the patch.
+
+	* The table of configuration registers used by setpci
+	  had a bug in the definition of SUBSYSTEM_VENDOR_ID.
+
 2016-05-22  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.1.
