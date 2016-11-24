@@ -29,13 +29,7 @@ show_kernel_init(void)
   if (show_kernel_inited >= 0)
     return show_kernel_inited;
 
-  struct utsname uts;
-  if (uname(&uts) < 0)
-    die("uname() failed: %m");
-  char *name = alloca(64 + strlen(uts.release));
-  sprintf(name, "/lib/modules/%s", uts.release);
-
-  kmod_ctx = kmod_new(name, NULL);
+  kmod_ctx = kmod_new(NULL, NULL);
   if (!kmod_ctx)
     {
       fprintf(stderr, "lspci: Unable to initialize libkmod context\n");
