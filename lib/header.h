@@ -859,7 +859,13 @@
 #define  PCI_EXP_DEV2_TIMEOUT_RANGE(x)	((x) & 0xf) /* Completion Timeout Ranges Supported */
 #define  PCI_EXP_DEV2_TIMEOUT_VALUE(x)	((x) & 0xf) /* Completion Timeout Value */
 #define  PCI_EXP_DEV2_TIMEOUT_DIS	0x0010	/* Completion Timeout Disable Supported */
+#define  PCI_EXP_DEV2_ATOMICOP_REQUESTER_EN	0x0040	/* AtomicOp RequesterEnable */
+#define  PCI_EXP_DEV2_ATOMICOP_EGRESS_BLOCK	0x0080	/* AtomicOp Egress Blocking */
 #define  PCI_EXP_DEV2_ARI		0x0020	/* ARI Forwarding */
+#define  PCI_EXP_DEVCAP2_ATOMICOP_ROUTING	0x0040	/* AtomicOp Routing Supported */
+#define  PCI_EXP_DEVCAP2_32BIT_ATOMICOP_COMP	0x0080	/* 32bit AtomicOp Completer Supported */
+#define  PCI_EXP_DEVCAP2_64BIT_ATOMICOP_COMP	0x0100	/* 64bit AtomicOp Completer Supported */
+#define  PCI_EXP_DEVCAP2_128BIT_CAS_COMP	0x0200	/* 128bit CAS Completer Supported */
 #define  PCI_EXP_DEV2_LTR		0x0400	/* LTR enabled */
 #define  PCI_EXP_DEV2_OBFF(x)		(((x) >> 13) & 3) /* OBFF enabled */
 #define PCI_EXP_DEVSTA2			0x2a	/* Device Status */

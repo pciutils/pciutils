@@ -963,11 +963,31 @@ static const char *cap_express_devctl2_obff(int obff)
     }
 }
 
+static int
+device_has_memory_space_bar(struct device *d)
+{
+  struct pci_dev *p = d->dev;
+  int i, found = 0;
+
+  for (i=0; i<6; i++)
+    if (p->base_addr[i] && p->size[i])
+      {
+        if (!(p->base_addr[i] & PCI_BASE_ADDRESS_SPACE_IO))
+          {
+            found = 1;
+            break;
+          }
+      }
+  return found;
+}
+
 static void cap_express_dev2(struct device *d, int where, int type)
 {
   u32 l;
   u16 w;
+  int has_mem_bar = 0;
 
+  has_mem_bar = device_has_memory_space_bar(d);
   l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
   printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
 	cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
@@ -978,6 +998,20 @@ static void cap_express_dev2(struct device *d, int where, int type)
     printf(" ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
   else
     printf("\n");
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
+      type == PCI_EXP_TYPE_DOWNSTREAM || has_mem_bar)
+    {
+       printf("\t\tAtomicOpsCap:");
+       if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
+           type == PCI_EXP_TYPE_DOWNSTREAM)
+         printf(" Routing%c", FLAG(l, PCI_EXP_DEVCAP2_ATOMICOP_ROUTING));
+       if (type == PCI_EXP_TYPE_ROOT_PORT || has_mem_bar)
+         printf(" 32bit%c 64bit%c 128bitCAS%c",
+		FLAG(l, PCI_EXP_DEVCAP2_32BIT_ATOMICOP_COMP),
+		FLAG(l, PCI_EXP_DEVCAP2_64BIT_ATOMICOP_COMP),
+		FLAG(l, PCI_EXP_DEVCAP2_128BIT_CAS_COMP));
+       printf("\n");
+    }
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL2);
   printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
@@ -989,6 +1023,19 @@ static void cap_express_dev2(struct device *d, int where, int type)
     printf(" ARIFwd%c\n", FLAG(w, PCI_EXP_DEV2_ARI));
   else
     printf("\n");
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
+      type == PCI_EXP_TYPE_DOWNSTREAM || type == PCI_EXP_TYPE_ENDPOINT ||
+      type == PCI_EXP_TYPE_ROOT_INT_EP || type == PCI_EXP_TYPE_LEG_END)
+    {
+      printf("\t\tAtomicOpsCtl:");
+      if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ENDPOINT ||
+          type == PCI_EXP_TYPE_ROOT_INT_EP || type == PCI_EXP_TYPE_LEG_END)
+        printf(" ReqEn%c", FLAG(w, PCI_EXP_DEV2_ATOMICOP_REQUESTER_EN));
+      if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
+          type == PCI_EXP_TYPE_DOWNSTREAM)
+        printf(" EgressBlck%c", FLAG(w, PCI_EXP_DEV2_ATOMICOP_EGRESS_BLOCK));
+      printf("\n");
+    }
 }
 
 static const char *cap_express_link2_speed(int type)
