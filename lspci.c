@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2015 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2016 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -329,7 +329,7 @@ show_terse(struct device *d)
 /*** Verbose output ***/
 
 static void
-show_size(pciaddr_t x)
+show_size(u64 x)
 {
   static const char suffix[][2] = { "", "K", "M", "G", "T" };
   unsigned i;
@@ -341,6 +341,32 @@ show_size(pciaddr_t x)
     x /= 1024;
   }
   printf(" [size=%u%s]", (unsigned)x, suffix[i]);
+}
+
+static void
+show_range(char *prefix, u64 base, u64 limit, int is_64bit)
+{
+  if (base > limit)
+    {
+      if (!verbose)
+	return;
+      else if (verbose < 3)
+	{
+	  printf("%s: None\n", prefix);
+	  return;
+	}
+    }
+
+  printf("%s: ", prefix);
+  if (is_64bit)
+    printf("%016" PCI_U64_FMT "x-%016" PCI_U64_FMT "x", base, limit);
+  else
+    printf("%08x-%08x", (unsigned) base, (unsigned) limit);
+  if (base <= limit)
+    show_size(limit - base + 1);
+  else
+    printf(" [empty]");
+  putchar('\n');
 }
 
 static void
@@ -486,7 +512,6 @@ show_htype1(struct device *d)
   u32 pref_type = pref_base & PCI_PREF_RANGE_TYPE_MASK;
   word sec_stat = get_conf_word(d, PCI_SEC_STATUS);
   word brc = get_conf_word(d, PCI_BRIDGE_CONTROL);
-  int verb = verbose > 2;
 
   show_bases(d, 2);
   printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
@@ -507,8 +532,7 @@ show_htype1(struct device *d)
 	  io_base |= (get_conf_word(d, PCI_IO_BASE_UPPER16) << 16);
 	  io_limit |= (get_conf_word(d, PCI_IO_LIMIT_UPPER16) << 16);
 	}
-      if (io_base <= io_limit || verb)
-	printf("\tI/O behind bridge: %08x-%08x\n", io_base, io_limit+0xfff);
+      show_range("\tI/O behind bridge", io_base, io_limit+0xfff, 0);
     }
 
   if (mem_type != (mem_limit & PCI_MEMORY_RANGE_TYPE_MASK) ||
@@ -518,8 +542,7 @@ show_htype1(struct device *d)
     {
       mem_base = (mem_base & PCI_MEMORY_RANGE_MASK) << 16;
       mem_limit = (mem_limit & PCI_MEMORY_RANGE_MASK) << 16;
-      if (mem_base <= mem_limit || verb)
-	printf("\tMemory behind bridge: %08x-%08x\n", mem_base, mem_limit + 0xfffff);
+      show_range("\tMemory behind bridge", mem_base, mem_limit + 0xfffff, 0);
     }
 
   if (pref_type != (pref_limit & PCI_PREF_RANGE_TYPE_MASK) ||
@@ -527,19 +550,14 @@ show_htype1(struct device *d)
     printf("\t!!! Unknown prefetchable memory range types %x/%x\n", pref_base, pref_limit);
   else
     {
-      pref_base = (pref_base & PCI_PREF_RANGE_MASK) << 16;
-      pref_limit = (pref_limit & PCI_PREF_RANGE_MASK) << 16;
-      if (pref_base <= pref_limit || verb)
+      u64 pref_base_64 = (pref_base & PCI_PREF_RANGE_MASK) << 16;
+      u64 pref_limit_64 = (pref_limit & PCI_PREF_RANGE_MASK) << 16;
+      if (pref_type == PCI_PREF_RANGE_TYPE_64)
 	{
-	  if (pref_type == PCI_PREF_RANGE_TYPE_32)
-	    printf("\tPrefetchable memory behind bridge: %08x-%08x\n", pref_base, pref_limit + 0xfffff);
-	  else
-	    printf("\tPrefetchable memory behind bridge: %08x%08x-%08x%08x\n",
-		   get_conf_long(d, PCI_PREF_BASE_UPPER32),
-		   pref_base,
-		   get_conf_long(d, PCI_PREF_LIMIT_UPPER32),
-		   pref_limit + 0xfffff);
+	  pref_base_64 |= (u64) get_conf_long(d, PCI_PREF_BASE_UPPER32) << 32;
+	  pref_limit_64 |= (u64) get_conf_long(d, PCI_PREF_LIMIT_UPPER32) << 32;
 	}
+      show_range("\tPrefetchable memory behind bridge", pref_base_64, pref_limit_64 + 0xfffff, (pref_type == PCI_PREF_RANGE_TYPE_64));
     }
 
   if (verbose > 1)
