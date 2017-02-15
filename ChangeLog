@@ -1,3 +1,21 @@
+2017-02-15  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.3.
+
+	* When lspci looks for Linux kernel modules, it uses the default
+	  path to module directory provided by libkmod. Previously,
+	  it tried to construct the path explicitly, which need not
+	  work on all systems.
+
+	* Improved formatting of memory and I/O ranges behind a bridge.
+
+	* PCIe link capabilities now display GEN4 speed (16GT/s).
+
+	* PCIe device capabilities now show bits related to atomic operations.
+	  Thanks to Satanand Burla for a patch.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2016-10-03  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.2.
