@@ -985,9 +985,8 @@ static void cap_express_dev2(struct device *d, int where, int type)
 {
   u32 l;
   u16 w;
-  int has_mem_bar = 0;
+  int has_mem_bar = device_has_memory_space_bar(d);
 
-  has_mem_bar = device_has_memory_space_bar(d);
   l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
   printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
 	cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
