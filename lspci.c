@@ -359,7 +359,7 @@ show_range(char *prefix, u64 base, u64 limit, int is_64bit)
 
   printf("%s: ", prefix);
   if (is_64bit)
-    printf("%016" PCI_U64_FMT "x-%016" PCI_U64_FMT "x", base, limit);
+    printf("%016" PCI_U64_FMT_X "-%016" PCI_U64_FMT_X, base, limit);
   else
     printf("%08x-%08x", (unsigned) base, (unsigned) limit);
   if (base <= limit)
