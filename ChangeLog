@@ -1,3 +1,10 @@
+2017-02-25  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.4.
+
+	* Previous version broke compilation on systems, for which lib/types.h
+	  did not provide a 64-bit integer type. It is provided everywhere now.
+
 2017-02-15  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.3.
