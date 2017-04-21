@@ -1000,7 +1000,7 @@ static void cap_express_dev2(struct device *d, int where, int type)
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
       type == PCI_EXP_TYPE_DOWNSTREAM || has_mem_bar)
     {
-       printf("\t\tAtomicOpsCap:");
+       printf("\t\t\t AtomicOpsCap:");
        if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
            type == PCI_EXP_TYPE_DOWNSTREAM)
          printf(" Routing%c", FLAG(l, PCI_EXP_DEVCAP2_ATOMICOP_ROUTING));
@@ -1026,7 +1026,7 @@ static void cap_express_dev2(struct device *d, int where, int type)
       type == PCI_EXP_TYPE_DOWNSTREAM || type == PCI_EXP_TYPE_ENDPOINT ||
       type == PCI_EXP_TYPE_ROOT_INT_EP || type == PCI_EXP_TYPE_LEG_END)
     {
-      printf("\t\tAtomicOpsCtl:");
+      printf("\t\t\t AtomicOpsCtl:");
       if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ENDPOINT ||
           type == PCI_EXP_TYPE_ROOT_INT_EP || type == PCI_EXP_TYPE_LEG_END)
         printf(" ReqEn%c", FLAG(w, PCI_EXP_DEV2_ATOMICOP_REQUESTER_EN));
