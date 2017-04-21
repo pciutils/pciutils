@@ -92,13 +92,13 @@ cap_dsn(struct device *d, int where)
 static void
 cap_aer(struct device *d, int where)
 {
-  u32 l;
+  u32 l, l0, l1, l2, l3;
 
   printf("Advanced Error Reporting\n");
   if (verbose < 2)
     return;
 
-  if (!config_fetch(d, where + PCI_ERR_UNCOR_STATUS, 24))
+  if (!config_fetch(d, where + PCI_ERR_UNCOR_STATUS, 40))
     return;
 
   l = get_conf_long(d, where + PCI_ERR_UNCOR_STATUS);
@@ -137,6 +137,12 @@ cap_aer(struct device *d, int where)
 	FLAG(l, PCI_ERR_CAP_ECRC_CHKC), FLAG(l, PCI_ERR_CAP_ECRC_CHKE),
 	FLAG(l, PCI_ERR_CAP_MULT_HDRC), FLAG(l, PCI_ERR_CAP_MULT_HDRE),
 	FLAG(l, PCI_ERR_CAP_TLP_PFX), FLAG(l, PCI_ERR_CAP_HDR_LOG));
+
+  l0 = get_conf_long(d, where + PCI_ERR_HEADER_LOG);
+  l1 = get_conf_long(d, where + PCI_ERR_HEADER_LOG + 4);
+  l2 = get_conf_long(d, where + PCI_ERR_HEADER_LOG + 8);
+  l3 = get_conf_long(d, where + PCI_ERR_HEADER_LOG + 12);
+  printf("\t\tHeaderLog: %08x %08x %08x %08x\n", l0, l1, l2, l3);
 }
 
 static void cap_dpc(struct device *d, int where)
