@@ -132,7 +132,7 @@ cap_aer(struct device *d, int where, int type)
 	FLAG(l, PCI_ERR_COR_RCVR), FLAG(l, PCI_ERR_COR_BAD_TLP), FLAG(l, PCI_ERR_COR_BAD_DLLP),
 	FLAG(l, PCI_ERR_COR_REP_ROLL), FLAG(l, PCI_ERR_COR_REP_TIMER), FLAG(l, PCI_ERR_COR_REP_ANFE));
   l = get_conf_long(d, where + PCI_ERR_CAP);
-  printf("\t\tAERCap:\tFirst Error Pointer: %02x, GenCap%c CGenEn%c ChkCap%c ChkEn%c\n"
+  printf("\t\tAERCap:\tFirst Error Pointer: %02x, ECRCGenCap%c ECRCGenEn%c ECRCChkCap%c ECRCChkEn%c\n"
 	"\t\t\tMultHdrRecCap%c MultHdrRecEn%c TLPPfxPres%c HdrLogCap%c\n",
 	PCI_ERR_CAP_FEP(l), FLAG(l, PCI_ERR_CAP_ECRC_GENC), FLAG(l, PCI_ERR_CAP_ECRC_GENE),
 	FLAG(l, PCI_ERR_CAP_ECRC_CHKC), FLAG(l, PCI_ERR_CAP_ECRC_CHKE),
