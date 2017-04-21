@@ -958,6 +958,10 @@
 #define  PCI_ERR_CAP_ECRC_GENE	0x00000040	/* ECRC Generation Enable */
 #define  PCI_ERR_CAP_ECRC_CHKC	0x00000080	/* ECRC Check Capable */
 #define  PCI_ERR_CAP_ECRC_CHKE	0x00000100	/* ECRC Check Enable */
+#define  PCI_ERR_CAP_MULT_HDRC	0x00000200	/* Multiple Header Capable */
+#define  PCI_ERR_CAP_MULT_HDRE	0x00000400	/* Multiple Header Enable */
+#define  PCI_ERR_CAP_TLP_PFX	0x00000800	/* TLP Prefix Log Present */
+#define  PCI_ERR_CAP_HDR_LOG	0x00001000	/* Completion Timeout Prefix/Header Log Capable */
 #define PCI_ERR_HEADER_LOG	28	/* Header Log Register (16 bytes) */
 #define PCI_ERR_ROOT_COMMAND	44	/* Root Error Command */
 #define PCI_ERR_ROOT_STATUS	48
