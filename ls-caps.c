@@ -1159,7 +1159,9 @@ cap_express(struct device *d, int where, int cap)
       printf("PCI-Express to PCI/PCI-X Bridge");
       break;
     case PCI_EXP_TYPE_PCIE_BRIDGE:
-      printf("PCI/PCI-X to PCI-Express Bridge");
+      slot = cap & PCI_EXP_FLAGS_SLOT;
+      printf("PCI/PCI-X to PCI-Express Bridge (Slot%c)",
+	     FLAG(cap, PCI_EXP_FLAGS_SLOT));
       break;
     case PCI_EXP_TYPE_ROOT_INT_EP:
       link = 0;
