@@ -777,8 +777,8 @@
 #define  PCI_EXP_LNKCAP_SPEED	0x0000f	/* Maximum Link Speed */
 #define  PCI_EXP_LNKCAP_WIDTH	0x003f0	/* Maximum Link Width */
 #define  PCI_EXP_LNKCAP_ASPM	0x00c00	/* Active State Power Management */
-#define  PCI_EXP_LNKCAP_L0S	0x07000	/* L0s Acceptable Latency */
-#define  PCI_EXP_LNKCAP_L1	0x38000	/* L1 Acceptable Latency */
+#define  PCI_EXP_LNKCAP_L0S	0x07000	/* L0s Exit Latency */
+#define  PCI_EXP_LNKCAP_L1	0x38000	/* L1 Exit Latency */
 #define  PCI_EXP_LNKCAP_CLOCKPM	0x40000	/* Clock Power Management */
 #define  PCI_EXP_LNKCAP_SURPRISE 0x80000 /* Surprise Down Error Reporting */
 #define  PCI_EXP_LNKCAP_DLLA	0x100000 /* Data Link Layer Active Reporting */

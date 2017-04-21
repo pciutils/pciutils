@@ -758,16 +758,25 @@ static const char *aspm_enabled(int code)
 
 static void cap_express_link(struct device *d, int where, int type)
 {
-  u32 t;
+  u32 t, aspm;
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_LNKCAP);
-  printf("\t\tLnkCap:\tPort #%d, Speed %s, Width x%d, ASPM %s, Exit Latency L0s %s, L1 %s\n",
+  aspm = (t & PCI_EXP_LNKCAP_ASPM) >> 10;
+  printf("\t\tLnkCap:\tPort #%d, Speed %s, Width x%d, ASPM %s",
 	t >> 24,
 	link_speed(t & PCI_EXP_LNKCAP_SPEED), (t & PCI_EXP_LNKCAP_WIDTH) >> 4,
-	aspm_support((t & PCI_EXP_LNKCAP_ASPM) >> 10),
-	latency_l0s((t & PCI_EXP_LNKCAP_L0S) >> 12),
-	latency_l1((t & PCI_EXP_LNKCAP_L1) >> 15));
+	aspm_support(aspm));
+  if (aspm)
+    {
+      printf(", Exit Latency ");
+      if (aspm & 1)
+	printf("L0s %s", latency_l0s((t & PCI_EXP_LNKCAP_L0S) >> 12));
+      if (aspm & 2)
+	printf("%sL1 %s", (aspm & 1) ? ", " : "",
+	    latency_l1((t & PCI_EXP_LNKCAP_L1) >> 15));
+    }
+  printf("\n");
   printf("\t\t\tClockPM%c Surprise%c LLActRep%c BwNot%c ASPMOptComp%c\n",
 	FLAG(t, PCI_EXP_LNKCAP_CLOCKPM),
 	FLAG(t, PCI_EXP_LNKCAP_SURPRISE),
