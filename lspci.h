@@ -68,7 +68,7 @@ void show_caps(struct device *d, int where);
 
 /* ls-ecaps.c */
 
-void show_ext_caps(struct device *d);
+void show_ext_caps(struct device *d, int type);
 
 /* ls-caps-vendor.c */
 

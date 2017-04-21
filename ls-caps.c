@@ -1125,7 +1125,7 @@ static void cap_express_slot2(struct device *d UNUSED, int where UNUSED)
   /* No capabilities that require this field in PCIe rev2.0 spec. */
 }
 
-static void
+static int
 cap_express(struct device *d, int where, int cap)
 {
   int type = (cap & PCI_EXP_FLAGS_TYPE) >> 4;
@@ -1174,7 +1174,7 @@ cap_express(struct device *d, int where, int cap)
   }
   printf(", MSI %02x\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
   if (verbose < 2)
-    return;
+    return type;
 
   size = 16;
   if (slot)
@@ -1182,7 +1182,7 @@ cap_express(struct device *d, int where, int cap)
   if (type == PCI_EXP_TYPE_ROOT_PORT)
     size = 32;
   if (!config_fetch(d, where + PCI_EXP_DEVCAP, size))
-    return;
+    return type;
 
   cap_express_dev(d, where, type);
   if (link)
@@ -1193,19 +1193,20 @@ cap_express(struct device *d, int where, int cap)
     cap_express_root(d, where);
 
   if ((cap & PCI_EXP_FLAGS_VERS) < 2)
-    return;
+    return type;
 
   size = 16;
   if (slot)
     size = 24;
   if (!config_fetch(d, where + PCI_EXP_DEVCAP2, size))
-    return;
+    return type;
 
   cap_express_dev2(d, where, type);
   if (link)
     cap_express_link2(d, where, type);
   if (slot)
     cap_express_slot2(d, where);
+  return type;
 }
 
 static void
@@ -1462,6 +1463,7 @@ void
 show_caps(struct device *d, int where)
 {
   int can_have_ext_caps = 0;
+  int type = -1;
 
   if (get_conf_word(d, PCI_STATUS) & PCI_STATUS_CAP_LIST)
     {
@@ -1540,7 +1542,7 @@ show_caps(struct device *d, int where)
 	      printf("Secure device <?>\n");
 	      break;
 	    case PCI_CAP_ID_EXP:
-	      cap_express(d, where, cap);
+	      type = cap_express(d, where, cap);
 	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_MSIX:
@@ -1562,5 +1564,5 @@ show_caps(struct device *d, int where)
 	}
     }
   if (can_have_ext_caps)
-    show_ext_caps(d);
+    show_ext_caps(d, type);
 }

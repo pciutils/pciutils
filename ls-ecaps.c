@@ -90,9 +90,10 @@ cap_dsn(struct device *d, int where)
 }
 
 static void
-cap_aer(struct device *d, int where)
+cap_aer(struct device *d, int where, int type)
 {
   u32 l, l0, l1, l2, l3;
+  u16 w;
 
   printf("Advanced Error Reporting\n");
   if (verbose < 2)
@@ -143,6 +144,36 @@ cap_aer(struct device *d, int where)
   l2 = get_conf_long(d, where + PCI_ERR_HEADER_LOG + 8);
   l3 = get_conf_long(d, where + PCI_ERR_HEADER_LOG + 12);
   printf("\t\tHeaderLog: %08x %08x %08x %08x\n", l0, l1, l2, l3);
+
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ROOT_EC)
+    {
+      if (!config_fetch(d, where + PCI_ERR_ROOT_COMMAND, 12))
+        return;
+
+      l = get_conf_long(d, where + PCI_ERR_ROOT_COMMAND);
+      printf("\t\tRootCmd: CERptEn%c NFERptEn%c FERptEn%c\n",
+	    FLAG(l, PCI_ERR_ROOT_CMD_COR_EN),
+	    FLAG(l, PCI_ERR_ROOT_CMD_NONFATAL_EN),
+	    FLAG(l, PCI_ERR_ROOT_CMD_FATAL_EN));
+
+      l = get_conf_long(d, where + PCI_ERR_ROOT_STATUS);
+      printf("\t\tRootSta: CERcvd%c MultCERcvd%c UERcvd%c MultUERcvd%c\n"
+	    "\t\t\t FirstFatal%c NonFatalMsg%c FatalMsg%c IntMsg %d\n",
+	    FLAG(l, PCI_ERR_ROOT_COR_RCV),
+	    FLAG(l, PCI_ERR_ROOT_MULTI_COR_RCV),
+	    FLAG(l, PCI_ERR_ROOT_UNCOR_RCV),
+	    FLAG(l, PCI_ERR_ROOT_MULTI_UNCOR_RCV),
+	    FLAG(l, PCI_ERR_ROOT_FIRST_FATAL),
+	    FLAG(l, PCI_ERR_ROOT_NONFATAL_RCV),
+	    FLAG(l, PCI_ERR_ROOT_FATAL_RCV),
+	    PCI_ERR_MSG_NUM(l));
+
+      w = get_conf_word(d, where + PCI_ERR_ROOT_COR_SRC);
+      printf("\t\tErrorSrc: ERR_COR: %04x ", w);
+
+      w = get_conf_word(d, where + PCI_ERR_ROOT_SRC);
+      printf("ERR_FATAL/NONFATAL: %04x\n", w);
+    }
 }
 
 static void cap_dpc(struct device *d, int where)
@@ -678,7 +709,7 @@ cap_ptm(struct device *d, int where)
 }
 
 void
-show_ext_caps(struct device *d)
+show_ext_caps(struct device *d, int type)
 {
   int where = 0x100;
   char been_there[0x1000];
@@ -707,7 +738,7 @@ show_ext_caps(struct device *d)
       switch (id)
 	{
 	  case PCI_EXT_CAP_ID_AER:
-	    cap_aer(d, where);
+	    cap_aer(d, where, type);
 	    break;
 	  case PCI_EXT_CAP_ID_DPC:
 	    cap_dpc(d, where);

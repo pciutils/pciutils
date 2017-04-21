@@ -964,7 +964,18 @@
 #define  PCI_ERR_CAP_HDR_LOG	0x00001000	/* Completion Timeout Prefix/Header Log Capable */
 #define PCI_ERR_HEADER_LOG	28	/* Header Log Register (16 bytes) */
 #define PCI_ERR_ROOT_COMMAND	44	/* Root Error Command */
-#define PCI_ERR_ROOT_STATUS	48
+#define  PCI_ERR_ROOT_CMD_COR_EN	0x00000001 /* Correctable Error Reporting Enable */
+#define  PCI_ERR_ROOT_CMD_NONFATAL_EN	0x00000002 /* Non-Fatal Error Reporting Enable*/
+#define  PCI_ERR_ROOT_CMD_FATAL_EN	0x00000004 /* Fatal Error Reporting Enable */
+#define PCI_ERR_ROOT_STATUS	48	/* Root Error Status */
+#define  PCI_ERR_ROOT_COR_RCV		0x00000001 /* ERR_COR Received */
+#define  PCI_ERR_ROOT_MULTI_COR_RCV	0x00000002 /* Multiple ERR_COR Received */
+#define  PCI_ERR_ROOT_UNCOR_RCV		0x00000004 /* ERR_FATAL/NONFATAL Received */
+#define  PCI_ERR_ROOT_MULTI_UNCOR_RCV	0x00000008 /* Multiple ERR_FATAL/NONFATAL Received */
+#define  PCI_ERR_ROOT_FIRST_FATAL	0x00000010 /* First Uncorrectable Fatal */
+#define  PCI_ERR_ROOT_NONFATAL_RCV	0x00000020 /* Non-Fatal Error Messages Received */
+#define  PCI_ERR_ROOT_FATAL_RCV		0x00000040 /* Fatal Error Messages Received */
+#define  PCI_ERR_MSG_NUM(x)	(((x) >> 27) & 0x1f) /* MSI/MSI-X vector */
 #define PCI_ERR_ROOT_COR_SRC	52
 #define PCI_ERR_ROOT_SRC	54
 
