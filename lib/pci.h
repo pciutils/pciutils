@@ -147,7 +147,7 @@ struct pci_dev {
   u8 *cache;				/* Cached config registers */
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
-  void *aux;				/* Auxillary data */
+  void *aux;				/* Auxiliary data */
 };
 
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
