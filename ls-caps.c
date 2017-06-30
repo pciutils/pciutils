@@ -879,7 +879,7 @@ static void cap_express_root(struct device *d, int where)
   printf("\t\tRootCap: CRSVisible%c\n",
 	FLAG(w, PCI_EXP_RTCAP_CRSVIS));
 
-  w = get_conf_word(d, where + PCI_EXP_RTSTA);
+  w = get_conf_long(d, where + PCI_EXP_RTSTA);
   printf("\t\tRootSta: PME ReqID %04x, PMEStatus%c PMEPending%c\n",
 	w & PCI_EXP_RTSTA_PME_REQID,
 	FLAG(w, PCI_EXP_RTSTA_PME_STATUS),
