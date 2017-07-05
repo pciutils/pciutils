@@ -1,3 +1,15 @@
+2017-07-05  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.5.
+
+	* Better decoding of AER capability.
+
+	* "Slot Implemented" flag is decoded for PCI/PCI-X to PCIe bridges.
+
+	* Minor fixes of decoding other capabilities.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2017-02-25  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.4.
