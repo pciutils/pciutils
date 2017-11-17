@@ -33,7 +33,7 @@ static const struct vpd_item {
 } vpd_items[] = {
   { 'C','P', F_BINARY,	"Extended capability" },
   { 'E','C', F_TEXT,	"Engineering changes" },
-  { 'M','N', F_BINARY,	"Manufacture ID" },
+  { 'M','N', F_TEXT,	"Manufacture ID" },
   { 'P','N', F_TEXT,	"Part number" },
   { 'R','V', F_RESVD,	"Reserved" },
   { 'R','W', F_RDWR,	"Read-write area" },
