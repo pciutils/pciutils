@@ -1,3 +1,14 @@
+2017-11-17  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.5.6.
+
+	* Improvements of the FreeBSD back-end: read-only access for non-root,
+	  support DragonFly BSD, support extended config space.
+
+	* MN VPD keyword is decoded correctly.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2017-07-05  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.5.
