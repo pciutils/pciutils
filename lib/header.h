@@ -135,6 +135,7 @@
 #define  PCI_BRIDGE_CTL_SERR	0x02	/* The same for SERR forwarding */
 #define  PCI_BRIDGE_CTL_NO_ISA	0x04	/* Disable bridging of ISA ports */
 #define  PCI_BRIDGE_CTL_VGA	0x08	/* Forward VGA addresses */
+#define  PCI_BRIDGE_CTL_VGA_16BIT 0x10	/* VGA 16-bit decode */
 #define  PCI_BRIDGE_CTL_MASTER_ABORT 0x20  /* Report master aborts */
 #define  PCI_BRIDGE_CTL_BUS_RESET 0x40	/* Secondary bus reset */
 #define  PCI_BRIDGE_CTL_FAST_BACK 0x80	/* Fast Back2Back enabled on secondary interface */

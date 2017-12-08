@@ -1,0 +1,129 @@
+00:1c.0 PCI bridge: Intel Corporation Device 9d10 (rev f1) (prog-if 00 [Normal decode])
+	Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0
+	Interrupt: pin A routed to IRQ 255
+	Bus: primary=00, secondary=02, subordinate=02, sec-latency=0
+	I/O behind bridge: None
+	Memory behind bridge: f1100000-f11fffff [size=1M]
+	Prefetchable memory behind bridge: None
+	Secondary status: 66MHz- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort+ <SERR- <PERR-
+	BridgeCtl: Parity- SERR- NoISA- VGA+ VGA16+ MAbort- >Reset- FastB2B-
+		PriDiscTmr- SecDiscTmr- DiscTmrStat- DiscTmrSERREn-
+	Capabilities: [40] Express (v2) Root Port (Slot+), MSI 00
+		DevCap:	MaxPayload 256 bytes, PhantFunc 0
+			ExtTag- RBE+
+		DevCtl:	Report errors: Correctable- Non-Fatal- Fatal- Unsupported-
+			RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+			MaxPayload 256 bytes, MaxReadReq 128 bytes
+		DevSta:	CorrErr- UncorrErr- FatalErr- UnsuppReq- AuxPwr+ TransPend-
+		LnkCap:	Port #1, Speed 8GT/s, Width x1, ASPM L1, Exit Latency L1 <16us
+			ClockPM- Surprise- LLActRep+ BwNot+ ASPMOptComp+
+		LnkCtl:	ASPM L1 Enabled; RCB 64 bytes Disabled- CommClk+
+			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+		LnkSta:	Speed 5GT/s, Width x1, TrErr- Train- SlotClk+ DLActive+ BWMgmt+ ABWMgmt-
+		SltCap:	AttnBtn- PwrCtrl- MRL- AttnInd- PwrInd- HotPlug- Surprise-
+			Slot #0, PowerLimit 10.000W; Interlock- NoCompl+
+		SltCtl:	Enable: AttnBtn- PwrFlt- MRL- PresDet- CmdCplt- HPIrq- LinkChg-
+			Control: AttnInd Unknown, PwrInd Unknown, Power- Interlock-
+		SltSta:	Status: AttnBtn- PowerFlt- MRL- CmdCplt- PresDet+ Interlock-
+			Changed: MRL- PresDet- LinkState+
+		RootCtl: ErrCorrectable- ErrNon-Fatal- ErrFatal- PMEIntEna- CRSVisible-
+		RootCap: CRSVisible-
+		RootSta: PME ReqID 0000, PMEStatus- PMEPending-
+		DevCap2: Completion Timeout: Range ABC, TimeoutDis+, LTR+, OBFF Not Supported ARIFwd+
+			 AtomicOpsCap: Routing- 32bit- 64bit- 128bitCAS-
+		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR+, OBFF Disabled ARIFwd-
+			 AtomicOpsCtl: ReqEn- EgressBlck-
+		LnkCtl2: Target Link Speed: 8GT/s, EnterCompliance- SpeedDis-
+			 Transmit Margin: Normal Operating Range, EnterModifiedCompliance- ComplianceSOS-
+			 Compliance De-emphasis: -6dB
+		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-, EqualizationPhase1-
+			 EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+	Capabilities: [80] MSI: Enable- Count=1/1 Maskable- 64bit-
+		Address: 00000000  Data: 0000
+	Capabilities: [90] Subsystem: Lenovo Device 2238
+	Capabilities: [a0] Power Management version 3
+		Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
+		Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+00: 86 80 10 9d 07 00 10 00 f1 00 04 06 00 00 81 00
+10: 00 00 00 00 00 00 00 00 00 02 02 00 f0 00 00 20
+20: 10 f1 10 f1 f1 ff 01 00 00 00 00 00 00 00 00 00
+30: 00 00 00 00 40 00 00 00 00 00 00 00 ff 01 18 00
+40: 10 80 42 01 01 80 00 00 20 00 10 00 13 48 72 01
+50: 42 00 12 70 00 b2 04 00 00 00 40 01 00 00 00 00
+60: 00 00 00 00 37 08 00 00 00 04 00 00 0e 00 00 00
+70: 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+80: 05 90 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+90: 0d a0 00 00 aa 17 38 22 00 00 00 00 00 00 00 00
+a0: 01 00 03 c8 00 00 00 00 00 00 00 00 00 00 00 00
+b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+d0: 11 10 00 07 42 18 00 00 08 00 9e 8b 00 00 00 00
+e0: 00 f7 f3 00 00 00 00 00 06 80 12 00 00 00 00 00
+f0: 50 01 00 00 00 03 00 40 b3 0f 30 08 04 00 00 01
+
+00:1c.2 PCI bridge: Intel Corporation Device 9d12 (rev f1) (prog-if 00 [Normal decode])
+	Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0
+	Interrupt: pin C routed to IRQ 255
+	Bus: primary=00, secondary=04, subordinate=04, sec-latency=0
+	I/O behind bridge: None
+	Memory behind bridge: f1000000-f10fffff [size=1M]
+	Prefetchable memory behind bridge: None
+	Secondary status: 66MHz- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort+ <SERR- <PERR-
+	BridgeCtl: Parity- SERR- NoISA- VGA- VGA16- MAbort- >Reset- FastB2B-
+		PriDiscTmr- SecDiscTmr- DiscTmrStat- DiscTmrSERREn-
+	Capabilities: [40] Express (v2) Root Port (Slot+), MSI 00
+		DevCap:	MaxPayload 256 bytes, PhantFunc 0
+			ExtTag- RBE+
+		DevCtl:	Report errors: Correctable- Non-Fatal- Fatal- Unsupported-
+			RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+			MaxPayload 128 bytes, MaxReadReq 128 bytes
+		DevSta:	CorrErr- UncorrErr- FatalErr- UnsuppReq- AuxPwr+ TransPend-
+		LnkCap:	Port #3, Speed 8GT/s, Width x1, ASPM L0s L1, Exit Latency L0s <1us, L1 <16us
+			ClockPM- Surprise- LLActRep+ BwNot+ ASPMOptComp+
+		LnkCtl:	ASPM L1 Enabled; RCB 64 bytes Disabled- CommClk+
+			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+		LnkSta:	Speed 2.5GT/s, Width x1, TrErr- Train- SlotClk+ DLActive+ BWMgmt+ ABWMgmt-
+		SltCap:	AttnBtn- PwrCtrl- MRL- AttnInd- PwrInd- HotPlug- Surprise-
+			Slot #2, PowerLimit 10.000W; Interlock- NoCompl+
+		SltCtl:	Enable: AttnBtn- PwrFlt- MRL- PresDet- CmdCplt- HPIrq- LinkChg-
+			Control: AttnInd Unknown, PwrInd Unknown, Power- Interlock-
+		SltSta:	Status: AttnBtn- PowerFlt- MRL- CmdCplt- PresDet+ Interlock-
+			Changed: MRL- PresDet- LinkState+
+		RootCtl: ErrCorrectable- ErrNon-Fatal- ErrFatal- PMEIntEna- CRSVisible-
+		RootCap: CRSVisible-
+		RootSta: PME ReqID 0000, PMEStatus- PMEPending-
+		DevCap2: Completion Timeout: Range ABC, TimeoutDis+, LTR+, OBFF Not Supported ARIFwd+
+			 AtomicOpsCap: Routing- 32bit- 64bit- 128bitCAS-
+		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR+, OBFF Disabled ARIFwd-
+			 AtomicOpsCtl: ReqEn- EgressBlck-
+		LnkCtl2: Target Link Speed: 8GT/s, EnterCompliance- SpeedDis-
+			 Transmit Margin: Normal Operating Range, EnterModifiedCompliance- ComplianceSOS-
+			 Compliance De-emphasis: -6dB
+		LnkSta2: Current De-emphasis Level: -3.5dB, EqualizationComplete-, EqualizationPhase1-
+			 EqualizationPhase2-, EqualizationPhase3-, LinkEqualizationRequest-
+	Capabilities: [80] MSI: Enable- Count=1/1 Maskable- 64bit-
+		Address: 00000000  Data: 0000
+	Capabilities: [90] Subsystem: Lenovo Device 2238
+	Capabilities: [a0] Power Management version 3
+		Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
+		Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+00: 86 80 12 9d 07 00 10 00 f1 00 04 06 00 00 81 00
+10: 00 00 00 00 00 00 00 00 00 04 04 00 f0 00 00 20
+20: 00 f1 00 f1 f1 ff 01 00 00 00 00 00 00 00 00 00
+30: 00 00 00 00 40 00 00 00 00 00 00 00 ff 03 00 00
+40: 10 80 42 01 01 80 00 00 00 00 10 00 13 4c 72 03
+50: 42 00 11 70 00 b2 14 00 00 00 40 01 00 00 00 00
+60: 00 00 00 00 37 08 00 00 00 04 00 00 0e 00 00 00
+70: 03 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00
+80: 05 90 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+90: 0d a0 00 00 aa 17 38 22 00 00 00 00 00 00 00 00
+a0: 01 00 03 c8 00 00 00 00 00 00 00 00 00 00 00 00
+b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+d0: 01 10 00 07 42 18 00 00 08 00 9e 8b 00 00 00 00
+e0: 00 03 63 00 56 88 56 88 16 00 10 00 00 00 00 00
+f0: 50 01 00 00 00 00 00 4c b3 0f 30 08 04 00 00 03

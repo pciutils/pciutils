@@ -578,11 +578,12 @@ show_htype1(struct device *d)
 
   if (verbose > 1)
     {
-      printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c MAbort%c >Reset%c FastB2B%c\n",
+      printf("\tBridgeCtl: Parity%c SERR%c NoISA%c VGA%c VGA16%c MAbort%c >Reset%c FastB2B%c\n",
 	FLAG(brc, PCI_BRIDGE_CTL_PARITY),
 	FLAG(brc, PCI_BRIDGE_CTL_SERR),
 	FLAG(brc, PCI_BRIDGE_CTL_NO_ISA),
 	FLAG(brc, PCI_BRIDGE_CTL_VGA),
+	FLAG(brc, PCI_BRIDGE_CTL_VGA_16BIT),
 	FLAG(brc, PCI_BRIDGE_CTL_MASTER_ABORT),
 	FLAG(brc, PCI_BRIDGE_CTL_BUS_RESET),
 	FLAG(brc, PCI_BRIDGE_CTL_FAST_BACK));
