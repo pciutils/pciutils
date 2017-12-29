@@ -57,3 +57,11 @@ outl (u32 value, u16 port)
 {
   write_isa_io(0, (void *)(u32)port, sizeof(value), value);
 }
+
+static inline void intel_io_lock(void)
+{
+}
+
+static inline void intel_io_unlock(void)
+{
+}

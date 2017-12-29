@@ -64,3 +64,11 @@ outl (u32 value, u16 port)
 {
   __asm__ __volatile__ ("outl (%w1)": :"a" (value), "Nd" (port));
 }
+
+static inline void intel_io_lock(void)
+{
+}
+
+static inline void intel_io_unlock(void)
+{
+}

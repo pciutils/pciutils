@@ -68,6 +68,16 @@ typedef u16 word;
 #endif
 #endif
 
+#ifdef PCI_OS_DJGPP
+  #define BIG_ENDIAN 4321
+  #define LITTLE_ENDIAN	1234
+  #define BYTE_ORDER LITTLE_ENDIAN
+#endif
+
+#if !defined(BYTE_ORDER)
+#error "BYTE_ORDER not defined for your platform"
+#endif
+
 #if BYTE_ORDER == BIG_ENDIAN
 #define cpu_to_le16 swab16
 #define cpu_to_le32 swab32

@@ -26,6 +26,8 @@
 #include "i386-io-haiku.h"
 #elif defined(PCI_OS_BEOS)
 #include "i386-io-beos.h"
+#elif defined(PCI_OS_DJGPP)
+#include "i386-io-djgpp.h"
 #else
 #error Do not know how to access I/O ports on this OS.
 #endif
@@ -106,12 +108,16 @@ conf1_detect(struct pci_access *a)
       a->debug("...no I/O permission");
       return 0;
     }
+
+  intel_io_lock();
   outb (0x01, 0xCFB);
   tmp = inl (0xCF8);
   outl (0x80000000, 0xCF8);
   if (inl (0xCF8) == 0x80000000)
     res = 1;
   outl (tmp, 0xCF8);
+  intel_io_unlock();
+
   if (res)
     res = intel_sanity_check(a, &pm_intel_conf1);
   return res;
@@ -121,10 +127,12 @@ static int
 conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xcfc + (pos&3);
+  int res = 1;
 
   if (pos >= 256)
     return 0;
 
+  intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -139,19 +147,23 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
       ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
       break;
     default:
-      return pci_generic_block_read(d, pos, buf, len);
+      res = pci_generic_block_read(d, pos, buf, len);
     }
-  return 1;
+
+  intel_io_unlock();
+  return res;
 }
 
 static int
 conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
   int addr = 0xcfc + (pos&3);
+  int res = 1;
 
   if (pos >= 256)
     return 0;
 
+  intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -166,9 +178,10 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
       outl(le32_to_cpu(((u32 *) buf)[0]), addr);
       break;
     default:
-      return pci_generic_block_write(d, pos, buf, len);
+      res = pci_generic_block_write(d, pos, buf, len);
     }
-  return 1;
+  intel_io_unlock();
+  return res;
 }
 
 /*
@@ -178,6 +191,8 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 static int
 conf2_detect(struct pci_access *a)
 {
+  int res = 0;
+
   if (!conf12_setup_io(a))
     {
       a->debug("...no I/O permission");
@@ -186,18 +201,20 @@ conf2_detect(struct pci_access *a)
 
   /* This is ugly and tends to produce false positives. Beware. */
 
+  intel_io_lock();
   outb(0x00, 0xCFB);
   outb(0x00, 0xCF8);
   outb(0x00, 0xCFA);
   if (inb(0xCF8) == 0x00 && inb(0xCFA) == 0x00)
-    return intel_sanity_check(a, &pm_intel_conf2);
-  else
-    return 0;
+    res = intel_sanity_check(a, &pm_intel_conf2);
+  intel_io_unlock();
+  return res;
 }
 
 static int
 conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
+  int res = 1;
   int addr = 0xc000 | (d->dev << 8) | pos;
 
   if (pos >= 256)
@@ -206,6 +223,8 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (d->dev >= 16)
     /* conf2 supports only 16 devices per bus */
     return 0;
+
+  intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
   switch (len)
@@ -220,16 +239,17 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
       ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
       break;
     default:
-      outb(0, 0xcf8);
-      return pci_generic_block_read(d, pos, buf, len);
+      res = pci_generic_block_read(d, pos, buf, len);
     }
   outb(0, 0xcf8);
-  return 1;
+  intel_io_unlock();
+  return res;
 }
 
 static int
 conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
+  int res = 1;
   int addr = 0xc000 | (d->dev << 8) | pos;
 
   if (pos >= 256)
@@ -237,6 +257,8 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (d->dev >= 16)
     d->access->error("conf2_write: only first 16 devices exist.");
+
+  intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
   switch (len)
@@ -251,11 +273,12 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
       outl(le32_to_cpu(* (u32 *) buf), addr);
       break;
     default:
-      outb(0, 0xcf8);
-      return pci_generic_block_write(d, pos, buf, len);
+      res = pci_generic_block_write(d, pos, buf, len);
     }
+
   outb(0, 0xcf8);
-  return 1;
+  intel_io_unlock();
+  return res;
 }
 
 struct pci_methods pm_intel_conf1 = {

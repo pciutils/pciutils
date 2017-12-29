@@ -120,7 +120,11 @@ case $sys in
 		echo >>$m 'WITH_LIBS+=-lpci'
 		LIBRESOLV=
 		;;
-    	gnu)
+	gnu)
+		echo_n " i386-ports"
+		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		;;
+	djgpp)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		;;

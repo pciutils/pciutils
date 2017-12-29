@@ -20,3 +20,11 @@ intel_cleanup_io(struct pci_access *a UNUSED)
   iopl(3);
   return -1;
 }
+
+static inline void intel_io_lock(void)
+{
+}
+
+static inline void intel_io_unlock(void)
+{
+}

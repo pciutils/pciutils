@@ -122,3 +122,11 @@ outl (u32 value, u16 port)
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u32), value };
   ioctl(poke_driver_fd, POKE_PORT_WRITE, &args, sizeof(args));
 }
+
+static inline void intel_io_lock(void)
+{
+}
+
+static inline void intel_io_unlock(void)
+{
+}
