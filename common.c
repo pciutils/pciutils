@@ -25,7 +25,7 @@ die(char *msg, ...)
   fputc('\n', stderr);
   exit(1);
 }
-
+#ifndef PCI_OS_SYLIXOS
 void *
 xmalloc(unsigned int howmuch)
 {
@@ -52,7 +52,7 @@ xstrdup(char *str)
   memcpy(copy, str, len);
   return copy;
 }
-
+#endif
 static void
 set_pci_method(struct pci_access *pacc, char *arg)
 {
@@ -97,7 +97,7 @@ set_pci_option(struct pci_access *pacc, char *arg)
 	die("Unrecognized PCI access parameter: %s (see `-O help' for a list)", arg);
     }
 }
-
+#ifndef PCI_OS_SYLIXOS
 int
 parse_generic_option(int i, struct pci_access *pacc, char *optarg)
 {
@@ -133,3 +133,46 @@ parse_generic_option(int i, struct pci_access *pacc, char *optarg)
     }
   return 1;
 }
+#else
+int
+parse_generic_option(int i, struct pci_access *pacc, char *arg)
+{
+  switch (i)
+    {
+#ifdef PCI_HAVE_PM_INTEL_CONF
+    case 'H':
+      if (!strcmp(arg, "1"))
+    pacc->method = PCI_ACCESS_I386_TYPE1;
+      else if (!strcmp(arg, "2"))
+    pacc->method = PCI_ACCESS_I386_TYPE2;
+      else
+    die("Unknown hardware configuration type %s", arg);
+      break;
+#endif
+#ifdef PCI_HAVE_PM_DUMP
+    case 'F':
+      pci_set_param(pacc, "dump.name", arg);
+      pacc->method = PCI_ACCESS_DUMP;
+      break;
+#endif
+    case 'A':
+      set_pci_method(pacc, arg);
+      break;
+    case 'G':
+      pacc->debugging++;
+      break;
+    case 'O':
+      set_pci_option(pacc, arg);
+      break;
+#ifdef PCI_HAVE_PM_SYLIXOS_DEVICE
+    case 'S':
+      pacc->method = PCI_ACCESS_SYLIXOS_DEVICE;
+      break;
+#endif
+    default:
+      return 0;
+    }
+  return 1;
+}
+#endif
+

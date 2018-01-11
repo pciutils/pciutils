@@ -62,6 +62,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+#ifdef PCI_HAVE_PM_SYLIXOS_DEVICE
+  &pm_sylixos_device,
+#else
+  NULL,
+#endif
 };
 
 void *
