@@ -53,7 +53,7 @@ int  sylixos_pci_traversal (int (*func)(), void *arg, int min_bus_num, int max_b
     for (ibus = min_bus_num; ibus <= max_bus_num; ibus++) {
         for (islot = 0; islot < PCI_MAX_SLOTS; islot++) {
             for (ifunc = 0; ifunc < PCI_MAX_FUNCTIONS; ifunc++) {
-                API_PciConfigInWord(ibus, islot, ifunc, PCI_VENDOR_ID, &vendor);
+                pciConfigInWord(ibus, islot, ifunc, PCI_VENDOR_ID, &vendor);
 
                 if (PCI_VENDOR_ID_IS_INVALIDATE(vendor)) {
                     if (ifunc == 0) {
@@ -67,7 +67,7 @@ int  sylixos_pci_traversal (int (*func)(), void *arg, int min_bus_num, int max_b
                 }
 
                 if (ifunc == 0) {
-                    API_PciConfigInByte(ibus, islot, ifunc, PCI_HEADER_TYPE, &header);
+                    pciConfigInByte(ibus, islot, ifunc, PCI_HEADER_TYPE, &header);
                     if ((header & PCI_HEADER_MULTI_FUNC) != PCI_HEADER_MULTI_FUNC) {
                         break;
                     }
@@ -302,7 +302,7 @@ sylixos_fill_info(struct pci_dev *d, int flags)
         break;
     }
 
-    hDevHandle = API_PciDevHandleGet(d->bus, d->dev, d->func);
+    hDevHandle = pciDevHandleGet(d->bus, d->dev, d->func);
     if (!hDevHandle) {
         return (ret);
     }
