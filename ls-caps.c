@@ -686,7 +686,7 @@ static void cap_express_dev(struct device *d, int where, int type)
   printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
-  printf("\t\tDevCtl:\tReport errors: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
+  printf("\t\tDevCtl:\tCorrErr%c NonFatalErr%c FatalErr%c UnsupReq%c\n",
 	FLAG(w, PCI_EXP_DEVCTL_CERE),
 	FLAG(w, PCI_EXP_DEVCTL_NFERE),
 	FLAG(w, PCI_EXP_DEVCTL_FERE),
@@ -707,7 +707,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	128 << ((w & PCI_EXP_DEVCTL_READRQ) >> 12));
 
   w = get_conf_word(d, where + PCI_EXP_DEVSTA);
-  printf("\t\tDevSta:\tCorrErr%c UncorrErr%c FatalErr%c UnsuppReq%c AuxPwr%c TransPend%c\n",
+  printf("\t\tDevSta:\tCorrErr%c NonFatalErr%c FatalErr%c UnsupReq%c AuxPwr%c TransPend%c\n",
 	FLAG(w, PCI_EXP_DEVSTA_CED),
 	FLAG(w, PCI_EXP_DEVSTA_NFED),
 	FLAG(w, PCI_EXP_DEVSTA_FED),
