@@ -1,23 +1,10 @@
-/*********************************************************************************************************
-**
-**                                    中国软件开源组织
-**
-**                                   嵌入式实时操作系统
-**
-**                                SylixOS(TM)  LW : long wing
-**
-**                               Copyright All Rights Reserved
-**
-**--------------文件信息--------------------------------------------------------------------------------
-**
-** 文   件   名: sylixos-ports.c
-**
-** 创   建   人: Gong.YuJian (弓羽箭)
-**
-** 文件创建日期: 2015 年 09 月 28 日
-**
-** 描        述: SylixOS 移植.
-*********************************************************************************************************/
+/*
+ *  The PCI Library -- Direct Configuration access via SylixOS Ports
+ *
+ *  Copyright (c) 2018 YuJian.Gong <gongyujian@acoinfo.com>
+ *
+ *  Can be freely distributed and used under the terms of the GNU GPL.
+ */
 
 #define _GNU_SOURCE
 #define  __SYLIXOS_KERNEL
@@ -346,6 +333,3 @@ struct pci_methods pm_sylixos_device = {
   NULL,					                                                /* init_dev                     */
   NULL					                                                /* cleanup_dev                  */
 };
-/*********************************************************************************************************
-  END
-*********************************************************************************************************/

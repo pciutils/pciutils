@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Capabilities
  *
- *	Copyright (c) 1997--2010 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -686,7 +686,7 @@ static void cap_express_dev(struct device *d, int where, int type)
   printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
-  printf("\t\tDevCtl:\tReport errors: Correctable%c Non-Fatal%c Fatal%c Unsupported%c\n",
+  printf("\t\tDevCtl:\tCorrErr%c NonFatalErr%c FatalErr%c UnsupReq%c\n",
 	FLAG(w, PCI_EXP_DEVCTL_CERE),
 	FLAG(w, PCI_EXP_DEVCTL_NFERE),
 	FLAG(w, PCI_EXP_DEVCTL_FERE),
@@ -707,7 +707,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	128 << ((w & PCI_EXP_DEVCTL_READRQ) >> 12));
 
   w = get_conf_word(d, where + PCI_EXP_DEVSTA);
-  printf("\t\tDevSta:\tCorrErr%c UncorrErr%c FatalErr%c UnsuppReq%c AuxPwr%c TransPend%c\n",
+  printf("\t\tDevSta:\tCorrErr%c NonFatalErr%c FatalErr%c UnsupReq%c AuxPwr%c TransPend%c\n",
 	FLAG(w, PCI_EXP_DEVSTA_CED),
 	FLAG(w, PCI_EXP_DEVSTA_NFED),
 	FLAG(w, PCI_EXP_DEVSTA_FED),
@@ -731,6 +731,15 @@ static char *link_speed(int speed)
       default:
 	return "unknown";
     }
+}
+
+static char *link_compare(int sta, int cap)
+{
+  if (sta < cap)
+    return "downgraded";
+  if (sta > cap)
+    return "strange";
+  return "ok";
 }
 
 static char *aspm_support(int code)
@@ -758,14 +767,16 @@ static const char *aspm_enabled(int code)
 
 static void cap_express_link(struct device *d, int where, int type)
 {
-  u32 t, aspm;
+  u32 t, aspm, cap_speed, cap_width, sta_speed, sta_width;
   u16 w;
 
   t = get_conf_long(d, where + PCI_EXP_LNKCAP);
   aspm = (t & PCI_EXP_LNKCAP_ASPM) >> 10;
+  cap_speed = t & PCI_EXP_LNKCAP_SPEED;
+  cap_width = (t & PCI_EXP_LNKCAP_WIDTH) >> 4;
   printf("\t\tLnkCap:\tPort #%d, Speed %s, Width x%d, ASPM %s",
 	t >> 24,
-	link_speed(t & PCI_EXP_LNKCAP_SPEED), (t & PCI_EXP_LNKCAP_WIDTH) >> 4,
+	link_speed(cap_speed), cap_width,
 	aspm_support(aspm));
   if (aspm)
     {
@@ -799,9 +810,14 @@ static void cap_express_link(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_LNKCTL_AUTBWIE));
 
   w = get_conf_word(d, where + PCI_EXP_LNKSTA);
-  printf("\t\tLnkSta:\tSpeed %s, Width x%d, TrErr%c Train%c SlotClk%c DLActive%c BWMgmt%c ABWMgmt%c\n",
-	link_speed(w & PCI_EXP_LNKSTA_SPEED),
-	(w & PCI_EXP_LNKSTA_WIDTH) >> 4,
+  sta_speed = w & PCI_EXP_LNKSTA_SPEED;
+  sta_width = (w & PCI_EXP_LNKSTA_WIDTH) >> 4;
+  printf("\t\tLnkSta:\tSpeed %s (%s), Width x%d (%s)\n",
+	link_speed(sta_speed),
+	link_compare(sta_speed, cap_speed),
+	sta_width,
+	link_compare(sta_width, cap_width));
+  printf("\t\t\tTrErr%c Train%c SlotClk%c DLActive%c BWMgmt%c ABWMgmt%c\n",
 	FLAG(w, PCI_EXP_LNKSTA_TR_ERR),
 	FLAG(w, PCI_EXP_LNKSTA_TRAIN),
 	FLAG(w, PCI_EXP_LNKSTA_SL_CLK),
