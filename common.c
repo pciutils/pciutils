@@ -99,34 +99,34 @@ set_pci_option(struct pci_access *pacc, char *arg)
 }
 
 int
-parse_generic_option(int i, struct pci_access *pacc, char *optarg)
+parse_generic_option(int i, struct pci_access *pacc, char *arg)
 {
   switch (i)
     {
 #ifdef PCI_HAVE_PM_INTEL_CONF
     case 'H':
-      if (!strcmp(optarg, "1"))
+      if (!strcmp(arg, "1"))
 	pacc->method = PCI_ACCESS_I386_TYPE1;
-      else if (!strcmp(optarg, "2"))
+      else if (!strcmp(arg, "2"))
 	pacc->method = PCI_ACCESS_I386_TYPE2;
       else
-	die("Unknown hardware configuration type %s", optarg);
+	die("Unknown hardware configuration type %s", arg);
       break;
 #endif
 #ifdef PCI_HAVE_PM_DUMP
     case 'F':
-      pci_set_param(pacc, "dump.name", optarg);
+      pci_set_param(pacc, "dump.name", arg);
       pacc->method = PCI_ACCESS_DUMP;
       break;
 #endif
     case 'A':
-      set_pci_method(pacc, optarg);
+      set_pci_method(pacc, arg);
       break;
     case 'G':
       pacc->debugging++;
       break;
     case 'O':
-      set_pci_option(pacc, optarg);
+      set_pci_option(pacc, arg);
       break;
     default:
       return 0;
