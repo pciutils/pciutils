@@ -29,7 +29,7 @@
 struct pci_methods;
 
 enum pci_access_type {
-  /* Known access methods, remember to update access.c as well */
+  /* Known access methods, remember to update init.c as well */
   PCI_ACCESS_AUTO,			/* Autodetection */
   PCI_ACCESS_SYS_BUS_PCI,		/* Linux /sys/bus/pci */
   PCI_ACCESS_PROC_BUS_PCI,		/* Linux /proc/bus/pci */
