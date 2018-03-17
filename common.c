@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Common Functions
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2016 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -27,25 +27,25 @@ die(char *msg, ...)
 }
 
 void *
-xmalloc(unsigned int howmuch)
+xmalloc(size_t howmuch)
 {
   void *p = malloc(howmuch);
   if (!p)
-    die("Unable to allocate %d bytes of memory", howmuch);
+    die("Unable to allocate %d bytes of memory", (int) howmuch);
   return p;
 }
 
 void *
-xrealloc(void *ptr, unsigned int howmuch)
+xrealloc(void *ptr, size_t howmuch)
 {
   void *p = realloc(ptr, howmuch);
   if (!p)
-    die("Unable to allocate %d bytes of memory", howmuch);
+    die("Unable to allocate %d bytes of memory", (int) howmuch);
   return p;
 }
 
 char *
-xstrdup(char *str)
+xstrdup(const char *str)
 {
   int len = strlen(str) + 1;
   char *copy = xmalloc(len);
