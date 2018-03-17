@@ -128,11 +128,6 @@ parse_generic_option(int i, struct pci_access *pacc, char *arg)
     case 'O':
       set_pci_option(pacc, arg);
       break;
-#ifdef PCI_HAVE_PM_SYLIXOS_DEVICE
-    case 'S':
-      pacc->method = PCI_ACCESS_SYLIXOS_DEVICE;
-      break;
-#endif
     default:
       return 0;
     }
