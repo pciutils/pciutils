@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Common Functions
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2016 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -31,7 +31,7 @@ xmalloc(size_t howmuch)
 {
   void *p = malloc(howmuch);
   if (!p)
-    die("Unable to allocate %d bytes of memory", howmuch);
+    die("Unable to allocate %d bytes of memory", (int) howmuch);
   return p;
 }
 
@@ -40,7 +40,7 @@ xrealloc(void *ptr, size_t howmuch)
 {
   void *p = realloc(ptr, howmuch);
   if (!p)
-    die("Unable to allocate %d bytes of memory", howmuch);
+    die("Unable to allocate %d bytes of memory", (int) howmuch);
   return p;
 }
 
@@ -106,11 +106,11 @@ parse_generic_option(int i, struct pci_access *pacc, char *arg)
 #ifdef PCI_HAVE_PM_INTEL_CONF
     case 'H':
       if (!strcmp(arg, "1"))
-    pacc->method = PCI_ACCESS_I386_TYPE1;
+	pacc->method = PCI_ACCESS_I386_TYPE1;
       else if (!strcmp(arg, "2"))
-    pacc->method = PCI_ACCESS_I386_TYPE2;
+	pacc->method = PCI_ACCESS_I386_TYPE2;
       else
-    die("Unknown hardware configuration type %s", arg);
+	die("Unknown hardware configuration type %s", arg);
       break;
 #endif
 #ifdef PCI_HAVE_PM_DUMP
