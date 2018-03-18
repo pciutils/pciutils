@@ -92,7 +92,7 @@ pci_dev_list_create (int  bus, int  dev, int  func, void *arg)
   d->vendor_id = vd & 0xffff;
   d->device_id = vd >> 16U;
   d->known_fields = PCI_FILL_IDENT;
-  d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE);
+  d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
   pci_link_dev(f->a, d);
 
   return  (ERROR_NONE);
