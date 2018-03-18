@@ -274,7 +274,7 @@ sylixos_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_sylixos_device = {
-  "SylixOS-PCI",
+  "sylixos-device",
   "SylixOS /proc/pci device",
   sylixos_config,					                                    /* config                       */
   sylixos_detect,
