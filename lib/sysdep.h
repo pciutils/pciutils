@@ -68,6 +68,10 @@ typedef u16 word;
 #endif
 #endif
 
+#ifdef PCI_OS_SYLIXOS
+#include <endian.h>
+#endif
+
 #ifdef PCI_OS_DJGPP
   #define BIG_ENDIAN 4321
   #define LITTLE_ENDIAN	1234

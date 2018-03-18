@@ -141,6 +141,13 @@ case $sys in
 		esac
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
+	sylixos)
+		echo >>$c '#define PCI_PATH_SYLIXOS_DEVICE "/proc/pci"'
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		echo >>$c '#define PCI_HAVE_PM_SYLIXOS_DEVICE'
+		echo >>$c '#define PCI_SCAN_FUNC "PCI_SCAN_TBL"'
+		IDSDIR="/etc/pci"
+		;;
 	*)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
 		exit 1
