@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Initialization and related things
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -67,6 +67,23 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+};
+
+// If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
+static int probe_sequence[] = {
+  // System-specific methods
+  PCI_ACCESS_SYLIXOS_DEVICE,
+  PCI_ACCESS_SYS_BUS_PCI,
+  PCI_ACCESS_PROC_BUS_PCI,
+  PCI_ACCESS_FBSD_DEVICE,
+  PCI_ACCESS_AIX_DEVICE,
+  PCI_ACCESS_NBSD_LIBPCI,
+  PCI_ACCESS_OBSD_DEVICE,
+  PCI_ACCESS_DARWIN,
+  // Low-level methods poking the hardware directly
+  PCI_ACCESS_I386_TYPE1,
+  PCI_ACCESS_I386_TYPE2,
+  -1,
 };
 
 void *
@@ -198,19 +215,21 @@ pci_init_v35(struct pci_access *a)
   else
     {
       unsigned int i;
-      for (i=0; i<PCI_ACCESS_MAX; i++)
-	if (pci_methods[i])
-	  {
-	    a->debug("Trying method %d...", i);
-	    if (pci_methods[i]->detect(a))
-	      {
-		a->debug("...OK\n");
-		a->methods = pci_methods[i];
-		a->method = i;
-		break;
-	      }
-	    a->debug("...No.\n");
-	  }
+      for (i=0; probe_sequence[i] >= 0; i++)
+	{
+	  struct pci_methods *m = pci_methods[probe_sequence[i]];
+	  if (!m)
+	    continue;
+	  a->debug("Trying method %s...", m->name);
+	  if (m->detect(a))
+	    {
+	      a->debug("...OK\n");
+	      a->methods = m;
+	      a->method = probe_sequence[i];
+	      break;
+	    }
+	  a->debug("...No.\n");
+	}
       if (!a->methods)
 	a->error("Cannot find any working access method.");
     }
