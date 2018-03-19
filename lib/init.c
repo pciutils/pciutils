@@ -72,7 +72,6 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
 static int probe_sequence[] = {
   // System-specific methods
-  PCI_ACCESS_SYLIXOS_DEVICE,
   PCI_ACCESS_SYS_BUS_PCI,
   PCI_ACCESS_PROC_BUS_PCI,
   PCI_ACCESS_FBSD_DEVICE,
@@ -80,6 +79,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_NBSD_LIBPCI,
   PCI_ACCESS_OBSD_DEVICE,
   PCI_ACCESS_DARWIN,
+  PCI_ACCESS_SYLIXOS_DEVICE,
   // Low-level methods poking the hardware directly
   PCI_ACCESS_I386_TYPE1,
   PCI_ACCESS_I386_TYPE2,
