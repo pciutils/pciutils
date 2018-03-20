@@ -315,6 +315,8 @@ show_terse(struct device *d)
       word subsys_v, subsys_d;
       char ssnamebuf[256];
 
+      pci_fill_info(p, PCI_FILL_LABEL);
+
       if (p->label)
         printf("\tDeviceName: %s", p->label);
       get_subid(d, &subsys_v, &subsys_d);
@@ -683,7 +685,7 @@ show_verbose(struct device *d)
   show_terse(d);
 
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
-    PCI_FILL_PHYS_SLOT | PCI_FILL_LABEL | PCI_FILL_NUMA_NODE);
+    PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE);
   irq = p->irq;
 
   switch (htype)
