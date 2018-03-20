@@ -46,6 +46,10 @@ ifdef PCI_HAVE_PM_DARWIN_DEVICE
 OBJS += darwin
 endif
 
+ifdef PCI_HAVE_PM_SYLIXOS_DEVICE
+OBJS += sylixos-device
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)

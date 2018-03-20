@@ -146,6 +146,7 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$c '#define PCI_HAVE_PM_SYLIXOS_DEVICE'
 		IDSDIR="/etc/pci"
+		LIBRESOLV=
 		;;
 	*)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
