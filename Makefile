@@ -101,9 +101,17 @@ example.o: example.c $(PCIINC)
 %.8 %.7: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"
 
+ctags:
+	rm -f tags
+	find . -name '*.[hc]' -exec ctags --append {} +
+
+TAGS:
+	rm -f TAGS
+	find . -name '*.[hc]' -exec etags --append {} +
+
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci setpci example lib/config.* *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.*
+	rm -f update-pciids lspci setpci example lib/config.* *.[78] pci.ids.* lib/*.pc lib/*.so lib/*.so.* tags
 	rm -rf maint/dist
 
 distclean: clean
@@ -156,4 +164,4 @@ endif
 pci.ids.gz: pci.ids
 	gzip -9n <$< >$@
 
-.PHONY: all clean distclean install install-lib uninstall force
+.PHONY: all clean distclean install install-lib uninstall force tags TAGS
