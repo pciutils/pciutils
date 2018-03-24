@@ -1,0 +1,99 @@
+00:00.0 Host bridge: Advanced Micro Devices, Inc. [AMD/ATI] RD890 PCI to PCI bridge (external gfx0 port A) (rev 02)
+	Subsystem: Super Micro Computer Inc Device a711
+	Control: I/O- Mem+ BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort+ >SERR- <PERR- INTx-
+	Capabilities: [f0] HyperTransport: MSI Mapping Enable+ Fixed+
+	Capabilities: [c4] HyperTransport: Slave or Primary Interface
+		Command: BaseUnitID=0 UnitCnt=20 MastHost- DefDir- DUL-
+		Link Control 0: CFlE- CST- CFE- <LkFail- Init+ EOC- TXO- <CRCErr=0 IsocEn- LSEn- ExtCTL- 64b-
+		Link Config 0: MLWI=16bit DwFcIn- MLWO=16bit DwFcOut- LWI=16bit DwFcInEn- LWO=16bit DwFcOutEn-
+		Link Control 1: CFlE- CST- CFE- <LkFail+ Init- EOC+ TXO+ <CRCErr=0 IsocEn- LSEn- ExtCTL- 64b-
+		Link Config 1: MLWI=8bit DwFcIn- MLWO=8bit DwFcOut- LWI=8bit DwFcInEn- LWO=8bit DwFcOutEn-
+		Revision ID: 3.00
+		Link Frequency 0: [e]
+		Link Error 0: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability 0: 200MHz+ 300MHz- 400MHz+ 500MHz- 600MHz+ 800MHz+ 1.0GHz+ 1.2GHz+ 1.4GHz- 1.6GHz- Vend-
+		Feature Capability: IsocFC+ LDTSTOP+ CRCTM- ECTLT- 64bA+ UIDRD-
+		Link Frequency 1: 200MHz
+		Link Error 1: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability 1: 200MHz- 300MHz- 400MHz- 500MHz- 600MHz- 800MHz- 1.0GHz- 1.2GHz- 1.4GHz- 1.6GHz- Vend-
+		Error Handling: PFlE- OFlE- PFE- OFE- EOCFE- RFE- CRCFE- SERRFE- CF- RE- PNFE- ONFE- EOCNFE- RNFE- CRCNFE- SERRNFE-
+		Prefetchable memory behind bridge Upper: 00-00
+		Bus Number: 00
+	Capabilities: [40] HyperTransport: Retry Mode
+	Capabilities: [54] HyperTransport: UnitID Clumping
+	Capabilities: [9c] HyperTransport: #1a
+	Capabilities: [70] MSI: Enable- Count=1/4 Maskable- 64bit-
+		Address: 00000000  Data: 0000
+00: 02 10 13 5a 02 00 10 20 02 00 00 06 00 00 80 00
+10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+20: 00 00 00 00 00 00 00 00 00 00 00 00 d9 15 11 a7
+30: 00 00 00 00 f0 00 00 00 00 00 00 00 00 00 00 00
+40: 08 54 00 c0 c1 00 00 00 00 00 00 00 42 27 05 00
+50: d9 15 11 a7 08 9c 00 90 08 10 00 00 08 10 00 00
+60: 3c 00 00 00 00 00 00 00 00 00 00 40 63 4e 00 78
+70: 05 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00
+80: 00 00 00 00 10 00 00 03 20 02 30 00 31 20 00 c0
+90: 00 00 00 e0 00 00 00 00 10 0d 00 00 08 70 3c d0
+a0: 66 00 00 00 00 00 00 83 00 00 00 00 79 41 00 00
+b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+c0: 00 00 00 80 08 40 80 02 20 00 11 11 d0 00 00 00
+d0: 60 0e f5 7f 13 00 00 00 00 00 00 00 00 00 00 00
+e0: 00 00 05 00 ff ff ff ff 00 00 00 00 00 00 00 00
+f0: 08 c4 03 a8 00 80 80 00 01 00 00 00 08 00 c2 fe
+
+00:18.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Family 15h Processor Function 0
+	Control: I/O- Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	Capabilities: [80] HyperTransport: Host or Secondary Interface
+		Command: WarmRst+ DblEnd- DevNum=0 ChainSide- HostHide+ Slave- <EOCErr- DUL-
+		Link Control: CFlE- CST- CFE- <LkFail- Init- EOC+ TXO+ <CRCErr=0 IsocEn- LSEn- ExtCTL- 64b-
+		Link Config: MLWI=8bit DwFcIn- MLWO=8bit DwFcOut- LWI=N/C DwFcInEn- LWO=N/C DwFcOutEn-
+		Revision ID: 3.00
+		Link Frequency: 200MHz
+		Link Error: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability: 200MHz+ 300MHz- 400MHz+ 500MHz- 600MHz+ 800MHz+ 1.0GHz+ 1.2GHz+ 1.4GHz- 1.6GHz- Vend-
+		Feature Capability: IsocFC+ LDTSTOP+ CRCTM- ECTLT- 64bA+ UIDRD- ExtRS- UCnfE-
+	Capabilities: [a0] HyperTransport: Host or Secondary Interface
+		Command: WarmRst+ DblEnd- DevNum=0 ChainSide- HostHide+ Slave- <EOCErr- DUL-
+		Link Control: CFlE- CST- CFE- <LkFail- Init- EOC+ TXO+ <CRCErr=0 IsocEn- LSEn- ExtCTL- 64b-
+		Link Config: MLWI=8bit DwFcIn- MLWO=8bit DwFcOut- LWI=N/C DwFcInEn- LWO=N/C DwFcOutEn-
+		Revision ID: 3.00
+		Link Frequency: 200MHz
+		Link Error: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability: 200MHz+ 300MHz- 400MHz+ 500MHz- 600MHz+ 800MHz+ 1.0GHz+ 1.2GHz+ 1.4GHz- 1.6GHz- Vend-
+		Feature Capability: IsocFC+ LDTSTOP+ CRCTM- ECTLT- 64bA+ UIDRD- ExtRS- UCnfE-
+	Capabilities: [c0] HyperTransport: Host or Secondary Interface
+		Command: WarmRst+ DblEnd- DevNum=0 ChainSide- HostHide+ Slave- <EOCErr- DUL-
+		Link Control: CFlE- CST- CFE- <LkFail- Init+ EOC- TXO- <CRCErr=0 IsocEn- LSEn+ ExtCTL- 64b-
+		Link Config: MLWI=16bit DwFcIn- MLWO=16bit DwFcOut- LWI=16bit DwFcInEn- LWO=16bit DwFcOutEn-
+		Revision ID: 3.00
+		Link Frequency: 500MHz
+		Link Error: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability: 200MHz+ 300MHz- 400MHz+ 500MHz- 600MHz+ 800MHz+ 1.0GHz+ 1.2GHz+ 1.4GHz- 1.6GHz- Vend-
+		Feature Capability: IsocFC+ LDTSTOP+ CRCTM- ECTLT- 64bA+ UIDRD- ExtRS- UCnfE-
+	Capabilities: [e0] HyperTransport: Host or Secondary Interface
+		Command: WarmRst+ DblEnd- DevNum=0 ChainSide- HostHide+ Slave- <EOCErr- DUL-
+		Link Control: CFlE- CST- CFE- <LkFail- Init+ EOC- TXO- <CRCErr=0 IsocEn- LSEn+ ExtCTL- 64b-
+		Link Config: MLWI=16bit DwFcIn- MLWO=16bit DwFcOut- LWI=16bit DwFcInEn- LWO=16bit DwFcOutEn-
+		Revision ID: 3.00
+		Link Frequency: [e]
+		Link Error: <Prot- <Ovfl- <EOC- CTLTm-
+		Link Frequency Capability: 200MHz+ 300MHz- 400MHz+ 500MHz- 600MHz+ 800MHz+ 1.0GHz+ 1.2GHz+ 1.4GHz- 1.6GHz- Vend-
+		Feature Capability: IsocFC+ LDTSTOP+ CRCTM- ECTLT- 64bA+ UIDRD- ExtRS- UCnfE-
+00: 22 10 00 16 00 00 10 00 00 00 00 06 00 00 80 00
+10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+30: 00 00 00 00 80 00 00 00 00 00 00 00 00 00 00 00
+40: 01 02 24 00 08 10 04 00 01 02 04 00 01 02 04 00
+50: 01 02 04 00 01 02 04 00 01 02 04 00 01 02 04 00
+60: 10 00 0f 00 e0 03 00 00 00 b8 4e 02 10 0e 80 00
+70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+80: 08 a0 01 21 c0 00 00 77 60 00 f5 ff 13 00 00 00
+90: 00 00 00 00 00 00 00 00 00 00 00 00 0e 00 00 00
+a0: 08 c0 01 21 c0 00 00 77 60 00 f5 ff 13 00 00 00
+b0: 00 00 00 00 00 00 00 00 00 00 00 00 0e 00 00 00
+c0: 08 e0 01 21 20 20 11 11 60 03 f5 ff 13 00 00 00
+d0: 48 49 8f 80 00 00 01 00 03 00 00 00 0f 00 00 00
+e0: 08 00 01 21 20 20 11 11 60 0e f5 ff 13 00 00 00
+f0: ee 02 84 80 00 00 01 00 07 00 00 00 0e 00 00 00
