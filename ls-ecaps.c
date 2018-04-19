@@ -786,8 +786,17 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_SRIOV:
 	    cap_sriov(d, where);
 	    break;
+	  case PCI_EXT_CAP_ID_MRIOV:
+	    printf("Multi-Root I/O Virtualization <?>\n");
+	    break;
 	  case PCI_EXT_CAP_ID_PRI:
 	    cap_pri(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_REBAR:
+	    printf("Resizable BAR <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_DPA:
+	    printf("Dynamic Power Allocation <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_TPH:
 	    cap_tph(d, where);
@@ -795,14 +804,53 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_LTR:
 	    cap_ltr(d, where);
 	    break;
+	  case PCI_EXT_CAP_ID_SECPCI:
+	    printf("Secondary PCI Express <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_PMUX:
+	    printf("Protocol Multiplexing <?>\n");
+	    break;
 	  case PCI_EXT_CAP_ID_PASID:
 	    cap_pasid(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_LNR:
+	    printf("LN Requester <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_L1PM:
 	    cap_l1pm(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_PTM:
 	    cap_ptm(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_M_PCIE:
+	    printf("PCI Express over M_PHY <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_FRS:
+	    printf("FRS Queueing <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_RTR:
+	    printf("Readiness Time Reporting <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_DVSEC:
+	    printf("Designated Vendor-Specific <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_VF_REBAR:
+	    printf("VF Resizable BAR <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_DLNK:
+	    printf("Data Link Feature <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_16GT:
+	    printf("Physical Layer 16.0 GT/s <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_LMR:
+	    printf("Lane Margining at the Receiver <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_HIER_ID:
+	    printf("Hierarchy ID <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_NPEM:
+	    printf("Native PCIe Enclosure Management <?>\n");
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);

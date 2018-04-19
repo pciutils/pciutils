@@ -228,13 +228,30 @@
 #define PCI_EXT_CAP_ID_ARI	0x0e	/* Alternative Routing-ID Interpretation */
 #define PCI_EXT_CAP_ID_ATS	0x0f	/* Address Translation Service */
 #define PCI_EXT_CAP_ID_SRIOV	0x10	/* Single Root I/O Virtualization */
+#define PCI_EXT_CAP_ID_MRIOV	0x11	/* Multi-Root I/O Virtualization */
+#define PCI_EXT_CAP_ID_MCAST	0x12	/* Multicast */
 #define PCI_EXT_CAP_ID_PRI	0x13	/* Page Request Interface */
+#define PCI_EXT_CAP_ID_REBAR	0x15	/* Resizable BAR */
+#define PCI_EXT_CAP_ID_DPA	0x16	/* Dynamic Power Allocation */
 #define PCI_EXT_CAP_ID_TPH	0x17	/* Transaction processing hints */
 #define PCI_EXT_CAP_ID_LTR	0x18	/* Latency Tolerance Reporting */
+#define PCI_EXT_CAP_ID_SECPCI	0x19	/* Secondary PCI Express */
+#define PCI_EXT_CAP_ID_PMUX	0x1a	/* Protocol Multiplexing */
 #define PCI_EXT_CAP_ID_PASID	0x1b	/* Process Address Space ID */
+#define PCI_EXT_CAP_ID_LNR	0x1c	/* LN Requester */
 #define PCI_EXT_CAP_ID_DPC	0x1d	/* Downstream Port Containment */
 #define PCI_EXT_CAP_ID_L1PM	0x1e	/* L1 PM Substates */
 #define PCI_EXT_CAP_ID_PTM	0x1f	/* Precision Time Measurement */
+#define PCI_EXT_CAP_ID_M_PCIE	0x20	/* PCIe over M-PHY */
+#define PCI_EXT_CAP_ID_FRS	0x21	/* FRS Queuing */
+#define PCI_EXT_CAP_ID_RTR	0x22	/* Readiness Time Reporting */
+#define PCI_EXT_CAP_ID_DVSEC	0x23	/* Designated Vendor-Specific */
+#define PCI_EXT_CAP_ID_VF_REBAR	0x24	/* VF Resizable BAR */
+#define PCI_EXT_CAP_ID_DLNK	0x25	/* Data Link Feature */
+#define PCI_EXT_CAP_ID_16GT	0x26	/* Physical Layer 16.0 GT/s */
+#define PCI_EXT_CAP_ID_LMR	0x27	/* Lane Margining at Receiver */
+#define PCI_EXT_CAP_ID_HIER_ID	0x28	/* Hierarchy ID */
+#define PCI_EXT_CAP_ID_NPEM	0x29	/* Native PCIe Enclosure Management */
 
 /*** Definitions of capabilities ***/
 
