@@ -802,7 +802,7 @@ show_ext_caps(struct device *d, int type)
 	    cap_ptm(d, where);
 	    break;
 	  default:
-	    printf("#%02x\n", id);
+	    printf("Extended Capability ID %#02x\n", id);
 	    break;
 	}
       where = (header >> 20) & ~3;

@@ -1599,7 +1599,7 @@ show_caps(struct device *d, int where)
 	      cap_ea(d, where, cap);
 	      break;
 	    default:
-	      printf("#%02x [%04x]\n", id, cap);
+	      printf("Capability ID %#02x [%04x]\n", id, cap);
 	    }
 	  where = next;
 	}
