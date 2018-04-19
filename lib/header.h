@@ -185,6 +185,7 @@
 /* Capability lists */
 
 #define PCI_CAP_LIST_ID		0	/* Capability ID */
+#define  PCI_CAP_ID_NULL	0x00	/* Null Capability */
 #define  PCI_CAP_ID_PM		0x01	/* Power Management */
 #define  PCI_CAP_ID_AGP		0x02	/* Accelerated Graphics Port */
 #define  PCI_CAP_ID_VPD		0x03	/* Vital Product Data */
@@ -211,6 +212,7 @@
 
 /* Capabilities residing in the PCI Express extended configuration space */
 
+#define PCI_EXT_CAP_ID_NULL	0x00	/* Null Capability */
 #define PCI_EXT_CAP_ID_AER	0x01	/* Advanced Error Reporting */
 #define PCI_EXT_CAP_ID_VC	0x02	/* Virtual Channel */
 #define PCI_EXT_CAP_ID_DSN	0x03	/* Device Serial Number */

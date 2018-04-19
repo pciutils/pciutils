@@ -737,6 +737,9 @@ show_ext_caps(struct device *d, int type)
 	}
       switch (id)
 	{
+	  case PCI_EXT_CAP_ID_NULL:
+	    printf("Null\n");
+	    break;
 	  case PCI_EXT_CAP_ID_AER:
 	    cap_aer(d, where, type);
 	    break;

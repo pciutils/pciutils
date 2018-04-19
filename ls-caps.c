@@ -1536,6 +1536,9 @@ show_caps(struct device *d, int where)
 	    }
 	  switch (id)
 	    {
+	    case PCI_CAP_ID_NULL:
+	      printf("Null\n");
+	      break;
 	    case PCI_CAP_ID_PM:
 	      cap_pm(d, where, cap);
 	      break;
