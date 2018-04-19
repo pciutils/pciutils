@@ -768,8 +768,8 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_MFVC:
 	    printf("Multi-Function Virtual Channel <?>\n");
 	    break;
-	  case PCI_EXT_CAP_ID_RBCB:
-	    printf("Root Bridge Control Block <?>\n");
+	  case PCI_EXT_CAP_ID_RCRB:
+	    printf("Root Complex Register Block <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_VNDR:
 	    cap_evendor(d, where);
