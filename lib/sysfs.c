@@ -119,6 +119,23 @@ sysfs_get_string(struct pci_dev *d, char *object, char *buf, int mandatory)
   return 1;
 }
 
+static char *
+sysfs_deref_link(struct pci_dev *d, char *link_name)
+{
+  char path[2*OBJNAMELEN], rel_path[OBJNAMELEN];
+
+  sysfs_obj_name(d, link_name, path);
+  memset(rel_path, 0, sizeof(rel_path));
+
+  if (readlink(path, rel_path, sizeof(rel_path)) < 0)
+    return NULL;
+
+  sysfs_obj_name(d, "", path);
+  strcat(path, rel_path);
+
+  return canonicalize_file_name(path);
+}
+
 static int
 sysfs_get_value(struct pci_dev *d, char *object, int mandatory)
 {
@@ -310,6 +327,9 @@ sysfs_fill_info(struct pci_dev *d, int flags)
 
   if ((flags & PCI_FILL_NUMA_NODE) && !(d->known_fields & PCI_FILL_NUMA_NODE))
     d->numa_node = sysfs_get_value(d, "numa_node", 0);
+
+  if ((flags & PCI_FILL_DT_NODE) && !(d->known_fields & PCI_FILL_DT_NODE))
+      d->dt_node = sysfs_deref_link(d, "of_node");
 
   return pci_generic_fill_info(d, flags);
 }

@@ -137,6 +137,7 @@ struct pci_dev {
   char *phy_slot;			/* Physical slot */
   char *module_alias;			/* Linux kernel module alias */
   char *label;				/* Device name as exported by BIOS */
+  char *dt_node;			/* Path to the device-tree node for this device */
   int numa_node;			/* NUMA node */
   pciaddr_t flags[6];			/* PCI_IORESOURCE_* flags for regions */
   pciaddr_t rom_flags;			/* PCI_IORESOURCE_* flags for expansion ROM */
@@ -180,6 +181,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_LABEL		0x0400
 #define PCI_FILL_NUMA_NODE	0x0800
 #define PCI_FILL_IO_FLAGS	0x1000
+#define PCI_FILL_DT_NODE	0x2000
 #define PCI_FILL_RESCAN		0x00010000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
