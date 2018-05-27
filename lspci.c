@@ -395,8 +395,9 @@ show_bases(struct device *d, int cnt)
 	putchar('\t');
       if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
 	  printf("[enhanced] ");
-      else if (pos && !flg)	/* Reported by the OS, but not by the device */
+      else if (pos && !(flg & ((flg & PCI_BASE_ADDRESS_SPACE_IO) ? PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK)))
 	{
+	  /* Reported by the OS, but not by the device */
 	  printf("[virtual] ");
 	  flg = pos;
 	  virtual = 1;
