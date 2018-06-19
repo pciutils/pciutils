@@ -41,19 +41,13 @@ static const struct vpd_item {
   { 'Y','A', F_TEXT,	"Asset tag" },
   { 'V', 0 , F_TEXT,	"Vendor specific" },
   { 'Y', 0 , F_TEXT,	"System specific" },
-/*
- *  The following VPD keywords are vendor specific or not part of any
- *  current PCI-SIG specification
- */
-  { 'C','C', F_TEXT,   "CCIN" },
-  { 'F','C', F_TEXT,   "Feature code" },
-  { 'F','N', F_TEXT,   "FRU" },
-  { 'N','A', F_TEXT,   "Network address" },
-  { 'R','M', F_TEXT,   "Firmware version" },
-  { 'Z', 0 , F_TEXT,   "Product specific" },
-/*
- *  End vendor specific VPD keywords
- */
+  /* Non-standard extensions */
+  { 'C','C', F_TEXT,	"CCIN" },
+  { 'F','C', F_TEXT,	"Feature code" },
+  { 'F','N', F_TEXT,	"FRU" },
+  { 'N','A', F_TEXT,	"Network address" },
+  { 'R','M', F_TEXT,	"Firmware version" },
+  { 'Z', 0 , F_TEXT,	"Product specific" },
   {  0,  0 , F_BINARY,	"Unknown" }
 };
 
