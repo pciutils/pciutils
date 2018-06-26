@@ -75,6 +75,7 @@ void pci_free_dev(struct pci_dev *d)
   pci_mfree(d->module_alias);
   pci_mfree(d->label);
   pci_mfree(d->phy_slot);
+  pci_mfree(d->dt_node);
   pci_mfree(d);
 }
 

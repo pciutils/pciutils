@@ -686,7 +686,7 @@ show_verbose(struct device *d)
   show_terse(d);
 
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
-    PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE);
+    PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE);
   irq = p->irq;
 
   switch (htype)
@@ -717,6 +717,8 @@ show_verbose(struct device *d)
 
   if (verbose > 1)
     {
+      if (p->dt_node)
+        printf("\tDT Node: %s\n", p->dt_node);
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
 	     FLAG(cmd, PCI_COMMAND_IO),
 	     FLAG(cmd, PCI_COMMAND_MEMORY),
@@ -770,6 +772,8 @@ show_verbose(struct device *d)
     }
   else
     {
+      if (p->dt_node)
+        printf("\tDT Node: %s\n", p->dt_node);
       printf("\tFlags: ");
       if (cmd & PCI_COMMAND_MASTER)
 	printf("bus master, ");
@@ -868,7 +872,7 @@ show_machine(struct device *d)
 
   if (verbose)
     {
-      pci_fill_info(p, PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE);
+      pci_fill_info(p, PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE);
       printf((opt_machine >= 2) ? "Slot:\t" : "Device:\t");
       show_slot_name(d);
       putchar('\n');
@@ -895,6 +899,8 @@ show_machine(struct device *d)
 	show_kernel_machine(d);
       if (p->numa_node != -1)
 	printf("NUMANode:\t%d\n", p->numa_node);
+      if (p->dt_node)
+        printf("DTNode:\t%s\n", p->dt_node);
     }
   else
     {
