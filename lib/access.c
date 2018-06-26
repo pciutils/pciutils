@@ -86,11 +86,6 @@ void pci_free_dev(struct pci_dev *d)
 
   pci_free_caps(d);
   pci_free_properties(d);
-
-  pci_mfree(d->module_alias);
-  pci_mfree(d->label);
-  pci_mfree(d->phy_slot);
-
   pci_mfree(d);
 }
 
@@ -186,6 +181,9 @@ static void
 pci_reset_properties(struct pci_dev *d)
 {
   d->known_fields = 0;
+  d->phy_slot = NULL;
+  d->module_alias = NULL;
+  d->label = NULL;
   pci_free_caps(d);
   pci_free_properties(d);
 }

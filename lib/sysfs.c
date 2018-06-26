@@ -293,7 +293,7 @@ sysfs_fill_slots(struct pci_access *a)
 	{
 	  for (d = a->devices; d; d = d->next)
 	    if (dom == (unsigned)d->domain && bus == d->bus && dev == d->dev && !d->phy_slot)
-	      d->phy_slot = pci_strdup(a, entry->d_name);
+	      d->phy_slot = pci_set_property(d, PCI_FILL_PHYS_SLOT, entry->d_name);
 	}
       fclose(file);
     }
@@ -315,14 +315,14 @@ sysfs_fill_info(struct pci_dev *d, int flags)
     {
       char buf[OBJBUFSIZE];
       if (sysfs_get_string(d, "modalias", buf, 0))
-	d->module_alias = pci_strdup(d->access, buf);
+	d->module_alias = pci_set_property(d, PCI_FILL_MODULE_ALIAS, buf);
     }
 
   if ((flags & PCI_FILL_LABEL) && !(d->known_fields & PCI_FILL_LABEL))
     {
       char buf[OBJBUFSIZE];
       if (sysfs_get_string(d, "label", buf, 0))
-	d->label = pci_strdup(d->access, buf);
+	d->label = pci_set_property(d, PCI_FILL_LABEL, buf);
     }
 
   if ((flags & PCI_FILL_NUMA_NODE) && !(d->known_fields & PCI_FILL_NUMA_NODE))
