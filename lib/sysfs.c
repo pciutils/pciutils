@@ -329,7 +329,7 @@ sysfs_fill_info(struct pci_dev *d, int flags)
     d->numa_node = sysfs_get_value(d, "numa_node", 0);
 
   if ((flags & PCI_FILL_DT_NODE) && !(d->known_fields & PCI_FILL_DT_NODE))
-      d->dt_node = sysfs_deref_link(d, "of_node");
+    pci_set_property(d, PCI_FILL_DT_NODE, sysfs_deref_link(d, "of_node"));
 
   return pci_generic_fill_info(d, flags);
 }

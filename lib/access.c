@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- User Access
  *
- *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -67,15 +67,30 @@ pci_get_dev(struct pci_access *a, int domain, int bus, int dev, int func)
   return d;
 }
 
+static void
+pci_free_properties(struct pci_dev *d)
+{
+  struct pci_property *p;
+
+  while (p = d->properties)
+    {
+      d->properties = p->next;
+      pci_mfree(p);
+    }
+}
+
 void pci_free_dev(struct pci_dev *d)
 {
   if (d->methods->cleanup_dev)
     d->methods->cleanup_dev(d);
+
   pci_free_caps(d);
+  pci_free_properties(d);
+
   pci_mfree(d->module_alias);
   pci_mfree(d->label);
   pci_mfree(d->phy_slot);
-  pci_mfree(d->dt_node);
+
   pci_mfree(d);
 }
 
@@ -167,14 +182,21 @@ pci_write_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->write(d, pos, buf, len);
 }
 
+static void
+pci_reset_properties(struct pci_dev *d)
+{
+  d->known_fields = 0;
+  pci_free_caps(d);
+  pci_free_properties(d);
+}
+
 int
 pci_fill_info_v35(struct pci_dev *d, int flags)
 {
   if (flags & PCI_FILL_RESCAN)
     {
       flags &= ~PCI_FILL_RESCAN;
-      d->known_fields = 0;
-      pci_free_caps(d);
+      pci_reset_properties(d);
     }
   if (flags & ~d->known_fields)
     d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
@@ -201,4 +223,45 @@ pci_setup_cache(struct pci_dev *d, byte *cache, int len)
 {
   d->cache = cache;
   d->cache_len = len;
+}
+
+char *
+pci_set_property(struct pci_dev *d, u32 key, char *value)
+{
+  struct pci_property *p;
+  struct pci_property **pp = &d->properties;
+
+  while (p = *pp)
+    {
+      if (p->key == key)
+	{
+	  *pp = p->next;
+	  pci_mfree(p);
+	}
+      else
+	pp = &p->next;
+    }
+
+  if (!value)
+    return NULL;
+
+  p = pci_malloc(d->access, sizeof(*p) + strlen(value));
+  *pp = p;
+  p->next = NULL;
+  p->key = key;
+  strcpy(p->value, value);
+
+  return p->value;
+}
+
+char *
+pci_get_string_property(struct pci_dev *d, u32 prop)
+{
+  struct pci_property *p;
+
+  for (p = d->properties; p; p = p->next)
+    if (p->key == prop)
+      return p->value;
+
+  return NULL;
 }

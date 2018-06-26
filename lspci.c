@@ -682,6 +682,7 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   unsigned int irq;
+  char *dt_node;
 
   show_terse(d);
 
@@ -715,10 +716,11 @@ show_verbose(struct device *d)
   if (p->phy_slot)
     printf("\tPhysical Slot: %s\n", p->phy_slot);
 
+  if (dt_node = pci_get_string_property(p, PCI_FILL_DT_NODE))
+    printf("\tDevice tree node: %s\n", dt_node);
+
   if (verbose > 1)
     {
-      if (p->dt_node)
-        printf("\tDT Node: %s\n", p->dt_node);
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
 	     FLAG(cmd, PCI_COMMAND_IO),
 	     FLAG(cmd, PCI_COMMAND_MEMORY),
@@ -772,8 +774,6 @@ show_verbose(struct device *d)
     }
   else
     {
-      if (p->dt_node)
-        printf("\tDT Node: %s\n", p->dt_node);
       printf("\tFlags: ");
       if (cmd & PCI_COMMAND_MASTER)
 	printf("bus master, ");
@@ -867,6 +867,7 @@ show_machine(struct device *d)
   int c;
   word sv_id, sd_id;
   char classbuf[128], vendbuf[128], devbuf[128], svbuf[128], sdbuf[128];
+  char *dt_node;
 
   get_subid(d, &sv_id, &sd_id);
 
@@ -899,8 +900,8 @@ show_machine(struct device *d)
 	show_kernel_machine(d);
       if (p->numa_node != -1)
 	printf("NUMANode:\t%d\n", p->numa_node);
-      if (p->dt_node)
-        printf("DTNode:\t%s\n", p->dt_node);
+      if (dt_node = pci_get_string_property(p, PCI_FILL_DT_NODE))
+        printf("DTNode:\t%s\n", dt_node);
     }
   else
     {

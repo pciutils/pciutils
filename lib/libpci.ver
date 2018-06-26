@@ -72,3 +72,8 @@ LIBPCI_3.5 {
 		pci_init;
 		pci_fill_info;
 };
+
+LIBPCI_3.6 {
+	global:
+		pci_get_string_property;
+};

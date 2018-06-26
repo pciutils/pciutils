@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Internal Stuff
  *
- *	Copyright (c) 1997--2014 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -74,6 +74,14 @@ int pci_fill_info_v32(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v33(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v34(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v35(struct pci_dev *, int flags) VERSIONED_ABI;
+
+struct pci_property {
+  struct pci_property *next;
+  u32 key;
+  char value[1];
+};
+
+char *pci_set_property(struct pci_dev *d, u32 key, char *value);
 
 /* params.c */
 void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);

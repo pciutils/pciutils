@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2017 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -137,19 +137,19 @@ struct pci_dev {
   char *phy_slot;			/* Physical slot */
   char *module_alias;			/* Linux kernel module alias */
   char *label;				/* Device name as exported by BIOS */
-  char *dt_node;			/* Path to the device-tree node for this device */
   int numa_node;			/* NUMA node */
   pciaddr_t flags[6];			/* PCI_IORESOURCE_* flags for regions */
   pciaddr_t rom_flags;			/* PCI_IORESOURCE_* flags for expansion ROM */
   int domain;				/* PCI domain (host bridge) */
 
-  /* Fields used internally: */
+  /* Fields used internally */
   struct pci_access *access;
   struct pci_methods *methods;
   u8 *cache;				/* Cached config registers */
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
   void *aux;				/* Auxiliary data */
+  struct pci_property *properties;	/* A linked list of extra properties */
 };
 
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
@@ -166,7 +166,17 @@ int pci_write_word(struct pci_dev *, int pos, u16 data) PCI_ABI;
 int pci_write_long(struct pci_dev *, int pos, u32 data) PCI_ABI;
 int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 
-int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device information */
+/*
+ * Most device properties take some effort to obtain, so libpci does not
+ * initialize them during default bus scan. Instead, you have to call
+ * pci_fill_info() with the proper PCI_FILL_xxx constants OR'ed together.
+ *
+ * Some properties are stored directly in the pci_dev structure.
+ * The remaining ones can be accessed through pci_get_string_property().
+ */
+
+int pci_fill_info(struct pci_dev *, int flags) PCI_ABI;
+char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 
 #define PCI_FILL_IDENT		0x0001
 #define PCI_FILL_IRQ		0x0002
@@ -181,7 +191,7 @@ int pci_fill_info(struct pci_dev *, int flags) PCI_ABI; /* Fill in device inform
 #define PCI_FILL_LABEL		0x0400
 #define PCI_FILL_NUMA_NODE	0x0800
 #define PCI_FILL_IO_FLAGS	0x1000
-#define PCI_FILL_DT_NODE	0x2000
+#define PCI_FILL_DT_NODE	0x2000		/* Device tree node */
 #define PCI_FILL_RESCAN		0x00010000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
