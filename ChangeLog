@@ -1,3 +1,45 @@
+2018-06-30  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.6.0.
+
+	* BARs reported by the OS, but not set on the device itself are
+	  reliably marked with "[virtual]".
+
+	* Library: Introduced a generic mechanism of string properties. This
+	  avoids lots of special cases and makes ABI compatibility easier.
+
+	* On Linux systems with OpenFirmware, report corresponding device tree nodes
+	  as device properties.
+
+	* VPD decoder knows several non-standard extensions.
+
+	* When PCIe link speed is less than the maximum supported by the
+	  device, it is explicitly marked as "downgraded".
+
+	* Several new capabilities are not decoded yet, but at least their
+	  names are printed.
+
+	* The Null capability is easily decoded.
+
+	* Formatting of several capabilities was cleaned up.
+
+	* The VGA16 bit in the bridge control register is now supported.
+
+	* Added a port to SylixOS. Thanks to YuJian Gong for contribution.
+
+	* Added a port to DOS/DJGPP. Thanks to Rudolf Marek for contribution.
+
+	* The order in which back-ends are probed was decoupled from the
+	  internal back-end IDs. This helps, because new back-ends must have
+	  their ID allocated at the end to keep the ABI, but they might need
+	  to be proved earlier.
+
+	* The fbsd-device back-end should work again.
+
+	* Fixed a couple of bugs. Most notably, DeviceName was not printed.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2017-11-17  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.5.6.
