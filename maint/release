@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-require "maint/release.pm";
+require "./maint/release.pm";
 
 # Check API version
 my $apiver = "???";
