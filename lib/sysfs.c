@@ -133,7 +133,8 @@ sysfs_deref_link(struct pci_dev *d, char *link_name)
   sysfs_obj_name(d, "", path);
   strcat(path, rel_path);
 
-  return canonicalize_file_name(path);
+  // Returns a pointer to malloc'ed memory
+  return realpath(path, NULL);
 }
 
 static int
@@ -329,7 +330,14 @@ sysfs_fill_info(struct pci_dev *d, int flags)
     d->numa_node = sysfs_get_value(d, "numa_node", 0);
 
   if ((flags & PCI_FILL_DT_NODE) && !(d->known_fields & PCI_FILL_DT_NODE))
-    pci_set_property(d, PCI_FILL_DT_NODE, sysfs_deref_link(d, "of_node"));
+    {
+      char *node = sysfs_deref_link(d, "of_node");
+      if (node)
+	{
+	  pci_set_property(d, PCI_FILL_DT_NODE, node);
+	  free(node);
+	}
+    }
 
   return pci_generic_fill_info(d, flags);
 }
