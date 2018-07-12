@@ -1,3 +1,9 @@
+2018-07-12  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.6.1.
+
+	* Fixed compilation issues on Linux systems with MUSL libc.
+
 2018-06-30  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.6.0.
