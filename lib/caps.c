@@ -104,11 +104,21 @@ pci_free_caps(struct pci_dev *d)
 struct pci_cap *
 pci_find_cap(struct pci_dev *d, unsigned int id, unsigned int type)
 {
+  return pci_find_cap_nr(d, id, type, 0);
+}
+
+struct pci_cap *
+pci_find_cap_nr(struct pci_dev *d, unsigned int id, unsigned int type, unsigned int cap_number)
+{
   struct pci_cap *c;
+  unsigned int num = 0;
 
   pci_fill_info_v35(d, ((type == PCI_CAP_NORMAL) ? PCI_FILL_CAPS : PCI_FILL_EXT_CAPS));
   for (c=d->first_cap; c; c=c->next)
-    if (c->type == type && c->id == id)
-      return c;
+     if (c->type == type && c->id == id)
+       if (num == cap_number)
+          return c;
+       else
+          num++;
   return NULL;
 }
