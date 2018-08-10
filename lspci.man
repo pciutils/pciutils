@@ -95,6 +95,13 @@ PCI bus instead of as seen by the kernel.
 .B -D
 Always show PCI domain numbers. By default, lspci suppresses them on machines which
 have only domain 0.
+.TP
+.B -P
+Identify PCI devices by path through each bridge, instead of by bus number.
+.TP
+.B -PP
+Identify PCI devices by path through each bridge, showing the bus number as
+well as the device number.
 
 .SS Options to control resolving ID's to names
 .TP

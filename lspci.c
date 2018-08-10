@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2016 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -19,6 +19,7 @@ int verbose;				/* Show detailed information */
 static int opt_hex;			/* Show contents of config space as hexadecimal numbers */
 struct pci_filter filter;		/* Device filter */
 static int opt_tree;			/* Show bus tree */
+static int opt_path;			/* Show bridge path */
 static int opt_machine;			/* Generate machine-readable output */
 static int opt_map_mode;		/* Bus mapping mode enabled */
 static int opt_domains;			/* Show domain numbers (0=disabled, 1=auto-detected, 2=requested) */
@@ -29,7 +30,7 @@ char *opt_pcimap;			/* Override path to Linux modules.pcimap */
 
 const char program_name[] = "lspci";
 
-static char options[] = "nvbxs:d:ti:mgp:qkMDQ" GENERIC_OPTIONS ;
+static char options[] = "nvbxs:d:tPi:mgp:qkMDQ" GENERIC_OPTIONS ;
 
 static char help_msg[] =
 "Usage: lspci [<switches>]\n"
@@ -48,6 +49,8 @@ static char help_msg[] =
 "-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n"
 "-b\t\tBus-centric view (addresses and IRQ's as seen by the bus)\n"
 "-D\t\tAlways show domain numbers\n"
+"-P\t\tDisplay bridge path in addition to bus and device number\n"
+"-PP\t\tDisplay bus path in addition to bus and device number\n"
 "\n"
 "Resolving of device ID's to names:\n"
 "-n\t\tShow numeric ID's\n"
@@ -248,13 +251,36 @@ sort_them(void)
 /*** Normal output ***/
 
 static void
+show_slot_path(struct device *d)
+{
+  struct pci_dev *p = d->dev;
+
+  if (opt_path)
+    {
+      struct bus *bus = d->parent_bus;
+      struct bridge *br = bus->parent_bridge;
+
+      if (br && br->br_dev)
+	{
+	  show_slot_path(br->br_dev);
+	  if (opt_path > 1)
+	    printf("/%02x:%02x.%d", p->bus, p->dev, p->func);
+	  else
+	    printf("/%02x.%d", p->dev, p->func);
+	  return;
+	}
+    }
+  printf("%02x:%02x.%d", p->bus, p->dev, p->func);
+}
+
+static void
 show_slot_name(struct device *d)
 {
   struct pci_dev *p = d->dev;
 
   if (!opt_machine ? opt_domains : (p->domain || opt_domains >= 2))
     printf("%04x:", p->domain);
-  printf("%02x:%02x.%d", p->bus, p->dev, p->func);
+  show_slot_path(d);
 }
 
 void
@@ -951,6 +977,8 @@ show(void)
 {
   struct device *d;
 
+  if (opt_path)
+    grow_tree();
   for (d=first_dev; d; d=d->next)
     show_device(d);
 }
@@ -995,6 +1023,9 @@ main(int argc, char **argv)
 	break;
       case 'x':
 	opt_hex++;
+	break;
+      case 'P':
+	opt_path++;
 	break;
       case 't':
 	opt_tree++;
@@ -1052,7 +1083,11 @@ main(int argc, char **argv)
 
   pci_init(pacc);
   if (opt_map_mode)
-    map_the_bus();
+    {
+      if (opt_path)
+	die("Bus paths cannot be shown in bus mapping mode");
+      map_the_bus();
+    }
   else
     {
       scan_devices();
