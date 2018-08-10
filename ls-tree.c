@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Bus Tree
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -11,23 +11,7 @@
 
 #include "lspci.h"
 
-struct bridge {
-  struct bridge *chain;			/* Single-linked list of bridges */
-  struct bridge *next, *child;		/* Tree of bridges */
-  struct bus *first_bus;		/* List of buses connected to this bridge */
-  unsigned int domain;
-  unsigned int primary, secondary, subordinate;	/* Bus numbers */
-  struct device *br_dev;
-};
-
-struct bus {
-  unsigned int domain;
-  unsigned int number;
-  struct bus *sibling;
-  struct device *first_dev, **last_dev;
-};
-
-static struct bridge host_bridge = { NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
+struct bridge host_bridge = { NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
 
 static struct bus *
 find_bus(struct bridge *b, unsigned int domain, unsigned int n)
@@ -49,6 +33,7 @@ new_bus(struct bridge *b, unsigned int domain, unsigned int n)
   bus->sibling = b->first_bus;
   bus->first_dev = NULL;
   bus->last_dev = &bus->first_dev;
+  bus->parent_bridge = b;
   b->first_bus = bus;
   return bus;
 }
@@ -75,14 +60,15 @@ insert_dev(struct device *d, struct bridge *b)
    * and all devices on the new list have the same bus number.
    */
   *bus->last_dev = d;
-  bus->last_dev = &d->next;
-  d->next = NULL;
+  bus->last_dev = &d->bus_next;
+  d->bus_next = NULL;
+  d->parent_bus = bus;
 }
 
-static void
+void
 grow_tree(void)
 {
-  struct device *d, *d2;
+  struct device *d;
   struct bridge **last_br, *b;
 
   /* Build list of bridges */
@@ -114,6 +100,7 @@ grow_tree(void)
 	  b->next = b->child = NULL;
 	  b->first_bus = NULL;
 	  b->br_dev = d;
+	  d->bridge = b;
 	}
     }
   *last_br = NULL;
@@ -144,12 +131,8 @@ grow_tree(void)
 
   /* Create bus structs and link devices */
 
-  for (d=first_dev; d;)
-    {
-      d2 = d->next;
-      insert_dev(d, &host_bridge);
-      d = d2;
-    }
+  for (d=first_dev; d; d=d->next)
+    insert_dev(d, &host_bridge);
 }
 
 static void
@@ -198,7 +181,7 @@ show_tree_bus(struct bus *b, char *line, char *p)
 {
   if (!b->first_dev)
     print_it(line, p);
-  else if (!b->first_dev->next)
+  else if (!b->first_dev->bus_next)
     {
       *p++ = '-';
       *p++ = '-';
@@ -207,12 +190,12 @@ show_tree_bus(struct bus *b, char *line, char *p)
   else
     {
       struct device *d = b->first_dev;
-      while (d->next)
+      while (d->bus_next)
 	{
 	  p[0] = '+';
 	  p[1] = '-';
 	  show_tree_dev(d, line, p+2);
-	  d = d->next;
+	  d = d->bus_next;
 	}
       p[0] = '\\';
       p[1] = '-';
