@@ -237,7 +237,5 @@ void
 show_forest(void)
 {
   char line[256];
-
-  grow_tree();
   show_tree_bridge(&host_bridge, line, line);
 }

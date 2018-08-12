@@ -18,6 +18,7 @@
 int verbose;				/* Show detailed information */
 static int opt_hex;			/* Show contents of config space as hexadecimal numbers */
 struct pci_filter filter;		/* Device filter */
+static int opt_filter;			/* Any filter was given */
 static int opt_tree;			/* Show bus tree */
 static int opt_path;			/* Show bridge path */
 static int opt_machine;			/* Generate machine-readable output */
@@ -81,6 +82,7 @@ GENERIC_HELP
 struct pci_access *pacc;
 struct device *first_dev;
 static int seen_errors;
+static int need_topology;
 
 int
 config_fetch(struct device *d, unsigned int pos, unsigned int len)
@@ -117,7 +119,7 @@ scan_device(struct pci_dev *p)
 
   if (p->domain && !opt_domains)
     opt_domains = 1;
-  if (!pci_filter_match(&filter, p))
+  if (!pci_filter_match(&filter, p) && !need_topology)
     return NULL;
   d = xmalloc(sizeof(struct device));
   memset(d, 0, sizeof(*d));
@@ -977,10 +979,9 @@ show(void)
 {
   struct device *d;
 
-  if (opt_path)
-    grow_tree();
   for (d=first_dev; d; d=d->next)
-    show_device(d);
+    if (pci_filter_match(&filter, d->dev))
+      show_device(d);
 }
 
 /* Main */
@@ -1016,19 +1017,23 @@ main(int argc, char **argv)
       case 's':
 	if (msg = pci_filter_parse_slot(&filter, optarg))
 	  die("-s: %s", msg);
+	opt_filter = 1;
 	break;
       case 'd':
 	if (msg = pci_filter_parse_id(&filter, optarg))
 	  die("-d: %s", msg);
+	opt_filter = 1;
 	break;
       case 'x':
 	opt_hex++;
 	break;
       case 'P':
 	opt_path++;
+	need_topology = 1;
 	break;
       case 't':
 	opt_tree++;
+	need_topology = 1;
 	break;
       case 'i':
         pci_set_name_list_path(pacc, optarg, 0);
@@ -1072,6 +1077,9 @@ main(int argc, char **argv)
   if (optind < argc)
     goto bad;
 
+  if (opt_tree && opt_filter)
+    die("Tree mode does not support filtering");
+
   if (opt_query_dns)
     {
       pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK;
@@ -1084,14 +1092,16 @@ main(int argc, char **argv)
   pci_init(pacc);
   if (opt_map_mode)
     {
-      if (opt_path)
-	die("Bus paths cannot be shown in bus mapping mode");
+      if (need_topology)
+	die("Bus mapping mode does not recognize bus topology");
       map_the_bus();
     }
   else
     {
       scan_devices();
       sort_them();
+      if (need_topology)
+	grow_tree();
       if (opt_tree)
 	show_forest();
       else
