@@ -76,13 +76,14 @@ grow_tree(void)
   last_br = &host_bridge.chain;
   for (d=first_dev; d; d=d->next)
     {
-      word class = d->dev->device_class;
+      struct pci_dev *dd = d->dev;
+      word class = dd->device_class;
       byte ht = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
-      if (class == PCI_CLASS_BRIDGE_PCI &&
+      if ((class >> 8) == PCI_BASE_CLASS_BRIDGE &&
 	  (ht == PCI_HEADER_TYPE_BRIDGE || ht == PCI_HEADER_TYPE_CARDBUS))
 	{
 	  b = xmalloc(sizeof(struct bridge));
-	  b->domain = d->dev->domain;
+	  b->domain = dd->domain;
 	  if (ht == PCI_HEADER_TYPE_BRIDGE)
 	    {
 	      b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
@@ -101,6 +102,9 @@ grow_tree(void)
 	  b->first_bus = NULL;
 	  b->br_dev = d;
 	  d->bridge = b;
+	  pacc->debug("Tree: bridge %04x:%02x:%02x.%d: %02x -> %02x-%02x\n",
+	    dd->domain, dd->bus, dd->dev, dd->func,
+	    b->primary, b->secondary, b->subordinate);
 	}
     }
   *last_br = NULL;
