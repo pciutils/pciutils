@@ -1,3 +1,16 @@
+2018-08-12  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.6.2.
+
+	* Added "-P" and "-PP" switches to lspci, which display the path
+	  through bridges to each device.
+
+	* Fixed a couple of bugs in computation of bus topology. It was
+	  previously used only for the tree display, but we re-use it for
+	  computing the paths.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2018-07-12  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.6.1.
