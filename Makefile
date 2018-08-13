@@ -67,7 +67,7 @@ lib/$(PCILIB): $(PCIINC) force
 force:
 
 lib/config.h lib/config.mk:
-	cd lib && ./configure
+	cd lib && ./configure --prefix=$(PREFIX)
 
 lspci: lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o common.o lib/$(PCILIB)
 setpci: setpci.o common.o lib/$(PCILIB)
