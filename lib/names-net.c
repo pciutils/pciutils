@@ -15,6 +15,14 @@
 
 #ifdef PCI_USE_DNS
 
+/*
+ * Our definition of BYTE_ORDER confuses arpa/nameser_compat.h on
+ * Solaris so we must undef it before including arpa/nameser.h.
+ */
+#ifdef PCI_OS_SUNOS
+#undef BYTE_ORDER
+#endif
+
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <resolv.h>
