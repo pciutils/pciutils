@@ -212,7 +212,7 @@ struct pci_cap {
 
 struct pci_cap *pci_find_cap(struct pci_dev *, unsigned int id, unsigned int type) PCI_ABI;
 struct pci_cap *pci_find_cap_nr(struct pci_dev *, unsigned int id, unsigned int type,
-                             unsigned int cap_number) PCI_ABI;
+                             unsigned int *cap_number) PCI_ABI;
 
 /*
  *	Filters

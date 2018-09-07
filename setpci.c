@@ -85,13 +85,19 @@ exec_op(struct op *op, struct pci_dev *dev)
   if (op->cap_type)
     {
       struct pci_cap *cap;
-      cap = pci_find_cap_nr(dev, op->cap_id, op->cap_type, op->number);
+      unsigned int cap_nr = op->number;
+      cap = pci_find_cap_nr(dev, op->cap_id, op->cap_type, &cap_nr);
       if (cap)
         addr = cap->addr;
+      else if (cap_nr == 0)
+        die("%s: Instance #%d of %s %04x not found - there are no capabilities with that id.", slot,
+            op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
+            op->cap_id);
       else
-        die("%s: %d%s %s %04x not found", slot,
-            op->number, (op->number % 10 == 1) ? "st" : (op->number % 10 == 2) ? "nd" : "th",
-            ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"), op->cap_id);
+        die("%s: Instance #%d of %s %04x not found - there %s only %d capability with that id.", slot,
+            op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
+            op->cap_id, ((cap_nr == 1) ? "is" : "are"), cap_nr);
+
       trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x @%02x) " : "(ecap %04x @%03x) "), op->cap_id, addr);
     }
   addr += op->addr;

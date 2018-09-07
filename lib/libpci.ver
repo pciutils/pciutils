@@ -76,5 +76,9 @@ LIBPCI_3.5 {
 LIBPCI_3.6 {
 	global:
 		pci_get_string_property;
+};
+
+LIBPCI_3.7 {
+	global:
 		pci_find_cap_nr;
 };
