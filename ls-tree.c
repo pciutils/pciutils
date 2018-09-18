@@ -234,8 +234,23 @@ show_tree_bridge(struct bridge *b, char *line, char *p)
 }
 
 void
-show_forest(void)
+show_forest(struct pci_filter *filter)
 {
   char line[256];
-  show_tree_bridge(&host_bridge, line, line);
+  if (filter == NULL)
+    show_tree_bridge(&host_bridge, line, line);
+  else
+    {
+      struct bridge *b;
+      for (b=&host_bridge; b; b=b->chain)
+        {
+          if (b->br_dev && pci_filter_match(filter, b->br_dev->dev))
+            {
+                struct pci_dev *d = b->br_dev->dev;
+                char *p = line;
+                p += sprintf(line, "%04x:%02x:", d->domain_16, d->bus);
+                show_tree_dev(b->br_dev, line, p);
+            }
+        }
+    }
 }

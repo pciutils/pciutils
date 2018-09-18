@@ -107,7 +107,7 @@ struct bus {
 extern struct bridge host_bridge;
 
 void grow_tree(void);
-void show_forest(void);
+void show_forest(struct pci_filter *filter);
 
 /* ls-map.c */
 
