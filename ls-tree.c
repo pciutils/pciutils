@@ -139,6 +139,21 @@ grow_tree(void)
     insert_dev(d, &host_bridge);
 }
 
+static char*
+show_size(u64 x, char* out_p)
+{
+  static const char suffix[][2] = { "", "K", "M", "G", "T" };
+  unsigned i;
+  if (!x)
+    return out_p;
+  for (i = 0; i < (sizeof(suffix) / sizeof(*suffix) - 1); i++) {
+    if (x % 1024)
+      break;
+    x /= 1024;
+  }
+  return out_p + sprintf(out_p, " [size=%u%s]", (unsigned)x, suffix[i]);
+}
+
 static void
 print_it(char *line, char *p)
 {
@@ -152,6 +167,92 @@ print_it(char *line, char *p)
       *p = ' ';
 }
 
+static void
+show_bases(struct device *d, int cnt, char *line, char *out_pos)
+{
+  struct pci_dev *p = d->dev;
+  word cmd = get_conf_word(d, PCI_COMMAND);
+  int i;
+  int virtual = 0;
+
+  for (i=0; i<cnt; i++)
+    {
+      pciaddr_t pos = p->base_addr[i];
+      pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
+      pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->flags[i] : 0;
+      u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+      char* out_p = out_pos;
+      if (flg == 0xffffffff)
+        flg = 0;
+      if (!pos && !flg && !len)
+        continue;
+      if (verbose > 2)
+        out_p += sprintf(out_p, "  Region %d: ", i);
+      else
+        out_p += sprintf(out_p, "  ");
+      if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
+          out_p += sprintf(out_p, "[enhanced] ");
+      else if (pos && !(flg & ((flg & PCI_BASE_ADDRESS_SPACE_IO) ? PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK)))
+        {
+          /* Reported by the OS, but not by the device */
+          out_p += sprintf(out_p, "[virtual] ");
+          flg = pos;
+          virtual = 1;
+        }
+      if (flg & PCI_BASE_ADDRESS_SPACE_IO)
+        {
+          pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
+          out_p += sprintf(out_p, "I/O ports at ");
+          if (a || (cmd & PCI_COMMAND_IO))
+            out_p += sprintf(out_p, PCIADDR_PORT_FMT, a);
+          else if (flg & PCI_BASE_ADDRESS_IO_MASK)
+            out_p += sprintf(out_p, "<ignored>");
+          else
+            out_p += sprintf(out_p, "<unassigned>");
+          if (!virtual && !(cmd & PCI_COMMAND_IO))
+            out_p += sprintf(out_p, " [disabled]");
+        }
+      else
+        {
+          int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
+          pciaddr_t a = pos & PCI_ADDR_MEM_MASK;
+          int done = 0;
+          u32 z = 0;
+
+          out_p += sprintf(out_p, "Memory at ");
+          if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
+            {
+              if (i >= cnt - 1)
+                {
+                  out_p += sprintf(out_p, "<invalid-64bit-slot>");
+                  done = 1;
+                }
+              else
+                {
+                  i++;
+                  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+                }
+            }
+          if (!done)
+            {
+              if (a)
+                out_p += sprintf(out_p, PCIADDR_T_FMT, a);
+              else
+                out_p += sprintf(out_p, ((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
+            }
+          out_p += sprintf(out_p, " (%s, %sprefetchable)",
+                 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
+                 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
+                 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
+                 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
+          if (!virtual && !(cmd & PCI_COMMAND_MEMORY))
+            out_p += sprintf(out_p, " [disabled]");
+        }
+      out_p = show_size(len, out_p);
+      print_it(line, out_p);
+    }
+}
+
 static void show_tree_bridge(struct bridge *, char *, char *);
 
 static void
@@ -160,6 +261,7 @@ show_tree_dev(struct device *d, char *line, char *p)
   struct pci_dev *q = d->dev;
   struct bridge *b;
   char namebuf[256];
+  char* bases_p;
 
   p += sprintf(p, "%02x.%x", q->dev, q->func);
   for (b=&host_bridge; b; b=b->chain)
@@ -172,12 +274,15 @@ show_tree_dev(struct device *d, char *line, char *p)
         show_tree_bridge(b, line, p);
         return;
       }
+  bases_p = p + 2;
   if (verbose)
     p += sprintf(p, "  %s",
 		 pci_lookup_name(pacc, namebuf, sizeof(namebuf),
 				 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
 				 q->vendor_id, q->device_id));
   print_it(line, p);
+  if (verbose > 1)
+    show_bases(d, 6, line, bases_p);
 }
 
 static void
