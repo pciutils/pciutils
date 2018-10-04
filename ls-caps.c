@@ -1220,7 +1220,7 @@ cap_express(struct device *d, int where, int cap)
   size = 16;
   if (slot)
     size = 24;
-  if (type == PCI_EXP_TYPE_ROOT_PORT)
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ROOT_EC)
     size = 32;
   if (!config_fetch(d, where + PCI_EXP_DEVCAP, size))
     return type;
@@ -1230,7 +1230,7 @@ cap_express(struct device *d, int where, int cap)
     cap_express_link(d, where, type);
   if (slot)
     cap_express_slot(d, where);
-  if (type == PCI_EXP_TYPE_ROOT_PORT)
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ROOT_EC)
     cap_express_root(d, where);
 
   if ((cap & PCI_EXP_FLAGS_VERS) < 2)
