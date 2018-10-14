@@ -3,7 +3,7 @@
 [ "$1" = "-q" ] && quiet=true || quiet=false
 
 set -e
-SRC="http://pci-ids.ucw.cz/v2.2/pci.ids"
+SRC="https://pci-ids.ucw.cz/v2.2/pci.ids"
 DEST=pci.ids
 PCI_COMPRESSED_IDS=
 GREP=grep
