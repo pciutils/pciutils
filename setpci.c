@@ -36,6 +36,7 @@ struct op {
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
   unsigned int num_values;		/* Number of values to write; 0=read */
+  unsigned int number;                 /* The n-th capability of that id */
   struct value values[0];
 };
 
@@ -84,11 +85,19 @@ exec_op(struct op *op, struct pci_dev *dev)
   if (op->cap_type)
     {
       struct pci_cap *cap;
-      cap = pci_find_cap(dev, op->cap_id, op->cap_type);
+      unsigned int cap_nr = op->number;
+      cap = pci_find_cap_nr(dev, op->cap_id, op->cap_type, &cap_nr);
       if (cap)
-	addr = cap->addr;
+        addr = cap->addr;
+      else if (cap_nr == 0)
+        die("%s: Instance #%d of %s %04x not found - there are no capabilities with that id.", slot,
+            op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
+            op->cap_id);
       else
-	die("%s: %s %04x not found", slot, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"), op->cap_id);
+        die("%s: Instance #%d of %s %04x not found - there %s only %d capability with that id.", slot,
+            op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
+            op->cap_id, ((cap_nr == 1) ? "is" : "are"), cap_nr);
+
       trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x @%02x) " : "(ecap %04x @%03x) "), op->cap_id, addr);
     }
   addr += op->addr;
@@ -341,7 +350,7 @@ GENERIC_HELP
 "Setting commands:\n"
 "<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t\t-d [<vendor>]:[<device>]\n"
-"<reg>:\t\t<base>[+<offset>][.(B|W|L)]\n"
+"<reg>:\t\t<base>[+<offset>][.(B|W|L)][@<number>]\n"
 "<base>:\t\t<address>\n"
 "\t\t<named-register>\n"
 "\t\t[E]CAP_<capability-name>\n"
@@ -557,7 +566,7 @@ static void parse_register(struct op *op, char *base)
 
 static void parse_op(char *c, struct pci_dev **selected_devices)
 {
-  char *base, *offset, *width, *value;
+  char *base, *offset, *width, *value, *number;
   char *e, *f;
   int n, j;
   struct op *op;
@@ -566,6 +575,8 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
   base = xstrdup(c);
   if (value = strchr(base, '='))
     *value++ = 0;
+  if (number = strchr(base, '@'))
+    *number++ = 0;
   if (width = strchr(base, '.'))
     *width++ = 0;
   if (offset = strchr(base, '+'))
@@ -607,6 +618,18 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
     }
   else
     op->width = 0;
+
+  /* Check which n-th capability of the same id we want */
+  if (number)
+    {
+      unsigned int num;
+      if (parse_x32(number, NULL, &num) <= 0 || (int) num < 0)
+          parse_err("Invalid number \"%s\"", number);
+      op->number = num;
+
+    }
+  else
+      op->number = 0;
 
   /* Find the register */
   parse_register(op, base);
