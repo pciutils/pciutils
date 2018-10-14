@@ -332,7 +332,7 @@ in a single record. Please avoid using this format in any new code.
 .TP
 .B @IDSDIR@/pci.ids
 A list of all known PCI ID's (vendors, devices, classes and subclasses). Maintained
-at http://pci-ids.ucw.cz/, use the
+at https://pci-ids.ucw.cz/, use the
 .B update-pciids
 utility to download the most recent version.
 .TP
