@@ -1077,9 +1077,6 @@ main(int argc, char **argv)
   if (optind < argc)
     goto bad;
 
-  if (opt_tree && opt_filter)
-    die("Tree mode does not support filtering");
-
   if (opt_query_dns)
     {
       pacc->id_lookup_mode |= PCI_LOOKUP_NETWORK;
@@ -1103,7 +1100,7 @@ main(int argc, char **argv)
       if (need_topology)
 	grow_tree();
       if (opt_tree)
-	show_forest();
+	show_forest(opt_filter ? &filter : NULL);
       else
 	show();
     }
