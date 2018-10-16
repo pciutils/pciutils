@@ -94,9 +94,10 @@ exec_op(struct op *op, struct pci_dev *dev)
             op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
             op->cap_id);
       else
-        die("%s: Instance #%d of %s %04x not found - there %s only %d capability with that id.", slot,
+        die("%s: Instance #%d of %s %04x not found - there %s only %d %s with that id.", slot,
             op->number, ((op->cap_type == PCI_CAP_NORMAL) ? "Capability" : "Extended capability"),
-            op->cap_id, ((cap_nr == 1) ? "is" : "are"), cap_nr);
+            op->cap_id, ((cap_nr == 1) ? "is" : "are"), cap_nr,
+            ((cap_nr == 1) ? "capability" : "capabilities"));
 
       trace(((op->cap_type == PCI_CAP_NORMAL) ? "(cap %02x @%02x) " : "(ecap %04x @%03x) "), op->cap_id, addr);
     }
