@@ -120,6 +120,7 @@ pci_generic_error(char *msg, ...)
   va_start(args, msg);
   fputs("pcilib: ", stderr);
   vfprintf(stderr, msg, args);
+  va_end(args);
   fputc('\n', stderr);
   exit(1);
 }
@@ -132,6 +133,7 @@ pci_generic_warn(char *msg, ...)
   va_start(args, msg);
   fputs("pcilib: ", stderr);
   vfprintf(stderr, msg, args);
+  va_end(args);
   fputc('\n', stderr);
 }
 
