@@ -1095,6 +1095,24 @@
 #define PCI_IOV_MSA_BIR(x)	((x) & 7) /* VF Migration State BIR */
 #define PCI_IOV_MSA_OFFSET(x)	((x) & 0xfffffff8) /* VF Migration State Offset */
 
+/* Multicast */
+#define PCI_MCAST_CAP		0x04	/* Multicast Capability */
+#define  PCI_MCAST_CAP_MAX_GROUP(x) ((x) & 0x3f)
+#define  PCI_MCAST_CAP_WIN_SIZE(x) (((x) >> 8) & 0x3f)
+#define  PCI_MCAST_CAP_ECRC	0x8000	/* ECRC Regeneration Supported */
+#define PCI_MCAST_CTRL		0x06	/* Multicast Control */
+#define  PCI_MCAST_CTRL_NUM_GROUP(x) ((x) & 0x3f)
+#define  PCI_MCAST_CTRL_ENABLE	0x8000	/* MC Enabled */
+#define PCI_MCAST_BAR		0x08	/* Base Address */
+#define  PCI_MCAST_BAR_INDEX_POS(x)	((u32) ((x) & 0x3f))
+#define  PCI_MCAST_BAR_MASK	(~0xfffUL)
+#define PCI_MCAST_RCV		0x10	/* Receive */
+#define PCI_MCAST_BLOCK		0x18	/* Block All */
+#define PCI_MCAST_BLOCK_UNTRANS	0x20	/* Block Untranslated */
+#define PCI_MCAST_OVL_BAR	0x28	/* Overlay BAR */
+#define  PCI_MCAST_OVL_SIZE(x)	((u32) ((x) & 0x3f))
+#define  PCI_MCAST_OVL_MASK	(~0x3fUL)
+
 /* Page Request Interface */
 #define PCI_PRI_CTRL		0x04	/* PRI Control Register */
 #define  PCI_PRI_CTRL_ENABLE	0x01	/* Enable */

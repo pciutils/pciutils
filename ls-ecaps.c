@@ -397,6 +397,62 @@ cap_sriov(struct device *d, int where)
 }
 
 static void
+cap_multicast(struct device *d, int where, int type)
+{
+  u16 w;
+  u32 l;
+  u64 bar, rcv, block;
+
+  printf("Multicast\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_MCAST_CAP, 0x30))
+    return;
+
+  w = get_conf_word(d, where + PCI_MCAST_CAP);
+  printf("\t\tMcastCap: MaxGroups %d", PCI_MCAST_CAP_MAX_GROUP(w) + 1);
+  if (type == PCI_EXP_TYPE_ENDPOINT || type == PCI_EXP_TYPE_ROOT_INT_EP)
+    printf(", WindowSz %d (%d bytes)",
+      PCI_MCAST_CAP_WIN_SIZE(w), 1 << PCI_MCAST_CAP_WIN_SIZE(w));
+  if (type == PCI_EXP_TYPE_ROOT_PORT ||
+      type == PCI_EXP_TYPE_UPSTREAM || type == PCI_EXP_TYPE_DOWNSTREAM)
+    printf(", ECRCRegen%c\n", FLAG(w, PCI_MCAST_CAP_ECRC));
+  w = get_conf_word(d, where + PCI_MCAST_CTRL);
+  printf("\t\tMcastCtl: NumGroups %d, Enable%c\n",
+    PCI_MCAST_CTRL_NUM_GROUP(w) + 1, FLAG(w, PCI_MCAST_CTRL_ENABLE));
+  bar = get_conf_long(d, where + PCI_MCAST_BAR);
+  l = get_conf_long(d, where + PCI_MCAST_BAR + 4);
+  bar |= (u64) l << 32;
+  printf("\t\tMcastBAR: IndexPos %d, BaseAddr %016" PCI_U64_FMT_X "\n",
+    PCI_MCAST_BAR_INDEX_POS(bar), bar & PCI_MCAST_BAR_MASK);
+  rcv = get_conf_long(d, where + PCI_MCAST_RCV);
+  l = get_conf_long(d, where + PCI_MCAST_RCV + 4);
+  rcv |= (u64) l << 32;
+  printf("\t\tMcastReceiveVec:      %016" PCI_U64_FMT_X "\n", rcv);
+  block = get_conf_long(d, where + PCI_MCAST_BLOCK);
+  l = get_conf_long(d, where + PCI_MCAST_BLOCK + 4);
+  block |= (u64) l << 32;
+  printf("\t\tMcastBlockAllVec:     %016" PCI_U64_FMT_X "\n", block);
+  block = get_conf_long(d, where + PCI_MCAST_BLOCK_UNTRANS);
+  l = get_conf_long(d, where + PCI_MCAST_BLOCK_UNTRANS + 4);
+  block |= (u64) l << 32;
+  printf("\t\tMcastBlockUntransVec: %016" PCI_U64_FMT_X "\n", block);
+
+  if (type == PCI_EXP_TYPE_ENDPOINT || type == PCI_EXP_TYPE_ROOT_INT_EP)
+    return;
+  bar = get_conf_long(d, where + PCI_MCAST_OVL_BAR);
+  l = get_conf_long(d, where + PCI_MCAST_OVL_BAR + 4);
+  bar |= (u64) l << 32;
+  printf("\t\tMcastOverlayBAR: OverlaySize %d ", PCI_MCAST_OVL_SIZE(bar));
+  if (PCI_MCAST_OVL_SIZE(bar) >= 6)
+    printf("(%d bytes)", 1 << PCI_MCAST_OVL_SIZE(bar));
+  else
+    printf("(disabled)");
+  printf(", BaseAddr %016" PCI_U64_FMT_X "\n", bar & PCI_MCAST_OVL_MASK);
+}
+
+static void
 cap_vc(struct device *d, int where)
 {
   u32 cr1, cr2;
@@ -788,6 +844,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_MRIOV:
 	    printf("Multi-Root I/O Virtualization <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_MCAST:
+	    cap_multicast(d, where, type);
 	    break;
 	  case PCI_EXT_CAP_ID_PRI:
 	    cap_pri(d, where);
