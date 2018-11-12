@@ -133,8 +133,8 @@ pci_find_cap_nr(struct pci_dev *d, unsigned int id, unsigned int type,
 	{
 	  if (target == index)
 	    found = c;
+	  index++;
 	}
-      index++;
     }
 
   if (cap_number)
