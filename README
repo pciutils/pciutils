@@ -130,6 +130,8 @@ general introduction in the pcilib(7) man page. If you want to use the
 library in your programs, please follow the comments in lib/pci.h and in
 the example program example.c.
 
+There is also osme Doxygen-generated docs available: https://ufo.kit.edu/extra/pcitool/modules.html.
+
 
 6. Feedback
 ~~~~~~~~~~~
