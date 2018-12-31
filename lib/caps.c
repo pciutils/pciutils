@@ -15,8 +15,11 @@ pci_add_cap(struct pci_dev *d, unsigned int addr, unsigned int id, unsigned int 
 {
   struct pci_cap *cap = pci_malloc(d->access, sizeof(*cap));
 
-  cap->next = d->first_cap;
-  d->first_cap = cap;
+  if (d->last_cap)
+    d->last_cap->next = cap;
+  else
+    d->first_cap = cap;
+  d->last_cap = cap;
   cap->addr = addr;
   cap->id = id;
   cap->type = type;

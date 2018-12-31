@@ -150,6 +150,7 @@ struct pci_dev {
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
   void *aux;				/* Auxiliary data */
   struct pci_property *properties;	/* A linked list of extra properties */
+  struct pci_cap *last_cap;		/* Last capability in the list */
 };
 
 #define PCI_ADDR_IO_MASK (~(pciaddr_t) 0x3)
