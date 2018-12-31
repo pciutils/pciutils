@@ -1143,12 +1143,12 @@
 #define PCI_LTR_MAX_NOSNOOP	6	/* 16 bit value */
 
 /* Secondary PCI Express Extended Capability */
-#define PCI_SEC_LNKCTL3     4    /* Link Control 3 register*/
-#define  PCI_SEC_LNKCTL3_PERFORM_LINK_EQU       0x01
-#define  PCI_SEC_LNKCTL3_LNK_EQU_REQ_INTR_EN    0x02
-#define  PCI_SEC_LNKCTL3_ENBL_LOWER_SKP_OS_GEN_VEC(x)  ((x >> 8) & 0x7F)
-#define PCI_SEC_LANE_ERR    8   /* Lane Error status register */
-#define PCI_SEC_LANE_EQU_CTRL 12   /* Lane Equalization contol register */
+#define PCI_SEC_LNKCTL3		4	/* Link Control 3 register */
+#define  PCI_SEC_LNKCTL3_PERFORM_LINK_EQU	0x01
+#define  PCI_SEC_LNKCTL3_LNK_EQU_REQ_INTR_EN	0x02
+#define  PCI_SEC_LNKCTL3_ENBL_LOWER_SKP_OS_GEN_VEC(x) ((x >> 8) & 0x7F)
+#define PCI_SEC_LANE_ERR	8	/* Lane Error status register */
+#define PCI_SEC_LANE_EQU_CTRL	12	/* Lane Equalization control register */
 
 /* Process Address Space ID */
 #define PCI_PASID_CAP		0x04	/* PASID feature register */

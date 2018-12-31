@@ -97,7 +97,7 @@ cap_sec(struct device *d, int where, int type)
   printf("\t\tLaneErrStat: ");
   if (lane_err_stat)
     {
-      printf("LaneErr at Lane:");
+      printf("LaneErr at lane:");
       for (lane = 0; lane_err_stat; lane_err_stat >>= 1, lane += 1)
         if (BITS(lane_err_stat, 0, 1))
           printf(" %u", lane);
