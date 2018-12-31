@@ -689,7 +689,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(t, PCI_EXP_DEVCAP_ATN_IND), FLAG(t, PCI_EXP_DEVCAP_PWR_IND));
   printf(" RBE%c",
 	FLAG(t, PCI_EXP_DEVCAP_RBE));
-  if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END))
+  if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END) || (type == PCI_EXP_TYPE_ROOT_INT_EP))
     printf(" FLReset%c",
 	FLAG(t, PCI_EXP_DEVCAP_FLRESET));
   if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_UPSTREAM) ||
@@ -713,7 +713,7 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_DEVCTL_NOSNOOP));
   if (type == PCI_EXP_TYPE_PCI_BRIDGE)
     printf(" BrConfRtry%c", FLAG(w, PCI_EXP_DEVCTL_BCRE));
-  if (((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END)) &&
+  if (((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_LEG_END) || (type == PCI_EXP_TYPE_ROOT_INT_EP)) &&
       (t & PCI_EXP_DEVCAP_FLRESET))
     printf(" FLReset%c", FLAG(w, PCI_EXP_DEVCTL_FLRESET));
   printf("\n\t\t\tMaxPayload %d bytes, MaxReadReq %d bytes\n",
