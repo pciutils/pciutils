@@ -711,17 +711,19 @@ cap_l1pm(struct device *d, int where)
     FLAG(val, PCI_L1PM_SUBSTAT_CTL1_ASPM_L11));
 
   if (l1_cap & PCI_L1PM_SUBSTAT_CAP_PM_L12 || l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
-    printf("\t\t\t   T_CommonMode=%dus", BITS(val, 8, 8));
-
-  if (l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
     {
-      scale = BITS(val, 29, 3);
-      if (scale > 5)
-	printf(" LTR1.2_Threshold=<error>");
-      else
-	printf(" LTR1.2_Threshold=%lldns", BITS(val, 16, 10) * (unsigned long long) cap_ltr_scale(scale));
+      printf("\t\t\t   T_CommonMode=%dus", BITS(val, 8, 8));
+
+      if (l1_cap & PCI_L1PM_SUBSTAT_CAP_ASPM_L12)
+	{
+	  scale = BITS(val, 29, 3);
+	  if (scale > 5)
+	    printf(" LTR1.2_Threshold=<error>");
+	  else
+	    printf(" LTR1.2_Threshold=%lldns", BITS(val, 16, 10) * (unsigned long long) cap_ltr_scale(scale));
+	}
+      printf("\n");
     }
-  printf("\n");
 
   val = get_conf_long(d, where + PCI_L1PM_SUBSTAT_CTL2);
   printf("\t\tL1SubCtl2:");
