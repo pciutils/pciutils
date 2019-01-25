@@ -116,6 +116,7 @@ case $sys in
 		echo_n " nbsd-libpci"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$m 'LIBNAME=libpciutils'
 		echo >>$m 'WITH_LIBS+=-lpci'
 		LIBRESOLV=
