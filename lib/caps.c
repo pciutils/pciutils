@@ -20,6 +20,7 @@ pci_add_cap(struct pci_dev *d, unsigned int addr, unsigned int id, unsigned int 
   else
     d->first_cap = cap;
   d->last_cap = cap;
+  cap->next = NULL;
   cap->addr = addr;
   cap->id = id;
   cap->type = type;
