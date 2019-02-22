@@ -985,6 +985,52 @@ static const char *cap_express_devcap2_obff(int obff)
     }
 }
 
+static const char *cap_express_devcap2_epr(int epr)
+{
+  switch (epr)
+    {
+      case 1:
+        return "Dev Specific";
+      case 2:
+        return "Form Factor Dev Specific";
+      case 3:
+        return "Reserved";
+      default:
+        return "Not Supported";
+    }
+}
+
+static const char *cap_express_devcap2_lncls(int lncls)
+{
+  switch (lncls)
+    {
+      case 1:
+        return "64byte cachelines";
+      case 2:
+        return "128byte cachelines";
+      case 3:
+        return "Reserved";
+      default:
+        return "Not Supported";
+    }
+}
+
+static const char *cap_express_devcap2_tphcomp(int tph)
+{
+  switch (tph)
+    {
+      case 1:
+        return "TPHComp+, ExtTPHComp-";
+      case 2:
+        /* Reserved; intentionally left blank */
+        return "";
+      case 3:
+        return "TPHComp+, ExtTPHComp+";
+      default:
+        return "TPHComp-, ExtTPHComp-";
+    }
+}
+
 static const char *cap_express_devctl2_obff(int obff)
 {
   switch (obff)
@@ -1027,13 +1073,38 @@ static void cap_express_dev2(struct device *d, int where, int type)
   int has_mem_bar = device_has_memory_space_bar(d);
 
   l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
-  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
-	cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
-	FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS),
-	FLAG(l, PCI_EXP_DEVCAP2_LTR),
-	cap_express_devcap2_obff(PCI_EXP_DEVCAP2_OBFF(l)));
+  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, NROPrPrP%c, LTR%c",
+        cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
+        FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS),
+	FLAG(l, PCI_EXP_DEVCAP2_NROPRPRP),
+        FLAG(l, PCI_EXP_DEVCAP2_LTR));
+  printf("\n\t\t\t 10BitTagComp%c, 10BitTagReq%c, OBFF %s, ExtFmt%c, EETLPPrefix%c",
+        FLAG(l, PCI_EXP_DEVCAP2_10BIT_TAG_COMP),
+        FLAG(l, PCI_EXP_DEVCAP2_10BIT_TAG_REQ),
+        cap_express_devcap2_obff(PCI_EXP_DEVCAP2_OBFF(l)),
+        FLAG(l, PCI_EXP_DEVCAP2_EXTFMT),
+        FLAG(l, PCI_EXP_DEVCAP2_EE_TLP));
+
+  if (PCI_EXP_DEVCAP2_EE_TLP == (l & PCI_EXP_DEVCAP2_EE_TLP))
+    {
+      printf(", MaxEETLPPrefixes %d",
+             PCI_EXP_DEVCAP2_MEE_TLP(l) ? PCI_EXP_DEVCAP2_MEE_TLP(l) : 4);
+    }
+
+  printf("\n\t\t\t EmergencyPowerReduction %s, EmergencyPowerReductionInit%c",
+        cap_express_devcap2_epr(PCI_EXP_DEVCAP2_EPR(l)),
+        FLAG(l, PCI_EXP_DEVCAP2_EPR_INIT));
+  printf("\n\t\t\t FRS%c", FLAG(l, PCI_EXP_DEVCAP2_FRS));
+
+  if (type == PCI_EXP_TYPE_ROOT_PORT)
+    printf(", LN System CLS %s",
+          cap_express_devcap2_lncls(PCI_EXP_DEVCAP2_LN_CLS(l)));
+
+  if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ENDPOINT)
+    printf(", %s", cap_express_devcap2_tphcomp(PCI_EXP_DEVCAP2_TPH_COMP(l)));
+
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
-    printf(" ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
+    printf(", ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
   else
     printf("\n");
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||

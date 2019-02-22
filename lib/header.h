@@ -873,8 +873,19 @@
 #define  PCI_EXP_RTSTA_PME_STATUS  0x00010000 /* PME Status */
 #define  PCI_EXP_RTSTA_PME_PENDING 0x00020000 /* PME is Pending */
 #define PCI_EXP_DEVCAP2			0x24	/* Device capabilities 2 */
+#define  PCI_EXP_DEVCAP2_NROPRPRP	0x0400 /* No RO-enabled PR-PR Passing */
 #define  PCI_EXP_DEVCAP2_LTR		0x0800	/* LTR supported */
+#define  PCI_EXP_DEVCAP2_TPH_COMP(x)	(((x) >> 12) & 3) /* TPH Completer Supported */
+#define  PCI_EXP_DEVCAP2_LN_CLS(x)	(((x) >> 14) & 3) /* LN System CLS Supported */
+#define  PCI_EXP_DEVCAP2_10BIT_TAG_COMP 0x00010000 /* 10 Bit Tag Completer */
+#define  PCI_EXP_DEVCAP2_10BIT_TAG_REQ	0x00020000 /* 10 Bit Tag Requester */
 #define  PCI_EXP_DEVCAP2_OBFF(x)	(((x) >> 18) & 3) /* OBFF supported */
+#define  PCI_EXP_DEVCAP2_EXTFMT		0x00100000 /* Extended Fmt Field Supported */
+#define  PCI_EXP_DEVCAP2_EE_TLP		0x00200000 /* End-End TLP Prefix Supported */
+#define  PCI_EXP_DEVCAP2_MEE_TLP(x)	(((x) >> 22) & 3) /* Max End-End TLP Prefixes */
+#define  PCI_EXP_DEVCAP2_EPR(x)		(((x) >> 24) & 3) /* Emergency Power Reduction Supported */
+#define  PCI_EXP_DEVCAP2_EPR_INIT	0x04000000 /* Emergency Power Reduction Initialization Required */
+#define  PCI_EXP_DEVCAP2_FRS		0x80000000 /* FRS supported */
 #define PCI_EXP_DEVCTL2			0x28	/* Device Control */
 #define  PCI_EXP_DEV2_TIMEOUT_RANGE(x)	((x) & 0xf) /* Completion Timeout Ranges Supported */
 #define  PCI_EXP_DEV2_TIMEOUT_VALUE(x)	((x) & 0xf) /* Completion Timeout Value */
