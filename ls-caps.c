@@ -899,17 +899,19 @@ static void cap_express_slot(struct device *d, int where)
 
 static void cap_express_root(struct device *d, int where)
 {
-  u32 w = get_conf_word(d, where + PCI_EXP_RTCTL);
+  u32 w;
+
+  w = get_conf_word(d, where + PCI_EXP_RTCAP);
+  printf("\t\tRootCap: CRSVisible%c\n",
+	FLAG(w, PCI_EXP_RTCAP_CRSVIS));
+
+  w = get_conf_word(d, where + PCI_EXP_RTCTL);
   printf("\t\tRootCtl: ErrCorrectable%c ErrNon-Fatal%c ErrFatal%c PMEIntEna%c CRSVisible%c\n",
 	FLAG(w, PCI_EXP_RTCTL_SECEE),
 	FLAG(w, PCI_EXP_RTCTL_SENFEE),
 	FLAG(w, PCI_EXP_RTCTL_SEFEE),
 	FLAG(w, PCI_EXP_RTCTL_PMEIE),
 	FLAG(w, PCI_EXP_RTCTL_CRSVIS));
-
-  w = get_conf_word(d, where + PCI_EXP_RTCAP);
-  printf("\t\tRootCap: CRSVisible%c\n",
-	FLAG(w, PCI_EXP_RTCAP_CRSVIS));
 
   w = get_conf_long(d, where + PCI_EXP_RTSTA);
   printf("\t\tRootSta: PME ReqID %04x, PMEStatus%c PMEPending%c\n",
