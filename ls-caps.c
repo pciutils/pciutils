@@ -742,6 +742,8 @@ static char *link_speed(int speed)
 	return "8GT/s";
       case 4:
         return "16GT/s";
+      case 5:
+        return "32GT/s";
       default:
 	return "unknown";
     }
@@ -1160,6 +1162,8 @@ static const char *cap_express_link2_speed(int type)
 	return "8GT/s";
       case 4:
         return "16GT/s";
+      case 5:
+        return "32GT/s";
       default:
 	return "Unknown";
     }
