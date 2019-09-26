@@ -114,7 +114,8 @@ The current version of pciutils is available at:
 
 The tarball can be downloaded at the following places:
 
-	ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/
+	https://mj.ucw.cz/download/linux/pci/
+	ftp://ftp.ucw.cz/pub/mj/linux/pci/
 	https://www.kernel.org/pub/software/utils/pciutils/ (expect a couple of hours delay)
 
 There is also a public GIT tree at:

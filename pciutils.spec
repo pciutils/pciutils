@@ -1,7 +1,7 @@
 Name:		pciutils
 Version:	@VERSION@
 Release: 	1
-Source:		ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/%{name}-%{version}.tar.gz
+Source:		http://mj.ucw.cz/download/linux/pci/%{name}-%{version}.tar.gz
 Copyright:	GNU GPL
 Buildroot: 	/tmp/%{name}-%{version}-root
 ExclusiveOS: 	Linux
