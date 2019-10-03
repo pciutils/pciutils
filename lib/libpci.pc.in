@@ -1,7 +1,8 @@
 prefix=@PREFIX@
-includedir=@INCDIR@
+exec_prefix=@PREFIX@
+includedir=${prefix}/include
 libdir=@LIBDIR@
-idsdir=@IDSDIR@
+idsdir=${prefix}/share
 
 Name: libpci
 Description: libpci
