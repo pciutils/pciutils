@@ -67,6 +67,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+#ifdef PCI_HAVE_PM_HURD_CONF
+  &pm_hurd,
+#else
+  NULL,
+#endif
 };
 
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
@@ -80,6 +85,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_OBSD_DEVICE,
   PCI_ACCESS_DARWIN,
   PCI_ACCESS_SYLIXOS_DEVICE,
+  PCI_ACCESS_GNU,
   // Low-level methods poking the hardware directly
   PCI_ACCESS_I386_TYPE1,
   PCI_ACCESS_I386_TYPE2,

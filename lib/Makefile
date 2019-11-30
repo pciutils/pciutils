@@ -50,6 +50,10 @@ ifdef PCI_HAVE_PM_SYLIXOS_DEVICE
 OBJS += sylixos-device
 endif
 
+ifdef PCI_HAVE_PM_HURD_CONF
+OBJS += hurd
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)
@@ -78,7 +82,7 @@ $(PCILIBPC): libpci.pc.in
 init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 params.o: params.c $(INCL)
-i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
+i386-ports.o: i386-ports.c $(INCL) i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
 proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
@@ -95,3 +99,4 @@ names-parse.o: names-parse.c $(INCL) names.h
 names-hwdb.o: names-hwdb.c $(INCL) names.h
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
+hurd.o: hurd.c $(INCL)
