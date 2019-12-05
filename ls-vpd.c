@@ -178,7 +178,7 @@ cap_vpd(struct device *d)
 	      if (!read_vpd(d, res_addr + part_pos, buf, read_len, &csum))
 		break;
 
-	      printf("\t\t\t[%c%c] %s: ", id1, id2, item->name);
+	      printf("\t\t\t[%.1s%.1s] %s: ", &id1, &id2, item->name);
 
 	      switch (item->format)
 	        {
