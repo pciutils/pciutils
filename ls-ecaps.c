@@ -77,12 +77,12 @@ cap_ltr(struct device *d, int where)
 }
 
 static void
-cap_sec(struct device *d, int where, int type)
+cap_sec(struct device *d, int where)
 {
   u32 ctrl3, lane_err_stat;
   u8 lane;
   printf("Secondary PCI Express\n");
-  if (verbose < 2 && type == 0)
+  if (verbose < 2)
     return;
 
   if (!config_fetch(d, where + PCI_SEC_LNKCTL3, 12))
@@ -897,7 +897,7 @@ show_ext_caps(struct device *d, int type)
 	    cap_ltr(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_SECPCI:
-	    cap_sec(d, where, type);
+	    cap_sec(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_PMUX:
 	    printf("Protocol Multiplexing <?>\n");
