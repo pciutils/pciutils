@@ -59,7 +59,7 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
 
-all: lib/$(PCILIB) lspci setpci example lspci.8 setpci.8 pcilib.7 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCILIB) lspci setpci example lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
 
 lib/$(PCILIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -98,7 +98,7 @@ example.o: example.c $(PCIINC)
 %: %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
-%.8 %.7: %.man
+%.8 %.7 %.5: %.man
 	M=`echo $(DATE) | sed 's/-01-/-January-/;s/-02-/-February-/;s/-03-/-March-/;s/-04-/-April-/;s/-05-/-May-/;s/-06-/-June-/;s/-07-/-July-/;s/-08-/-August-/;s/-09-/-September-/;s/-10-/-October-/;s/-11-/-November-/;s/-12-/-December-/;s/\(.*\)-\(.*\)-\(.*\)/\3 \2 \1/'` ; sed <$< >$@ "s/@TODAY@/$$M/;s/@VERSION@/pciutils-$(VERSION)/;s#@IDSDIR@#$(IDSDIR)#"
 
 ctags:
@@ -118,12 +118,13 @@ distclean: clean
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
-	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7 $(DESTDIR)/$(MANDIR)/man5
 	$(INSTALL) -c -m 755 $(STRIP) lspci setpci $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
 	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -c -m 644 pcilib.7 $(DESTDIR)$(MANDIR)/man7
+	$(INSTALL) -c -m 644 pci.ids.5 $(DESTDIR)$(MANDIR)/man5
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME)$(ABI_VERSION).$(LIBEXT)

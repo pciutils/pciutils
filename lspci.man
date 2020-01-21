@@ -357,6 +357,7 @@ back-end.
 
 .SH SEE ALSO
 .BR setpci (8),
+.BR pci.ids (5),
 .BR update-pciids (8),
 .BR pcilib (7)
 

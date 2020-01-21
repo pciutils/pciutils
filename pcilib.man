@@ -112,6 +112,7 @@ Disable use of HWDB if set to a non-zero value.
 
 .BR lspci (8),
 .BR setpci (8),
+.BR pci.ids (5),
 .BR update-pciids (8)
 
 .SH AUTHOR
