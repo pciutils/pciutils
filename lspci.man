@@ -310,7 +310,7 @@ Kernel driver currently handling the device (optional, Linux only).
 .TP
 .B Module
 Kernel module reporting that it is capable of handling the device
-(optional, Linux only).
+(optional, Linux only). Multiple lines with this tag can occur.
 
 .TP
 .B NUMANode
