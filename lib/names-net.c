@@ -196,7 +196,7 @@ char
     default:
       return NULL;
     }
-  sprintf(dnsname, "%s.%s", name, domain);
+  sprintf(dnsname, "%.100s.%.100s", name, domain);
 
   a->debug("Resolving %s\n", dnsname);
   if (!resolver_inited)
