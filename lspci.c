@@ -506,26 +506,32 @@ show_rom(struct device *d, int reg)
 
   if (!rom && !flg && !len)
     return;
-  putchar('\t');
-  if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
-      printf("[enhanced] ");
-  else if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK))
+
+  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK) && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
     {
-      printf("[virtual] ");
       flg = rom;
       virtual = 1;
     }
-  printf("Expansion ROM at ");
+
+  printf("\tExpansion ROM at ");
   if (rom & PCI_ROM_ADDRESS_MASK)
     printf(PCIADDR_T_FMT, rom & PCI_ROM_ADDRESS_MASK);
   else if (flg & PCI_ROM_ADDRESS_MASK)
     printf("<ignored>");
   else
     printf("<unassigned>");
+
+  if (virtual)
+    printf(" [virtual]");
+
   if (!(flg & PCI_ROM_ADDRESS_ENABLE))
     printf(" [disabled]");
   else if (!virtual && !(cmd & PCI_COMMAND_MEMORY))
     printf(" [disabled by cmd]");
+
+  if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
+      printf(" [enhanced]");
+
   show_size(len);
   putchar('\n');
 }
