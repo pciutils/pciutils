@@ -1,11 +1,12 @@
 /*
  *	The PCI Utilities -- Show Bus Tree
  *
- *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -154,6 +155,31 @@ print_it(char *line, char *p)
 
 static void show_tree_bridge(struct bridge *, char *, char *);
 
+#define LINE_BUF_SIZE 1024
+
+static char * FORMAT_CHECK(printf, 3, 4)
+tree_printf(char *line, char *p, char *fmt, ...)
+{
+  va_list args;
+  char *end = line + LINE_BUF_SIZE - 2;
+
+  if (p >= end)
+    return p;
+
+  va_start(args, fmt);
+  int res = vsnprintf(p, end - p, fmt, args);
+  if (res < 0)
+    {
+      /* Ancient C libraries return -1 on overflow */
+      p += strlen(p);
+    }
+  else
+    p += res;
+
+  va_end(args);
+  return p;
+}
+
 static void
 show_tree_dev(struct device *d, char *line, char *p)
 {
@@ -161,22 +187,22 @@ show_tree_dev(struct device *d, char *line, char *p)
   struct bridge *b;
   char namebuf[256];
 
-  p += sprintf(p, "%02x.%x", q->dev, q->func);
+  p = tree_printf(line, p, "%02x.%x", q->dev, q->func);
   for (b=&host_bridge; b; b=b->chain)
     if (b->br_dev == d)
       {
 	if (b->secondary == b->subordinate)
-	  p += sprintf(p, "-[%02x]-", b->secondary);
+	  p = tree_printf(line, p, "-[%02x]-", b->secondary);
 	else
-	  p += sprintf(p, "-[%02x-%02x]-", b->secondary, b->subordinate);
+	  p = tree_printf(line, p, "-[%02x-%02x]-", b->secondary, b->subordinate);
         show_tree_bridge(b, line, p);
         return;
       }
   if (verbose)
-    p += sprintf(p, "  %s",
-		 pci_lookup_name(pacc, namebuf, sizeof(namebuf),
-				 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-				 q->vendor_id, q->device_id));
+    p = tree_printf(line, p, "  %s",
+		    pci_lookup_name(pacc, namebuf, sizeof(namebuf),
+				    PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
+				    q->vendor_id, q->device_id));
   print_it(line, p);
 }
 
@@ -187,8 +213,7 @@ show_tree_bus(struct bus *b, char *line, char *p)
     print_it(line, p);
   else if (!b->first_dev->bus_next)
     {
-      *p++ = '-';
-      *p++ = '-';
+      p = tree_printf(line, p, "--");
       show_tree_dev(b->first_dev, line, p);
     }
   else
@@ -196,14 +221,12 @@ show_tree_bus(struct bus *b, char *line, char *p)
       struct device *d = b->first_dev;
       while (d->bus_next)
 	{
-	  p[0] = '+';
-	  p[1] = '-';
-	  show_tree_dev(d, line, p+2);
+	  char *p2 = tree_printf(line, p, "+-");
+	  show_tree_dev(d, line, p2);
 	  d = d->bus_next;
 	}
-      p[0] = '\\';
-      p[1] = '-';
-      show_tree_dev(d, line, p+2);
+      p = tree_printf(line, p, "\\-");
+      show_tree_dev(d, line, p);
     }
 }
 
@@ -214,7 +237,7 @@ show_tree_bridge(struct bridge *b, char *line, char *p)
   if (!b->first_bus->sibling)
     {
       if (b == &host_bridge)
-        p += sprintf(p, "[%04x:%02x]-", b->domain, b->first_bus->number);
+        p = tree_printf(line, p, "[%04x:%02x]-", b->domain, b->first_bus->number);
       show_tree_bus(b->first_bus, line, p);
     }
   else
@@ -224,11 +247,11 @@ show_tree_bridge(struct bridge *b, char *line, char *p)
 
       while (u->sibling)
         {
-          k = p + sprintf(p, "+-[%04x:%02x]-", u->domain, u->number);
+          k = tree_printf(line, p, "+-[%04x:%02x]-", u->domain, u->number);
           show_tree_bus(u, line, k);
           u = u->sibling;
         }
-      k = p + sprintf(p, "\\-[%04x:%02x]-", u->domain, u->number);
+      k = tree_printf(line, p, "\\-[%04x:%02x]-", u->domain, u->number);
       show_tree_bus(u, line, k);
     }
 }
@@ -236,7 +259,7 @@ show_tree_bridge(struct bridge *b, char *line, char *p)
 void
 show_forest(struct pci_filter *filter)
 {
-  char line[256];
+  char line[LINE_BUF_SIZE];
   if (filter == NULL)
     show_tree_bridge(&host_bridge, line, line);
   else
@@ -248,7 +271,7 @@ show_forest(struct pci_filter *filter)
             {
                 struct pci_dev *d = b->br_dev->dev;
                 char *p = line;
-                p += sprintf(line, "%04x:%02x:", d->domain_16, d->bus);
+                p = tree_printf(line, p, "%04x:%02x:", d->domain_16, d->bus);
                 show_tree_dev(b->br_dev, line, p);
             }
         }
