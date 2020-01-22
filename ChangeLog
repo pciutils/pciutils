@@ -1,3 +1,34 @@
+2020-01-22  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.6.3.
+
+	* `lspci -t' (tree mode) can be combined with `-s' to show a sub-tree.
+	  We also fixed potential buffer overflows in the tree dumper.
+
+	* Cleaned messy code for dumping of I/O, memory, and ROM regions.
+	  This helped fixing a bug, which caused some 64-bit regions to be
+	  reported as virtual. All flags are now printed after the address
+	  (previously, "[virtual]" and "[enhanced]" were before it for no good
+	  reason).
+
+	* Added pci_find_cap_nr() to the library, which handles capabilities
+	  which occur multiple times in a single device.
+
+	* Minor improvements in printing of PCIe capabilities.
+
+	* We now decode the Multicast and Secondary PCI Express extended
+	  capabilities.
+
+	* The list of capability names available to setpci was updated.
+
+	* Minor bugs were fixed in FreeBSD and Solaris ports.
+
+	* We now prefer HTTPS URLs in all documentation
+
+	* The pci.ids file has a man page.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2018-08-12  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.6.2.
