@@ -7,7 +7,7 @@ Description:    This package contains various utilities for inspecting and
 Keywords:       kernel, pci, lspci, setpci, libpci
 Author:         mj@ucw.cz (Martin Mares)
 Maintained-by:  mj@ucw.cz (Martin Mares)
-Primary-site:   atrey.karlin.mff.cuni.cz pub/linux/pci/@ALPHADIR@pciutils-@VERSION@.tar.gz
+Primary-site:   ftp.ucw.cz pub/mj/linux/pci/@ALPHADIR@pciutils-@VERSION@.tar.gz
 Alternate-site: ftp.kernel.org pub/software/utils/pciutils/@ALPHADIR@pciutils-@VERSION@.tar.gz
 #ifndef ALPHA_VERSION
 Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-@VERSION@.tar.gz
