@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- List All PCI Devices
  *
- *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -405,72 +405,89 @@ show_bases(struct device *d, int cnt)
       pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
       pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->flags[i] : 0;
       u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+      u32 hw_lower;
+      u32 hw_upper = 0;
+      int broken = 0;
+
       if (flg == 0xffffffff)
 	flg = 0;
       if (!pos && !flg && !len)
 	continue;
+
       if (verbose > 1)
 	printf("\tRegion %d: ", i);
       else
 	putchar('\t');
-      if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
-	  printf("[enhanced] ");
-      else if (pos && !(flg & ((flg & PCI_BASE_ADDRESS_SPACE_IO) ? PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK)))
+
+      /* Read address as seen by the hardware */
+      if (flg & PCI_BASE_ADDRESS_SPACE_IO)
+	hw_lower = flg & PCI_BASE_ADDRESS_IO_MASK;
+      else
 	{
-	  /* Reported by the OS, but not by the device */
-	  printf("[virtual] ");
+	  hw_lower = flg & PCI_BASE_ADDRESS_MEM_MASK;
+	  if ((flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
+	    {
+	      if (i >= cnt - 1)
+		broken = 1;
+	      else
+		{
+		  i++;
+		  hw_upper = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+		}
+	    }
+	}
+
+      /* Detect virtual regions, which are reported by the OS, but unassigned in the device */
+      if (pos && !hw_lower && !hw_upper && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
+	{
 	  flg = pos;
 	  virtual = 1;
 	}
+
+      /* Print base address */
       if (flg & PCI_BASE_ADDRESS_SPACE_IO)
 	{
 	  pciaddr_t a = pos & PCI_BASE_ADDRESS_IO_MASK;
 	  printf("I/O ports at ");
 	  if (a || (cmd & PCI_COMMAND_IO))
 	    printf(PCIADDR_PORT_FMT, a);
-	  else if (flg & PCI_BASE_ADDRESS_IO_MASK)
+	  else if (hw_lower)
 	    printf("<ignored>");
 	  else
 	    printf("<unassigned>");
-	  if (!virtual && !(cmd & PCI_COMMAND_IO))
+	  if (virtual)
+	    printf(" [virtual]");
+	  else if (!(cmd & PCI_COMMAND_IO))
 	    printf(" [disabled]");
 	}
       else
 	{
 	  int t = flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK;
 	  pciaddr_t a = pos & PCI_ADDR_MEM_MASK;
-	  int done = 0;
-	  u32 z = 0;
 
 	  printf("Memory at ");
-	  if (t == PCI_BASE_ADDRESS_MEM_TYPE_64)
-	    {
-	      if (i >= cnt - 1)
-		{
-		  printf("<invalid-64bit-slot>");
-		  done = 1;
-		}
-	      else
-		{
-		  i++;
-		  z = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-		}
-	    }
-	  if (!done)
-	    {
-	      if (a)
-		printf(PCIADDR_T_FMT, a);
-	      else
-		printf(((flg & PCI_BASE_ADDRESS_MEM_MASK) || z) ? "<ignored>" : "<unassigned>");
-	    }
+	  if (broken)
+	    printf("<broken-64-bit-slot>");
+	  else if (a)
+	    printf(PCIADDR_T_FMT, a);
+	  else if (hw_lower || hw_upper)
+	    printf("<ignored>");
+	  else
+	    printf("<unassigned>");
 	  printf(" (%s, %sprefetchable)",
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_32) ? "32-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_64) ? "64-bit" :
 		 (t == PCI_BASE_ADDRESS_MEM_TYPE_1M) ? "low-1M" : "type 3",
 		 (flg & PCI_BASE_ADDRESS_MEM_PREFETCH) ? "" : "non-");
-	  if (!virtual && !(cmd & PCI_COMMAND_MEMORY))
+	  if (virtual)
+	    printf(" [virtual]");
+	  else if (!(cmd & PCI_COMMAND_MEMORY))
 	    printf(" [disabled]");
 	}
+
+      if (ioflg & PCI_IORESOURCE_PCI_EA_BEI)
+	printf(" [enhanced]");
+
       show_size(len);
       putchar('\n');
     }
