@@ -283,18 +283,6 @@ hurd_fill_info(struct pci_dev *d, int flags)
 
   device_port = *((mach_port_t *) d->aux);
 
-  if (flags & PCI_FILL_IDENT)
-    {
-      d->vendor_id = pci_read_word(d, PCI_VENDOR_ID);
-      d->device_id = pci_read_word(d, PCI_DEVICE_ID);
-    }
-
-  if (flags & PCI_FILL_CLASS)
-    d->device_class = pci_read_word(d, PCI_CLASS_DEVICE);
-
-  if (flags & PCI_FILL_IRQ)
-    d->irq = pci_read_byte(d, PCI_INTERRUPT_LINE);
-
   if (flags & PCI_FILL_BASES)
     {
       buf = (char *) &regions;
@@ -358,10 +346,7 @@ hurd_fill_info(struct pci_dev *d, int flags)
       d->rom_size = rom.size;
     }
 
-  if (flags & (PCI_FILL_CAPS | PCI_FILL_EXT_CAPS))
-    flags |= pci_scan_caps(d, flags);
-
-  return flags;
+  return pci_generic_fill_info(d, flags);
 }
 
 struct pci_methods pm_hurd = {
