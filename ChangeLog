@@ -1,3 +1,11 @@
+2020-01-25  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.6.4.
+
+	* A new back-end for the GNU Hurd was contributed by Joan Lledó.
+
+	* When printing VPD item identifiers, non-ASCII characters are escaped.
+
 2020-01-22  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.6.3.
@@ -82,7 +90,7 @@
 	* The order in which back-ends are probed was decoupled from the
 	  internal back-end IDs. This helps, because new back-ends must have
 	  their ID allocated at the end to keep the ABI, but they might need
-	  to be proved earlier.
+	  to be probed earlier.
 
 	* The fbsd-device back-end should work again.
 
