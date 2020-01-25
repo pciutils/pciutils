@@ -6,12 +6,16 @@
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
 
+#define _GNU_SOURCE
+
 #include "internal.h"
 
 #include <unistd.h>
 
 #if defined(PCI_OS_LINUX)
 #include "i386-io-linux.h"
+#elif defined(PCI_OS_GNU)
+#include "i386-io-hurd.h"
 #elif defined(PCI_OS_SUNOS)
 #include "i386-io-sunos.h"
 #elif defined(PCI_OS_WINDOWS)
