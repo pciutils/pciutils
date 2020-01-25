@@ -18,7 +18,6 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <string.h>
-#include <assert.h>
 #include <hurd.h>
 #include <hurd/pci.h>
 #include <hurd/paths.h>
@@ -89,11 +88,11 @@ hurd_cleanup_dev(struct pci_dev *d)
 }
 
 /* Walk through the FS tree to see what is allowed for us */
-static int
+static void
 enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	     int dev, int func, tree_level lev)
 {
-  int err, ret;
+  int ret;
   DIR *dir;
   struct dirent *entry;
   char path[NAME_MAX];
@@ -105,7 +104,13 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 
   dir = opendir(parent);
   if (!dir)
-    return errno;
+    {
+      if (errno == EPERM || errno == EACCES)
+	/* The client lacks the permissions to access this function, skip */
+	return;
+      else
+	a->error("Cannot open directory: %s (%s)", parent, strerror(errno));
+    }
 
   while ((entry = readdir(dir)) != 0)
     {
@@ -120,8 +125,11 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  ret = strtol(entry->d_name, 0, 16);
 	  if (errno)
 	    {
-	      closedir(dir);
-	      return errno;
+	      if (closedir(dir) < 0)
+		a->warning("Cannot close directory: %s (%s)", parent,
+			   strerror(errno));
+	      a->error("Wrong directory name: %s (number expected) probably \
+                not connected to an arbiter", entry->d_name);
 	    }
 
 	  /*
@@ -144,17 +152,13 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	      break;
 	    default:
 	      if (closedir(dir) < 0)
-		return errno;
-	      return -1;
+		a->warning("Cannot close directory: %s (%s)", parent,
+			   strerror(errno));
+	      a->error("Wrong directory tree, probably not connected \
+                to an arbiter");
 	    }
 
-	  err = enum_devices(path, a, domain, bus, dev, func, lev + 1);
-	  if (err && err != EPERM && err != EACCES)
-	    {
-	      if (closedir(dir) < 0)
-		return errno;
-	      return err;
-	    }
+	  enum_devices(path, a, domain, bus, dev, func, lev + 1);
 	}
       else
 	{
@@ -168,8 +172,10 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  device_port = file_name_lookup(server, 0, 0);
 	  if (device_port == MACH_PORT_NULL)
 	    {
-	      closedir(dir);
-	      return errno;
+	      if (closedir(dir) < 0)
+		a->warning("Cannot close directory: %s (%s)", parent,
+			   strerror(errno));
+	      a->error("Cannot open %s", server);
 	    }
 
 	  d = pci_alloc_dev(a);
@@ -190,19 +196,14 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
     }
 
   if (closedir(dir) < 0)
-    return errno;
-
-  return 0;
+    a->error("Cannot close directory: %s (%s)", parent, strerror(errno));
 }
 
 /* Enumerate devices */
 static void
 hurd_scan(struct pci_access *a)
 {
-  int err;
-
-  err = enum_devices(_SERVERS_BUS_PCI, a, -1, -1, -1, -1, LEVEL_DOMAIN);
-  assert(err == 0);
+  enum_devices(_SERVERS_BUS_PCI, a, -1, -1, -1, -1, LEVEL_DOMAIN);
 }
 
 /*
