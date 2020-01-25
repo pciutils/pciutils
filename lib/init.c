@@ -85,7 +85,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_OBSD_DEVICE,
   PCI_ACCESS_DARWIN,
   PCI_ACCESS_SYLIXOS_DEVICE,
-  PCI_ACCESS_GNU,
+  PCI_ACCESS_HURD,
   // Low-level methods poking the hardware directly
   PCI_ACCESS_I386_TYPE1,
   PCI_ACCESS_I386_TYPE2,
