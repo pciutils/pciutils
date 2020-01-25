@@ -73,8 +73,7 @@ hurd_cleanup(struct pci_access *a UNUSED)
 static void
 hurd_init_dev(struct pci_dev *d)
 {
-  d->aux = calloc(1, sizeof(mach_port_t));
-  assert(d->aux);
+  d->aux = pci_malloc(d->access, sizeof(mach_port_t));
 }
 
 /* Deallocate the port and free its space */
@@ -86,7 +85,7 @@ hurd_cleanup_dev(struct pci_dev *d)
   device_port = *((mach_port_t *) d->aux);
   mach_port_deallocate(mach_task_self(), device_port);
 
-  free(d->aux);
+  pci_mfree(d->aux);
 }
 
 /* Walk through the FS tree to see what is allowed for us */
