@@ -149,7 +149,7 @@ struct pci_dev {
   u8 *cache;				/* Cached config registers */
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
-  void *aux;				/* Auxiliary data */
+  void *aux;				/* Auxiliary data for use by the back-end */
   struct pci_property *properties;	/* A linked list of extra properties */
   struct pci_cap *last_cap;		/* Last capability in the list */
 };
