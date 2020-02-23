@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Manipulate PCI Configuration Registers
  *
- *	Copyright (c) 1998--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1998--2020 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -18,6 +18,7 @@
 static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
 static int demo_mode;			/* Only show */
+static int allow_raw_access;
 
 const char program_name[] = "setpci";
 
@@ -30,7 +31,6 @@ struct value {
 
 struct op {
   struct op *next;
-  struct pci_dev **dev_vector;
   u16 cap_type;				/* PCI_CAP_xxx or 0 */
   u16 cap_id;
   unsigned int addr;
@@ -40,24 +40,58 @@ struct op {
   struct value values[0];
 };
 
-static struct op *first_op, **last_op = &first_op;
+struct group {
+  struct group *next;
+  struct pci_filter filter;
+  struct op *first_op;
+  struct op **last_op;
+};
+
+static struct group *first_group, **last_group = &first_group;
+static int need_bus_scan;
 static unsigned int max_values[] = { 0, 0xff, 0xffff, 0, 0xffffffff };
 
-static struct pci_dev **
-select_devices(struct pci_filter *filt)
+static int
+matches_single_device(struct group *group)
 {
-  struct pci_dev *z, **a, **b;
-  int cnt = 1;
+  struct pci_filter *f = &group->filter;
+  return (f->domain >= 0 && f->bus >= 0 && f->slot >= 0 && f->func >= 0);
+}
 
-  for (z=pacc->devices; z; z=z->next)
-    if (pci_filter_match(filt, z))
-      cnt++;
-  a = b = xmalloc(sizeof(struct device *) * cnt);
-  for (z=pacc->devices; z; z=z->next)
-    if (pci_filter_match(filt, z))
-      *a++ = z;
-  *a = NULL;
-  return b;
+static struct pci_dev **
+select_devices(struct group *group)
+{
+  struct pci_filter *f = &group->filter;
+
+  if (!need_bus_scan && matches_single_device(group))
+    {
+      struct pci_dev **devs = xmalloc(sizeof(struct device *) * 2);
+      struct pci_dev *dev = pci_get_dev(pacc, f->domain, f->bus, f->slot, f->func);
+      int i = 0;
+      if (pci_filter_match(f, dev))
+	devs[i++] = dev;
+      devs[i] = NULL;
+      return devs;
+    }
+  else
+    {
+      struct pci_dev **devs, *dev;
+      int i = 0;
+      int cnt = 1;
+
+      for (dev = pacc->devices; dev; dev = dev->next)
+	if (pci_filter_match(f, dev))
+	  cnt++;
+
+      devs = xmalloc(sizeof(struct device *) * cnt);
+
+      for (dev = pacc->devices; dev; dev = dev->next)
+	if (pci_filter_match(f, dev))
+	  devs[i++] = dev;
+
+      devs[i] = NULL;
+      return devs;
+    }
 }
 
 static void PCI_PRINTF(1,2)
@@ -176,34 +210,46 @@ exec_op(struct op *op, struct pci_dev *dev)
 }
 
 static void
-execute(struct op *op)
+execute(void)
 {
-  struct pci_dev **vec = NULL;
-  struct pci_dev **pdev, *dev;
-  struct op *oops;
+  struct group *group;
+  int group_cnt = 0;
 
-  while (op)
+  for (group = first_group; group; group = group->next)
     {
-      pdev = vec = op->dev_vector;
-      while (dev = *pdev++)
-	for (oops=op; oops && oops->dev_vector == vec; oops=oops->next)
-	  exec_op(oops, dev);
-      while (op && op->dev_vector == vec)
-	op = op->next;
+      struct pci_dev **vec = select_devices(group);
+      struct pci_dev *dev;
+      unsigned int i;
+
+      group_cnt++;
+      if (!vec[0] && !force)
+	fprintf(stderr, "setpci: Warning: No devices selected for operation group %d.\n", group_cnt);
+
+      for (i = 0; dev = vec[i]; i++)
+	{
+	  struct op *op;
+	  for (op = group->first_op; op; op = op->next)
+	    exec_op(op, dev);
+	}
+
+      free(vec);
     }
 }
 
 static void
-scan_ops(struct op *op)
+scan_ops(void)
 {
-  if (demo_mode)
-    return;
-  while (op)
-    {
-      if (op->num_values)
-	pacc->writeable = 1;
-      op = op->next;
-    }
+  struct group *group;
+  struct op *op;
+
+  for (group = first_group; group; group = group->next)
+    for (op = group->first_op; op; op = op->next)
+      {
+	if (op->num_values && !demo_mode)
+	  pacc->writeable = 1;
+	if (!matches_single_device(group) || !allow_raw_access)
+	  need_bus_scan = 1;
+      }
 }
 
 struct reg_name {
@@ -368,6 +414,7 @@ usage(void)
 "-f\t\tDon't complain if there's nothing to do\n"
 "-v\t\tBe verbose\n"
 "-D\t\tList changes, don't commit them\n"
+"-r\t\tUse raw access without bus scan if possible\n"
 "--dumpregs\tDump all known register names and exit\n"
 "\n"
 "PCI access options:\n"
@@ -442,6 +489,10 @@ parse_options(int argc, char **argv)
 	    demo_mode++;
 	    c++;
 	    break;
+	  case 'r':
+	    allow_raw_access++;
+	    c++;
+	    break;
 	  default:
 	    if (e = strchr(opts, *c))
 	      {
@@ -474,7 +525,7 @@ parse_options(int argc, char **argv)
   return i;
 }
 
-static int parse_filter(int argc, char **argv, int i, struct pci_filter *filter)
+static int parse_filter(int argc, char **argv, int i, struct group *group)
 {
   char *c = argv[i++];
   char *d;
@@ -490,11 +541,11 @@ static int parse_filter(int argc, char **argv, int i, struct pci_filter *filter)
   switch (c[1])
     {
     case 's':
-      if (d = pci_filter_parse_slot(filter, d))
+      if (d = pci_filter_parse_slot(&group->filter, d))
 	parse_err("Unable to parse filter -s %s", d);
       break;
     case 'd':
-      if (d = pci_filter_parse_id(filter, d))
+      if (d = pci_filter_parse_id(&group->filter, d))
 	parse_err("Unable to parse filter -d %s", d);
       break;
     default:
@@ -590,7 +641,7 @@ static void parse_register(struct op *op, char *base)
   parse_err("Unknown register \"%s\"", base);
 }
 
-static void parse_op(char *c, struct pci_dev **selected_devices)
+static void parse_op(char *c, struct group *group)
 {
   char *base, *offset, *width, *value, *number;
   char *e, *f;
@@ -622,7 +673,9 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
 
   /* Allocate the operation */
   op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
-  op->dev_vector = selected_devices;
+  memset(op, 0, sizeof(struct op));
+  *group->last_op = op;
+  group->last_op = &op->next;
   op->num_values = n;
 
   /* What is the width suffix? */
@@ -703,17 +756,24 @@ static void parse_op(char *c, struct pci_dev **selected_devices)
 	op->values[j].mask = ~0U;
       value = e;
     }
+}
 
-  *last_op = op;
-  last_op = &op->next;
-  op->next = NULL;
+static struct group *new_group(void)
+{
+  struct group *g = xmalloc(sizeof(*g));
+
+  memset(g, 0, sizeof(*g));
+  pci_filter_init(pacc, &g->filter);
+  g->last_op = &g->first_op;
+
+  *last_group = g;
+  last_group = &g->next;
+  return g;
 }
 
 static void parse_ops(int argc, char **argv, int i)
 {
-  enum { STATE_INIT, STATE_GOT_FILTER, STATE_GOT_OP } state = STATE_INIT;
-  struct pci_filter filter;
-  struct pci_dev **selected_devices = NULL;
+  struct group *group = NULL;
 
   while (i < argc)
     {
@@ -721,24 +781,18 @@ static void parse_ops(int argc, char **argv, int i)
 
       if (*c == '-')
 	{
-	  if (state != STATE_GOT_FILTER)
-	    pci_filter_init(pacc, &filter);
-	  i = parse_filter(argc, argv, i-1, &filter);
-	  state = STATE_GOT_FILTER;
+	  if (!group || group->first_op)
+	    group = new_group();
+	  i = parse_filter(argc, argv, i-1, group);
 	}
       else
 	{
-	  if (state == STATE_INIT)
+	  if (!group)
 	    parse_err("Filter specification expected");
-	  if (state == STATE_GOT_FILTER)
-	    selected_devices = select_devices(&filter);
-	  if (!selected_devices[0] && !force)
-	    fprintf(stderr, "setpci: Warning: No devices selected for \"%s\".\n", c);
-	  parse_op(c, selected_devices);
-	  state = STATE_GOT_OP;
+	  parse_op(c, group);
 	}
     }
-  if (state == STATE_INIT)
+  if (!group)
     parse_err("No operation specified");
 }
 
@@ -752,11 +806,14 @@ main(int argc, char **argv)
   i = parse_options(argc, argv);
 
   pci_init(pacc);
-  pci_scan_bus(pacc);
 
   parse_ops(argc, argv, i);
-  scan_ops(first_op);
-  execute(first_op);
+  scan_ops();
+
+  if (need_bus_scan)
+    pci_scan_bus(pacc);
+
+  execute();
 
   return 0;
 }

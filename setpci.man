@@ -45,6 +45,13 @@ to verify that your complex sequence of
 .B setpci
 operations does what you think it should do.
 .TP
+.B -r
+Avoids bus scan if each operation selects a specific device (uses the
+.B -s
+selector with specific domain, bus, slot, and function). This is faster,
+but if the device does not exist, it fails instead of matching an empty
+set of devices.
+.TP
 .B --version
 Show
 .I setpci
