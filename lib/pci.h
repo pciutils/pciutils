@@ -204,6 +204,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_NUMA_NODE	0x0800
 #define PCI_FILL_IO_FLAGS	0x1000
 #define PCI_FILL_DT_NODE	0x2000		/* Device tree node */
+#define PCI_FILL_IOMMU_GROUP	0x4000
 #define PCI_FILL_RESCAN		0x00010000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;

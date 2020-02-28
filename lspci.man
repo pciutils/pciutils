@@ -316,6 +316,10 @@ Kernel module reporting that it is capable of handling the device
 .B NUMANode
 NUMA node this device is connected to (optional, Linux only).
 
+.TP
+.B IOMMUGroup
+IOMMU group that this device is part of (optional, Linux only).
+
 .P
 New tags can be added in future versions, so you should silently ignore any tags you don't recognize.
 

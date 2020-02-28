@@ -725,12 +725,12 @@ show_verbose(struct device *d)
   byte max_lat, min_gnt;
   byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
   unsigned int irq;
-  char *dt_node;
+  char *dt_node, *iommu_group;
 
   show_terse(d);
 
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
-    PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE);
+    PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP);
   irq = p->irq;
 
   switch (htype)
@@ -814,6 +814,8 @@ show_verbose(struct device *d)
 	       (int_pin ? 'A' + int_pin - 1 : '?'), irq);
       if (p->numa_node != -1)
 	printf("\tNUMA node: %d\n", p->numa_node);
+      if (iommu_group = pci_get_string_property(p, PCI_FILL_IOMMU_GROUP))
+	printf("\tIOMMU group: %s\n", iommu_group);
     }
   else
     {
@@ -840,6 +842,8 @@ show_verbose(struct device *d)
 	printf(", IRQ " PCIIRQ_FMT, irq);
       if (p->numa_node != -1)
 	printf(", NUMA node %d", p->numa_node);
+      if (iommu_group = pci_get_string_property(p, PCI_FILL_IOMMU_GROUP))
+	printf(", IOMMU group %s", iommu_group);
       putchar('\n');
     }
 
@@ -910,13 +914,13 @@ show_machine(struct device *d)
   int c;
   word sv_id, sd_id;
   char classbuf[128], vendbuf[128], devbuf[128], svbuf[128], sdbuf[128];
-  char *dt_node;
+  char *dt_node, *iommu_group;
 
   get_subid(d, &sv_id, &sd_id);
 
   if (verbose)
     {
-      pci_fill_info(p, PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE);
+      pci_fill_info(p, PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP);
       printf((opt_machine >= 2) ? "Slot:\t" : "Device:\t");
       show_slot_name(d);
       putchar('\n');
@@ -945,6 +949,8 @@ show_machine(struct device *d)
 	printf("NUMANode:\t%d\n", p->numa_node);
       if (dt_node = pci_get_string_property(p, PCI_FILL_DT_NODE))
         printf("DTNode:\t%s\n", dt_node);
+      if (iommu_group = pci_get_string_property(p, PCI_FILL_IOMMU_GROUP))
+	printf("IOMMUGroup:\t%s\n", iommu_group);
     }
   else
     {
