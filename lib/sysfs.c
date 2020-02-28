@@ -329,6 +329,16 @@ sysfs_fill_info(struct pci_dev *d, int flags)
   if ((flags & PCI_FILL_NUMA_NODE) && !(d->known_fields & PCI_FILL_NUMA_NODE))
     d->numa_node = sysfs_get_value(d, "numa_node", 0);
 
+  if ((flags & PCI_FILL_IOMMU_GROUP) && !(d->known_fields & PCI_FILL_IOMMU_GROUP))
+    {
+      char *group_link = sysfs_deref_link(d, "iommu_group");
+      if (group_link)
+        {
+          pci_set_property(d, PCI_FILL_IOMMU_GROUP, basename(group_link));
+          free(group_link);
+        }
+    }
+
   if ((flags & PCI_FILL_DT_NODE) && !(d->known_fields & PCI_FILL_DT_NODE))
     {
       char *node = sysfs_deref_link(d, "of_node");
