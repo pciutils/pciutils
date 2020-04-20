@@ -1052,6 +1052,10 @@
 #define PCI_EVNDR_HEADER	4	/* Vendor-Specific Header */
 #define PCI_EVNDR_REGISTERS	8	/* Vendor-Specific Registers */
 
+/* PCIe Designated Vendor-Specific Capability */
+#define PCI_DVSEC_HEADER1	4	/* Designated Vendor-Specific Header 1 */
+#define PCI_DVSEC_HEADER2	8	/* Designated Vendor-Specific Header 2 */
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
