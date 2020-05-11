@@ -635,6 +635,29 @@ cap_rclink(struct device *d, int where)
 }
 
 static void
+cap_dvsec(struct device *d, int where)
+{
+  u32 hdr;
+
+  printf("Designated Vendor-Specific:\n");
+  if (!config_fetch(d, where + PCI_DVSEC_HEADER1, 8))
+    {
+      printf("<unreadable>\n");
+      return;
+    }
+
+  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
+  printf("\t\tDVSEC Vendor ID=%04x Rev=%d Len=%03x <?>\n",
+    BITS(hdr, 0, 16),
+    BITS(hdr, 16, 4),
+    BITS(hdr, 20, 12));
+
+  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER2);
+  printf("\t\tDVSEC ID=%04x <?>\n",
+    BITS(hdr, 0, 16));
+}
+
+static void
 cap_evendor(struct device *d, int where)
 {
   u32 hdr;
@@ -924,7 +947,7 @@ show_ext_caps(struct device *d, int type)
 	    printf("Readiness Time Reporting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_DVSEC:
-	    printf("Designated Vendor-Specific <?>\n");
+	    cap_dvsec(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_VF_REBAR:
 	    printf("VF Resizable BAR <?>\n");
