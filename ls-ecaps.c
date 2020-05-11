@@ -635,6 +635,57 @@ cap_rclink(struct device *d, int where)
 }
 
 static void
+cap_cxl(struct device *d, int where)
+{
+  u16 l;
+
+  printf("CXL Designated Vendor-Specific:\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_CXL_CAP, 12))
+    return;
+
+  l = get_conf_word(d, where + PCI_CXL_CAP);
+  printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
+    FLAG(l, PCI_CXL_CAP_CACHE), FLAG(l, PCI_CXL_CAP_IO), FLAG(l, PCI_CXL_CAP_MEM),
+    FLAG(l, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(l), FLAG(l, PCI_CXL_CAP_VIRAL));
+
+  l = get_conf_word(d, where + PCI_CXL_CTRL);
+  printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
+    FLAG(l, PCI_CXL_CTRL_CACHE), FLAG(l, PCI_CXL_CTRL_IO), FLAG(l, PCI_CXL_CTRL_MEM),
+    PCI_CXL_CTRL_CACHE_SF_COV(l), PCI_CXL_CTRL_CACHE_SF_GRAN(l), FLAG(l, PCI_CXL_CTRL_CACHE_CLN),
+    FLAG(l, PCI_CXL_CTRL_VIRAL));
+
+  l = get_conf_word(d, where + PCI_CXL_STATUS);
+  printf("\t\tCXLSta:\tViral%c\n", FLAG(l, PCI_CXL_STATUS_VIRAL));
+}
+
+static int
+is_cxl_cap(struct device *d, int where)
+{
+  u32 hdr;
+  u16 w;
+
+  if (!config_fetch(d, where + PCI_DVSEC_HEADER1, 8))
+    return 0;
+
+  /* Check for supported Vendor */
+  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
+  w = BITS(hdr, 0, 16);
+  if (w != PCI_DVSEC_VENDOR_ID_CXL)
+    return 0;
+
+  /* Check for Designated Vendor-Specific ID */
+  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER2);
+  w = BITS(hdr, 0, 16);
+  if (w == PCI_DVSEC_INTEL_CXL)
+    return 1;
+
+  return 0;
+}
+
+static void
 cap_dvsec(struct device *d, int where)
 {
   u32 hdr;
@@ -947,7 +998,10 @@ show_ext_caps(struct device *d, int type)
 	    printf("Readiness Time Reporting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_DVSEC:
-	    cap_dvsec(d, where);
+	    if (is_cxl_cap(d, where))
+	      cap_cxl(d, where);
+	    else
+	      cap_dvsec(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_VF_REBAR:
 	    printf("VF Resizable BAR <?>\n");
