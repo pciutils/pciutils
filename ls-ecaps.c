@@ -89,7 +89,7 @@ cap_sec(struct device *d, int where)
     return;
 
   ctrl3 = get_conf_word(d, where + PCI_SEC_LNKCTL3);
-  printf("\t\tLnkCtl3: LnkEquIntrruptEn%c, PerformEqu%c\n",
+  printf("\t\tLnkCtl3: LnkEquIntrruptEn%c PerformEqu%c\n",
 	FLAG(ctrl3, PCI_SEC_LNKCTL3_LNK_EQU_REQ_INTR_EN),
 	FLAG(ctrl3, PCI_SEC_LNKCTL3_PERFORM_LINK_EQU));
 

@@ -822,7 +822,7 @@ static void cap_express_link(struct device *d, int where, int type)
   printf("\t\tLnkCtl:\tASPM %s;", aspm_enabled(w & PCI_EXP_LNKCTL_ASPM));
   if ((type == PCI_EXP_TYPE_ROOT_PORT) || (type == PCI_EXP_TYPE_ENDPOINT) ||
       (type == PCI_EXP_TYPE_LEG_END) || (type == PCI_EXP_TYPE_PCI_BRIDGE))
-    printf(" RCB %d bytes", w & PCI_EXP_LNKCTL_RCB ? 128 : 64);
+    printf(" RCB %d bytes,", w & PCI_EXP_LNKCTL_RCB ? 128 : 64);
   printf(" Disabled%c CommClk%c\n\t\t\tExtSynch%c ClockPM%c AutWidDis%c BWInt%c AutBWInt%c\n",
 	FLAG(w, PCI_EXP_LNKCTL_DISABLE),
 	FLAG(w, PCI_EXP_LNKCTL_CLOCK),
@@ -1031,14 +1031,14 @@ static const char *cap_express_devcap2_tphcomp(int tph)
   switch (tph)
     {
       case 1:
-        return "TPHComp+, ExtTPHComp-";
+        return "TPHComp+ ExtTPHComp-";
       case 2:
         /* Reserved; intentionally left blank */
         return "";
       case 3:
-        return "TPHComp+, ExtTPHComp+";
+        return "TPHComp+ ExtTPHComp+";
       default:
-        return "TPHComp-, ExtTPHComp-";
+        return "TPHComp- ExtTPHComp-";
     }
 }
 
@@ -1084,12 +1084,12 @@ static void cap_express_dev2(struct device *d, int where, int type)
   int has_mem_bar = device_has_memory_space_bar(d);
 
   l = get_conf_long(d, where + PCI_EXP_DEVCAP2);
-  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c, NROPrPrP%c, LTR%c",
+  printf("\t\tDevCap2: Completion Timeout: %s, TimeoutDis%c NROPrPrP%c LTR%c",
         cap_express_dev2_timeout_range(PCI_EXP_DEV2_TIMEOUT_RANGE(l)),
         FLAG(l, PCI_EXP_DEV2_TIMEOUT_DIS),
 	FLAG(l, PCI_EXP_DEVCAP2_NROPRPRP),
         FLAG(l, PCI_EXP_DEVCAP2_LTR));
-  printf("\n\t\t\t 10BitTagComp%c, 10BitTagReq%c, OBFF %s, ExtFmt%c, EETLPPrefix%c",
+  printf("\n\t\t\t 10BitTagComp%c 10BitTagReq%c OBFF %s, ExtFmt%c EETLPPrefix%c",
         FLAG(l, PCI_EXP_DEVCAP2_10BIT_TAG_COMP),
         FLAG(l, PCI_EXP_DEVCAP2_10BIT_TAG_REQ),
         cap_express_devcap2_obff(PCI_EXP_DEVCAP2_OBFF(l)),
@@ -1108,14 +1108,14 @@ static void cap_express_dev2(struct device *d, int where, int type)
   printf("\n\t\t\t FRS%c", FLAG(l, PCI_EXP_DEVCAP2_FRS));
 
   if (type == PCI_EXP_TYPE_ROOT_PORT)
-    printf(", LN System CLS %s",
+    printf(" LN System CLS %s,",
           cap_express_devcap2_lncls(PCI_EXP_DEVCAP2_LN_CLS(l)));
 
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_ENDPOINT)
-    printf(", %s", cap_express_devcap2_tphcomp(PCI_EXP_DEVCAP2_TPH_COMP(l)));
+    printf(" %s", cap_express_devcap2_tphcomp(PCI_EXP_DEVCAP2_TPH_COMP(l)));
 
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_DOWNSTREAM)
-    printf(", ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
+    printf(" ARIFwd%c\n", FLAG(l, PCI_EXP_DEV2_ARI));
   else
     printf("\n");
   if (type == PCI_EXP_TYPE_ROOT_PORT || type == PCI_EXP_TYPE_UPSTREAM ||
@@ -1134,7 +1134,7 @@ static void cap_express_dev2(struct device *d, int where, int type)
     }
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL2);
-  printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c, LTR%c, OBFF %s",
+  printf("\t\tDevCtl2: Completion Timeout: %s, TimeoutDis%c LTR%c OBFF %s,",
 	cap_express_dev2_timeout_value(PCI_EXP_DEV2_TIMEOUT_VALUE(w)),
 	FLAG(w, PCI_EXP_DEV2_TIMEOUT_DIS),
 	FLAG(w, PCI_EXP_DEV2_LTR),
@@ -1303,8 +1303,8 @@ static void cap_express_link2(struct device *d, int where, int type)
   }
 
   w = get_conf_word(d, where + PCI_EXP_LNKSTA2);
-  printf("\t\tLnkSta2: Current De-emphasis Level: %s, EqualizationComplete%c, EqualizationPhase1%c\n"
-	"\t\t\t EqualizationPhase2%c, EqualizationPhase3%c, LinkEqualizationRequest%c\n"
+  printf("\t\tLnkSta2: Current De-emphasis Level: %s, EqualizationComplete%c EqualizationPhase1%c\n"
+	"\t\t\t EqualizationPhase2%c EqualizationPhase3%c LinkEqualizationRequest%c\n"
 	"\t\t\t Retimer%c 2Retimers%c CrosslinkRes: %s",
 	cap_express_link2_deemphasis(PCI_EXP_LINKSTA2_DEEMPHASIS(w)),
 	FLAG(w, PCI_EXP_LINKSTA2_EQU_COMP),
