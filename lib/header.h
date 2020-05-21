@@ -901,6 +901,11 @@
 #define  PCI_EXP_DEV2_OBFF(x)		(((x) >> 13) & 3) /* OBFF enabled */
 #define PCI_EXP_DEVSTA2			0x2a	/* Device Status */
 #define PCI_EXP_LNKCAP2			0x2c	/* Link Capabilities */
+#define  PCI_EXP_LNKCAP2_SPEED(x)	(((x) >> 1) & 0x7f)
+#define  PCI_EXP_LNKCAP2_CROSSLINK	0x00000100 /* Crosslink Supported */
+#define  PCI_EXP_LNKCAP2_RETIMER	0x00800000 /* Retimer Supported */
+#define  PCI_EXP_LNKCAP2_2RETIMERS	0x01000000 /* 2 Retimers Supported */
+#define  PCI_EXP_LNKCAP2_DRS		0x80000000 /* Device Readiness Status */
 #define PCI_EXP_LNKCTL2			0x30	/* Link Control */
 #define  PCI_EXP_LNKCTL2_SPEED(x)	((x) & 0xf) /* Target Link Speed */
 #define  PCI_EXP_LNKCTL2_CMPLNC		0x0010	/* Enter Compliance */
@@ -917,6 +922,11 @@
 #define  PCI_EXP_LINKSTA2_EQU_PHASE2	0x08	/* Equalization Phase 2 Successful */
 #define  PCI_EXP_LINKSTA2_EQU_PHASE3	0x10	/* Equalization Phase 3 Successful */
 #define  PCI_EXP_LINKSTA2_EQU_REQ	0x20	/* Link Equalization Request */
+#define  PCI_EXP_LINKSTA2_RETIMER	0x0040	/* Retimer Detected */
+#define  PCI_EXP_LINKSTA2_2RETIMERS	0x0080	/* 2 Retimers Detected */
+#define  PCI_EXP_LINKSTA2_CROSSLINK(x)	(((x) >> 8) & 0x3) /* Crosslink Res */
+#define  PCI_EXP_LINKSTA2_COMPONENT(x)	(((x) >> 12) & 0x7) /* Presence */
+#define  PCI_EXP_LINKSTA2_DRS_RCVD	0x8000	/* DRS Msg Received */
 #define PCI_EXP_SLTCAP2			0x34	/* Slot Capabilities */
 #define PCI_EXP_SLTCTL2			0x38	/* Slot Control */
 #define PCI_EXP_SLTSTA2			0x3a	/* Slot Status */
