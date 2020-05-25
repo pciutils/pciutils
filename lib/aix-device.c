@@ -60,9 +60,10 @@ aix_find_bus(struct pci_access *a, int bus_number)
 }
 
 static int
-aix_bus_open(struct pci_access *a, int bus_number)
+aix_bus_open(struct pci_dev *d)
 {
-  aix_pci_bus *bp = aix_find_bus(a, bus_number);
+  struct pci_access *a = d->access;
+  aix_pci_bus *bp = aix_find_bus(a, d->bus);
 
   if (bp->bus_fd < 0)
     {
@@ -72,9 +73,7 @@ aix_bus_open(struct pci_access *a, int bus_number)
       snprintf(devbuf, sizeof (devbuf), "/dev/%s", bp->bus_name);
       bp->bus_fd = open(devbuf, mode, 0);
       if (bp->bus_fd < 0)
-        {
-          a->error("aix_open_bus: %s open failed", devbuf);
-        }
+	a->error("aix_open_bus: %s open failed", devbuf);
     }
 
   return bp->bus_fd;
@@ -218,10 +217,10 @@ aix_read(struct pci_dev *d, int pos, byte *buf, int len)
   struct mdio mdio;
   int fd;
 
-  if (pos + len > 256)
+  if (d->domain || pos + len > 256)
     return 0;
 
-  fd = aix_bus_open(d->access, d->bus);
+  fd = aix_bus_open(d);
   mdio.md_addr = (ulong) pos;
   mdio.md_size = len;
   mdio.md_incr = MV_BYTE;
@@ -240,10 +239,10 @@ aix_write(struct pci_dev *d, int pos, byte *buf, int len)
   struct mdio mdio;
   int fd;
 
-  if (pos + len > 256)
+  if (d->domain || pos + len > 256)
     return 0;
 
-  fd = aix_bus_open(d->access, d->bus);
+  fd = aix_bus_open(d);
   mdio.md_addr = (ulong) pos;
   mdio.md_size = len;
   mdio.md_incr = MV_BYTE;

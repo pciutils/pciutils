@@ -1,5 +1,3 @@
-- all back-ends: fail on non-zero domain
-
 - review class names
 
 Setpci:

@@ -266,6 +266,9 @@ fbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
 
 #if __FreeBSD_version >= 700053 || defined(__DragonFly__)
   pi.pi_sel.pc_domain = d->domain;
+#else
+  if (d->domain)
+    return 0;
 #endif
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;
@@ -315,6 +318,9 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 
 #if __FreeBSD_version >= 700053 || defined(__DragonFly__)
   pi.pi_sel.pc_domain = d->domain;
+#else
+  if (d->domain)
+    return 0;
 #endif
   pi.pi_sel.pc_bus = d->bus;
   pi.pi_sel.pc_dev = d->dev;

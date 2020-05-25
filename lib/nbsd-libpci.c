@@ -71,7 +71,7 @@ nbsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (!(len == 1 || len == 2 || len == 4))
     return pci_generic_block_read(d, pos, buf, len);
 
-  if (pos >= 4096)
+  if (d->domain || pos >= 4096)
     return 0;
 
   shift = 8*(pos % 4);
@@ -104,7 +104,7 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (!(len == 1 || len == 2 || len == 4))
     return pci_generic_block_write(d, pos, buf, len);
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   /*

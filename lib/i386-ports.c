@@ -129,7 +129,7 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
   int addr = 0xcfc + (pos&3);
   int res = 1;
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   intel_io_lock();
@@ -160,7 +160,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
   int addr = 0xcfc + (pos&3);
   int res = 1;
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   intel_io_lock();
@@ -217,7 +217,7 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
   int res = 1;
   int addr = 0xc000 | (d->dev << 8) | pos;
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   if (d->dev >= 16)
@@ -252,11 +252,12 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
   int res = 1;
   int addr = 0xc000 | (d->dev << 8) | pos;
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   if (d->dev >= 16)
-    d->access->error("conf2_write: only first 16 devices exist.");
+    /* conf2 supports only 16 devices per bus */
+    return 0;
 
   intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);

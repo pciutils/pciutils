@@ -65,7 +65,7 @@ obsd_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (!(len == 1 || len == 2 || len == 4))
     return pci_generic_block_read(d, pos, buf, len);
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   pi.pi_sel.pc_bus = d->bus;
@@ -106,7 +106,7 @@ obsd_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (!(len == 1 || len == 2 || len == 4))
     return pci_generic_block_write(d, pos, buf, len);
 
-  if (pos >= 256)
+  if (d->domain || pos >= 256)
     return 0;
 
   pi.pi_sel.pc_bus = d->bus;
