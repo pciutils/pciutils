@@ -1055,7 +1055,8 @@
 /* PCIe Designated Vendor-Specific Capability */
 #define PCI_DVSEC_HEADER1	4	/* Designated Vendor-Specific Header 1 */
 #define PCI_DVSEC_HEADER2	8	/* Designated Vendor-Specific Header 2 */
-#define PCI_DVSEC_INTEL_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
+#define PCI_DVSEC_VENDOR_ID_CXL	0x1e98	/* Designated Vendor-Specific Vendor ID for CXL */
+#define PCI_DVSEC_ID_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
 
 /* PCIe CXL Designated Vendor-Specific Capabilities, Control, Status */
 #define PCI_CXL_CAP		0x0a	/* CXL Capability Register */

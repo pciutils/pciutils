@@ -679,7 +679,7 @@ cap_dvsec(struct device *d, int where)
   u16 id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
 
   printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
-  if (vendor == PCI_VENDOR_ID_INTEL && id == PCI_DVSEC_INTEL_CXL && len >= 16)
+  if (vendor == PCI_DVSEC_VENDOR_ID_CXL && id == PCI_DVSEC_ID_CXL && len >= 16)
     cap_dvsec_cxl(d, where);
   else
     printf(" <?>\n");
