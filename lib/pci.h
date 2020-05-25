@@ -126,7 +126,7 @@ struct pci_dev {
   u8 bus, dev, func;			/* Bus inside domain, device and function */
 
   /* These fields are set by pci_fill_info() */
-  int known_fields;			/* Set of info fields already known */
+  unsigned int known_fields;		/* Set of info fields already known (see pci_fill_info()) */
   u16 vendor_id, device_id;		/* Identity of the device */
   u16 device_class;			/* PCI device class */
   int irq;				/* IRQ number */
@@ -175,6 +175,16 @@ int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
  *
  * Some properties are stored directly in the pci_dev structure.
  * The remaining ones can be accessed through pci_get_string_property().
+ *
+ * pci_fill_info() returns the current value of pci_dev->known_fields.
+ * This is a bit mask of all fields, which were already obtained during
+ * the lifetime of the device. This includes fields which are not supported
+ * by the particular device -- in that case, the field is left at its default
+ * value, which is 0 for integer fields and NULL for pointers. On the other
+ * hand, we never consider known fields unsupported by the current back-end;
+ * such fields always contain the default value.
+ *
+ * XXX: flags and the result should be unsigned, but we do not want to break the ABI.
  */
 
 int pci_fill_info(struct pci_dev *, int flags) PCI_ABI;

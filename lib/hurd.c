@@ -271,82 +271,96 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 }
 
 /* Get requested info from the server */
-static int
-hurd_fill_info(struct pci_dev *d, int flags)
+
+static void
+hurd_fill_regions(struct pci_dev *d)
 {
-  int err, i;
+  mach_port_t device_port = *((mach_port_t *) d->aux);
   struct pci_bar regions[6];
+  char *buf = (char *) &regions;
+  size_t size = sizeof(regions);
+
+  int err = pci_get_dev_regions(device_port, &buf, &size);
+  if (err)
+    return;
+
+  if ((char *) &regions != buf)
+    {
+      /* Sanity check for bogus server.  */
+      if (size > sizeof(regions))
+	{
+	  vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
+	  return;
+	}
+
+      memcpy(&regions, buf, size);
+      vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
+    }
+
+  for (int i = 0; i < 6; i++)
+    {
+      if (regions[i].size == 0)
+	continue;
+
+      d->base_addr[i] = regions[i].base_addr;
+      d->base_addr[i] |= regions[i].is_IO;
+      d->base_addr[i] |= regions[i].is_64 << 2;
+      d->base_addr[i] |= regions[i].is_prefetchable << 3;
+
+      if (flags & PCI_FILL_SIZES)
+	d->size[i] = regions[i].size;
+    }
+}
+
+static void
+hurd_fill_rom(struct pci_dev *d)
+{
   struct pci_xrom_bar rom;
-  size_t size;
-  char *buf;
-  mach_port_t device_port;
+  mach_port_t device_port = *((mach_port_t *) d->aux);
+  char *buf = (char *) &rom;
+  size_t size = sizeof(rom);
 
-  device_port = *((mach_port_t *) d->aux);
+  int err = pci_get_dev_rom(device_port, &buf, &size);
+  if (err)
+    return;
 
-  if (flags & PCI_FILL_BASES)
+  if ((char *) &rom != buf)
     {
-      buf = (char *) &regions;
-      size = sizeof(regions);
-
-      err = pci_get_dev_regions(device_port, &buf, &size);
-      if (err)
-	return err;
-
-      if ((char *) &regions != buf)
+      /* Sanity check for bogus server.  */
+      if (size > sizeof(rom))
 	{
-	  /* Sanity check for bogus server.  */
-	  if (size > sizeof(regions))
-	    {
-	      vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
-	      return EGRATUITOUS;
-	    }
-
-	  memcpy(&regions, buf, size);
 	  vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
+	  return;
 	}
 
-      for (i = 0; i < 6; i++)
+      memcpy(&rom, buf, size);
+      vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
+    }
+
+  d->rom_base_addr = rom.base_addr;
+  d->rom_size = rom.size;
+}
+
+static unsigned int
+hurd_fill_info(struct pci_dev *d, unsigned int flags)
+{
+  unsigned int done = 0;
+
+  if (!d->access->buscentric)
+    {
+      if (flags & (PCI_FILL_BASES | PCI_FILL_SIZES))
 	{
-	  if (regions[i].size == 0)
-	    continue;
-
-	  d->base_addr[i] = regions[i].base_addr;
-	  d->base_addr[i] |= regions[i].is_IO;
-	  d->base_addr[i] |= regions[i].is_64 << 2;
-	  d->base_addr[i] |= regions[i].is_prefetchable << 3;
-
-	  if (flags & PCI_FILL_SIZES)
-	    d->size[i] = regions[i].size;
+	  hurd_fill_regions(d);
+	  done |= PCI_FILL_BASES | PCI_FILL_SIZES;
+	}
+      if (flags & PCI_FILL_ROM_BASE)
+	{
+	  hurd_fill_rom(d);
+	  done |= PCI_FILL_ROM_BASE;
 	}
     }
 
-  if (flags & PCI_FILL_ROM_BASE)
-    {
-      /* Get rom info */
-      buf = (char *) &rom;
-      size = sizeof(rom);
-      err = pci_get_dev_rom(device_port, &buf, &size);
-      if (err)
-	return err;
-
-      if ((char *) &rom != buf)
-	{
-	  /* Sanity check for bogus server.  */
-	  if (size > sizeof(rom))
-	    {
-	      vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
-	      return EGRATUITOUS;
-	    }
-
-	  memcpy(&rom, buf, size);
-	  vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
-	}
-
-      d->rom_base_addr = rom.base_addr;
-      d->rom_size = rom.size;
-    }
-
-  return pci_generic_fill_info(d, flags);
+  return done | pci_generic_fill_info(d, flags & ~done);
 }
 
 struct pci_methods pm_hurd = {

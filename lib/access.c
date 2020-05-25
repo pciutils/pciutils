@@ -191,12 +191,13 @@ pci_reset_properties(struct pci_dev *d)
 int
 pci_fill_info_v35(struct pci_dev *d, int flags)
 {
-  if (flags & PCI_FILL_RESCAN)
+  unsigned int uflags = flags;
+  if (uflags & PCI_FILL_RESCAN)
     {
-      flags &= ~PCI_FILL_RESCAN;
+      uflags &= ~PCI_FILL_RESCAN;
       pci_reset_properties(d);
     }
-  if (flags & ~d->known_fields)
+  if (uflags & ~d->known_fields)
     d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
   return d->known_fields;
 }

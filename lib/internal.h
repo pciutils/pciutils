@@ -41,7 +41,7 @@ struct pci_methods {
   void (*init)(struct pci_access *);
   void (*cleanup)(struct pci_access *);
   void (*scan)(struct pci_access *);
-  int (*fill_info)(struct pci_dev *, int flags);
+  unsigned int (*fill_info)(struct pci_dev *, unsigned int flags);
   int (*read)(struct pci_dev *, int pos, byte *buf, int len);
   int (*write)(struct pci_dev *, int pos, byte *buf, int len);
   int (*read_vpd)(struct pci_dev *, int pos, byte *buf, int len);
@@ -52,7 +52,7 @@ struct pci_methods {
 /* generic.c */
 void pci_generic_scan_bus(struct pci_access *, byte *busmap, int bus);
 void pci_generic_scan(struct pci_access *);
-int pci_generic_fill_info(struct pci_dev *, int flags);
+unsigned int pci_generic_fill_info(struct pci_dev *, unsigned int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
 int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 
