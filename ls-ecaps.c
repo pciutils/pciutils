@@ -875,13 +875,13 @@ static void
 cap_rebar(struct device *d, int where, int virtual)
 {
   u32 sizes_buffer, control_buffer, ext_sizes, current_size;
-  u16 bar_index, barcount, data_count;
-  // If structure exists at least one bar is defined
+  u16 bar_index, barcount, i;
+  // If the structure exists, at least one bar is defined
   u16 num_bars = 1;
 
   printf("%s Resizable BAR\n", (virtual) ? "Virtual" : "Physical");
 
-  if (verbose < 1)
+  if (verbose < 2)
     return;
 
   // Go through all defined BAR definitions of the caps, at minimum 1
@@ -898,80 +898,41 @@ cap_rebar(struct device *d, int where, int virtual)
         }
 
       sizes_buffer = get_conf_long(d, where) >> 4;
-
       where += 4;
-
       control_buffer = get_conf_long(d, where);
 
-      bar_index  = control_buffer & 0x07;
-      current_size = (control_buffer >> 8) & 0x3f;
-      ext_sizes = control_buffer >> 16;
+      bar_index  = BITS(control_buffer, 0, 3);
+      current_size = BITS(control_buffer, 8, 6);
+      ext_sizes = BITS(control_buffer, 16, 16);
 
       if (barcount == 0)
         {
           // Only index 0 controlreg has the num_bar count definition
-          num_bars = (control_buffer >> 5)  & 0x07;
-          if (verbose == 1)
-            {
-              // Must be below or equal 6
-              if (num_bars <= 6)
-                {
-                  // Fewer resizable BARs than total supported BARs may be available,
-                  // or the resizable BAR support may not start at BAR index 0.
-                  // list how many resizable BARs are expected.
-                  printf("\t\t%d resizable BAR%s available\n", num_bars, (num_bars == 1) ? "" : "s");
-                }
-            }
-            // If num_bars value is outside of the supported range, exit the parsing loop
-            if (num_bars > 6)
-              {
-                printf("\t\t<error in resizable BAR # value: %d is out of specification>", num_bars);
-                break;
-              }
+          num_bars = BITS(control_buffer, 5, 3);
+	  if (num_bars < 1 || num_bars > 6)
+	    {
+	      printf("\t\t<error in resizable BAR: num_bars=%d is out of specification>\n", num_bars);
+	      break;
+	    }
         }
 
       // Resizable BAR list entry have an arbitrary index and current size
-      printf("\t\tBAR %d, current size:", bar_index);
+      printf("\t\tBAR %d: current size:", bar_index);
       print_rebar_range_size(current_size);
 
-      // Only print out the detail BAR sizes if vv is defined. Function modifies caps bits
-      // to enumerate supported sizes, ext_sizes is only != 0 for devices with
-      // extended resizable BAR capability, e.g. when > 128TB is needed
+      if (sizes_buffer || ext_sizes)
+	{
+	  printf(", supported:");
 
-      if ((verbose < 2) ||
-	  ((sizes_buffer == 0) && (ext_sizes == 0)))
-        {
-          printf("\n");
-          continue;
-        }
+	  for (i=0; i<28; i++)
+	    if (sizes_buffer & (1U << i))
+	      print_rebar_range_size(i);
 
-      printf("\n\t\tsupported:");
+	  for (i=0; i<16; i++)
+	    if (ext_sizes & (1U << i))
+	      print_rebar_range_size(i + 28);
+	}
 
-      for (data_count = 0; data_count < 28; data_count++)
-        {
-          if ((sizes_buffer & (1U << data_count)) != 0)
-            {
-	      // Mark the supported size as processed
-              sizes_buffer &= ~(1U << data_count);
-              print_rebar_range_size(data_count);
-            }
-        }
-
-      // If a device needs > 128TB BAR, extended Resizable BAR feature is active and
-      // ext_sizes is set. This is not common.
-
-      if (ext_sizes != 0)
-        {
-          for (data_count = 0; data_count < 16; data_count++)
-            {
-              if ((ext_sizes & (1U << data_count)) != 0)
-                {
-                  // Mark the supported size as processed
-                  ext_sizes &= ~(1U << data_count);
-                  print_rebar_range_size((data_count + 28));
-                }
-            }
-        }
       printf("\n");
     }
 }
