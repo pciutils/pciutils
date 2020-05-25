@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Extended Capabilities
  *
- *	Copyright (c) 1997--2010 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -635,11 +635,11 @@ cap_rclink(struct device *d, int where)
 }
 
 static void
-cap_cxl(struct device *d, int where)
+cap_dvsec_cxl(struct device *d, int where)
 {
   u16 l;
 
-  printf("CXL Designated Vendor-Specific:\n");
+  printf(": CXL\n");
   if (verbose < 2)
     return;
 
@@ -661,51 +661,28 @@ cap_cxl(struct device *d, int where)
   printf("\t\tCXLSta:\tViral%c\n", FLAG(l, PCI_CXL_STATUS_VIRAL));
 }
 
-static int
-is_cxl_cap(struct device *d, int where)
-{
-  u32 hdr;
-  u16 w;
-
-  if (!config_fetch(d, where + PCI_DVSEC_HEADER1, 8))
-    return 0;
-
-  /* Check for supported Vendor */
-  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
-  w = BITS(hdr, 0, 16);
-  if (w != PCI_VENDOR_ID_INTEL)
-    return 0;
-
-  /* Check for Designated Vendor-Specific ID */
-  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER2);
-  w = BITS(hdr, 0, 16);
-  if (w == PCI_DVSEC_INTEL_CXL)
-    return 1;
-
-  return 0;
-}
-
 static void
 cap_dvsec(struct device *d, int where)
 {
-  u32 hdr;
-
-  printf("Designated Vendor-Specific:\n");
+  printf("Designated Vendor-Specific: ");
   if (!config_fetch(d, where + PCI_DVSEC_HEADER1, 8))
     {
       printf("<unreadable>\n");
       return;
     }
 
-  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
-  printf("\t\tDVSEC Vendor ID=%04x Rev=%d Len=%03x <?>\n",
-    BITS(hdr, 0, 16),
-    BITS(hdr, 16, 4),
-    BITS(hdr, 20, 12));
+  u32 hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
+  u16 vendor = BITS(hdr, 0, 16);
+  byte rev = BITS(hdr, 16, 4);
+  u16 len = BITS(hdr, 20, 12);
 
-  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER2);
-  printf("\t\tDVSEC ID=%04x <?>\n",
-    BITS(hdr, 0, 16));
+  u16 id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
+
+  printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
+  if (vendor == PCI_VENDOR_ID_INTEL && id == PCI_DVSEC_INTEL_CXL && len >= 16)
+    cap_dvsec_cxl(d, where);
+  else
+    printf(" <?>\n");
 }
 
 static void
@@ -998,10 +975,7 @@ show_ext_caps(struct device *d, int type)
 	    printf("Readiness Time Reporting <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_DVSEC:
-	    if (is_cxl_cap(d, where))
-	      cap_cxl(d, where);
-	    else
-	      cap_dvsec(d, where);
+	    cap_dvsec(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_VF_REBAR:
 	    printf("VF Resizable BAR <?>\n");
