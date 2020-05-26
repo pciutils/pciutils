@@ -362,6 +362,7 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
           pci_set_property(d, PCI_FILL_IOMMU_GROUP, basename(group_link));
           free(group_link);
         }
+      done |= PCI_FILL_IOMMU_GROUP;
     }
 
   if (flags & PCI_FILL_DT_NODE)
