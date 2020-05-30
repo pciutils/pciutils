@@ -28,7 +28,7 @@ sub new($$) {
 		"LSMDATE" => `date '+%y%m%d' | tr -d '\n'`,
 		"distfiles" => [
 			],
-		"archivedir" => $ENV{HOME} . "archives/sw/$basename",
+		"archivedir" => $ENV{HOME} . "/archives/sw/$basename",
 		"uploads" => [
 			],
 		# Options
