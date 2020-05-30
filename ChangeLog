@@ -1,3 +1,35 @@
+2020-05-31  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.7.0.
+
+	* Added or improved the following capabilities: Designated Vendor-Specific,
+	  Compute eXpress Link, Resizable BARs, VF Resizable BARs, Link
+	  Capabilities 2, Link Status 2.
+
+	* On Linux, lspci can show IOMMU groups.
+
+	* setpci can be asked to skip bus scan and operate on a device
+	  completely specified by its domain/bus/dev/func address. This
+	  involved major internal cleanup.
+
+	* The above feature of setpci uses the pci_get_dev() function,
+	  which obtains a struct pci_dev without doing a bus scan. This was
+	  always possible, but apparently little used, because back-ends
+	  frequently choked when operating on such devices. Fixed a lot
+	  of minor bugs related to this.
+
+	* Also, back-ends which do not support domains now correctly fail when
+	  trying to access devices outside domain 0.
+
+	* Semantics of pci_fill_info() and pci_dev->known_fields was underspecified,
+	  which lead to inconsistencies between back-ends. Improved documentation
+	  to give a more precise definition and updated all back-ends to conform
+	  to it. Most importantly, pci_dev->known_fields shows all fields requested
+	  over the lifetime of the pci_dev, but never those which are not supported
+	  by the back-end.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2020-01-25  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.6.4.
