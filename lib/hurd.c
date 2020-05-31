@@ -102,6 +102,9 @@ device_port_lookup(struct pci_dev *d)
     FILE_CONFIG_NAME);
   device_port = file_name_lookup(server, 0, 0);
 
+  if (device_port == MACH_PORT_NULL)
+    a->error("Cannot find the PCI arbiter");
+
   *((mach_port_t *) d->aux) = device_port;
   return device_port;
 }
@@ -189,15 +192,6 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  d->dev = dev;
 	  d->func = func;
 
-	  /* Get the arbiter port */
-	  if (device_port_lookup(d) == MACH_PORT_NULL)
-	    {
-	      if (closedir(dir) < 0)
-		a->warning("Cannot close directory: %s (%s)", parent,
-			   strerror(errno));
-	      a->error("Cannot find the PCI arbiter");
-	    }
-
 	  pci_link_dev(a, d);
 
 	  vd = pci_read_long(d, PCI_VENDOR_ID);
@@ -232,14 +226,10 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   int err;
   size_t nread;
   char *data;
-  mach_port_t device_port;
+  mach_port_t device_port = device_port_lookup(d);
 
   if (len > 4)
     return pci_generic_block_read(d, pos, buf, nread);
-
-  device_port = device_port_lookup(d);
-  if (device_port == MACH_PORT_NULL)
-    d->access->error("Cannot find the PCI arbiter");
 
   data = (char *) buf;
   nread = len;
@@ -270,14 +260,10 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 {
   int err;
   size_t nwrote;
-  mach_port_t device_port;
+  mach_port_t device_port = device_port_lookup(d);
 
   if (len > 4)
     return pci_generic_block_write(d, pos, buf, len);
-
-  device_port = device_port_lookup(d);
-  if (device_port == MACH_PORT_NULL)
-    d->access->error("Cannot find the PCI arbiter");
 
   nwrote = len;
   err = pci_conf_write(device_port, pos, (char *) buf, len, &nwrote);
@@ -290,7 +276,7 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 static void
 hurd_fill_regions(struct pci_dev *d)
 {
-  mach_port_t device_port = *((mach_port_t *) d->aux);
+  mach_port_t device_port = device_port_lookup(d);
   struct pci_bar regions[6];
   char *buf = (char *) &regions;
   size_t size = sizeof(regions);
@@ -330,7 +316,7 @@ static void
 hurd_fill_rom(struct pci_dev *d)
 {
   struct pci_xrom_bar rom;
-  mach_port_t device_port = *((mach_port_t *) d->aux);
+  mach_port_t device_port = device_port_lookup(d);
   char *buf = (char *) &rom;
   size_t size = sizeof(rom);
 
