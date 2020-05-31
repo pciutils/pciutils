@@ -88,20 +88,22 @@ hurd_cleanup_dev(struct pci_dev *d)
   pci_mfree(d->aux);
 }
 
-static int
+static mach_port_t
 device_port_lookup(struct pci_dev *d)
 {
-  mach_port_t device_port;
   char server[NAME_MAX];
+  mach_port_t device_port = *((mach_port_t *) d->aux);
+
+  if (device_port != MACH_PORT_NULL)
+    return device_port;
 
   snprintf(server, NAME_MAX, "%s/%04x/%02x/%02x/%01u/%s",
-     _SERVERS_BUS_PCI, d->domain, d->bus, d->dev, d->func,
-     FILE_CONFIG_NAME);
+    _SERVERS_BUS_PCI, d->domain, d->bus, d->dev, d->func,
+    FILE_CONFIG_NAME);
   device_port = file_name_lookup(server, 0, 0);
 
   *((mach_port_t *) d->aux) = device_port;
-
-  return d->aux != MACH_PORT_NULL;
+  return device_port;
 }
 
 /* Walk through the FS tree to see what is allowed for us */
@@ -188,7 +190,7 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  d->func = func;
 
 	  /* Get the arbiter port */
-	  if (!device_port_lookup(d))
+	  if (device_port_lookup(d) == MACH_PORT_NULL)
 	    {
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
@@ -233,15 +235,9 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nread = len;
-  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
-    {
-      /* We still don't have the port for this device */
-      if (device_port_lookup(d))
-	{
-	  d->access->error("Cannot find the PCI arbiter");
-	}
-    }
-  device_port = *((mach_port_t *) d->aux);
+  device_port = device_port_lookup(d);
+  if (device_port == MACH_PORT_NULL)
+    d->access->error("Cannot find the PCI arbiter");
 
   if (len > 4)
     err = !pci_generic_block_read(d, pos, buf, nread);
@@ -281,15 +277,9 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nwrote = len;
-  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
-    {
-      /* We still don't have the port for this device */
-      if (device_port_lookup(d))
-	{
-	  d->access->error("Cannot find the PCI arbiter");
-	}
-    }
-  device_port = *((mach_port_t *) d->aux);
+  device_port = device_port_lookup(d);
+  if (device_port == MACH_PORT_NULL)
+    d->access->error("Cannot find the PCI arbiter");
 
   if (len > 4)
     err = !pci_generic_block_write(d, pos, buf, len);
