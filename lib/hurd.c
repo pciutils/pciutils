@@ -234,34 +234,30 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   char *data;
   mach_port_t device_port;
 
-  nread = len;
+  if (len > 4)
+    return pci_generic_block_read(d, pos, buf, nread);
+
   device_port = device_port_lookup(d);
   if (device_port == MACH_PORT_NULL)
     d->access->error("Cannot find the PCI arbiter");
 
-  if (len > 4)
-    err = !pci_generic_block_read(d, pos, buf, nread);
-  else
+  data = (char *) buf;
+  nread = len;
+  err = pci_conf_read(device_port, pos, &data, &nread, len);
+
+  if (data != (char *) buf)
     {
-      data = (char *) buf;
-      err = pci_conf_read(device_port, pos, &data, &nread, len);
-
-      if (data != (char *) buf)
+      if (nread > (size_t) len)	/* Sanity check for bogus server.  */
 	{
-	  if (nread > (size_t) len)	/* Sanity check for bogus server.  */
-	    {
-	      vm_deallocate(mach_task_self(), (vm_address_t) data, nread);
-	      return 0;
-	    }
-
-	  memcpy(buf, data, nread);
 	  vm_deallocate(mach_task_self(), (vm_address_t) data, nread);
+	  return 0;
 	}
-    }
-  if (err)
-    return 0;
 
-  return nread == (size_t) len;
+      memcpy(buf, data, nread);
+      vm_deallocate(mach_task_self(), (vm_address_t) data, nread);
+    }
+
+  return !err && nread == (size_t) len;
 }
 
 /*
@@ -276,19 +272,17 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   size_t nwrote;
   mach_port_t device_port;
 
-  nwrote = len;
+  if (len > 4)
+    return pci_generic_block_write(d, pos, buf, len);
+
   device_port = device_port_lookup(d);
   if (device_port == MACH_PORT_NULL)
     d->access->error("Cannot find the PCI arbiter");
 
-  if (len > 4)
-    err = !pci_generic_block_write(d, pos, buf, len);
-  else
-    err = pci_conf_write(device_port, pos, (char *) buf, len, &nwrote);
-  if (err)
-    return 0;
+  nwrote = len;
+  err = pci_conf_write(device_port, pos, (char *) buf, len, &nwrote);
 
-  return nwrote == (size_t) len;
+  return !err && nwrote == (size_t) len;
 }
 
 /* Get requested info from the server */
