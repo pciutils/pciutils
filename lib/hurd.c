@@ -73,6 +73,7 @@ static void
 hurd_init_dev(struct pci_dev *d)
 {
   d->aux = pci_malloc(d->access, sizeof(mach_port_t));
+  *((mach_port_t *) d->aux) = MACH_PORT_NULL;
 }
 
 /* Deallocate the port and free its space */
@@ -87,6 +88,22 @@ hurd_cleanup_dev(struct pci_dev *d)
   pci_mfree(d->aux);
 }
 
+static int
+device_port_lookup(struct pci_dev *d)
+{
+  mach_port_t device_port;
+  char server[NAME_MAX];
+
+  snprintf(server, NAME_MAX, "%s/%04x/%02x/%02x/%01u/%s",
+     _SERVERS_BUS_PCI, d->domain, d->bus, d->dev, d->func,
+     FILE_CONFIG_NAME);
+  device_port = file_name_lookup(server, 0, 0);
+
+  *((mach_port_t *) d->aux) = device_port;
+
+  return d->aux != MACH_PORT_NULL;
+}
+
 /* Walk through the FS tree to see what is allowed for us */
 static void
 enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
@@ -96,10 +113,8 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
   DIR *dir;
   struct dirent *entry;
   char path[NAME_MAX];
-  char server[NAME_MAX];
   uint32_t vd;
   uint8_t ht;
-  mach_port_t device_port;
   struct pci_dev *d;
 
   dir = opendir(parent);
@@ -128,8 +143,8 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
 			   strerror(errno));
-	      a->error("Wrong directory name: %s (number expected) probably \
-                not connected to an arbiter", entry->d_name);
+	      a->error("Wrong directory name: %s (number expected) probably "
+		       "not connected to an arbiter", entry->d_name);
 	    }
 
 	  /*
@@ -154,8 +169,7 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
 			   strerror(errno));
-	      a->error("Wrong directory tree, probably not connected \
-                to an arbiter");
+	      a->error("Wrong directory tree, probably not connected to an arbiter");
 	    }
 
 	  enum_devices(path, a, domain, bus, dev, func, lev + 1);
@@ -167,22 +181,21 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	    continue;
 
 	  /* We found an available virtual device, add it to our list */
-	  snprintf(server, NAME_MAX, "%s/%04x/%02x/%02x/%01u/%s",
-		   _SERVERS_BUS_PCI, domain, bus, dev, func, entry->d_name);
-	  device_port = file_name_lookup(server, 0, 0);
-	  if (device_port == MACH_PORT_NULL)
+	  d = pci_alloc_dev(a);
+	  d->domain = domain;
+	  d->bus = bus;
+	  d->dev = dev;
+	  d->func = func;
+
+	  /* Get the arbiter port */
+	  if (!device_port_lookup(d))
 	    {
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
 			   strerror(errno));
-	      a->error("Cannot open %s", server);
+	      a->error("Cannot find the PCI arbiter");
 	    }
 
-	  d = pci_alloc_dev(a);
-	  *((mach_port_t *) d->aux) = device_port;
-	  d->bus = bus;
-	  d->dev = dev;
-	  d->func = func;
 	  pci_link_dev(a, d);
 
 	  vd = pci_read_long(d, PCI_VENDOR_ID);
@@ -220,7 +233,16 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nread = len;
+  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
+    {
+      /* We still don't have the port for this device */
+      if (device_port_lookup(d))
+	{
+	  d->access->error("Cannot find the PCI arbiter");
+	}
+    }
   device_port = *((mach_port_t *) d->aux);
+
   if (len > 4)
     err = !pci_generic_block_read(d, pos, buf, nread);
   else
@@ -259,7 +281,16 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nwrote = len;
+  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
+    {
+      /* We still don't have the port for this device */
+      if (device_port_lookup(d))
+	{
+	  d->access->error("Cannot find the PCI arbiter");
+	}
+    }
   device_port = *((mach_port_t *) d->aux);
+
   if (len > 4)
     err = !pci_generic_block_write(d, pos, buf, len);
   else
