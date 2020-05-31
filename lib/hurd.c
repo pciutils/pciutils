@@ -73,7 +73,7 @@ static void
 hurd_init_dev(struct pci_dev *d)
 {
   d->aux = pci_malloc(d->access, sizeof(mach_port_t));
-  *((mach_port_t *) d->aux) = 0;
+  *((mach_port_t *) d->aux) = MACH_PORT_NULL;
 }
 
 /* Deallocate the port and free its space */
@@ -232,7 +232,7 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nread = len;
-  if (*((mach_port_t *) d->aux) == 0)
+  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
     {
       /* We still don't have the port for this device */
       device_port_lookup(d);
@@ -281,7 +281,7 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port;
 
   nwrote = len;
-  if (*((mach_port_t *) d->aux) == 0)
+  if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
     {
       /* We still don't have the port for this device */
       device_port_lookup(d);
