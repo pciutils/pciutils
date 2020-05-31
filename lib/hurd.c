@@ -141,8 +141,8 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
 			   strerror(errno));
-	      a->error("Wrong directory name: %s (number expected) probably \
-		       not connected to an arbiter", entry->d_name);
+	      a->error("Wrong directory name: %s (number expected) probably "
+		       "not connected to an arbiter", entry->d_name);
 	    }
 
 	  /*
@@ -167,8 +167,7 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
 			   strerror(errno));
-	      a->error("Wrong directory tree, probably not connected \
-		       to an arbiter");
+	      a->error("Wrong directory tree, probably not connected to an arbiter");
 	    }
 
 	  enum_devices(path, a, domain, bus, dev, func, lev + 1);
