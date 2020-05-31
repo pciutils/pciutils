@@ -118,8 +118,6 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
   DIR *dir;
   struct dirent *entry;
   char path[NAME_MAX];
-  uint32_t vd;
-  uint8_t ht;
   struct pci_dev *d;
 
   dir = opendir(parent);
@@ -191,16 +189,7 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  d->bus = bus;
 	  d->dev = dev;
 	  d->func = func;
-
 	  pci_link_dev(a, d);
-
-	  vd = pci_read_long(d, PCI_VENDOR_ID);
-	  ht = pci_read_byte(d, PCI_HEADER_TYPE);
-
-	  d->vendor_id = vd & 0xffff;
-	  d->device_id = vd >> 16U;
-	  d->known_fields = PCI_FILL_IDENT;
-	  d->hdrtype = ht;
 	}
     }
 
