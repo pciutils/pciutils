@@ -307,8 +307,7 @@ hurd_fill_regions(struct pci_dev *d)
       d->base_addr[i] |= regions[i].is_64 << 2;
       d->base_addr[i] |= regions[i].is_prefetchable << 3;
 
-      if (flags & PCI_FILL_SIZES)
-	d->size[i] = regions[i].size;
+      d->size[i] = regions[i].size;
     }
 }
 
