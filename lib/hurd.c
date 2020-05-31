@@ -88,7 +88,7 @@ hurd_cleanup_dev(struct pci_dev *d)
   pci_mfree(d->aux);
 }
 
-static void
+static int
 device_port_lookup(struct pci_dev *d)
 {
   mach_port_t device_port;
@@ -100,6 +100,8 @@ device_port_lookup(struct pci_dev *d)
   device_port = file_name_lookup(server, 0, 0);
 
   *((mach_port_t *) d->aux) = device_port;
+
+  return d->aux != MACH_PORT_NULL;
 }
 
 /* Walk through the FS tree to see what is allowed for us */
@@ -186,8 +188,7 @@ enum_devices(const char *parent, struct pci_access *a, int domain, int bus,
 	  d->func = func;
 
 	  /* Get the arbiter port */
-	  device_port_lookup(d);
-	  if (d->aux == MACH_PORT_NULL)
+	  if (!device_port_lookup(d))
 	    {
 	      if (closedir(dir) < 0)
 		a->warning("Cannot close directory: %s (%s)", parent,
@@ -235,8 +236,7 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
     {
       /* We still don't have the port for this device */
-      device_port_lookup(d);
-      if (d->aux == MACH_PORT_NULL)
+      if (device_port_lookup(d))
 	{
 	  d->access->error("Cannot find the PCI arbiter");
 	}
@@ -284,8 +284,7 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   if (*((mach_port_t *) d->aux) == MACH_PORT_NULL)
     {
       /* We still don't have the port for this device */
-      device_port_lookup(d);
-      if (d->aux == MACH_PORT_NULL)
+      if (device_port_lookup(d))
 	{
 	  d->access->error("Cannot find the PCI arbiter");
 	}
