@@ -103,7 +103,7 @@ device_port_lookup(struct pci_dev *d)
   device_port = file_name_lookup(server, 0, 0);
 
   if (device_port == MACH_PORT_NULL)
-    a->error("Cannot find the PCI arbiter");
+    d->access->error("Cannot find the PCI arbiter");
 
   *((mach_port_t *) d->aux) = device_port;
   return device_port;
@@ -218,10 +218,9 @@ hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
   mach_port_t device_port = device_port_lookup(d);
 
   if (len > 4)
-    return pci_generic_block_read(d, pos, buf, nread);
+    return pci_generic_block_read(d, pos, buf, len);
 
   data = (char *) buf;
-  nread = len;
   err = pci_conf_read(device_port, pos, &data, &nread, len);
 
   if (data != (char *) buf)
@@ -254,7 +253,6 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
   if (len > 4)
     return pci_generic_block_write(d, pos, buf, len);
 
-  nwrote = len;
   err = pci_conf_write(device_port, pos, (char *) buf, len, &nwrote);
 
   return !err && nwrote == (size_t) len;
