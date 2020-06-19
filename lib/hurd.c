@@ -261,7 +261,7 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 /* Get requested info from the server */
 
 static void
-hurd_fill_regions(struct pci_dev *d)
+hurd_fill_regions(struct pci_dev *d, unsigned int flags)
 {
   mach_port_t device_port = device_port_lookup(d);
   struct pci_bar regions[6];
@@ -337,7 +337,7 @@ hurd_fill_info(struct pci_dev *d, unsigned int flags)
     {
       if (flags & (PCI_FILL_BASES | PCI_FILL_SIZES))
 	{
-	  hurd_fill_regions(d);
+	  hurd_fill_regions(d, flags);
 	  done |= PCI_FILL_BASES | PCI_FILL_SIZES;
 	}
       if (flags & PCI_FILL_ROM_BASE)
