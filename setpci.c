@@ -350,7 +350,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x20004,	0, 0, "ECAP_PB" },
   { 0x20005,	0, 0, "ECAP_RCLINK" },
   { 0x20006,	0, 0, "ECAP_RCILINK" },
-  { 0x20007,	0, 0, "ECAP_RCECOLL" },
+  { 0x20007,	0, 0, "ECAP_RCEC" },
   { 0x20008,	0, 0, "ECAP_MFVC" },
   { 0x20009,	0, 0, "ECAP_VC2" },
   { 0x2000a,	0, 0, "ECAP_RBCB" },

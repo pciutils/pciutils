@@ -219,7 +219,7 @@
 #define PCI_EXT_CAP_ID_PB	0x04	/* Power Budgeting */
 #define PCI_EXT_CAP_ID_RCLINK	0x05	/* Root Complex Link Declaration */
 #define PCI_EXT_CAP_ID_RCILINK	0x06	/* Root Complex Internal Link Declaration */
-#define PCI_EXT_CAP_ID_RCECOLL	0x07	/* Root Complex Event Collector */
+#define PCI_EXT_CAP_ID_RCEC	0x07	/* Root Complex Event Collector */
 #define PCI_EXT_CAP_ID_MFVC	0x08	/* Multi-Function Virtual Channel */
 #define PCI_EXT_CAP_ID_VC2	0x09	/* Virtual Channel (2nd ID) */
 #define PCI_EXT_CAP_ID_RCRB	0x0a	/* Root Complex Register Block */
@@ -1047,6 +1047,12 @@
 #define  PCI_RCLINK_LINK_DESC	0	/* Link Entry: Description */
 #define  PCI_RCLINK_LINK_ADDR	8	/* Link Entry: Address (64-bit) */
 #define  PCI_RCLINK_LINK_SIZE	16	/* Link Entry: sizeof */
+
+/* Root Complex Event Collector Endpoint Association */
+#define  PCI_RCEC_EP_CAP_VER(reg)	(((reg) >> 16) & 0xf)
+#define  PCI_RCEC_BUSN_REG_VER	0x02	/* as per PCIe sec 7.9.10.1 */
+#define  PCI_RCEC_RCIEP_BMAP	0x0004	/* as per PCIe sec 7.9.10.2 */
+#define  PCI_RCEC_BUSN_REG	0x0008	/* as per PCIe sec 7.9.10.3 */
 
 /* PCIe Vendor-Specific Capability */
 #define PCI_EVNDR_HEADER	4	/* Vendor-Specific Header */

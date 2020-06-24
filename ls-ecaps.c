@@ -635,6 +635,61 @@ cap_rclink(struct device *d, int where)
 }
 
 static void
+cap_rcec(struct device *d, int where)
+{
+  printf("Root Complex Event Collector Endpoint Association\n");
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where, 12))
+    return;
+
+  u32 hdr = get_conf_long(d, where);
+  byte cap_ver = PCI_RCEC_EP_CAP_VER(hdr);
+  u32 bmap = get_conf_long(d, where + PCI_RCEC_RCIEP_BMAP);
+  printf("\t\tRCiEPBitmap: ");
+  if (bmap)
+    {
+      int prevmatched=0;
+      int adjcount=0;
+      int prevdev=0;
+      printf("RCiEP at Device(s):");
+      for (int dev=0; dev < 32; dev++)
+        {
+	  if (BITS(bmap, dev, 1))
+	    {
+	      if (!adjcount)
+	        printf("%s %u", (prevmatched) ? "," : "", dev);
+	      adjcount++;
+	      prevdev=dev;
+	      prevmatched=1;
+            }
+	  else
+	    {
+	      if (adjcount > 1)
+	        printf("-%u", prevdev);
+	      adjcount=0;
+            }
+        }
+   }
+  else
+    printf("%s", (verbose > 2) ? "00000000 [none]" : "[none]");
+  printf("\n");
+
+  if (cap_ver < PCI_RCEC_BUSN_REG_VER)
+    return;
+
+  u32 busn = get_conf_long(d, where + PCI_RCEC_BUSN_REG);
+  u8 lastbusn = BITS(busn, 16, 8);
+  u8 nextbusn = BITS(busn, 8, 8);
+
+  if ((lastbusn == 0x00) && (nextbusn == 0xff))
+    printf("\t\tAssociatedBusNumbers: %s\n", (verbose > 2) ? "ff-00 [none]" : "[none]");
+  else
+    printf("\t\tAssociatedBusNumbers: %02x-%02x\n", nextbusn, lastbusn );
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int where)
 {
   u16 l;
@@ -991,8 +1046,8 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_RCILINK:
 	    printf("Root Complex Internal Link <?>\n");
 	    break;
-	  case PCI_EXT_CAP_ID_RCECOLL:
-	    printf("Root Complex Event Collector <?>\n");
+	  case PCI_EXT_CAP_ID_RCEC:
+	    cap_rcec(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_MFVC:
 	    printf("Multi-Function Virtual Channel <?>\n");
