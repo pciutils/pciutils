@@ -701,7 +701,7 @@ cap_dvsec_cxl(struct device *d, int id, int where)
   if (id != 0)
     return;
 
-  if (!config_fetch(d, where + PCI_CXL_CAP, 12))
+  if (!config_fetch(d, where + PCI_CXL_CAP, 0x38 - 0xa))
     return;
 
   w = get_conf_word(d, where + PCI_CXL_CAP);
