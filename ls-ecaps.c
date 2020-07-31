@@ -690,18 +690,12 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
-cap_dvsec_cxl(struct device *d, int id, int where)
+dvsec_cxl_device(struct device *d, int where, int rev)
 {
   u16 w;
 
-  printf(": CXL\n");
-  if (verbose < 2)
-    return;
-
-  if (id != 0)
-    return;
-
-  if (!config_fetch(d, where + PCI_CXL_CAP, PCI_CXL_DEV_LEN - PCI_CXL_CAP))
+  /* Legacy 1.1 revs aren't handled */
+  if (rev < 1)
     return;
 
   w = get_conf_word(d, where + PCI_CXL_CAP);
@@ -717,6 +711,26 @@ cap_dvsec_cxl(struct device *d, int id, int where)
 
   w = get_conf_word(d, where + PCI_CXL_STATUS);
   printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_STATUS_VIRAL));
+}
+
+static void
+cap_dvsec_cxl(struct device *d, int id, int where)
+{
+  u8 rev;
+
+  printf(": CXL\n");
+  if (verbose < 2)
+    return;
+
+  if (id != 0)
+    return;
+
+  rev = BITS(get_conf_byte(d, where + 0x6), 0, 4);
+
+  if (!config_fetch(d, where, PCI_CXL_DEV_LEN))
+    return;
+
+  dvsec_cxl_device(d, where, rev);
 }
 
 static void
