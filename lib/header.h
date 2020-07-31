@@ -1069,6 +1069,7 @@
 #define PCI_DVSEC_ID_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
 
 /* PCIe CXL Designated Vendor-Specific Capabilities, Control, Status */
+#define PCI_CXL_DEV_LEN 0x38 /* CXL Device DVSEC Length */
 #define PCI_CXL_CAP		0x0a	/* CXL Capability Register */
 #define  PCI_CXL_CAP_CACHE	0x0001	/* CXL.cache Protocol Support */
 #define  PCI_CXL_CAP_IO		0x0002	/* CXL.io Protocol Support */
