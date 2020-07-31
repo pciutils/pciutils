@@ -690,12 +690,15 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
-cap_dvsec_cxl(struct device *d, int where)
+cap_dvsec_cxl(struct device *d, int id, int where)
 {
   u16 w;
 
   printf(": CXL\n");
   if (verbose < 2)
+    return;
+
+  if (id != 0)
     return;
 
   if (!config_fetch(d, where + PCI_CXL_CAP, 12))
@@ -734,8 +737,8 @@ cap_dvsec(struct device *d, int where)
   u16 id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
 
   printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
-  if (vendor == PCI_DVSEC_VENDOR_ID_CXL && id == PCI_DVSEC_ID_CXL && len >= 16)
-    cap_dvsec_cxl(d, where);
+  if (vendor == PCI_DVSEC_VENDOR_ID_CXL && len >= 16)
+    cap_dvsec_cxl(d, id, where);
   else
     printf(" <?>\n");
 }
