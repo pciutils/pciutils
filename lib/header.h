@@ -1067,24 +1067,24 @@
 #define PCI_DVSEC_VENDOR_ID_CXL	0x1e98	/* Designated Vendor-Specific Vendor ID for CXL */
 #define PCI_DVSEC_ID_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
 
-/* PCIe CXL Designated Vendor-Specific Capabilities, Control, Status */
-#define PCI_CXL_CAP		0x0a	/* CXL Capability Register */
-#define  PCI_CXL_CAP_CACHE	0x0001	/* CXL.cache Protocol Support */
-#define  PCI_CXL_CAP_IO		0x0002	/* CXL.io Protocol Support */
-#define  PCI_CXL_CAP_MEM	0x0004	/* CXL.mem Protocol Support */
-#define  PCI_CXL_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initializes with HW/FW Support */
-#define  PCI_CXL_CAP_HDM_CNT(x)	(((x) & (3 << 4)) >> 4)	/* CXL Number of HDM ranges */
-#define  PCI_CXL_CAP_VIRAL	0x4000	/* CXL Viral Handling Support */
-#define PCI_CXL_CTRL		0x0c	/* CXL Control Register */
-#define  PCI_CXL_CTRL_CACHE	0x0001	/* CXL.cache Protocol Enable */
-#define  PCI_CXL_CTRL_IO	0x0002	/* CXL.io Protocol Enable */
-#define  PCI_CXL_CTRL_MEM	0x0004	/* CXL.mem Protocol Enable */
-#define  PCI_CXL_CTRL_CACHE_SF_COV(x)	(((x) & (0x1f << 3)) >> 3) /* Snoop Filter Coverage */
-#define  PCI_CXL_CTRL_CACHE_SF_GRAN(x)	(((x) & (0x7 << 8)) >> 8) /* Snoop Filter Granularity */
-#define  PCI_CXL_CTRL_CACHE_CLN	0x0800	/* CXL.cache Performance Hint on Clean Evictions */
-#define  PCI_CXL_CTRL_VIRAL	0x4000	/* CXL Viral Handling Enable */
-#define PCI_CXL_STATUS		0x0e	/* CXL Status Register */
-#define  PCI_CXL_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
+/* PCIe CXL Designated Vendor-Specific Capabilities for Devices: Control, Status */
+#define PCI_CXL_DEV_CAP			0x0a	/* CXL Capability Register */
+#define  PCI_CXL_DEV_CAP_CACHE		0x0001	/* CXL.cache Protocol Support */
+#define  PCI_CXL_DEV_CAP_IO		0x0002	/* CXL.io Protocol Support */
+#define  PCI_CXL_DEV_CAP_MEM		0x0004	/* CXL.mem Protocol Support */
+#define  PCI_CXL_DEV_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initializes with HW/FW Support */
+#define  PCI_CXL_DEV_CAP_HDM_CNT(x)	(((x) & (3 << 4)) >> 4)	/* CXL Number of HDM ranges */
+#define  PCI_CXL_DEV_CAP_VIRAL		0x4000	/* CXL Viral Handling Support */
+#define PCI_CXL_DEV_CTRL		0x0c	/* CXL Control Register */
+#define  PCI_CXL_DEV_CTRL_CACHE		0x0001	/* CXL.cache Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_IO		0x0002	/* CXL.io Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_MEM		0x0004	/* CXL.mem Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_CACHE_SF_COV(x) (((x) & (0x1f << 3)) >> 3) /* Snoop Filter Coverage */
+#define  PCI_CXL_DEV_CTRL_CACHE_SF_GRAN(x) (((x) & (0x7 << 8)) >> 8) /* Snoop Filter Granularity */
+#define  PCI_CXL_DEV_CTRL_CACHE_CLN	0x0800	/* CXL.cache Performance Hint on Clean Evictions */
+#define  PCI_CXL_DEV_CTRL_VIRAL		0x4000	/* CXL Viral Handling Enable */
+#define PCI_CXL_DEV_STATUS		0x0e	/* CXL Status Register */
+#define  PCI_CXL_DEV_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
 
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
