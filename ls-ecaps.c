@@ -779,6 +779,29 @@ dvsec_cxl_device(struct device *d, int where, int rev)
 }
 
 static void
+dvsec_cxl_port(struct device *d, int where)
+{
+  u16 w, m1, m2;
+  u8 b1, b2;
+
+  w = get_conf_word(d, where + PCI_CXL_PORT_EXT_STATUS);
+  printf("\t\tCXLPortSta:\tPMComplete%c\n", FLAG(w, PCI_CXL_PORT_EXT_STATUS));
+
+  w = get_conf_word(d, where + PCI_CXL_PORT_CTRL);
+  printf("\t\tCXLPortCtl:\tUnmaskSBR%c UnmaskLinkDisable%c AltMem%c AltBME%c ViralEnable%c\n",
+    FLAG(w, PCI_CXL_PORT_UNMASK_SBR), FLAG(w, PCI_CXL_PORT_UNMASK_LINK),
+    FLAG(w, PCI_CXL_PORT_ALT_MEMORY), FLAG(w, PCI_CXL_PORT_ALT_BME),
+    FLAG(w, PCI_CXL_PORT_VIRAL_EN));
+
+  b1 = get_conf_byte(d, where + PCI_CXL_PORT_ALT_BUS_BASE);
+  b2 = get_conf_byte(d, where + PCI_CXL_PORT_ALT_BUS_LIMIT);
+  printf("\t\tAlternateBus:\t%02x-%02x\n", b1, b2);
+  m1 = get_conf_word(d, where + PCI_CXL_PORT_ALT_MEM_BASE);
+  m2 = get_conf_word(d, where + PCI_CXL_PORT_ALT_MEM_LIMIT);
+  printf("\t\tAlternateBus:\t%04x-%04x\n", m1, m2);
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int id, int where)
 {
   u8 rev;
@@ -787,15 +810,24 @@ cap_dvsec_cxl(struct device *d, int id, int where)
   if (verbose < 2)
     return;
 
-  if (id != 0)
-    return;
-
   rev = BITS(get_conf_byte(d, where + 0x6), 0, 4);
 
-  if (!config_fetch(d, where, PCI_CXL_DEV_LEN))
-    return;
+  switch (id) {
+    case 0:
+      if (!config_fetch(d, where, PCI_CXL_DEV_LEN))
+        return;
 
-  dvsec_cxl_device(d, where, rev);
+      dvsec_cxl_device(d, where, rev);
+      break;
+    case 3:
+      if (!config_fetch(d, where, PCI_CXL_PORT_EXT_LEN))
+        return;
+
+      dvsec_cxl_port(d, where);
+      break;
+    default:
+      break;
+  }
 }
 
 static void

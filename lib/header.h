@@ -1111,6 +1111,21 @@
 #define PCI_CXL_DEV_RANGE2_BASE_HI	0x30
 #define PCI_CXL_DEV_RANGE2_BASE_LO	0x34
 
+/* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Ports */
+#define PCI_CXL_PORT_EXT_LEN 0x28 /* CXL Extensions DVSEC for Ports Length */
+#define PCI_CXL_PORT_EXT_STATUS 0x0a		/* Port Extension Status */
+#define  PCI_CXL_PORT_PM_INIT_COMPLETE 0x1	/* Port Power Management Initialization Complete */
+#define PCI_CXL_PORT_CTRL 0x0c			/* Port Control Override */
+#define  PCI_CXL_PORT_UNMASK_SBR 0x0001		/* Unmask SBR */
+#define  PCI_CXL_PORT_UNMASK_LINK 0x0002	/* Unmask Link Disable */
+#define  PCI_CXL_PORT_ALT_MEMORY 0x0004		/* Alt Memory and ID Space Enable */
+#define  PCI_CXL_PORT_ALT_BME 0x0008		/* Alt BME */
+#define  PCI_CXL_PORT_VIRAL_EN 0x4000		/* Viral Enable */
+#define PCI_CXL_PORT_ALT_BUS_BASE 0xe
+#define PCI_CXL_PORT_ALT_BUS_LIMIT 0xf
+#define PCI_CXL_PORT_ALT_MEM_BASE 0x10
+#define PCI_CXL_PORT_ALT_MEM_LIMIT 0x12
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
