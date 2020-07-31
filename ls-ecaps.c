@@ -690,9 +690,33 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
-cap_dvsec_cxl(struct device *d, int id, int where)
+dvsec_cxl_device(uint8_t *data, int rev)
 {
   u16 w;
+
+  /* Legacy 1.1 revs aren't handled */
+  if (rev != 1)
+    return;
+
+  w = *(u16 *)(data + PCI_CXL_CAP);
+  printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
+    FLAG(w, PCI_CXL_CAP_CACHE), FLAG(w, PCI_CXL_CAP_IO), FLAG(w, PCI_CXL_CAP_MEM),
+    FLAG(w, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_CAP_VIRAL));
+
+  w = *(u16 *)(data + PCI_CXL_CTRL);
+  printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
+    FLAG(w, PCI_CXL_CTRL_CACHE), FLAG(w, PCI_CXL_CTRL_IO), FLAG(w, PCI_CXL_CTRL_MEM),
+    PCI_CXL_CTRL_CACHE_SF_COV(w), PCI_CXL_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_CTRL_CACHE_CLN),
+    FLAG(w, PCI_CXL_CTRL_VIRAL));
+
+  w = *(u16 *)(data + PCI_CXL_STATUS);
+  printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_STATUS_VIRAL));
+}
+
+static void
+cap_dvsec_cxl(struct device *d, int id, int where)
+{
+  u8 rev;
 
   printf(": CXL\n");
   if (verbose < 2)
@@ -701,22 +725,12 @@ cap_dvsec_cxl(struct device *d, int id, int where)
   if (id != 0)
     return;
 
-  if (!config_fetch(d, where + PCI_CXL_CAP, 0x38 - 0xa))
+  rev = BITS(get_conf_byte(d, where + 0x6), 0, 4);
+
+  if (!config_fetch(d, where, 0x38))
     return;
 
-  w = get_conf_word(d, where + PCI_CXL_CAP);
-  printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
-    FLAG(w, PCI_CXL_CAP_CACHE), FLAG(w, PCI_CXL_CAP_IO), FLAG(w, PCI_CXL_CAP_MEM),
-    FLAG(w, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_CAP_VIRAL));
-
-  w = get_conf_word(d, where + PCI_CXL_CTRL);
-  printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
-    FLAG(w, PCI_CXL_CTRL_CACHE), FLAG(w, PCI_CXL_CTRL_IO), FLAG(w, PCI_CXL_CTRL_MEM),
-    PCI_CXL_CTRL_CACHE_SF_COV(w), PCI_CXL_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_CTRL_CACHE_CLN),
-    FLAG(w, PCI_CXL_CTRL_VIRAL));
-
-  w = get_conf_word(d, where + PCI_CXL_STATUS);
-  printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_STATUS_VIRAL));
+  dvsec_cxl_device(d->config + where, rev);
 }
 
 static void
