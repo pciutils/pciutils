@@ -804,9 +804,46 @@ dvsec_cxl_port(uint8_t* data, int rev)
   printf("\t\tAlternateBus:\t%04x-%04x\n", m1, m2);
 }
 
+static const char *id[] = {
+  "empty",
+  "component registers",
+  "BAR virtualization",
+  "CXL device registers"};
+
+static inline void
+dvsec_decode_block(uint32_t lo, uint32_t hi, char which)
+{
+  u64 base_hi = hi, base_lo;
+  u8 bir, block_id;
+
+  bir = BITS(lo, 0, 3);
+  block_id = BITS(lo, 8, 8);
+  base_lo = BITS(lo, 16, 16);
+
+  if (!block_id)
+    return;
+
+  printf("\t\tBlock%c\tBIR: bar%d\tID: %s\n", which, bir, id[block_id]);
+  printf("\t\t\tRegisterOffset: %016" PCI_U64_FMT_X "\n", (base_hi << 32ULL) | base_lo << 16);
+}
+
+static void
+dvsec_cxl_register_locator(uint8_t* data, int len, int rev)
+{
+  int i, j;
+
+  if (rev != 0)
+    return;
+
+  for (i = 0xc, j = 1; i < len; i += 8, j++) {
+    dvsec_decode_block(*(u32 *)(data + i), *(u32 *)(data + i + 4), j + 0x31);
+  }
+}
+
 static void
 cap_dvsec_cxl(struct device *d, int id, int where)
 {
+  u16 len;
   u8 rev;
 
   printf(": CXL\n");
@@ -827,6 +864,13 @@ cap_dvsec_cxl(struct device *d, int id, int where)
         return;
 
       dvsec_cxl_port(d->config + where, rev);
+      break;
+    case 8:
+      len = BITS(get_conf_word(d, where + 0x6), 4, 12);
+      if (!config_fetch(d, where, len))
+        return;
+
+      dvsec_cxl_register_locator(d->config + where, len, rev);
       break;
     default:
       break;
