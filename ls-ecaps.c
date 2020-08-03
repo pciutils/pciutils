@@ -866,6 +866,21 @@ cap_dvsec_cxl(struct device *d, int id, int where)
 
       dvsec_cxl_register_locator(d, where, len);
       break;
+    case 2:
+      printf("\t\tNon-CXL Function Map DVSEC\n");
+      break;
+    case 4:
+      printf("\t\tGPF DVSEC for Port\n");
+      break;
+    case 5:
+      printf("\t\tGPF DVSEC for Device\n");
+      break;
+    case 7:
+      printf("\t\tPCIe DVSEC Flex Bus Port\n");
+      break;
+    case 9:
+      printf("\t\tMLD DVSEC\n");
+      break;
     default:
       break;
   }
