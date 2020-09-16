@@ -49,7 +49,7 @@ CC=$(CROSS_COMPILE)gcc
 AR=$(CROSS_COMPILE)ar
 RANLIB=$(CROSS_COMPILE)ranlib
 
-# Base name of the library (overriden on NetBSD, which has its own libpci)
+# Base name of the library (overridden on NetBSD, which has its own libpci)
 LIBNAME=libpci
 
 -include lib/config.mk

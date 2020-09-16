@@ -1069,7 +1069,7 @@
 #define  PCI_CXL_CAP_CACHE	0x0001	/* CXL.cache Protocol Support */
 #define  PCI_CXL_CAP_IO		0x0002	/* CXL.io Protocol Support */
 #define  PCI_CXL_CAP_MEM	0x0004	/* CXL.mem Protocol Support */
-#define  PCI_CXL_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initalizes with HW/FW Support */
+#define  PCI_CXL_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initializes with HW/FW Support */
 #define  PCI_CXL_CAP_HDM_CNT(x)	(((x) & (3 << 4)) >> 4)	/* CXL Number of HDM ranges */
 #define  PCI_CXL_CAP_VIRAL	0x4000	/* CXL Viral Handling Support */
 #define PCI_CXL_CTRL		0x0c	/* CXL Control Register */
@@ -1214,7 +1214,7 @@
 
 #define PCI_DPC_CAP		4	/* DPC Capability */
 #define  PCI_DPC_CAP_INT_MSG(x) ((x) & 0x1f)	/* DPC Interrupt Message Number */
-#define  PCI_DPC_CAP_RP_EXT	0x20		/* DPC Root Port Extentions */
+#define  PCI_DPC_CAP_RP_EXT	0x20		/* DPC Root Port Extensions */
 #define  PCI_DPC_CAP_TLP_BLOCK	0x40		/* DPC Poisoned TLP Egress Blocking */
 #define  PCI_DPC_CAP_SW_TRIGGER	0x80		/* DPC Software Trigger */
 #define  PCI_DPC_CAP_RP_LOG(x)	(((x) >> 8) & 0xf) /* DPC RP PIO Log Size */
@@ -1232,7 +1232,7 @@
 #define  PCI_DPC_STS_REASON(x) (((x) >> 1) & 0x3) /* DPC Trigger Reason */
 #define  PCI_DPC_STS_INT	0x08		/* DPC Interrupt Status */
 #define  PCI_DPC_STS_RP_BUSY	0x10		/* DPC Root Port Busy */
-#define  PCI_DPC_STS_TRIGGER_EXT(x) (((x) >> 5) & 0x3) /* Trigger Reason Extention */
+#define  PCI_DPC_STS_TRIGGER_EXT(x) (((x) >> 5) & 0x3) /* Trigger Reason Extension */
 #define  PCI_DPC_STS_PIO_FEP(x) (((x) >> 8) & 0x1f) /* DPC PIO First Error Pointer */
 #define PCI_DPC_SOURCE		10	/* DPC Source ID */
 

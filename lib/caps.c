@@ -117,8 +117,8 @@ pci_find_cap(struct pci_dev *d, unsigned int id, unsigned int type)
  * To select one capability if there are more than one with the same id, you
  * can provide a pointer to an unsigned int that contains the index which you
  * want as cap_number. If you don't care and are fine with the first one you
- * can supply NULL. The cap_number will be replaced by the acutal number
- * of capablities with that id.
+ * can supply NULL. The cap_number will be replaced by the actual number
+ * of capabilities with that id.
  */
 struct pci_cap *
 pci_find_cap_nr(struct pci_dev *d, unsigned int id, unsigned int type,
