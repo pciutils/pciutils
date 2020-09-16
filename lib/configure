@@ -25,7 +25,7 @@ if [ -z "$HOST" ] ; then
 		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
 		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
 	else
-		cpu=`uname -m | sed 's/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/;s/^BePC$/i386/;s/^BeMac$/powerpc/;s/^BeBox$/powerpc/'`
+		cpu=`uname -m | sed 's/^i.86-AT386/i386/;s/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/;s/^BePC$/i386/;s/^BeMac$/powerpc/;s/^BeBox$/powerpc/'`
 	fi
 	if [ "$sys" = "DragonFly" ]
 	then
@@ -34,6 +34,10 @@ if [ -z "$HOST" ] ; then
 	if [ "$sys" = "GNU/kFreeBSD" ]
 	then
 		sys=kfreebsd
+	fi
+	if [ "$sys" = "GNU" ]
+	then
+		sys=gnu
 	fi
 	if [ "$sys" = "CYGWIN_NT-5.1" -o "$sys" = "CYGWIN_NT-6.0" ]
 	then
