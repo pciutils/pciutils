@@ -1,12 +1,12 @@
 #!/bin/sh
 
-[ "$1" = "-q" ] && quiet=true || quiet=false
-
 set -e
 SRC="https://pci-ids.ucw.cz/v2.2/pci.ids"
 DEST=pci.ids
 PCI_COMPRESSED_IDS=
 GREP=grep
+
+[ "$1" = "-q" ] && quiet=true || quiet=false
 
 # if pci.ids is read-only (because the filesystem is read-only),
 # then just skip this whole process.
