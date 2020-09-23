@@ -60,7 +60,7 @@ if ! $GREP >/dev/null "^C " $DEST.neww ; then
 fi
 
 if [ -f $DEST ] ; then
-	mv $DEST $DEST.old
+	ln -f $DEST $DEST.old
 	# --reference is supported only by chmod from GNU file, so let's ignore any errors
 	chmod -f --reference=$DEST.old $DEST.neww 2>/dev/null || true
 fi
