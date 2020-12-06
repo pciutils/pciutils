@@ -763,7 +763,7 @@
 
 2007-08-31  Martin Mares <mj@ucw.cz>
 
-	* Makefile, lib/Makefile: `ar' and `ranlib' can be overriden to allow
+	* Makefile, lib/Makefile: `ar' and `ranlib' can be overridden to allow
 	cross-compilation.
 
 2007-08-27  Martin Mares  <mj@ucw.cz>
@@ -1337,7 +1337,7 @@
 	is not supported by all C libraries.
 
 	* Makefile: Always enter the lib directory (remember that we don't have
-	full dependecies for the library in the top-level Makefile; hmmm, another
+	full dependencies for the library in the top-level Makefile; hmmm, another
 	thing to rewrite some day).
 
 	* lib/sysfs.c: Added Linux sysfs access method based on the patch
@@ -1860,7 +1860,7 @@ Wed Jul  7 00:55:48 1999  Martin Mares  <mj@albireo.ucw.cz>
 
 	* lspci.c (show_msi): Added dumping of the MSI capability.
 	(show_slotid): The same for SlotID capability.
-	(show_caps): Seperated capability dumping, because it should
+	(show_caps): Separated capability dumping, because it should
 	be used for both htype0 and htype1. Even PCI 2.2 doesn't mention
 	layout of htype2, so I'm a bit unsure about it wrt capabilities
 	-- they at least have to live somewhere else since address 0x34
@@ -1975,7 +1975,7 @@ Thu Jan 28 20:54:16 1999  Martin Mares  <mj@albireo.ucw.cz>
 	is mainly guesswork based on DEC/Intel 21153 bridge specs
 	since I don't have the PCI Power Management document).
 
-	* lspci.c: Replaced numerous occurences of (x & flag) ? '+' : '-'
+	* lspci.c: Replaced numerous occurrences of (x & flag) ? '+' : '-'
 	by FLAG macro.
 
 	* lspci.c: Added bridge checks to bus mapping code.
@@ -2007,11 +2007,11 @@ Sun Jan 24 22:10:36 1999  Martin Mares  <mj@albireo.ucw.cz>
 	* lib/header.h: Until kernel adopts new layout of PCI
 	includes (i.e., separate declaration of header structure,
 	functions and device IDs), which is not going to happen
-	before 2.3, we'll use our own definiton of the header.
+	before 2.3, we'll use our own definition of the header.
 
 	* lspci.c (show_verbose): Display `Cap' flag in device status.
 
-	* lspci.c (show_htype0): Display capability lists whereever
+	* lspci.c (show_htype0): Display capability lists wherever
 	available. The only capability name we recognize now is `AGP'.
 	Unfortunately, capabilities are stored in device-dependent
 	portion of the configuration space and are thus available

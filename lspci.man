@@ -188,7 +188,7 @@ available methods and their descriptions.
 .TP
 .B -O <param>=<value>
 The behavior of the library is controlled by several named parameters.
-This option allows to set the value of any of the parameters. Use \fB-O help\fP
+This option allows one to set the value of any of the parameters. Use \fB-O help\fP
 for a list of known parameters and their default values.
 .TP
 .B -H1
