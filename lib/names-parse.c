@@ -42,7 +42,7 @@ static pci_file pci_open(struct pci_access *a)
 #define pci_close(f)		gzclose(f)
 #define PCI_ERROR(f, err)						\
 	if (!err) {							\
-		int errnum;						\
+		int errnum = 0;						\
 		gzerror(f, &errnum);					\
 		if (errnum >= 0) err = NULL;				\
 		else if (errnum == Z_ERRNO) err = "I/O error";		\
