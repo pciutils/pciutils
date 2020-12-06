@@ -77,7 +77,8 @@ $(PCILIBPC): libpci.pc.in
 		-e 's,@LIBDIR@,$(LIBDIR),' \
 		-e 's,@IDSDIR@,$(IDSDIR),' \
 		-e 's,@VERSION@,$(VERSION),' \
-		-e 's,@LDLIBS@,$(LDLIBS),'
+		-e 's,@LDLIBS@,$(LDLIBS),' \
+		-e 's,@WITH_LIBS@,$(WITH_LIBS),'
 
 init.o: init.c $(INCL)
 access.o: access.c $(INCL)
