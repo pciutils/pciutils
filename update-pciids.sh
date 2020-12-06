@@ -1,12 +1,13 @@
 #!/bin/sh
 
-[ "$1" = "-q" ] && quiet=true || quiet=false
-
 set -e
+
 SRC="https://pci-ids.ucw.cz/v2.2/pci.ids"
 DEST=pci.ids
 PCI_COMPRESSED_IDS=
 GREP=grep
+
+[ "$1" = "-q" ] && quiet=true || quiet=false
 
 # if pci.ids is read-only (because the filesystem is read-only),
 # then just skip this whole process.
@@ -31,7 +32,7 @@ fi
 
 if which curl >/dev/null 2>&1 ; then
 	DL="curl -o $DEST.new $SRC"
-    ${quiet} && DL="$DL -s -S"
+	${quiet} && DL="$DL -s -S"
 elif which wget >/dev/null 2>&1 ; then
 	DL="wget --no-timestamping -O $DEST.new $SRC"
 	${quiet} && DL="$DL -q"
@@ -59,7 +60,7 @@ if ! $GREP >/dev/null "^C " $DEST.neww ; then
 fi
 
 if [ -f $DEST ] ; then
-	mv $DEST $DEST.old
+	ln -f $DEST $DEST.old
 	# --reference is supported only by chmod from GNU file, so let's ignore any errors
 	chmod -f --reference=$DEST.old $DEST.neww 2>/dev/null || true
 fi
