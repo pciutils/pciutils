@@ -31,6 +31,7 @@ static char *id_lookup(struct pci_access *a, int flags, int cat, int id1, int id
 	  if (name = pci_id_hwdb_lookup(a, cat, id1, id2, id3, id4))
 	    {
 	      pci_id_insert(a, cat, id1, id2, id3, id4, name, SRC_HWDB);
+	      pci_mfree(name);
 	      continue;
 	    }
 	}
