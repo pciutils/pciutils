@@ -83,6 +83,11 @@ or more spaces, and the name of the subsystem.
 To ensure extensibility of the format, lines starting with an unrecognized letter
 followed by a single space are ignored and so are all following TAB-indented lines.
 
+.SH FILES
+.TP
+.B @IDSDIR@/@PCI_IDS@
+Location of the list.
+
 .SH SEE ALSO
 .BR lspci (8),
 .BR update-pciids (8),
