@@ -158,6 +158,7 @@ uninstall: all
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
 	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
+	rm -f $(DESTDIR)$(MANDIR)/man5/pci.ids.5
 ifeq ($(SHARED),yes)
 	rm -f $(DESTDIR)$(LIBDIR)/$(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).so$(ABI_VERSION)
 endif
