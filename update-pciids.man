@@ -27,7 +27,12 @@ Here we install the new list.
 
 .SH SEE ALSO
 .BR lspci (8),
-.BR pci.ids (5)
+.BR pci.ids (5),
+.BR curl (1),
+.BR wget (1),
+.BR lynx (1),
+.BR gzip (1),
+.BR bzip2 (1)
 
 .SH AUTHOR
 The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.
