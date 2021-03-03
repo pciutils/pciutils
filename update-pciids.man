@@ -22,7 +22,7 @@ Be quiet and do not report anything except errors.
 
 .SH FILES
 .TP
-.B @IDSDIR@/pci.ids
+.B @IDSDIR@/@PCI_IDS@
 Here we install the new list.
 
 .SH SEE ALSO
