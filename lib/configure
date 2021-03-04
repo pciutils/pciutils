@@ -62,6 +62,7 @@ echo >$m 'WITH_LIBS='
 echo_n "Looking for access methods..."
 LIBRESOLV=-lresolv
 LIBEXT=so
+MACSDKROOT=
 
 case $sys in
 	linux*)
@@ -112,6 +113,7 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		LIBRESOLV=
 		LIBEXT=dylib
+		MACSDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 		;;
 	aix)
 		echo_n " aix-device"
@@ -172,7 +174,7 @@ echo_n "Checking for zlib support... "
 if [ "$ZLIB" = yes -o "$ZLIB" = no ] ; then
 	echo "$ZLIB (set manually)"
 else
-	if [ -f /usr/include/zlib.h -o -f /usr/local/include/zlib.h ] ; then
+	if [ -f "$MACSDKROOT"/usr/include/zlib.h -o -f /usr/local/include/zlib.h ] ; then
 		ZLIB=yes
 	else
 		ZLIB=no
@@ -193,7 +195,7 @@ echo_n "Checking for DNS support... "
 if [ "$DNS" = yes -o "$DNS" = no ] ; then
 	echo "$DNS (set manually)"
 else
-	if [ -f /usr/include/resolv.h ] ; then
+	if [ -f "$MACSDKROOT"/usr/include/resolv.h ] ; then
 		DNS=yes
 	else
 		DNS=no
