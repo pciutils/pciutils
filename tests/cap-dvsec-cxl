@@ -79,8 +79,8 @@
                 PTMControl: Enabled:- RootSelected:-
                 PTMEffectiveGranularity: Unknown
         Capabilities: [b80 v1] Single Root I/O Virtualization (SR-IOV)
-                IOVCap: Migration-, Interrupt Message Number: 000
-                IOVCtl: Enable- Migration- Interrupt- MSE- ARIHierarchy-
+                IOVCap: Migration- 10BitTagReq- Interrupt Message Number: 000
+                IOVCtl: Enable- Migration- Interrupt- MSE- ARIHierarchy- 10BitTagReq-
                 IOVSta: Migration-
                 Initial VFs: 6, Total VFs: 6, Number of VFs: 0, Function Dependency Link: 00
                 VF offset: 16, stride: 2, Device ID: 0d52

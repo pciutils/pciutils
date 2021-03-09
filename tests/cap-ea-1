@@ -57,8 +57,8 @@
 		ARICtl:	MFVC- ACS-, Function Group: 0
 	Capabilities: [108 v1] Vendor Specific Information: ID=00a0 Rev=1 Len=040 <?>
 	Capabilities: [180 v1] Single Root I/O Virtualization (SR-IOV)
-		IOVCap:	Migration-, Interrupt Message Number: 000
-		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy+
+		IOVCap:	Migration- 10BitTagReq- Interrupt Message Number: 000
+		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy+ 10BitTagReq-
 		IOVSta:	Migration-
 		Initial VFs: 128, Total VFs: 128, Number of VFs: 128, Function Dependency Link: 00
 		VF offset: 1, stride: 1, Device ID: a034

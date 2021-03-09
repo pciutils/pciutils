@@ -48,8 +48,8 @@
 		ARICap:	MFVC- ACS-, Next Function: 1
 		ARICtl:	MFVC- ACS-, Function Group: 0
 	Capabilities: [160] Single Root I/O Virtualization (SR-IOV)
-		IOVCap:	Migration-, Interrupt Message Number: 000
-		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy-
+		IOVCap:	Migration- 10BitTagReq- Interrupt Message Number: 000
+		IOVCtl:	Enable+ Migration- Interrupt- MSE+ ARIHierarchy- 10BitTagReq-
 		IOVSta:	Migration-
 		Initial VFs: 8, Total VFs: 8, Number of VFs: 1, Function Dependency Link: 00
 		VF offset: 384, stride: 2, Device ID: 10ca
