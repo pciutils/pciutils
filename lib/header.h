@@ -1126,6 +1126,7 @@
 /* Single Root I/O Virtualization */
 #define PCI_IOV_CAP		0x04	/* SR-IOV Capability Register */
 #define  PCI_IOV_CAP_VFM	0x00000001 /* VF Migration Capable */
+#define  PCI_IOV_CAP_VF_10BIT_TAG_REQ 0x00000004 /* VF 10-Bit Tag Requester Supported */
 #define  PCI_IOV_CAP_IMN(x)	((x) >> 21) /* VF Migration Interrupt Message Number */
 #define PCI_IOV_CTRL		0x08	/* SR-IOV Control Register */
 #define  PCI_IOV_CTRL_VFE	0x0001	/* VF Enable */
@@ -1133,6 +1134,7 @@
 #define  PCI_IOV_CTRL_VFMIE	0x0004	/* VF Migration Interrupt Enable */
 #define  PCI_IOV_CTRL_MSE	0x0008	/* VF MSE */
 #define  PCI_IOV_CTRL_ARI	0x0010	/* ARI Capable Hierarchy */
+#define  PCI_IOV_CTRL_VF_10BIT_TAG_REQ_EN 0x0020 /* VF 10-Bit Tag Requester Enable */
 #define PCI_IOV_STATUS		0x0a	/* SR-IOV Status Register */
 #define  PCI_IOV_STATUS_MS	0x0001	/* VF Migration Status */
 #define PCI_IOV_INITIALVF	0x0c	/* Number of VFs that are initially associated */
