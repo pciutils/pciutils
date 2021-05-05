@@ -141,7 +141,7 @@ install-pcilib: lib/$(PCILIB)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
 	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
 
-install-lib: $(PCIINC_INS) lib/$(PCILIBPC) install-pcilib
+install-lib: $(PCIINC_INS) install-pcilib
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(PKGCFDIR)
 	$(INSTALL) -c -m 644 $(PCIINC_INS) $(DESTDIR)$(INCDIR)/pci
 	$(INSTALL) -c -m 644 lib/$(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
