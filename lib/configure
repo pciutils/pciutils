@@ -9,7 +9,7 @@ echo_n() {
 	printf '%s' "$*"
 }
 
-if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
+if [ -z "$VERSION" ] || [ -z "$IDSDIR" ] ; then
 	echo >&2 "Please run the configure script from the top-level Makefile"
 	exit 1
 fi
@@ -19,11 +19,11 @@ if [ -z "$HOST" ] ; then
 	sys=`uname -s`
 	rel=`uname -r`
 	realsys="$sys"
-	if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
+	if [ "$sys" = "AIX" ] && [ -x /usr/bin/oslevel ] && [ -x /usr/sbin/lsattr ]
 	then
 		rel=`/usr/bin/oslevel`
 		proc=`/usr/sbin/lsdev -C -c processor -S available -F name | head -1`
-		cpu=`/usr/sbin/lsattr -F value -l $proc -a type | sed 's/_.*//'`
+		cpu=`/usr/sbin/lsattr -F value -l $proc ] && [ type | sed 's/_.*//'`
 	else
 		cpu=`uname -m | sed 's/^i.86-AT386/i386/;s/^i.86$/i386/;s/^sun4u$/sparc64/;s/^i86pc$/i386/;s/^BePC$/i386/;s/^BeMac$/powerpc/;s/^BeBox$/powerpc/'`
 	fi
@@ -39,7 +39,7 @@ if [ -z "$HOST" ] ; then
 	then
 		sys=gnu
 	fi
-	if [ "$sys" = "CYGWIN_NT-5.1" -o "$sys" = "CYGWIN_NT-6.0" ]
+	if [ "$sys" = "CYGWIN_NT-5.1" ] || [ "$sys" = "CYGWIN_NT-6.0" ]
 	then
 		sys=cygwin
 	fi
@@ -169,10 +169,10 @@ echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
 
 echo_n "Checking for zlib support... "
-if [ "$ZLIB" = yes -o "$ZLIB" = no ] ; then
+if [ "$ZLIB" = yes ] || [ "$ZLIB" = no ] ; then
 	echo "$ZLIB (set manually)"
 else
-	if [ -f /usr/include/zlib.h -o -f /usr/local/include/zlib.h ] ; then
+	if [ -f /usr/include/zlib.h ] || [ -f /usr/local/include/zlib.h ] ; then
 		ZLIB=yes
 	else
 		ZLIB=no
@@ -190,7 +190,7 @@ fi
 echo >>$c "#define PCI_PATH_IDS_DIR \"$IDSDIR\""
 
 echo_n "Checking for DNS support... "
-if [ "$DNS" = yes -o "$DNS" = no ] ; then
+if [ "$DNS" = yes ] || [ "$DNS" = no ] ; then
 	echo "$DNS (set manually)"
 else
 	if [ -f /usr/include/resolv.h ] ; then
@@ -219,9 +219,9 @@ if [ "$sys" = linux ] ; then
 			LIBKMOD_DETECTED=1
 		fi
 	fi
-	if [ "$LIBKMOD" = yes -o "$LIBKMOD" = no ] ; then
+	if [ "$LIBKMOD" = yes ] || [ "$LIBKMOD" = no ] ; then
 		echo "$LIBKMOD (set manually)"
-		if [ "$LIBKMOD" = yes -a -z "$LIBKMOD_DETECTED" ] ; then
+		if [ "$LIBKMOD" = yes ] && [ -z "$LIBKMOD_DETECTED" ] ; then
 			echo "Requested use of libkmod, but it is not available. Giving up."
 			exit 1
 		fi
@@ -240,7 +240,7 @@ if [ "$sys" = linux ] ; then
 	fi
 
 	echo_n "Checking for udev hwdb support... "
-	if [ "$HWDB" = yes -o "$HWDB" = no ] ; then
+	if [ "$HWDB" = yes ] || [ "$HWDB" = no ] ; then
 		echo "$HWDB (set manually)"
 	else
 		if `which pkg-config >/dev/null && pkg-config --atleast-version=196 libudev` ; then
@@ -272,7 +272,7 @@ else
 	echo >>$m 'LDLIBS='
 	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
 	echo >>$c '#define PCI_SHARED_LIB'
-	if [ "$SHARED" = yes -a "$LIBEXT" = so ]; then
+	if [ "$SHARED" = yes ] && [ "$LIBEXT" = so ]; then
 		echo >>$m 'SONAME=-Wl,-soname,$(LIBNAME).$(LIBEXT)$(ABI_VERSION)'
 	fi
 fi
