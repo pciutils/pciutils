@@ -692,7 +692,7 @@ cap_rcec(struct device *d, int where)
 static void
 cap_dvsec_cxl(struct device *d, int where)
 {
-  u16 l;
+  u16 w;
 
   printf(": CXL\n");
   if (verbose < 2)
@@ -701,19 +701,19 @@ cap_dvsec_cxl(struct device *d, int where)
   if (!config_fetch(d, where + PCI_CXL_CAP, 12))
     return;
 
-  l = get_conf_word(d, where + PCI_CXL_CAP);
+  w = get_conf_word(d, where + PCI_CXL_CAP);
   printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
-    FLAG(l, PCI_CXL_CAP_CACHE), FLAG(l, PCI_CXL_CAP_IO), FLAG(l, PCI_CXL_CAP_MEM),
-    FLAG(l, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(l), FLAG(l, PCI_CXL_CAP_VIRAL));
+    FLAG(w, PCI_CXL_CAP_CACHE), FLAG(w, PCI_CXL_CAP_IO), FLAG(w, PCI_CXL_CAP_MEM),
+    FLAG(w, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_CAP_VIRAL));
 
-  l = get_conf_word(d, where + PCI_CXL_CTRL);
+  w = get_conf_word(d, where + PCI_CXL_CTRL);
   printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
-    FLAG(l, PCI_CXL_CTRL_CACHE), FLAG(l, PCI_CXL_CTRL_IO), FLAG(l, PCI_CXL_CTRL_MEM),
-    PCI_CXL_CTRL_CACHE_SF_COV(l), PCI_CXL_CTRL_CACHE_SF_GRAN(l), FLAG(l, PCI_CXL_CTRL_CACHE_CLN),
-    FLAG(l, PCI_CXL_CTRL_VIRAL));
+    FLAG(w, PCI_CXL_CTRL_CACHE), FLAG(w, PCI_CXL_CTRL_IO), FLAG(w, PCI_CXL_CTRL_MEM),
+    PCI_CXL_CTRL_CACHE_SF_COV(w), PCI_CXL_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_CTRL_CACHE_CLN),
+    FLAG(w, PCI_CXL_CTRL_VIRAL));
 
-  l = get_conf_word(d, where + PCI_CXL_STATUS);
-  printf("\t\tCXLSta:\tViral%c\n", FLAG(l, PCI_CXL_STATUS_VIRAL));
+  w = get_conf_word(d, where + PCI_CXL_STATUS);
+  printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_STATUS_VIRAL));
 }
 
 static void
