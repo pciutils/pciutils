@@ -690,8 +690,30 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
+cxl_range(u64 base, u64 size, int n)
+{
+  u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
+  const char *type[] = { "Volatile", "Non-volatile", "CDAT" };
+  const char *class[] = { "DRAM", "Storage", "CDAT" };
+  u16 w;
+
+  w = (u16) size;
+
+  size &= ~0x0fffffffULL;
+
+  printf("\t\tRange%d: %016"PCI_U64_FMT_X"-%016"PCI_U64_FMT_X"\n", n, base, base + size - 1);
+  printf("\t\t\tValid%c Active%c Type=%s Class=%s interleave=%d timeout=%ds\n",
+    FLAG(w, PCI_CXL_RANGE_VALID), FLAG(w, PCI_CXL_RANGE_ACTIVE),
+    type[PCI_CXL_RANGE_TYPE(w)], class[PCI_CXL_RANGE_CLASS(w)],
+    interleave[PCI_CXL_RANGE_INTERLEAVE(w)],
+    1 << (PCI_CXL_RANGE_TIMEOUT(w) * 2));
+}
+
+static void
 dvsec_cxl_device(struct device *d, int where, int rev)
 {
+  u32 cache_size, cache_unit_size, l;
+  u64 range_base, range_size;
   u16 w;
 
   /* Legacy 1.1 revs aren't handled */
@@ -711,6 +733,49 @@ dvsec_cxl_device(struct device *d, int where, int rev)
 
   w = get_conf_word(d, where + PCI_CXL_DEV_STATUS);
   printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_DEV_STATUS_VIRAL));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_STATUS2);
+  printf("\t\tCXLSta2:\tResetComplete%c ResetError%c PMComplete%c\n",
+    FLAG(w, PCI_CXL_DEV_STATUS_RC), FLAG(w,PCI_CXL_DEV_STATUS_RE), FLAG(w, PCI_CXL_DEV_STATUS_PMC));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_CAP2);
+  cache_unit_size = BITS(w, 0, 4);
+  cache_size = BITS(w, 8, 8);
+  switch (cache_unit_size)
+    {
+      case PCI_CXL_DEV_CAP2_CACHE_1M:
+        printf("\t\tCache Size: %08x\n", cache_size * (1<<20));
+	break;
+      case PCI_CXL_DEV_CAP2_CACHE_64K:
+        printf("\t\tCache Size: %08x\n", cache_size * (64<<10));
+	break;
+      case PCI_CXL_DEV_CAP2_CACHE_UNK:
+        printf("\t\tCache Size Not Reported\n");
+	break;
+      default:
+        printf("\t\tCache Size: %d of unknown unit size (%d)\n", cache_size, cache_unit_size);
+	break;
+    }
+
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI);
+  range_size = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
+  range_size |= l;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI);
+  range_base = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
+  range_base |= l;
+  cxl_range(range_base, range_size, 1);
+
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI);
+  range_size = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
+  range_size |= l;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI);
+  range_base = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
+  range_base |= l;
+  cxl_range(range_base, range_size, 2);
 }
 
 static void

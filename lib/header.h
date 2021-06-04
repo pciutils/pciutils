@@ -1087,6 +1087,29 @@
 #define  PCI_CXL_DEV_CTRL_VIRAL		0x4000	/* CXL Viral Handling Enable */
 #define PCI_CXL_DEV_STATUS		0x0e	/* CXL Status Register */
 #define  PCI_CXL_DEV_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
+#define PCI_CXL_DEV_STATUS2		0x12
+#define  PCI_CXL_DEV_STATUS_CACHE_INV	0x0001
+#define  PCI_CXL_DEV_STATUS_RC		0x0002  /* Device Reset Complete */
+#define  PCI_CXL_DEV_STATUS_RE		0x0004  /* Device Reset Error */
+#define  PCI_CXL_DEV_STATUS_PMC		0x8000  /* Power Management Init Complete */
+#define PCI_CXL_DEV_CAP2		0x16
+#define  PCI_CXL_DEV_CAP2_CACHE_UNK	0x0000	/* Cache Size Isn't Reported */
+#define  PCI_CXL_DEV_CAP2_CACHE_64K	0x0001  /* Unit Size 64K */
+#define  PCI_CXL_DEV_CAP2_CACHE_1M	0x0002  /* Unit Size 1M */
+#define PCI_CXL_DEV_RANGE1_SIZE_HI	0x18
+#define PCI_CXL_DEV_RANGE1_SIZE_LO	0x1c
+#define  PCI_CXL_RANGE_VALID		0x0001
+#define  PCI_CXL_RANGE_ACTIVE		0x0002
+#define  PCI_CXL_RANGE_TYPE(x)		(((x) >> 2) & 0x7)
+#define  PCI_CXL_RANGE_CLASS(x)		(((x) >> 5) & 0x7)
+#define  PCI_CXL_RANGE_INTERLEAVE(x)	(((x) >> 8) & 0x1f)
+#define  PCI_CXL_RANGE_TIMEOUT(x)	(((x) >> 13) & 0x7)
+#define PCI_CXL_DEV_RANGE1_BASE_HI	0x20
+#define PCI_CXL_DEV_RANGE1_BASE_LO	0x24
+#define PCI_CXL_DEV_RANGE2_SIZE_HI	0x28
+#define PCI_CXL_DEV_RANGE2_SIZE_LO	0x2c
+#define PCI_CXL_DEV_RANGE2_BASE_HI	0x30
+#define PCI_CXL_DEV_RANGE2_BASE_LO	0x34
 
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
