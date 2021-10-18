@@ -374,12 +374,12 @@ show_size(u64 x)
 }
 
 static void
-show_range(char *prefix, u64 base, u64 limit, int is_64bit)
+show_range(char *prefix, u64 base, u64 limit, int bits)
 {
   printf("%s:", prefix);
   if (base <= limit || verbose > 2)
     {
-      if (is_64bit)
+      if (bits > 32)
         printf(" %016" PCI_U64_FMT_X "-%016" PCI_U64_FMT_X, base, limit);
       else
         printf(" %08x-%08x", (unsigned) base, (unsigned) limit);
@@ -388,6 +388,7 @@ show_range(char *prefix, u64 base, u64 limit, int is_64bit)
     show_size(limit - base + 1);
   else
     printf(" [disabled]");
+  printf(" [%d-bit]", bits);
   putchar('\n');
 }
 
@@ -578,7 +579,7 @@ show_htype1(struct device *d)
 	  io_base |= (get_conf_word(d, PCI_IO_BASE_UPPER16) << 16);
 	  io_limit |= (get_conf_word(d, PCI_IO_LIMIT_UPPER16) << 16);
 	}
-      show_range("\tI/O behind bridge", io_base, io_limit+0xfff, 0);
+      show_range("\tI/O behind bridge", io_base, io_limit+0xfff, (io_type == PCI_IO_RANGE_TYPE_32) ? 32 : 16);
     }
 
   if (mem_type != (mem_limit & PCI_MEMORY_RANGE_TYPE_MASK) ||
@@ -588,7 +589,7 @@ show_htype1(struct device *d)
     {
       mem_base = (mem_base & PCI_MEMORY_RANGE_MASK) << 16;
       mem_limit = (mem_limit & PCI_MEMORY_RANGE_MASK) << 16;
-      show_range("\tMemory behind bridge", mem_base, mem_limit + 0xfffff, 0);
+      show_range("\tMemory behind bridge", mem_base, mem_limit + 0xfffff, 32);
     }
 
   if (pref_type != (pref_limit & PCI_PREF_RANGE_TYPE_MASK) ||
@@ -603,7 +604,7 @@ show_htype1(struct device *d)
 	  pref_base_64 |= (u64) get_conf_long(d, PCI_PREF_BASE_UPPER32) << 32;
 	  pref_limit_64 |= (u64) get_conf_long(d, PCI_PREF_LIMIT_UPPER32) << 32;
 	}
-      show_range("\tPrefetchable memory behind bridge", pref_base_64, pref_limit_64 + 0xfffff, (pref_type == PCI_PREF_RANGE_TYPE_64));
+      show_range("\tPrefetchable memory behind bridge", pref_base_64, pref_limit_64 + 0xfffff, (pref_type == PCI_PREF_RANGE_TYPE_64) ? 64 : 32);
     }
 
   if (verbose > 1)
