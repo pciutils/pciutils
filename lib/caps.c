@@ -128,7 +128,7 @@ pci_find_cap_nr(struct pci_dev *d, unsigned int id, unsigned int type,
   unsigned int target = (cap_number ? *cap_number : 0);
   unsigned int index = 0;
 
-  pci_fill_info_v35(d, ((type == PCI_CAP_NORMAL) ? PCI_FILL_CAPS : PCI_FILL_EXT_CAPS));
+  pci_fill_info_v38(d, ((type == PCI_CAP_NORMAL) ? PCI_FILL_CAPS : PCI_FILL_EXT_CAPS));
 
   for (c=d->first_cap; c; c=c->next)
     {

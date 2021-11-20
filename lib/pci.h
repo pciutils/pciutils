@@ -142,6 +142,9 @@ struct pci_dev {
   pciaddr_t flags[6];			/* PCI_IORESOURCE_* flags for regions */
   pciaddr_t rom_flags;			/* PCI_IORESOURCE_* flags for expansion ROM */
   int domain;				/* PCI domain (host bridge) */
+  pciaddr_t bridge_base_addr[4];	/* Bridge base addresses (without flags) */
+  pciaddr_t bridge_size[4];		/* Bridge sizes */
+  pciaddr_t bridge_flags[4];		/* PCI_IORESOURCE_* flags for bridge addresses */
 
   /* Fields used internally */
   struct pci_access *access;
@@ -205,6 +208,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_IO_FLAGS	0x1000
 #define PCI_FILL_DT_NODE	0x2000		/* Device tree node */
 #define PCI_FILL_IOMMU_GROUP	0x4000
+#define PCI_FILL_BRIDGE_BASES	0x8000
 #define PCI_FILL_RESCAN		0x00010000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;

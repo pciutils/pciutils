@@ -153,14 +153,17 @@ sysfs_get_resources(struct pci_dev *d)
 {
   struct pci_access *a = d->access;
   char namebuf[OBJNAMELEN], buf[256];
+  struct { pciaddr_t flags, base_addr, size; } lines[10];
+  int have_bar_bases, have_rom_base, have_bridge_bases;
   FILE *file;
   int i;
 
+  have_bar_bases = have_rom_base = have_bridge_bases = 0;
   sysfs_obj_name(d, "resource", namebuf);
   file = fopen(namebuf, "r");
   if (!file)
     a->error("Cannot open %s: %s", namebuf, strerror(errno));
-  for (i = 0; i < 7; i++)
+  for (i = 0; i < 7+6+4+1; i++)
     {
       unsigned long long start, end, size, flags;
       if (!fgets(buf, sizeof(buf), file))
@@ -177,16 +180,55 @@ sysfs_get_resources(struct pci_dev *d)
 	  flags &= PCI_ADDR_FLAG_MASK;
 	  d->base_addr[i] = start | flags;
 	  d->size[i] = size;
+	  have_bar_bases = 1;
 	}
-      else
+      else if (i == 6)
 	{
 	  d->rom_flags = flags;
 	  flags &= PCI_ADDR_FLAG_MASK;
 	  d->rom_base_addr = start | flags;
 	  d->rom_size = size;
+	  have_rom_base = 1;
 	}
+      else if (i < 7+6+4)
+        {
+          /*
+           * If kernel was compiled without CONFIG_PCI_IOV option then after
+           * the ROM line for configured bridge device (that which had set
+           * subordinary bus number to non-zero value) are four additional lines
+           * which describe resources behind bridge. For PCI-to-PCI bridges they
+           * are: IO, MEM, PREFMEM and empty. For CardBus bridges they are: IO0,
+           * IO1, MEM0 and MEM1. For unconfigured bridges and other devices
+           * there is no additional line after the ROM line. If kernel was
+           * compiled with CONFIG_PCI_IOV option then after the ROM line and
+           * before the first bridge resource line are six additional lines
+           * which describe IOV resources. Read all remaining lines in resource
+           * file and based on the number of remaining lines (0, 4, 6, 10) parse
+           * resources behind bridge.
+           */
+          lines[i-7].flags = flags;
+          lines[i-7].base_addr = start;
+          lines[i-7].size = size;
+        }
+    }
+  if (i == 7+4 || i == 7+6+4)
+    {
+      int offset = (i == 7+6+4) ? 6 : 0;
+      for (i = 0; i < 4; i++)
+        {
+          d->bridge_flags[i] = lines[offset+i].flags;
+          d->bridge_base_addr[i] = lines[offset+i].base_addr;
+          d->bridge_size[i] = lines[offset+i].size;
+        }
+      have_bridge_bases = 1;
     }
   fclose(file);
+  if (!have_bar_bases)
+    clear_fill(d, PCI_FILL_BASES | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS);
+  if (!have_rom_base)
+    clear_fill(d, PCI_FILL_ROM_BASE);
+  if (!have_bridge_bases)
+    clear_fill(d, PCI_FILL_BRIDGE_BASES);
 }
 
 static void sysfs_scan(struct pci_access *a)
@@ -307,7 +349,7 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	d->device_class = sysfs_get_value(d, "class", 1) >> 8;
       if (want_fill(d, flags, PCI_FILL_IRQ))
 	  d->irq = sysfs_get_value(d, "irq", 1);
-      if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS))
+      if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS | PCI_FILL_BRIDGE_BASES))
 	  sysfs_get_resources(d);
     }
 
