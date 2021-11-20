@@ -378,12 +378,7 @@ show_range(char *prefix, u64 base, u64 limit, int bits)
 {
   printf("%s:", prefix);
   if (base <= limit || verbose > 2)
-    {
-      if (bits > 32)
-        printf(" %016" PCI_U64_FMT_X "-%016" PCI_U64_FMT_X, base, limit);
-      else
-        printf(" %08x-%08x", (unsigned) base, (unsigned) limit);
-    }
+    printf(" %0*" PCI_U64_FMT_X "-%0*" PCI_U64_FMT_X, (bits+3)/4, base, (bits+3)/4, limit);
   if (base <= limit)
     show_size(limit - base + 1);
   else
