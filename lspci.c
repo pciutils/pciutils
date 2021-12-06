@@ -133,6 +133,9 @@ scan_device(struct pci_dev *p)
       fprintf(stderr, "lspci: Unable to read the standard configuration space header of device %04x:%02x:%02x.%d\n",
 	      p->domain, p->bus, p->dev, p->func);
       seen_errors++;
+      free(d->config);
+      free(d->present);
+      free(d);
       return NULL;
     }
   if ((d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
