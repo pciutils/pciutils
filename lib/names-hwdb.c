@@ -70,9 +70,13 @@ pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int
 	}
 
       struct udev_list_entry *entry;
+      char *tmp_key;
       udev_list_entry_foreach(entry, udev_hwdb_get_properties_list_entry(a->id_udev_hwdb, modalias, 0))
-        if (strcmp(udev_list_entry_get_name(entry), key) == 0)
-    	  return pci_strdup(a, udev_list_entry_get_value(entry));
+	{
+	  tmp_key = udev_list_entry_get_name(entry);
+	  if (tmp_key && strcmp(tmp_key, key) == 0)
+	    return pci_strdup(a, udev_list_entry_get_value(entry));
+	}
     }
 
   return NULL;
