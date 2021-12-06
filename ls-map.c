@@ -88,6 +88,8 @@ do_map_bus(int bus)
 			  map_bridge(bi, d, PCI_CB_PRIMARY_BUS, PCI_CB_CARD_BUS, PCI_CB_SUBORDINATE_BUS);
 			  break;
 			}
+                      free(d->config);
+                      free(d->present);
 		      free(d);
 		    }
 		  else if (verbose)
