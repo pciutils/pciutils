@@ -186,6 +186,9 @@ pci_alloc(void)
   struct pci_access *a = malloc(sizeof(struct pci_access));
   int i;
 
+  if (!a)
+    pci_generic_error("Out of memory, allocation failed.");
+
   memset(a, 0, sizeof(*a));
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
 #ifdef PCI_USE_DNS
