@@ -70,6 +70,8 @@ select_devices(struct group *group)
       int i = 0;
       if (pci_filter_match(f, dev))
 	devs[i++] = dev;
+      else
+        pci_free_dev(dev);
       devs[i] = NULL;
       return devs;
     }
