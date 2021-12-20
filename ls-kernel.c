@@ -173,16 +173,14 @@ static int
 match_pcimap(struct device *d, struct pcimap_entry *e)
 {
   struct pci_dev *dev = d->dev;
-  unsigned int class = get_conf_long(d, PCI_REVISION_ID) >> 8;
-  word subv, subd;
+  unsigned int class = (((unsigned int)dev->device_class << 8) | dev->prog_if);
 
 #define MATCH(x, y) ((y) > 0xffff || (x) == (y))
-  get_subid(d, &subv, &subd);
   return
     MATCH(dev->vendor_id, e->vendor) &&
     MATCH(dev->device_id, e->device) &&
-    MATCH(subv, e->subvendor) &&
-    MATCH(subd, e->subdevice) &&
+    MATCH(dev->subsys_vendor_id, e->subvendor) &&
+    MATCH(dev->subsys_id, e->subdevice) &&
     (class & e->class_mask) == e->class;
 #undef MATCH
 }

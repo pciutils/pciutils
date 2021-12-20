@@ -143,7 +143,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
   return d;
 }
 
@@ -285,25 +285,6 @@ show_slot_name(struct device *d)
   show_slot_path(d);
 }
 
-void
-get_subid(struct device *d, word *subvp, word *subdp)
-{
-  byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
-
-  if (htype == PCI_HEADER_TYPE_NORMAL)
-    {
-      *subvp = get_conf_word(d, PCI_SUBSYSTEM_VENDOR_ID);
-      *subdp = get_conf_word(d, PCI_SUBSYSTEM_ID);
-    }
-  else if (htype == PCI_HEADER_TYPE_CARDBUS && d->config_cached >= 128)
-    {
-      *subvp = get_conf_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
-      *subdp = get_conf_word(d, PCI_CB_SUBSYSTEM_ID);
-    }
-  else
-    *subvp = *subdp = 0xffff;
-}
-
 static void
 show_terse(struct device *d)
 {
@@ -319,12 +300,12 @@ show_terse(struct device *d)
 	 pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			 PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
 			 p->vendor_id, p->device_id));
-  if (c = get_conf_byte(d, PCI_REVISION_ID))
-    printf(" (rev %02x)", c);
+  if ((p->known_fields & PCI_FILL_CLASS_EXT) && p->rev_id)
+    printf(" (rev %02x)", p->rev_id);
   if (verbose)
     {
       char *x;
-      c = get_conf_byte(d, PCI_CLASS_PROG);
+      c = (p->known_fields & PCI_FILL_CLASS_EXT) ? p->prog_if : 0;
       x = pci_lookup_name(pacc, devbuf, sizeof(devbuf),
 			  PCI_LOOKUP_PROGIF | PCI_LOOKUP_NO_NUMBERS,
 			  p->device_class, c);
@@ -340,19 +321,18 @@ show_terse(struct device *d)
 
   if (verbose || opt_kernel)
     {
-      word subsys_v, subsys_d;
       char ssnamebuf[256];
 
       pci_fill_info(p, PCI_FILL_LABEL);
 
       if (p->label)
         printf("\tDeviceName: %s", p->label);
-      get_subid(d, &subsys_v, &subsys_d);
-      if (subsys_v && subsys_v != 0xffff)
+      if ((p->known_fields & PCI_FILL_SUBSYS) &&
+	  p->subsys_vendor_id && p->subsys_vendor_id != 0xffff)
 	printf("\tSubsystem: %s\n",
 		pci_lookup_name(pacc, ssnamebuf, sizeof(ssnamebuf),
 			PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR | PCI_LOOKUP_DEVICE,
-			p->vendor_id, p->device_id, subsys_v, subsys_d));
+			p->vendor_id, p->device_id, p->subsys_vendor_id, p->subsys_id));
     }
 }
 
@@ -766,7 +746,7 @@ show_verbose(struct device *d)
 
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
     PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP |
-    PCI_FILL_BRIDGE_BASES);
+    PCI_FILL_BRIDGE_BASES | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
   irq = p->irq;
 
   switch (htype)
@@ -947,12 +927,8 @@ static void
 show_machine(struct device *d)
 {
   struct pci_dev *p = d->dev;
-  int c;
-  word sv_id, sd_id;
   char classbuf[128], vendbuf[128], devbuf[128], svbuf[128], sdbuf[128];
   char *dt_node, *iommu_group;
-
-  get_subid(d, &sv_id, &sd_id);
 
   if (verbose)
     {
@@ -966,19 +942,20 @@ show_machine(struct device *d)
 	     pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
       printf("Device:\t%s\n",
 	     pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id));
-      if (sv_id && sv_id != 0xffff)
+      if ((p->known_fields & PCI_FILL_SUBSYS) &&
+	  p->subsys_vendor_id && p->subsys_vendor_id != 0xffff)
 	{
 	  printf("SVendor:\t%s\n",
-		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id));
+		 pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->subsys_vendor_id));
 	  printf("SDevice:\t%s\n",
-		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
+		 pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, p->subsys_vendor_id, p->subsys_id));
 	}
       if (p->phy_slot)
 	printf("PhySlot:\t%s\n", p->phy_slot);
-      if (c = get_conf_byte(d, PCI_REVISION_ID))
-	printf("Rev:\t%02x\n", c);
-      if (c = get_conf_byte(d, PCI_CLASS_PROG))
-	printf("ProgIf:\t%02x\n", c);
+      if ((p->known_fields & PCI_FILL_CLASS_EXT) && p->rev_id)
+	printf("Rev:\t%02x\n", p->rev_id);
+      if (p->known_fields & PCI_FILL_CLASS_EXT)
+	printf("ProgIf:\t%02x\n", p->prog_if);
       if (opt_kernel)
 	show_kernel_machine(d);
       if (p->numa_node != -1)
@@ -994,14 +971,15 @@ show_machine(struct device *d)
       print_shell_escaped(pci_lookup_name(pacc, classbuf, sizeof(classbuf), PCI_LOOKUP_CLASS, p->device_class));
       print_shell_escaped(pci_lookup_name(pacc, vendbuf, sizeof(vendbuf), PCI_LOOKUP_VENDOR, p->vendor_id, p->device_id));
       print_shell_escaped(pci_lookup_name(pacc, devbuf, sizeof(devbuf), PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id));
-      if (c = get_conf_byte(d, PCI_REVISION_ID))
-	printf(" -r%02x", c);
-      if (c = get_conf_byte(d, PCI_CLASS_PROG))
-	printf(" -p%02x", c);
-      if (sv_id && sv_id != 0xffff)
+      if ((p->known_fields & PCI_FILL_CLASS_EXT) && p->rev_id)
+	printf(" -r%02x", p->rev_id);
+      if (p->known_fields & PCI_FILL_CLASS_EXT)
+	printf(" -p%02x", p->prog_if);
+      if ((p->known_fields & PCI_FILL_SUBSYS) &&
+	  p->subsys_vendor_id && p->subsys_vendor_id != 0xffff)
 	{
-	  print_shell_escaped(pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, sv_id));
-	  print_shell_escaped(pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, sv_id, sd_id));
+	  print_shell_escaped(pci_lookup_name(pacc, svbuf, sizeof(svbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_VENDOR, p->subsys_vendor_id));
+	  print_shell_escaped(pci_lookup_name(pacc, sdbuf, sizeof(sdbuf), PCI_LOOKUP_SUBSYSTEM | PCI_LOOKUP_DEVICE, p->vendor_id, p->device_id, p->subsys_vendor_id, p->subsys_id));
 	}
       else
 	printf(" \"\" \"\"");
