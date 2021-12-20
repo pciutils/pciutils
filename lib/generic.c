@@ -86,6 +86,7 @@ void
 pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 {
   struct pci_access *a = d->access;
+  struct pci_cap *cap;
 
   if (want_fill(d, flags, PCI_FILL_IDENT))
     {
@@ -109,6 +110,14 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
         case PCI_HEADER_TYPE_NORMAL:
           d->subsys_vendor_id = pci_read_word(d, PCI_SUBSYSTEM_VENDOR_ID);
           d->subsys_id = pci_read_word(d, PCI_SUBSYSTEM_ID);
+          break;
+        case PCI_HEADER_TYPE_BRIDGE:
+          cap = pci_find_cap(d, PCI_CAP_ID_SSVID, PCI_CAP_NORMAL);
+          if (cap)
+            {
+              d->subsys_vendor_id = pci_read_word(d, cap->addr + PCI_SSVID_VENDOR);
+              d->subsys_id = pci_read_word(d, cap->addr + PCI_SSVID_DEVICE);
+            }
           break;
         case PCI_HEADER_TYPE_CARDBUS:
           d->subsys_vendor_id = pci_read_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
