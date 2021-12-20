@@ -90,7 +90,9 @@ dump_init(struct pci_access *a)
       else if (!len)
 	dev = NULL;
       else if (dev &&
-	       (dump_validate(buf, "##: ") || dump_validate(buf, "###: ")) &&
+	       (dump_validate(buf, "##: ") || dump_validate(buf, "###: ") || dump_validate(buf, "####: ") ||
+		dump_validate(buf, "#####: ") || dump_validate(buf, "######: ") ||
+		dump_validate(buf, "#######: ") || dump_validate(buf, "########: ")) &&
 	       sscanf(buf, "%x: ", &i) == 1)
 	{
 	  struct dump_data *dd = dev->aux;
