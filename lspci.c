@@ -17,6 +17,7 @@
 
 int verbose;				/* Show detailed information */
 static int opt_hex;			/* Show contents of config space as hexadecimal numbers */
+static int opt_hex_parsed;	/* Show parsed contents of config space as hexadecimal numbers */
 struct pci_filter filter;		/* Device filter */
 static int opt_filter;			/* Any filter was given */
 static int opt_tree;			/* Show bus tree */
@@ -31,7 +32,7 @@ char *opt_pcimap;			/* Override path to Linux modules.pcimap */
 
 const char program_name[] = "lspci";
 
-static char options[] = "nvbxs:d:tPi:mgp:qkMDQ" GENERIC_OPTIONS ;
+static char options[] = "nvbxXs:d:tPi:mgp:qkMDQ" GENERIC_OPTIONS ;
 
 static char help_msg[] =
 "Usage: lspci [<switches>]\n"
@@ -895,6 +896,56 @@ show_hex_dump(struct device *d)
 }
 
 static void
+show_hex_parsed(struct device *d)
+{
+  unsigned int i, cnt;
+  int dbgidx = 0;
+
+  cnt = d->config_cached;
+  if (opt_hex_parsed >= 3 && config_fetch(d, cnt, 256-cnt))
+    {
+      cnt = 256;
+      if (opt_hex_parsed >= 4 && config_fetch(d, 256, 4096-256))
+	cnt = 4096;
+    }
+  
+  for (i=0; i<cnt; i++)
+    {
+          if (! (i & 15))
+        printf("%02x:", i);
+          printf(" %02x", get_conf_byte(d, i));
+          if ((i & 15) == 15)
+        putchar('\n');
+        
+          switch(i)
+        {
+            case PCI_LOOKUP_VENDOR:
+                printf(" \n\n VENDOR \n\n");
+        }
+    }
+#if 0
+PCI_LOOKUP_DEVICE 
+PCI_LOOKUP_CLASS 
+PCI_LOOKUP_SUBSYSTEM 
+PCI_LOOKUP_PROGIF 
+PCI_LOOKUP_NUMERIC 
+PCI_LOOKUP_NO_NUMBERS 
+PCI_LOOKUP_MIXED 
+PCI_LOOKUP_NETWORK 
+PCI_LOOKUP_SKIP_LOCAL 
+PCI_LOOKUP_CACHE 
+PCI_LOOKUP_REFRESH_CACHE 
+PCI_LOOKUP_NO_HWDB 
+
+#endif
+
+
+
+
+
+}
+
+static void
 print_shell_escaped(char *c)
 {
   printf(" \"");
@@ -991,7 +1042,9 @@ show_device(struct device *d)
     }
   if (opt_hex)
     show_hex_dump(d);
-  if (verbose || opt_hex)
+  if (opt_hex_parsed)
+    show_hex_parsed(d);
+  if (verbose || opt_hex || opt_hex_parsed)
     putchar('\n');
 }
 
@@ -1023,6 +1076,8 @@ main(int argc, char **argv)
   pacc->error = die;
   pci_filter_init(pacc, &filter);
 
+  printf("\n\n MODIFIED lspci\n");
+
   while ((i = getopt(argc, argv, options)) != -1)
     switch (i)
       {
@@ -1047,6 +1102,9 @@ main(int argc, char **argv)
 	break;
       case 'x':
 	opt_hex++;
+	break;
+      case 'X':
+	opt_hex_parsed++;
 	break;
       case 'P':
 	opt_path++;
