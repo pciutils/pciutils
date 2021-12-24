@@ -49,6 +49,7 @@ static char help_msg[] =
 "-x\t\tShow hex-dump of the standard part of the config space\n"
 "-xxx\t\tShow hex-dump of the whole config space (dangerous; root only)\n"
 "-xxxx\t\tShow hex-dump of the 4096-byte extended config space (root only)\n"
+"-X\t\tShow parsed hex-dump of the standard part of the config space\n"
 "-b\t\tBus-centric view (addresses and IRQ's as seen by the bus)\n"
 "-D\t\tAlways show domain numbers\n"
 "-P\t\tDisplay bridge path in addition to bus and device number\n"
@@ -225,6 +226,8 @@ compare_them(const void *A, const void *B)
     return 1;
   return 0;
 }
+
+
 
 static void
 sort_them(void)
@@ -908,41 +911,155 @@ show_hex_parsed(struct device *d)
       if (opt_hex_parsed >= 4 && config_fetch(d, 256, 4096-256))
 	cnt = 4096;
     }
-  
+
   for (i=0; i<cnt; i++)
     {
-          if (! (i & 15))
-        printf("%02x:", i);
-          printf(" %02x", get_conf_byte(d, i));
-          if ((i & 15) == 15)
-        putchar('\n');
-        
+        if (! (i & 15))
+      printf("%02x:", i);
+  
           switch(i)
         {
-            case PCI_LOOKUP_VENDOR:
-                printf(" \n\n VENDOR \n\n");
-        }
-    }
+          case PCI_VENDOR_ID:
+            printf("\tVendor ID:\t");
+            break;		
+          case PCI_DEVICE_ID:
+            printf("\n\tDevice ID:\t");
+            break;		
+          case PCI_COMMAND:
+            printf("\n\tCommand:\t");
+            break;	
+          case PCI_STATUS:
+            printf("\n\tStatus:\t\t");
+            break;	
+          case PCI_REVISION_ID:
+            printf("\n\tRevision ID:\t");
+            break;         
+          case PCI_CLASS_PROG:
+            printf("\n\tClass Prog IF:\t");
+            break;          
+          case PCI_CLASS_DEVICE:
+            printf("\n\tClass Device:\t");
+            break;        
+          case PCI_CACHE_LINE_SIZE:
+            printf("\n\tCache Line Size:");
+            break;	
+          case PCI_LATENCY_TIMER:
+            printf("\n\tLatency Timer:\t");
+            break;	
+          case PCI_HEADER_TYPE:
+            printf("\n\tHeader Type:\t");
+            break;		
+          case PCI_BIST_CODE_MASK:
+            printf("\n\tBIST Code Mask: ");
+            break;	
+          case PCI_BIST_START:
+            printf("\n\tBIST Start:\t");
+            break;		
+          case PCI_BIST_CAPABLE:
+            printf("\n\tBIST Capable:\t");
+            break;	
+          case PCI_BASE_ADDRESS_0:
+            printf("\tBAR 0:\t\t");
+            break;	
+          case PCI_BASE_ADDRESS_1:
+            printf("\n\tBAR 1:\t\t");
+            break;	
+          case PCI_BASE_ADDRESS_2:
+            printf("\n\tBAR 2:\t\t");
+            break;	
+          case PCI_BASE_ADDRESS_3:
+            printf("\n\tBAR 3:\t\t");
+            break;	
+          case PCI_BASE_ADDRESS_4:
+            printf("\tBAR 4:\t\t");
+            break;	
+          case PCI_BASE_ADDRESS_5:
+            printf("\n\tBAR 5:\t\t");
+            break;	
+          case PCI_CARDBUS_CIS:
+            printf("\n\tCardbus CIS:\t");
+            break;		
+          case PCI_SUBSYSTEM_VENDOR_ID:
+            printf("\n\tSubsys Vendor:\t");
+            break;	
+          case PCI_SUBSYSTEM_ID:
+            printf("\n\tSubsystem ID:\t");
+            break;	
+          case PCI_ROM_ADDRESS:
+            printf("\tExpan ROM BAR:\t");
+            break;		
+          case PCI_CAPABILITY_LIST:
+            printf("\n\tCapability Ptr:\t");
+            break;
+          case PCI_CAPABILITY_LIST+1:
+            printf("\n\tReserved:\t");
+            break;
+          case PCI_INTERRUPT_LINE:
+            printf("\n\tInterrupt Line:\t");
+            break;	
+          case PCI_INTERRUPT_PIN:
+            printf("\n\tInterrupt Pin:\t");
+            break;	
+          case PCI_MIN_GNT:
+            printf("\n\tMin Gnt:\t");
+            break;		
+          case PCI_MAX_LAT:
+            printf("\n\tMax Lat:\t");
+            break;		
 #if 0
-PCI_LOOKUP_DEVICE 
-PCI_LOOKUP_CLASS 
-PCI_LOOKUP_SUBSYSTEM 
-PCI_LOOKUP_PROGIF 
-PCI_LOOKUP_NUMERIC 
-PCI_LOOKUP_NO_NUMBERS 
-PCI_LOOKUP_MIXED 
-PCI_LOOKUP_NETWORK 
-PCI_LOOKUP_SKIP_LOCAL 
-PCI_LOOKUP_CACHE 
-PCI_LOOKUP_REFRESH_CACHE 
-PCI_LOOKUP_NO_HWDB 
-
+          case PCI_PRIMARY_BUS:
+            printf("\n\tReserved:\t");
+            break;		
+          case PCI_SECONDARY_BUS:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_SUBORDINATE_BUS:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_SEC_LATENCY_TIMER:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_IO_BASE:
+            printf("\n\tReserved:\t");
+            break;		
+          case PCI_IO_LIMIT:
+            printf("\n\tReserved:\t");
+            break;		
+          case PCI_SEC_STATUS:
+            printf("\n\tReserved:\t");
+            break;		
+          case PCI_MEMORY_BASE:
+            printf("\n\tReserved:\t");
+            break;		
+          case PCI_MEMORY_LIMIT:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_PREF_MEMORY_BASE:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_PREF_MEMORY_LIMIT:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_PREF_BASE_UPPER32:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_PREF_LIMIT_UPPER32:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_IO_BASE_UPPER16:
+            printf("\n\tReserved:\t");
+            break;	
+          case PCI_IO_LIMIT_UPPER16:
+            printf("\n\tReserved:\t");
+            break;
 #endif
-
-
-
-
-
+        }
+          
+        printf(" %02x", get_conf_byte(d, i));
+        if ((i & 15) == 15)
+      putchar('\n');
+        
+    }
 }
 
 static void
