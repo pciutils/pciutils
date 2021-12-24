@@ -1233,6 +1233,35 @@ static const char *cap_express_link2_deemphasis(int type)
     }
 }
 
+static const char *cap_express_link2_compliance_preset(int type)
+{
+  switch (type)
+    {
+      case 0:
+	return "-6dB de-emphasis, 0dB preshoot";
+      case 1:
+	return "-3.5dB de-emphasis, 0dB preshoot";
+      case 2:
+	return "-4.4dB de-emphasis, 0dB preshoot";
+      case 3:
+	return "-2.5dB de-emphasis, 0dB preshoot";
+      case 4:
+	return "0dB de-emphasis, 0dB preshoot";
+      case 5:
+	return "0dB de-emphasis, 1.9dB preshoot";
+      case 6:
+	return "0dB de-emphasis, 2.5dB preshoot";
+      case 7:
+	return "-6.0dB de-emphasis, 3.5dB preshoot";
+      case 8:
+	return "-3.5dB de-emphasis, 3.5dB preshoot";
+      case 9:
+	return "0dB de-emphasis, 3.5dB preshoot";
+      default:
+	return "Unknown";
+    }
+}
+
 static const char *cap_express_link2_transmargin(int type)
 {
   switch (type)
@@ -1314,11 +1343,11 @@ static void cap_express_link2(struct device *d, int where, int type)
 	cap_express_link2_deemphasis(PCI_EXP_LNKCTL2_DEEMPHASIS(w)));
     printf("\n"
 	"\t\t\t Transmit Margin: %s, EnterModifiedCompliance%c ComplianceSOS%c\n"
-	"\t\t\t Compliance De-emphasis: %s\n",
+	"\t\t\t Compliance Preset/De-emphasis: %s\n",
 	cap_express_link2_transmargin(PCI_EXP_LNKCTL2_MARGIN(w)),
 	FLAG(w, PCI_EXP_LNKCTL2_MOD_CMPLNC),
 	FLAG(w, PCI_EXP_LNKCTL2_CMPLNC_SOS),
-	cap_express_link2_deemphasis(PCI_EXP_LNKCTL2_COM_DEEMPHASIS(w)));
+	cap_express_link2_compliance_preset(PCI_EXP_LNKCTL2_COM_DEEMPHASIS(w)));
   }
 
   w = get_conf_word(d, where + PCI_EXP_LNKSTA2);
