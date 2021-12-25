@@ -36,6 +36,17 @@ intel_setup_io(struct pci_access *a)
   MYPROC InitializeWinIo;
   HMODULE lib;
 
+#ifndef _WIN64
+  /* 16/32-bit non-NT systems allow applications to access PCI I/O ports without any special setup. */
+  OSVERSIONINFOA version;
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (GetVersionExA(&version) && version.dwPlatformId < VER_PLATFORM_WIN32_NT)
+    {
+      a->debug("Detected 16/32-bit non-NT system, skipping NT setup...");
+      return 1;
+    }
+#endif
+
   lib = LoadLibrary("WinIo.dll");
   if (!lib)
     {
