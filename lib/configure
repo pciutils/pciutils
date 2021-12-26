@@ -142,10 +142,16 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		EXEEXT=.exe
 		;;
-	cygwin)
+	cygwin|windows)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-		echo >>$m 'WITH_LIBS+=-lioperm'
+		if [ "$sys" = "cygwin" ] ; then
+			# ioperm is cygwin specific library and used only by lib/i386-io-cygwin.h
+			echo >>$m 'WITH_LIBS+=-lioperm'
+		elif [ "$sys" = "windows" ] ; then
+			# advapi32 is windows system library and used only by lib/i386-io-windows.h
+			echo >>$m 'WITH_LIBS+=-ladvapi32'
+		fi
 		EXEEXT=.exe
 		;;
 	beos|haiku)
@@ -199,7 +205,7 @@ echo_n "Checking for DNS support... "
 if [ "$DNS" = yes -o "$DNS" = no ] ; then
 	echo "$DNS (set manually)"
 else
-	if [ -f "$SYSINCLUDE/resolv.h" ] ; then
+	if [ "$sys" != "windows" -a -f "$SYSINCLUDE/resolv.h" ] ; then
 		DNS=yes
 	else
 		DNS=no
