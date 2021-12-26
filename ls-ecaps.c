@@ -653,8 +653,9 @@ cap_rcec(struct device *d, int where)
       int prevmatched=0;
       int adjcount=0;
       int prevdev=0;
+      int dev;
       printf("RCiEP at Device(s):");
-      for (int dev=0; dev < 32; dev++)
+      for (dev=0; dev < 32; dev++)
         {
 	  if (BITS(bmap, dev, 1))
 	    {
