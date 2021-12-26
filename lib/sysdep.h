@@ -21,7 +21,7 @@ typedef u8 byte;
 typedef u16 word;
 
 #ifdef PCI_OS_WINDOWS
-#define strcasecmp strcmpi
+#define strcasecmp _strcmpi
 #endif
 
 #ifdef PCI_HAVE_LINUX_BYTEORDER_H
