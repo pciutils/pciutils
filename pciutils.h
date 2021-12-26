@@ -9,7 +9,20 @@
 #include "lib/pci.h"
 #include "lib/sysdep.h"
 
-#ifdef PCI_OS_WINDOWS
+/*
+ * gcc predefines macro __MINGW32__ for all MinGW targets.
+ * Including some MinGW header (e.g. windef.h) defines additional
+ * macro __MINGW32_MAJOR_VERSION (available for all MinGW targets).
+ */
+#if defined(PCI_OS_WINDOWS) && defined(__MINGW32__)
+#include <windef.h>
+#endif
+
+/*
+ * On Windows only MinGW 3.0 and higher versions provides <getopt.h>
+ * header file. Older MinGW versions and MSVC do not have it.
+ */
+#if defined(PCI_OS_WINDOWS) && !(defined(__MINGW32_MAJOR_VERSION) && __MINGW32_MAJOR_VERSION >= 3)
 #include "compat/getopt.h"
 #else
 #include <unistd.h>
