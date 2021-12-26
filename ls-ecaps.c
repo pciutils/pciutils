@@ -637,6 +637,13 @@ cap_rclink(struct device *d, int where)
 static void
 cap_rcec(struct device *d, int where)
 {
+  u32 hdr;
+  byte cap_ver;
+  u32 bmap;
+  u32 busn;
+  u8 lastbusn;
+  u8 nextbusn;
+
   printf("Root Complex Event Collector Endpoint Association\n");
   if (verbose < 2)
     return;
@@ -644,9 +651,9 @@ cap_rcec(struct device *d, int where)
   if (!config_fetch(d, where, 12))
     return;
 
-  u32 hdr = get_conf_long(d, where);
-  byte cap_ver = PCI_RCEC_EP_CAP_VER(hdr);
-  u32 bmap = get_conf_long(d, where + PCI_RCEC_RCIEP_BMAP);
+  hdr = get_conf_long(d, where);
+  cap_ver = PCI_RCEC_EP_CAP_VER(hdr);
+  bmap = get_conf_long(d, where + PCI_RCEC_RCIEP_BMAP);
   printf("\t\tRCiEPBitmap: ");
   if (bmap)
     {
@@ -679,9 +686,9 @@ cap_rcec(struct device *d, int where)
   if (cap_ver < PCI_RCEC_BUSN_REG_VER)
     return;
 
-  u32 busn = get_conf_long(d, where + PCI_RCEC_BUSN_REG);
-  u8 lastbusn = BITS(busn, 16, 8);
-  u8 nextbusn = BITS(busn, 8, 8);
+  busn = get_conf_long(d, where + PCI_RCEC_BUSN_REG);
+  lastbusn = BITS(busn, 16, 8);
+  nextbusn = BITS(busn, 8, 8);
 
   if ((lastbusn == 0x00) && (nextbusn == 0xff))
     printf("\t\tAssociatedBusNumbers: %s\n", (verbose > 2) ? "ff-00 [none]" : "[none]");
@@ -719,6 +726,12 @@ cap_dvsec_cxl(struct device *d, int where)
 static void
 cap_dvsec(struct device *d, int where)
 {
+  u32 hdr;
+  u16 vendor;
+  byte rev;
+  u16 len;
+  u16 id;
+
   printf("Designated Vendor-Specific: ");
   if (!config_fetch(d, where + PCI_DVSEC_HEADER1, 8))
     {
@@ -726,12 +739,12 @@ cap_dvsec(struct device *d, int where)
       return;
     }
 
-  u32 hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
-  u16 vendor = BITS(hdr, 0, 16);
-  byte rev = BITS(hdr, 16, 4);
-  u16 len = BITS(hdr, 20, 12);
+  hdr = get_conf_long(d, where + PCI_DVSEC_HEADER1);
+  vendor = BITS(hdr, 0, 16);
+  rev = BITS(hdr, 16, 4);
+  len = BITS(hdr, 20, 12);
 
-  u16 id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
+  id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
 
   printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
   if (vendor == PCI_DVSEC_VENDOR_ID_CXL && id == PCI_DVSEC_ID_CXL && len >= 16)

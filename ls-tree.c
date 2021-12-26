@@ -169,12 +169,13 @@ tree_printf(char *line, char *p, char *fmt, ...)
 {
   va_list args;
   int space = line + LINE_BUF_SIZE - 1 - p;
+  int res;
 
   if (space <= 0)
     return p;
 
   va_start(args, fmt);
-  int res = vsnprintf(p, space, fmt, args);
+  res = vsnprintf(p, space, fmt, args);
   if (res < 0)
     {
       /* Ancient C libraries return -1 on overflow and they do not truncate the output properly. */
