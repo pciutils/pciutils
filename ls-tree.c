@@ -170,6 +170,8 @@ tree_printf(char *line, char *p, char *fmt, ...)
   int res = vsnprintf(p, end - p, fmt, args);
   if (res < 0)
     {
+      /* msvcrt _vsnprintf() does not set nul-term byte */
+      *end = '\0';
       /* Ancient C libraries return -1 on overflow */
       p += strlen(p);
     }
