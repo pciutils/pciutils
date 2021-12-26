@@ -9,7 +9,7 @@ echo_n() {
 	printf '%s' "$*"
 }
 
-if [ -z "$VERSION" -o -z "$IDSDIR" ] ; then
+if [ -z "$VERSION" ] ; then
 	echo >&2 "Please run the configure script from the top-level Makefile"
 	exit 1
 fi

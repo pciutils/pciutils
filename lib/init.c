@@ -13,6 +13,10 @@
 
 #include "internal.h"
 
+#ifdef PCI_OS_WINDOWS
+#include <windows.h>
+#endif
+
 static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
   NULL,
 #ifdef PCI_HAVE_PM_LINUX_SYSFS
@@ -189,7 +193,28 @@ pci_alloc(void)
   int i;
 
   memset(a, 0, sizeof(*a));
+#ifdef PCI_OS_WINDOWS
+  if ((PCI_PATH_IDS_DIR)[0])
+    pci_set_name_list_path(a, PCI_PATH_IDS_DIR "\\" PCI_IDS, 0);
+  else
+    {
+      char *path, *sep;
+      DWORD len;
+
+      path = pci_malloc(a, MAX_PATH+1);
+      len = GetModuleFileNameA(NULL, path, MAX_PATH+1);
+      sep = (len > 0) ? strrchr(path, '\\') : NULL;
+      if (len == 0 || len == MAX_PATH+1 || !sep || MAX_PATH-(size_t)(sep+1-path) < sizeof(PCI_IDS))
+        free(path);
+      else
+        {
+          memcpy(sep+1, PCI_IDS, sizeof(PCI_IDS));
+          pci_set_name_list_path(a, path, 1);
+        }
+    }
+#else
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
+#endif
 #ifdef PCI_USE_DNS
   pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
   pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
