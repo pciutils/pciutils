@@ -13,6 +13,13 @@ SeImpersonatePrivilege (Impersonate a client after authentication privilege)
 which is by default enabled for all local Administrators accounts. There is no
 special requirement for DOS-based systems.
 
+To compile this port, run following command:
+
+  make CROSS_COMPILE=i586-mingw32msvc- HOST=i386-windows ZLIB=no IDSDIR=""
+
+Sometimes compilation may fail due to broken or missing getopt implementation.
+In this case try to compile with additional make option: COMPAT_GETOPT=yes
+
 ================================================================================
 BEWARE: The current implementation pokes I/O ports to access the PCI devices
 directly. This leads to several problems: some devices are invisible, extended
