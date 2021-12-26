@@ -22,6 +22,9 @@ typedef u16 word;
 
 #ifdef PCI_OS_WINDOWS
 #define strcasecmp _strcmpi
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define vsnprintf _vsnprintf
+#endif
 #endif
 
 #ifdef PCI_HAVE_LINUX_BYTEORDER_H
