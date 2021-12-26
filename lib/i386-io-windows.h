@@ -1290,7 +1290,7 @@ intel_setup_io(struct pci_access *a)
   return 1;
 }
 
-static inline int
+static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
   /*
@@ -1298,7 +1298,6 @@ intel_cleanup_io(struct pci_access *a UNUSED)
    * systems ProcessUserModeIOPL permanently changes IOPL to 3 for the current
    * NT process, no revert for current process is possible.
    */
-  return 1;
 }
 
 static inline void intel_io_lock(void)

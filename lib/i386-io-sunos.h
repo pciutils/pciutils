@@ -16,11 +16,10 @@ intel_setup_io(struct pci_access *a UNUSED)
   return (sysi86(SI86V86, V86SC_IOPL, PS_IOPL) < 0) ? 0 : 1;
 }
 
-static inline int
+static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
   /* FIXME: How to switch off I/O port access? */
-  return 1;
 }
 
 static inline u8

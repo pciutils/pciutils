@@ -18,12 +18,10 @@ intel_setup_io(struct pci_access *a UNUSED)
   return (ioperm (0, 65535, 1) == -1) ? 0 : 1;
 }
 
-static inline int
+static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
   ioperm (0, 65535, 0);
-
-  return -1;
 }
 
 static inline void intel_io_lock(void)

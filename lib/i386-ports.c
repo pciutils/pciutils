@@ -53,7 +53,10 @@ static void
 conf12_cleanup(struct pci_access *a UNUSED)
 {
   if (conf12_io_enabled > 0)
-    conf12_io_enabled = intel_cleanup_io(a);
+    {
+      intel_cleanup_io(a);
+      conf12_io_enabled = -1;
+    }
 }
 
 /*

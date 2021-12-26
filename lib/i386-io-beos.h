@@ -16,10 +16,9 @@ intel_setup_io(struct pci_access *a UNUSED)
   return 1;
 }
 
-static inline int
+static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
-  return 1;
 }
 
 static inline u8

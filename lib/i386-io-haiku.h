@@ -68,11 +68,10 @@ intel_setup_io(struct pci_access *a UNUSED)
   return (poke_driver_fd < 0) ? 0 : 1;
 }
 
-static inline int
+static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
   close(poke_driver_fd);
-  return 1;
 }
 
 static inline u8
