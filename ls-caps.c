@@ -656,10 +656,22 @@ static int exp_downstream_port(int type)
 	 type == PCI_EXP_TYPE_PCIE_BRIDGE;	/* PCI/PCI-X to PCIe Bridge */
 }
 
-static float power_limit(int value, int scale)
+static void show_power_limit(int value, int scale)
 {
   static const float scales[4] = { 1.0, 0.1, 0.01, 0.001 };
-  return value * scales[scale];
+  static const int scale0_values[3] = { 250, 275, 300 };
+
+  if (scale == 0 && value >= 0xF0)
+    {
+      /* F3h to FFh = Reserved for Slot Power Limit values above 300 W */
+      if (value >= 0xF3)
+        {
+          printf(">300W");
+          return;
+        }
+      value = scale0_values[value - 0xF0];
+    }
+  printf("%gW", value * scales[scale]);
 }
 
 static const char *latency_l0s(int value)
@@ -701,9 +713,10 @@ static void cap_express_dev(struct device *d, int where, int type)
 	FLAG(t, PCI_EXP_DEVCAP_FLRESET));
   if ((type == PCI_EXP_TYPE_ENDPOINT) || (type == PCI_EXP_TYPE_UPSTREAM) ||
       (type == PCI_EXP_TYPE_PCI_BRIDGE))
-    printf(" SlotPowerLimit %.3fW",
-	power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18,
-		    (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26));
+    {
+      printf(" SlotPowerLimit ");
+      show_power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18, (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26);
+    }
   printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
@@ -871,9 +884,10 @@ static void cap_express_slot(struct device *d, int where)
 	FLAG(t, PCI_EXP_SLTCAP_PWRI),
 	FLAG(t, PCI_EXP_SLTCAP_HPC),
 	FLAG(t, PCI_EXP_SLTCAP_HPS));
-  printf("\t\t\tSlot #%d, PowerLimit %.3fW; Interlock%c NoCompl%c\n",
-	(t & PCI_EXP_SLTCAP_PSN) >> 19,
-	power_limit((t & PCI_EXP_SLTCAP_PWR_VAL) >> 7, (t & PCI_EXP_SLTCAP_PWR_SCL) >> 15),
+  printf("\t\t\tSlot #%d, PowerLimit ",
+	(t & PCI_EXP_SLTCAP_PSN) >> 19);
+  show_power_limit((t & PCI_EXP_SLTCAP_PWR_VAL) >> 7, (t & PCI_EXP_SLTCAP_PWR_SCL) >> 15);
+  printf("; Interlock%c NoCompl%c\n",
 	FLAG(t, PCI_EXP_SLTCAP_INTERLOCK),
 	FLAG(t, PCI_EXP_SLTCAP_NOCMDCOMP));
 
