@@ -62,6 +62,7 @@ echo >$m 'WITH_LIBS='
 echo_n "Looking for access methods..."
 LIBRESOLV=-lresolv
 LIBEXT=so
+EXEEXT=
 SYSINCLUDE=/usr/include
 
 case $sys in
@@ -139,11 +140,13 @@ case $sys in
 	djgpp)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		EXEEXT=.exe
 		;;
 	cygwin)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		echo >>$m 'WITH_LIBS+=-lioperm'
+		EXEEXT=.exe
 		;;
 	beos|haiku)
 		case $cpu in
@@ -167,6 +170,7 @@ case $sys in
 esac
 
 echo >>$m "LIBEXT="$LIBEXT
+echo >>$m "EXEEXT="$EXEEXT
 echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
 
