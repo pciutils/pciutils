@@ -36,7 +36,6 @@
 #endif
 
 #include <stdio.h>
-#include <string.h>
 
 /* Comment out all this code if we are using the GNU C Library, and are not
    actually compiling the library itself.  This code is part of the GNU C
@@ -163,6 +162,8 @@ static enum {
 #include <string.h>
 #define	my_index	strchr
 #define	my_strlen	strlen
+#define	my_strcmp	strcmp
+#define	my_strncmp	strncmp
 #else
 
 /* Avoid depending on library functions or files
@@ -170,11 +171,11 @@ static enum {
 
 #if __STDC__ || defined(PROTO)
 extern char *getenv(const char *name);
-extern int strcmp(const char *s1, const char *s2);
-extern int strncmp(const char *s1, const char *s2, int n);
 
 static int my_strlen(const char *s);
 static char *my_index(const char *str, int chr);
+static int my_strncmp(const char *s1, const char *s2, int n);
+static int my_strcmp(const char *s1, const char *s2);
 #else
 extern char *getenv();
 #endif
@@ -195,6 +196,23 @@ static char *my_index(const char *str, int chr)
 		str++;
 	}
 	return 0;
+}
+
+static int my_strncmp(const char *s1, const char *s2, int n)
+{
+	while (n && *s1 && (*s1 == *s2)) {
+		++s1;
+		++s2;
+		--n;
+	}
+	if (n == 0)
+		return 0;
+	return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+
+static int my_strcmp(const char *s1, const char *s2)
+{
+	return my_strncmp(s1, s2, -1);
 }
 
 #endif				/* GNU C library.  */
@@ -385,7 +403,7 @@ int _getopt_internal(int argc, char *const *argv, const char *optstring,
 		   then exchange with previous non-options as if it were an option,
 		   then skip everything else like a non-option.  */
 
-		if (optind != argc && !strcmp(argv[optind], "--")) {
+		if (optind != argc && !my_strcmp(argv[optind], "--")) {
 			optind++;
 
 			if (first_nonopt != last_nonopt && last_nonopt != optind)
@@ -445,7 +463,7 @@ int _getopt_internal(int argc, char *const *argv, const char *optstring,
 
 		/* Test all options for either exact match or abbreviated matches.  */
 		for (p = longopts, option_index = 0; p->name; p++, option_index++)
-			if (!strncmp(p->name, nextchar, s - nextchar)) {
+			if (!my_strncmp(p->name, nextchar, s - nextchar)) {
 				if (s - nextchar == my_strlen(p->name)) {
 					/* Exact match found.  */
 					pfound = p;
