@@ -69,8 +69,13 @@ force:
 lib/config.h lib/config.mk:
 	cd lib && ./configure
 
-lspci$(EXEEXT): lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o common.o lib/$(PCILIB)
-setpci$(EXEEXT): setpci.o common.o lib/$(PCILIB)
+COMMON=common.o
+ifeq ($(COMPAT_GETOPT),yes)
+COMMON+=compat/getopt.o
+endif
+
+lspci$(EXEEXT): lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o $(COMMON) lib/$(PCILIB)
+setpci$(EXEEXT): setpci.o $(COMMON) lib/$(PCILIB)
 
 LSPCIINC=lspci.h pciutils.h $(PCIINC)
 lspci.o: lspci.c $(LSPCIINC)
@@ -83,6 +88,7 @@ ls-map.o: ls-map.c $(LSPCIINC)
 
 setpci.o: setpci.c pciutils.h $(PCIINC)
 common.o: common.c pciutils.h $(PCIINC)
+compat/getopt.o: compat/getopt.c
 
 lspci$(EXEEXT): LDLIBS+=$(LIBKMOD_LIBS)
 ls-kernel.o: CFLAGS+=$(LIBKMOD_CFLAGS)
