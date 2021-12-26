@@ -68,12 +68,12 @@ cap_ltr(struct device *d, int where)
   snoop = get_conf_word(d, where + PCI_LTR_MAX_SNOOP);
   scale = cap_ltr_scale((snoop >> PCI_LTR_SCALE_SHIFT) & PCI_LTR_SCALE_MASK);
   printf("\t\tMax snoop latency: %lldns\n",
-	 ((unsigned long long)snoop & PCI_LTR_VALUE_MASK) * scale);
+	 ((u64)snoop & PCI_LTR_VALUE_MASK) * scale);
 
   nosnoop = get_conf_word(d, where + PCI_LTR_MAX_NOSNOOP);
   scale = cap_ltr_scale((nosnoop >> PCI_LTR_SCALE_SHIFT) & PCI_LTR_SCALE_MASK);
   printf("\t\tMax no snoop latency: %lldns\n",
-	 ((unsigned long long)nosnoop & PCI_LTR_VALUE_MASK) * scale);
+	 ((u64)nosnoop & PCI_LTR_VALUE_MASK) * scale);
 }
 
 static void
@@ -840,7 +840,7 @@ cap_l1pm(struct device *d, int where)
 	  if (scale > 5)
 	    printf(" LTR1.2_Threshold=<error>");
 	  else
-	    printf(" LTR1.2_Threshold=%lldns", BITS(val, 16, 10) * (unsigned long long) cap_ltr_scale(scale));
+	    printf(" LTR1.2_Threshold=%lldns", BITS(val, 16, 10) * (u64) cap_ltr_scale(scale));
 	}
       printf("\n");
     }

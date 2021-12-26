@@ -578,7 +578,7 @@ cap_ht(struct device *d, int where, int cmd)
 	    break;
 	  offl = get_conf_long(d, where + PCI_HT_MSIM_ADDR_LO);
 	  offh = get_conf_long(d, where + PCI_HT_MSIM_ADDR_HI);
-	  printf("\t\tMapping Address Base: %016llx\n", ((unsigned long long)offh << 32) | (offl & ~0xfffff));
+	  printf("\t\tMapping Address Base: %016" PCI_U64_FMT_X "\n", ((u64)offh << 32) | (offl & ~0xfffff));
 	}
       break;
     case PCI_HT_CMD_TYP_DR:
