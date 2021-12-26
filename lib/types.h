@@ -11,8 +11,8 @@
 #ifndef PCI_HAVE_Uxx_TYPES
 
 #ifdef PCI_OS_WINDOWS
-/* On Windows compilers, use <windef.h> */
-#include <windef.h>
+/* On Windows compilers, use <windows.h> */
+#include <windows.h>
 typedef BYTE u8;
 typedef WORD u16;
 typedef DWORD u32;
