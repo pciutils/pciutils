@@ -10,7 +10,6 @@
 
 #include "internal.h"
 
-#include <unistd.h>
 #include <string.h>
 
 #if defined(PCI_OS_LINUX)
