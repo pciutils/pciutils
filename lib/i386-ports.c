@@ -75,6 +75,7 @@ intel_sanity_check(struct pci_access *a, struct pci_methods *m)
 {
   struct pci_dev d;
 
+  memset(&d, 0, sizeof(d));
   a->debug("...sanity check");
   d.bus = 0;
   d.func = 0;
