@@ -92,32 +92,6 @@ static int probe_sequence[] = {
   -1,
 };
 
-void *
-pci_malloc(struct pci_access *a, int size)
-{
-  void *x = malloc(size);
-
-  if (!x)
-    a->error("Out of memory (allocation of %d bytes failed)", size);
-  return x;
-}
-
-void
-pci_mfree(void *x)
-{
-  if (x)
-    free(x);
-}
-
-char *
-pci_strdup(struct pci_access *a, const char *s)
-{
-  int len = strlen(s) + 1;
-  char *t = pci_malloc(a, len);
-  memcpy(t, s, len);
-  return t;
-}
-
 static void
 pci_generic_error(char *msg, ...)
 {
@@ -158,6 +132,34 @@ pci_null_debug(char *msg UNUSED, ...)
 {
 }
 
+// Memory allocation functions are safe to call if pci_access is not fully initalized or even NULL
+
+void *
+pci_malloc(struct pci_access *a, int size)
+{
+  void *x = malloc(size);
+
+  if (!x)
+    (a && a->error ? a->error : pci_generic_error)("Out of memory (allocation of %d bytes failed)", size);
+  return x;
+}
+
+void
+pci_mfree(void *x)
+{
+  if (x)
+    free(x);
+}
+
+char *
+pci_strdup(struct pci_access *a, const char *s)
+{
+  int len = strlen(s) + 1;
+  char *t = pci_malloc(a, len);
+  memcpy(t, s, len);
+  return t;
+}
+
 int
 pci_lookup_method(char *name)
 {
@@ -183,7 +185,7 @@ pci_get_method_name(int index)
 struct pci_access *
 pci_alloc(void)
 {
-  struct pci_access *a = malloc(sizeof(struct pci_access));
+  struct pci_access *a = pci_malloc(NULL, sizeof(struct pci_access));
   int i;
 
   memset(a, 0, sizeof(*a));
