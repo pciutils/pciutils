@@ -12,7 +12,7 @@
 
 #include "lspci.h"
 
-struct bridge host_bridge = { NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
+struct bridge host_bridge = { NULL, NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
 
 static struct bus *
 find_bus(struct bridge *b, unsigned int domain, unsigned int n)
@@ -31,11 +31,15 @@ new_bus(struct bridge *b, unsigned int domain, unsigned int n)
   struct bus *bus = xmalloc(sizeof(struct bus));
   bus->domain = domain;
   bus->number = n;
-  bus->sibling = b->first_bus;
+  bus->sibling = NULL;
   bus->first_dev = NULL;
   bus->last_dev = &bus->first_dev;
   bus->parent_bridge = b;
-  b->first_bus = bus;
+  if (b->last_bus)
+    b->last_bus->sibling = bus;
+  b->last_bus = bus;
+  if (!b->first_bus)
+    b->first_bus = bus;
   return bus;
 }
 
@@ -101,6 +105,7 @@ grow_tree(void)
 	  last_br = &b->chain;
 	  b->next = b->child = NULL;
 	  b->first_bus = NULL;
+	  b->last_bus = NULL;
 	  b->br_dev = d;
 	  d->bridge = b;
 	  pacc->debug("Tree: bridge %04x:%02x:%02x.%d: %02x -> %02x-%02x\n",
