@@ -186,14 +186,11 @@ pci_get_method_name(int index)
     return pci_methods[index]->name;
 }
 
-struct pci_access *
-pci_alloc(void)
-{
-  struct pci_access *a = pci_malloc(NULL, sizeof(struct pci_access));
-  int i;
-
-  memset(a, 0, sizeof(*a));
 #ifdef PCI_OS_WINDOWS
+
+static void
+pci_init_name_list_path(struct pci_access *a)
+{
   if ((PCI_PATH_IDS_DIR)[0])
     pci_set_name_list_path(a, PCI_PATH_IDS_DIR "\\" PCI_IDS, 0);
   else
@@ -212,9 +209,26 @@ pci_alloc(void)
           pci_set_name_list_path(a, path, 1);
         }
     }
+}
+
 #else
+
+static void
+pci_init_name_list_path(struct pci_access *a)
+{
   pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
+}
+
 #endif
+
+struct pci_access *
+pci_alloc(void)
+{
+  struct pci_access *a = pci_malloc(NULL, sizeof(struct pci_access));
+  int i;
+
+  memset(a, 0, sizeof(*a));
+  pci_init_name_list_path(a);
 #ifdef PCI_USE_DNS
   pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
   pci_define_param(a, "net.cache_name", "~/.pciids-cache", "Name of the ID cache file");
