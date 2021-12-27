@@ -211,40 +211,6 @@ show_kernel_cleanup(void)
 
 #endif
 
-#define DRIVER_BUF_SIZE 1024
-
-static char *
-find_driver(struct device *d, char *buf)
-{
-  struct pci_dev *dev = d->dev;
-  char name[1024], *drv, *base;
-  int n;
-
-  if (dev->access->method != PCI_ACCESS_SYS_BUS_PCI)
-    return NULL;
-
-  base = pci_get_param(dev->access, "sysfs.path");
-  if (!base || !base[0])
-    return NULL;
-
-  n = snprintf(name, sizeof(name), "%s/devices/%04x:%02x:%02x.%d/driver",
-	       base, dev->domain, dev->bus, dev->dev, dev->func);
-  if (n < 0 || n >= (int)sizeof(name))
-    die("show_driver: sysfs device name too long, why?");
-
-  n = readlink(name, buf, DRIVER_BUF_SIZE);
-  if (n < 0)
-    return NULL;
-  if (n >= DRIVER_BUF_SIZE)
-    return "<name-too-long>";
-  buf[n] = 0;
-
-  if (drv = strrchr(buf, '/'))
-    return drv+1;
-  else
-    return buf;
-}
-
 static const char *
 next_module_filtered(struct device *d)
 {
@@ -267,10 +233,10 @@ next_module_filtered(struct device *d)
 void
 show_kernel(struct device *d)
 {
-  char buf[DRIVER_BUF_SIZE];
   const char *driver, *module;
 
-  if (driver = find_driver(d, buf))
+  pci_fill_info(d->dev, PCI_FILL_DRIVER);
+  if (driver = pci_get_string_property(d->dev, PCI_FILL_DRIVER))
     printf("\tKernel driver in use: %s\n", driver);
 
   if (!show_kernel_init())
@@ -286,10 +252,10 @@ show_kernel(struct device *d)
 void
 show_kernel_machine(struct device *d)
 {
-  char buf[DRIVER_BUF_SIZE];
   const char *driver, *module;
 
-  if (driver = find_driver(d, buf))
+  pci_fill_info(d->dev, PCI_FILL_DRIVER);
+  if (driver = pci_get_string_property(d->dev, PCI_FILL_DRIVER))
     printf("Driver:\t%s\n", driver);
 
   if (!show_kernel_init())
@@ -302,13 +268,23 @@ show_kernel_machine(struct device *d)
 #else
 
 void
-show_kernel(struct device *d UNUSED)
+show_kernel(struct device *d)
 {
+  const char *driver;
+
+  pci_fill_info(d->dev, PCI_FILL_DRIVER);
+  if (driver = pci_get_string_property(d->dev, PCI_FILL_DRIVER))
+    printf("\tDriver in use: %s\n", driver);
 }
 
 void
-show_kernel_machine(struct device *d UNUSED)
+show_kernel_machine(struct device *d)
 {
+  const char *driver;
+
+  pci_fill_info(d->dev, PCI_FILL_DRIVER);
+  if (driver = pci_get_string_property(d->dev, PCI_FILL_DRIVER))
+    printf("Driver:\t%s\n", driver);
 }
 
 void
