@@ -461,6 +461,20 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	}
     }
 
+  if (want_fill(d, flags, PCI_FILL_DRIVER))
+    {
+      char *driver_path = sysfs_deref_link(d, "driver");
+      if (driver_path)
+        {
+          char *driver = strrchr(driver_path, '/');
+          driver = driver ? driver+1 : driver_path;
+          pci_set_property(d, PCI_FILL_DRIVER, driver);
+          free(driver_path);
+        }
+      else
+        clear_fill(d, PCI_FILL_DRIVER);
+    }
+
   pci_generic_fill_info(d, flags);
 }
 
