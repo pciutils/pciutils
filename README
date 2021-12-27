@@ -49,7 +49,8 @@ The utilities include:  (See manual pages for more details)
 2. Compiling and (un)installing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Just run "make" to compile the package and then "make install" to install it.
-Please note that GNU make is needed on most platforms.
+Please note that a C compiler supporting the C99 standard is required.
+Also, GNU make is needed on most platforms.
 
 If you want to change the default installation location, please override
 the PREFIX variable specified in the Makefile -- e.g., you can use
