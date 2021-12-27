@@ -96,6 +96,29 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
   if (want_fill(d, flags, PCI_FILL_CLASS))
     d->device_class = pci_read_word(d, PCI_CLASS_DEVICE);
 
+  if (want_fill(d, flags, PCI_FILL_CLASS_EXT))
+    {
+      d->prog_if = pci_read_byte(d, PCI_CLASS_PROG);
+      d->rev_id = pci_read_byte(d, PCI_REVISION_ID);
+    }
+
+  if (want_fill(d, flags, PCI_FILL_SUBSYS))
+    {
+      switch (get_hdr_type(d))
+        {
+        case PCI_HEADER_TYPE_NORMAL:
+          d->subsys_vendor_id = pci_read_word(d, PCI_SUBSYSTEM_VENDOR_ID);
+          d->subsys_id = pci_read_word(d, PCI_SUBSYSTEM_ID);
+          break;
+        case PCI_HEADER_TYPE_CARDBUS:
+          d->subsys_vendor_id = pci_read_word(d, PCI_CB_SUBSYSTEM_VENDOR_ID);
+          d->subsys_id = pci_read_word(d, PCI_CB_SUBSYSTEM_ID);
+          break;
+        default:
+          clear_fill(d, PCI_FILL_SUBSYS);
+        }
+    }
+
   if (want_fill(d, flags, PCI_FILL_IRQ))
     d->irq = pci_read_byte(d, PCI_INTERRUPT_LINE);
 
