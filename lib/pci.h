@@ -216,6 +216,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_CLASS_EXT	0x00020000      /* prog_if and rev_id */
 #define PCI_FILL_SUBSYS		0x00040000      /* subsys_vendor_id and subsys_id */
 #define PCI_FILL_PARENT		0x00080000
+#define PCI_FILL_DRIVER		0x00100000      /* OS driver currently in use (string property) */
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
 
