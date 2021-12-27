@@ -333,6 +333,8 @@ sysfs_fill_slots(struct pci_access *a)
 static void
 sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 {
+  int value, want_class, want_class_ext;
+
   if (!d->access->buscentric)
     {
       /*
@@ -345,8 +347,36 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	  d->vendor_id = sysfs_get_value(d, "vendor", 1);
 	  d->device_id = sysfs_get_value(d, "device", 1);
 	}
-      if (want_fill(d, flags, PCI_FILL_CLASS))
-	d->device_class = sysfs_get_value(d, "class", 1) >> 8;
+      want_class = want_fill(d, flags, PCI_FILL_CLASS);
+      want_class_ext = want_fill(d, flags, PCI_FILL_CLASS_EXT);
+      if (want_class || want_class_ext)
+        {
+	  value = sysfs_get_value(d, "class", 1);
+	  if (want_class)
+	    d->device_class = value >> 8;
+	  if (want_class_ext)
+	    {
+	      d->prog_if = value & 0xff;
+	      value = sysfs_get_value(d, "revision", 0);
+	      if (value < 0)
+	        value = pci_read_byte(d, PCI_REVISION_ID);
+	      if (value >= 0)
+	        d->rev_id = value;
+	    }
+	}
+      if (want_fill(d, flags, PCI_FILL_SUBSYS))
+	{
+	  value = sysfs_get_value(d, "subsystem_vendor", 0);
+	  if (value >= 0)
+	    {
+	      d->subsys_vendor_id = value;
+	      value = sysfs_get_value(d, "subsystem_device", 0);
+	      if (value >= 0)
+	        d->subsys_id = value;
+	    }
+	  else
+	    clear_fill(d, PCI_FILL_SUBSYS);
+	}
       if (want_fill(d, flags, PCI_FILL_IRQ))
 	  d->irq = sysfs_get_value(d, "irq", 1);
       if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS | PCI_FILL_BRIDGE_BASES))
