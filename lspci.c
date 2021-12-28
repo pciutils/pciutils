@@ -124,18 +124,18 @@ scan_device(struct pci_dev *p)
   d = xmalloc(sizeof(struct device));
   memset(d, 0, sizeof(*d));
   d->dev = p;
+  d->no_config_access = p->no_config_access;
   d->config_cached = d->config_bufsize = 64;
   d->config = xmalloc(64);
   d->present = xmalloc(64);
   memset(d->present, 1, 64);
-  if (!pci_read_block(p, 0, d->config, 64))
+  if (!d->no_config_access && !pci_read_block(p, 0, d->config, 64))
     {
-      fprintf(stderr, "lspci: Unable to read the standard configuration space header of device %04x:%02x:%02x.%d\n",
-	      p->domain, p->bus, p->dev, p->func);
-      seen_errors++;
-      return NULL;
+      d->no_config_access = 1;
+      d->config_cached = d->config_bufsize = 0;
+      memset(d->present, 0, 64);
     }
-  if ((d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
+  if (!d->no_config_access && (d->config[PCI_HEADER_TYPE] & 0x7f) == PCI_HEADER_TYPE_CARDBUS)
     {
       /* For cardbus bridges, we need to fetch 64 bytes more to get the
        * full standard header... */
@@ -799,7 +799,7 @@ show_verbose(struct device *d)
   struct pci_dev *p = d->dev;
   int unknown_config_data = 0;
   word class = p->device_class;
-  byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+  byte htype = d->no_config_access ? -1 : (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f);
   byte bist;
   byte max_lat, min_gnt;
   char *dt_node, *iommu_group;
@@ -832,6 +832,7 @@ show_verbose(struct device *d)
       min_gnt = max_lat = 0;
       break;
     default:
+      if (!d->no_config_access)
       printf("\t!!! Unknown header type %02x\n", htype);
       bist = 0;
       min_gnt = max_lat = 0;
@@ -972,6 +973,12 @@ static void
 show_hex_dump(struct device *d)
 {
   unsigned int i, cnt;
+
+  if (d->no_config_access)
+    {
+      printf("WARNING: Cannot show hex-dump of the config space\n");
+      return;
+    }
 
   cnt = d->config_cached;
   if (opt_hex >= 3 && config_fetch(d, cnt, 256-cnt))
