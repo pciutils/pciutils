@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Bus Tree
  *
- *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2021 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -145,12 +145,16 @@ grow_tree(void)
     insert_dev(d, &host_bridge);
 }
 
+#define LINE_BUF_SIZE 1024
+
 static void
 print_it(char *line, char *p)
 {
-  *p++ = '\n';
   *p = 0;
   fputs(line, stdout);
+  if (p >= line + LINE_BUF_SIZE - 1)
+    fputs("...", stdout);
+  putchar('\n');
   for (p=line; *p; p++)
     if (*p == '+' || *p == '|')
       *p = '|';
@@ -160,24 +164,25 @@ print_it(char *line, char *p)
 
 static void show_tree_bridge(struct bridge *, char *, char *);
 
-#define LINE_BUF_SIZE 1024
-
 static char * FORMAT_CHECK(printf, 3, 4)
 tree_printf(char *line, char *p, char *fmt, ...)
 {
   va_list args;
-  char *end = line + LINE_BUF_SIZE - 2;
+  int space = line + LINE_BUF_SIZE - 1 - p;
 
-  if (p >= end)
+  if (space <= 0)
     return p;
 
   va_start(args, fmt);
-  int res = vsnprintf(p, end - p, fmt, args);
+  int res = vsnprintf(p, space, fmt, args);
   if (res < 0)
     {
-      /* Ancient C libraries return -1 on overflow */
-      p += strlen(p);
+      /* Ancient C libraries return -1 on overflow and they do not truncate the output properly. */
+      *p = 0;
+      p += space;
     }
+  else if (res >= space)
+    p += space;
   else
     p += res;
 
