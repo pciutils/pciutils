@@ -71,6 +71,7 @@ lib/config.h lib/config.mk:
 
 COMMON=common.o
 ifeq ($(COMPAT_GETOPT),yes)
+PCIINC+=compat/getopt.h
 COMMON+=compat/getopt.o
 endif
 
