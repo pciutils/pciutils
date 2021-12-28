@@ -39,6 +39,7 @@ struct device {
   struct bus *parent_bus;
   struct bridge *bridge;
   /* Cache */
+  int no_config_access;
   unsigned int config_cached, config_bufsize;
   byte *config;				/* Cached configuration space data */
   byte *present;			/* Maps which configuration bytes are present */

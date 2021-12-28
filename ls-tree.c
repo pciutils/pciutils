@@ -107,7 +107,7 @@ grow_tree(void)
     {
       struct pci_dev *dd = d->dev;
       word class = dd->device_class;
-      byte ht = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
+      byte ht = d->no_config_access ? -1 : (get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f);
       if ((class >> 8) == PCI_BASE_CLASS_BRIDGE &&
 	  (ht == PCI_HEADER_TYPE_BRIDGE || ht == PCI_HEADER_TYPE_CARDBUS))
 	{
