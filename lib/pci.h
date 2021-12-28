@@ -147,6 +147,7 @@ struct pci_dev {
   pciaddr_t bridge_flags[4];		/* PCI_IORESOURCE_* flags for bridge addresses */
   u8 prog_if, rev_id;			/* Programming interface for device_class and revision id */
   u16 subsys_vendor_id, subsys_id;	/* Subsystem vendor id and subsystem id */
+  struct pci_dev *parent;		/* Parent device, does not have to be always accessible */
 
   /* Fields used internally */
   struct pci_access *access;
@@ -214,6 +215,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_RESCAN		0x00010000
 #define PCI_FILL_CLASS_EXT	0x00020000      /* prog_if and rev_id */
 #define PCI_FILL_SUBSYS		0x00040000      /* subsys_vendor_id and subsys_id */
+#define PCI_FILL_PARENT		0x00080000
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
 
