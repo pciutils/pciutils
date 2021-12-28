@@ -381,6 +381,39 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	  d->irq = sysfs_get_value(d, "irq", 1);
       if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS | PCI_FILL_BRIDGE_BASES))
 	  sysfs_get_resources(d);
+      if (want_fill(d, flags, PCI_FILL_PARENT))
+	{
+	  unsigned int domain, bus, dev, func;
+	  char *path_abs, *path_canon, *name;
+	  char path_rel[OBJNAMELEN];
+	  struct pci_dev *parent;
+
+	  /* Construct sysfs path for parent device */
+	  sysfs_obj_name(d, "..", path_rel);
+	  path_abs = realpath(path_rel, NULL);
+	  name = path_abs ? strrchr(path_abs, '/') : NULL;
+	  name = name ? name+1 : name;
+	  parent = NULL;
+
+	  if (name && sscanf(name, "%x:%x:%x.%d", &domain, &bus, &dev, &func) == 4 && domain <= 0x7fffffff)
+	    for (parent = d->access->devices; parent; parent = parent->next)
+	      if (parent->domain == (int)domain && parent->bus == bus && parent->dev == dev && parent->func == func)
+	        break;
+
+	  if (parent)
+	    {
+	      /* Check if parsed BDF address from parent sysfs device is really expected PCI device */
+	      sysfs_obj_name(parent, ".", path_rel);
+	      path_canon = realpath(path_rel, NULL);
+	      if (!path_canon || strcmp(path_canon, path_abs) != 0)
+	        parent = NULL;
+	    }
+
+	  if (parent)
+	    d->parent = parent;
+	  else
+	    clear_fill(d, PCI_FILL_PARENT);
+	}
     }
 
   if (want_fill(d, flags, PCI_FILL_PHYS_SLOT))
