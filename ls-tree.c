@@ -25,6 +25,19 @@ find_bus(struct bridge *b, unsigned int domain, unsigned int n)
   return bus;
 }
 
+static struct device *
+find_device(struct pci_dev *dd)
+{
+  struct device *d;
+
+  if (!dd)
+    return NULL;
+  for (d=first_dev; d; d=d->next)
+    if (d->dev == dd)
+      break;
+  return d;
+}
+
 static struct bus *
 new_bus(struct bridge *b, unsigned int domain, unsigned int n)
 {
@@ -47,9 +60,20 @@ static void
 insert_dev(struct device *d, struct bridge *b)
 {
   struct pci_dev *p = d->dev;
-  struct bus *bus;
+  struct device *parent = NULL;
+  struct bus *bus = NULL;
 
-  if (! (bus = find_bus(b, p->domain, p->bus)))
+  if (p->known_fields & PCI_FILL_PARENT)
+    parent = find_device(p->parent);
+
+  if (parent && parent->bridge)
+    {
+      bus = parent->bridge->first_bus;
+      if (!bus)
+        bus = new_bus(parent->bridge, p->domain, p->bus);
+    }
+
+  if (!bus && ! (bus = find_bus(b, p->domain, p->bus)))
     {
       struct bridge *c;
       for (c=b->child; c; c=c->next)
@@ -113,14 +137,47 @@ grow_tree(void)
 	    b->primary, b->secondary, b->subordinate);
 	}
     }
+
+  /* Append additional bridges reported by libpci via d->parent */
+
+  for (d=first_dev; d; d=d->next)
+    {
+      struct device *parent = NULL;
+      if (d->dev->known_fields & PCI_FILL_PARENT)
+        parent = find_device(d->dev->parent);
+      if (!parent || parent->bridge)
+        continue;
+      b = xmalloc(sizeof(struct bridge));
+      b->domain = parent->dev->domain;
+      b->primary = parent->dev->bus;
+      b->secondary = d->dev->bus;
+      /* At this stage subordinate number is unknown, so set it to secondary bus number. */
+      b->subordinate = b->secondary;
+      *last_br = b;
+      last_br = &b->chain;
+      b->next = b->child = NULL;
+      b->first_bus = NULL;
+      b->last_bus = NULL;
+      b->br_dev = parent;
+      parent->bridge = b;
+      pacc->debug("Tree: bridge %04x:%02x:%02x.%d\n", b->domain,
+        parent->dev->bus, parent->dev->dev, parent->dev->func);
+    }
   *last_br = NULL;
 
   /* Create a bridge tree */
 
   for (b=&host_bridge; b; b=b->chain)
     {
-      struct bridge *c, *best;
-      best = NULL;
+      struct device *br_dev = b->br_dev;
+      struct bridge *c, *best = NULL;
+      struct device *parent = NULL;
+
+      if (br_dev && (br_dev->dev->known_fields & PCI_FILL_PARENT))
+        parent = find_device(br_dev->dev->parent);
+      if (parent)
+        best = parent->bridge;
+      if (!best)
       for (c=&host_bridge; c; c=c->chain)
 	if (c != b && (c == &host_bridge || b->domain == c->domain) &&
 	    b->primary >= c->secondary && b->primary <= c->subordinate &&

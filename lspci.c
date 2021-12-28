@@ -143,7 +143,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS | (need_topology ? PCI_FILL_PARENT : 0));
   return d;
 }
 
