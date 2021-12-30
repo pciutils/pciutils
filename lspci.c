@@ -897,10 +897,207 @@ show_hex_dump(struct device *d)
 }
 
 static void
+print_header_type_0(int i, int *field_len_ptr)
+{
+  int field_len=0;
+  
+  switch(i)
+  {
+    case PCI_BASE_ADDRESS_0:
+      printf("\tBAR 0:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_1:
+      printf("\n\tBAR 1:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_2:
+      printf("\n\tBAR 2:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_3:
+      printf("\n\tBAR 3:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_4:
+      printf("\tBAR 4:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_5:
+      printf("\n\tBAR 5:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_CARDBUS_CIS:
+      printf("\n\tCardbus CIS:\t");
+      field_len = sizeof(u32);
+      break;		
+    case PCI_SUBSYSTEM_VENDOR_ID:
+      printf("\n\tSubsys Vendor:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_SUBSYSTEM_ID:
+      printf("\n\tSubsystem ID:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_ROM_ADDRESS:
+      printf("\tExpan ROM BAR:\t");
+      field_len = sizeof(u32);
+      break;		
+    case PCI_CAPABILITY_LIST:
+      printf("\n\tCapability Ptr:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CAPABILITY_LIST+1:
+      printf("\n\tReserved:\t");
+      field_len = sizeof(u32)+sizeof(word)+sizeof(byte);
+      break;
+    case PCI_INTERRUPT_LINE:
+      printf("\n\tInterrupt Line:\t");
+      field_len = sizeof(byte);
+      break;	
+    case PCI_INTERRUPT_PIN:
+      printf("\n\tInterrupt Pin:\t");
+      field_len = sizeof(byte);
+      break;	
+    case PCI_MIN_GNT:
+      printf("\n\tMin Grant:\t");
+      field_len = sizeof(byte);
+      break;		
+    case PCI_MAX_LAT:
+      printf("\n\tMax Latency:\t");
+      field_len = sizeof(byte);
+      break;		
+    default:
+      field_len--;
+      field_len = *field_len_ptr;
+      break;
+    }
+  
+  *field_len_ptr = field_len;
+}
+
+static void
+print_header_type_1(int i, int *field_len_ptr)
+{
+  int field_len=0;
+
+  switch(i)
+  {  
+    case PCI_BASE_ADDRESS_0:
+      printf("\tBAR 0:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_BASE_ADDRESS_1:
+      printf("\n\tBAR 1:\t\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_PRIMARY_BUS:
+      printf("\n\tPrimary Bus:\t");
+      field_len = sizeof(byte);
+      break;		
+    case PCI_SECONDARY_BUS:
+      printf("\n\tSecondary Bus:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_SUBORDINATE_BUS:
+      printf("\n\tSubordinate Bus:");
+      field_len = sizeof(byte);
+      break;
+    case PCI_SEC_LATENCY_TIMER:
+      printf("\n\tSec Latency Tmr:");
+      field_len = sizeof(byte);
+      break;
+    case PCI_IO_BASE:
+      printf("\n\tI/O Base:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_IO_LIMIT:
+      printf("\n\tI/O Limit:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_SEC_STATUS:
+      printf("\n\tSec Status:\t");
+      field_len = sizeof(word);
+      break;		
+    case PCI_MEMORY_BASE:
+      printf("\tMemory Base:\t");
+      field_len = sizeof(word);
+      break;		
+    case PCI_MEMORY_LIMIT:
+      printf("\n\tMemory Limit:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_PREF_MEMORY_BASE:
+      printf("\n\tPref Mem Base:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_PREF_MEMORY_LIMIT:
+      printf("\n\tPref Mem Limit:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_PREF_BASE_UPPER32:
+      printf("\n\tPref Base Up32:\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_PREF_LIMIT_UPPER32:
+      printf("\n\tPref Lim Up32:\t");
+      field_len = sizeof(u32);
+      break;	
+    case PCI_IO_BASE_UPPER16:
+      printf("\tI/O Base Up16:\t");
+      field_len = sizeof(word);
+      break;	
+    case PCI_IO_LIMIT_UPPER16:
+      printf("\n\tI/O Lim Up16:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CAPABILITY_LIST:
+      printf("\n\tCapability Ptr:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CAPABILITY_LIST+1:
+      printf("\n\tReserved:\t");
+      field_len = sizeof(word)+sizeof(byte);
+      break;
+    case PCI_ROM_ADDRESS1:
+      printf("\n\tExpan ROM BAR:\t");
+      field_len = sizeof(u32);
+      break;		
+    case PCI_INTERRUPT_LINE:
+      printf("\n\tInterrupt Line:\t");
+      field_len = sizeof(byte);
+      break;	
+    case PCI_INTERRUPT_PIN:
+      printf("\n\tInterrupt Pin:\t");
+      field_len = sizeof(byte);
+      break;	
+    case PCI_BRIDGE_CONTROL:
+      printf("\n\tBridge Control:\t");
+      field_len = sizeof(word);
+      break;		
+    default:
+      field_len--;
+      field_len = *field_len_ptr;
+      break;
+    }
+  *field_len_ptr = field_len;
+}
+
+#if 0
+static int
+print_header_type_2(int i)
+{
+  int field_len=0;
+
+  return field_len;
+}
+#endif
+
+static void
 show_hex_parsed(struct device *d)
 {
-  unsigned int i, cnt;
-  int field_len=0;
+  unsigned int i, cnt, header_type = 0;
+  int field_len = 0;
 
   cnt = d->config_cached;
   if (opt_hex_parsed >= 3 && config_fetch(d, cnt, 256-cnt))
@@ -943,7 +1140,7 @@ show_hex_parsed(struct device *d)
             break;          
           case PCI_CLASS_DEVICE:
             printf("\n\tClass Device:\t");
-            field_len = sizeof(byte);
+            field_len = sizeof(word);
             break;        
           case PCI_CACHE_LINE_SIZE:
             printf("\n\tCache Line Size:");
@@ -956,126 +1153,35 @@ show_hex_parsed(struct device *d)
           case PCI_HEADER_TYPE:
             printf("\n\tHeader Type:\t");
             field_len = sizeof(byte);
+            /* if 0x1000 */
             break;		
           case PCI_BIST:
-            printf("\n\tBIST:\t\t");
+            printf("\n\tBIST:\t\t"); 
+            header_type = get_conf_byte(d, i+field_len-1);
             field_len = sizeof(byte);
             break;
-          case PCI_BASE_ADDRESS_0:
-            printf("\tBAR 0:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_BASE_ADDRESS_1:
-            printf("\n\tBAR 1:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_BASE_ADDRESS_2:
-            printf("\n\tBAR 2:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_BASE_ADDRESS_3:
-            printf("\n\tBAR 3:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_BASE_ADDRESS_4:
-            printf("\tBAR 4:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_BASE_ADDRESS_5:
-            printf("\n\tBAR 5:\t\t");
-            field_len = sizeof(u32);
-            break;	
-          case PCI_CARDBUS_CIS:
-            printf("\n\tCardbus CIS:\t");
-            field_len = sizeof(u32);
-            break;		
-          case PCI_SUBSYSTEM_VENDOR_ID:
-            printf("\n\tSubsys Vendor:\t");
-            field_len = sizeof(word);
-            break;	
-          case PCI_SUBSYSTEM_ID:
-            printf("\n\tSubsystem ID:\t");
-            field_len = sizeof(word);
-            break;	
-          case PCI_ROM_ADDRESS:
-            printf("\tExpan ROM BAR:\t");
-            field_len = sizeof(u32);
-            break;		
-          case PCI_CAPABILITY_LIST:
-            printf("\n\tCapability Ptr:\t");
-            field_len = sizeof(byte);
-            break;
-          case PCI_CAPABILITY_LIST+1:
-            printf("\n\tReserved:\t");
-            field_len = sizeof(u32)+sizeof(word)+sizeof(byte);
-            break;
-          case PCI_INTERRUPT_LINE:
-            printf("\n\tInterrupt Line:\t");
-            field_len = sizeof(byte);
-            break;	
-          case PCI_INTERRUPT_PIN:
-            printf("\n\tInterrupt Pin:\t");
-            field_len = sizeof(byte);
-            break;	
-          case PCI_MIN_GNT:
-            printf("\n\tMin Grant:\t");
-            field_len = sizeof(byte);
-            break;		
-          case PCI_MAX_LAT:
-            printf("\n\tMax Latency:\t");
-            field_len = sizeof(byte);
-            break;		
-#if 0
-          case PCI_PRIMARY_BUS:
-            printf("\n\tReserved:\t");
-            break;		
-          case PCI_SECONDARY_BUS:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_SUBORDINATE_BUS:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_SEC_LATENCY_TIMER:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_IO_BASE:
-            printf("\n\tReserved:\t");
-            break;		
-          case PCI_IO_LIMIT:
-            printf("\n\tReserved:\t");
-            break;		
-          case PCI_SEC_STATUS:
-            printf("\n\tReserved:\t");
-            break;		
-          case PCI_MEMORY_BASE:
-            printf("\n\tReserved:\t");
-            break;		
-          case PCI_MEMORY_LIMIT:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_PREF_MEMORY_BASE:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_PREF_MEMORY_LIMIT:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_PREF_BASE_UPPER32:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_PREF_LIMIT_UPPER32:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_IO_BASE_UPPER16:
-            printf("\n\tReserved:\t");
-            break;	
-          case PCI_IO_LIMIT_UPPER16:
-            printf("\n\tReserved:\t");
-            break;
-#endif
           default:
             field_len--;
             break;
         }
+
+          if(i > PCI_BIST)
+        {
+            switch(header_type & 0x0003)
+          {
+            case 0:
+              print_header_type_0(i, &field_len);
+              break;
+            case 1:
+              print_header_type_1(i, &field_len);
+              break;
+            case 2:
+              break;
+            default:
+              break;
+          }
+        }
+
         printf(" %02x", get_conf_byte(d, i+(--field_len)));
         if ((i & 15) == 15)
       putchar('\n');
