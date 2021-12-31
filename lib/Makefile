@@ -54,6 +54,11 @@ ifdef PCI_HAVE_PM_HURD_CONF
 OBJS += hurd
 endif
 
+ifdef PCI_HAVE_PM_WIN32_CFGMGR32
+OBJS += emulated
+OBJS += win32-cfgmgr32
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)
@@ -102,3 +107,13 @@ names-hwdb.o: names-hwdb.c $(INCL) names.h
 filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
 hurd.o: hurd.c $(INCL)
+win32-cfgmgr32.o: win32-cfgmgr32.c $(INCL)
+
+# MinGW32 toolchain has some required Win32 header files in /ddk subdirectory.
+# But these header files include another header files from /ddk subdirectory
+# and expect that build system has already set /ddk subdirectory into includes.
+# So include /ddk subdirectory of each system predefined include path via -I.
+ifdef PCI_HAVE_PM_WIN32_CFGMGR32
+DDKCFLAGS:=$(shell echo | $(CC) $(CFLAGS) -E -Wp,-v -o /dev/null - 2>&1 | sed -n 's/^ \(.*\)/-I\1\/ddk/p')
+win32-cfgmgr32.o: override CFLAGS+=$(DDKCFLAGS)
+endif

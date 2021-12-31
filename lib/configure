@@ -145,6 +145,14 @@ case $sys in
 		EXEEXT=.exe
 		;;
 	cygwin|windows)
+		echo_n " win32-cfgmgr32"
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		echo >>$c '#define PCI_HAVE_PM_WIN32_CFGMGR32'
+		# Warning: MinGW-w64 (incorrectly) provides cfgmgr32 functions
+		# also in other import libraries, not only in libcfgmgr32.a.
+		# So always set -lcfgmgr32 as a first library parameter which
+		# instruct linker to prefer symbols from cfgmgr32.dll.
+		echo >>$m 'WITH_LIBS+=-lcfgmgr32'
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		if [ "$sys" = "cygwin" ] ; then
