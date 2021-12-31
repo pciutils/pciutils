@@ -1418,4 +1418,10 @@
 
 /* I/O resource flags, compatible with <include/linux/ioport.h> */
 
+#define PCI_IORESOURCE_TYPE_BITS	0x00001f00
+#define PCI_IORESOURCE_IO		0x00000100
+#define PCI_IORESOURCE_MEM		0x00000200
+#define PCI_IORESOURCE_PREFETCH		0x00002000
+#define PCI_IORESOURCE_MEM_64		0x00100000
+#define PCI_IORESOURCE_IO_16BIT_ADDR	(1<<0)
 #define PCI_IORESOURCE_PCI_EA_BEI	(1<<5)
