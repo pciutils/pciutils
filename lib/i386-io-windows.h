@@ -1031,6 +1031,7 @@ SetProcessUserModeIOPL(VOID)
   impersonate_privilege_enabled = FALSE;
   revert_to_old_token = FALSE;
   lsass_token = NULL;
+  old_token = NULL;
 
   /* Fast path when ProcessUserModeIOPL was already called. */
   if (read_iopl() == 3)
