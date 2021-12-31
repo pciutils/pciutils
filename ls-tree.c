@@ -258,7 +258,9 @@ show_tree_dev(struct device *d, char *line, char *p)
   for (b=&host_bridge; b; b=b->chain)
     if (b->br_dev == d)
       {
-	if (b->secondary == b->subordinate)
+	if (b->secondary == 0)
+	  p = tree_printf(line, p, "-");
+	else if (b->secondary == b->subordinate)
 	  p = tree_printf(line, p, "-[%02x]-", b->secondary);
 	else
 	  p = tree_printf(line, p, "-[%02x-%02x]-", b->secondary, b->subordinate);
