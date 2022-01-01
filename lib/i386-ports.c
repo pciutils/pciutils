@@ -51,7 +51,7 @@ conf12_init(struct pci_access *a)
 }
 
 static void
-conf12_cleanup(struct pci_access *a UNUSED)
+conf12_cleanup(struct pci_access *a)
 {
   if (conf12_io_enabled > 0)
     {
