@@ -56,6 +56,9 @@ void pci_generic_fill_info(struct pci_dev *, unsigned int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
 int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 
+/* emulated.c */
+int pci_emulated_read(struct pci_dev *d, int pos, byte *buf, int len);
+
 /* init.c */
 void *pci_malloc(struct pci_access *, int);
 void pci_mfree(void *);
