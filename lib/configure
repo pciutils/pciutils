@@ -68,12 +68,14 @@ LSPCIDIR=SBINDIR
 
 case $sys in
 	linux*)
-		echo_n " sysfs proc"
+		echo_n " sysfs proc mem-ports"
 		echo >>$c '#define PCI_HAVE_PM_LINUX_SYSFS'
 		echo >>$c '#define PCI_HAVE_PM_LINUX_PROC'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_HAVE_LINUX_BYTEORDER_H'
 		echo >>$c '#define PCI_PATH_PROC_BUS_PCI "/proc/bus/pci"'
 		echo >>$c '#define PCI_PATH_SYS_BUS_PCI "/sys/bus/pci"'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		case $cpu in
 				i?86|x86_64)	echo_n " i386-ports"
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
@@ -97,7 +99,9 @@ case $sys in
 	freebsd*|kfreebsd*)
 		echo_n " fbsd-device"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		if [ "$sys" != "kfreebsd" ] ; then
 			LIBRESOLV=
 		fi
@@ -105,13 +109,17 @@ case $sys in
         openbsd)
 	        echo_n " obsd-device"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		LIBRESOLV=
 		;;
 
         darwin*)
 	        echo_n " darwin"
 		echo >>$c '#define PCI_HAVE_PM_DARWIN_DEVICE'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$m 'WITH_LIBS+=-lresolv -framework CoreFoundation -framework IOKit'
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		LIBRESOLV=
@@ -121,6 +129,8 @@ case $sys in
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$m 'CFLAGS=-g'
 		echo >>$m 'INSTALL=installbsd'
 		echo >>$m 'DIRINSTALL=mkdir -p'
@@ -128,7 +138,9 @@ case $sys in
 	netbsd)
 		echo_n " nbsd-libpci"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$m 'LIBNAME=libpciutils'
 		echo >>$m 'WITH_LIBS+=-lpci'
@@ -138,6 +150,8 @@ case $sys in
 		echo_n " hurd i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_HURD_CONF'
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		;;
 	djgpp)
 		echo_n " i386-ports"
@@ -174,6 +188,8 @@ case $sys in
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						;;
 		esac
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/misc/mem"'
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	sylixos)

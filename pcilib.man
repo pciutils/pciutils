@@ -40,6 +40,13 @@ on Linux, Solaris/x86, GNU Hurd, Windows, BeOS and Haiku. Requires root privileg
 is able to address only the first 16 devices on any bus and it seems to be very
 unreliable in many cases.
 .TP
+.B mmio-conf1
+Direct hardware access via Intel configuration mechanism 1 via memory-mapped I/O.
+Mostly used on non-i386 platforms. Requires root privileges. Warning: This method
+needs to be properly configured via the
+.B mmio-conf1.addrs
+parameter.
+.TP
 .B fbsd-device
 The
 .B /dev/pci
@@ -111,6 +118,15 @@ Path to the procfs bus tree.
 .TP
 .B sysfs.path
 Path to the sysfs device tree.
+.TP
+.B devmem.path
+Path to the /dev/mem device.
+.TP
+.B mmio-conf1.addrs
+Physical addresses of memory-mapped I/O ports for Intel configuration mechanism 1.
+CF8 (address) and CFC (data) I/O port addresses are separated by slash and
+multiple addresses for different PCI domains are separated by commas.
+Format: 0xaddr1/0xdata1,0xaddr2/0xdata2,...
 
 .SS Parameters for resolving of ID's via DNS
 .TP
