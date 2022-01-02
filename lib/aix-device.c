@@ -206,7 +206,7 @@ aix_scan(struct pci_access *a)
       bus_number = pci_buses[i].bus_number;
       if (!busmap[bus_number])
         {
-          pci_generic_scan_bus(a, busmap, bus_number);
+          pci_generic_scan_bus(a, busmap, 0, bus_number);
         }
     }
 }

@@ -11,7 +11,7 @@
 #include "internal.h"
 
 void
-pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
+pci_generic_scan_bus(struct pci_access *a, byte *busmap, int domain, int bus)
 {
   int dev, multi, ht;
   struct pci_dev *t;
@@ -24,6 +24,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
     }
   busmap[bus] = 1;
   t = pci_alloc_dev(a);
+  t->domain = domain;
   t->bus = bus;
   for (dev=0; dev<32; dev++)
     {
@@ -41,6 +42,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	    multi = ht & 0x80;
 	  ht &= 0x7f;
 	  d = pci_alloc_dev(a);
+	  d->domain = t->domain;
 	  d->bus = t->bus;
 	  d->dev = t->dev;
 	  d->func = t->func;
@@ -55,7 +57,7 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 	      break;
 	    case PCI_HEADER_TYPE_BRIDGE:
 	    case PCI_HEADER_TYPE_CARDBUS:
-	      pci_generic_scan_bus(a, busmap, pci_read_byte(t, PCI_SECONDARY_BUS));
+	      pci_generic_scan_bus(a, busmap, domain, pci_read_byte(t, PCI_SECONDARY_BUS));
 	      break;
 	    default:
 	      a->debug("Device %04x:%02x:%02x.%d has unknown header type %02x.\n", d->domain, d->bus, d->dev, d->func, ht);
@@ -66,12 +68,18 @@ pci_generic_scan_bus(struct pci_access *a, byte *busmap, int bus)
 }
 
 void
-pci_generic_scan(struct pci_access *a)
+pci_generic_scan_domain(struct pci_access *a, int domain)
 {
   byte busmap[256];
 
   memset(busmap, 0, sizeof(busmap));
-  pci_generic_scan_bus(a, busmap, 0);
+  pci_generic_scan_bus(a, busmap, domain, 0);
+}
+
+void
+pci_generic_scan(struct pci_access *a)
+{
+  pci_generic_scan_domain(a, 0);
 }
 
 static int

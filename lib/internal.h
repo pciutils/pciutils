@@ -67,7 +67,8 @@ struct pci_methods {
 };
 
 /* generic.c */
-void pci_generic_scan_bus(struct pci_access *, byte *busmap, int bus);
+void pci_generic_scan_bus(struct pci_access *, byte *busmap, int domain, int bus);
+void pci_generic_scan_domain(struct pci_access *, int domain);
 void pci_generic_scan(struct pci_access *);
 void pci_generic_fill_info(struct pci_dev *, unsigned int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
