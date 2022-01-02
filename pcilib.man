@@ -47,6 +47,13 @@ needs to be properly configured via the
 .B mmio-conf1.addrs
 parameter.
 .TP
+.B mmio-conf1-ext
+Direct hardware access via Extended PCIe Intel configuration mechanism 1 via memory-mapped I/O.
+Mostly used on non-i386 platforms. Requires root privileges. Warning: This method
+needs to be properly configured via the
+.B mmio-conf1-ext.addrs
+parameter.
+.TP
 .B fbsd-device
 The
 .B /dev/pci
@@ -152,6 +159,12 @@ Physical addresses of memory-mapped I/O ports for Intel configuration mechanism 
 CF8 (address) and CFC (data) I/O port addresses are separated by slash and
 multiple addresses for different PCI domains are separated by commas.
 Format: 0xaddr1/0xdata1,0xaddr2/0xdata2,...
+.TP
+.B mmio-conf1-ext.addrs
+Physical addresses of memory-mapped I/O ports for Extended PCIe Intel configuration mechanism 1.
+It has same format as
+.B mmio-conf1.addrs
+parameter.
 
 .SS Parameters for resolving of ID's via DNS
 .TP

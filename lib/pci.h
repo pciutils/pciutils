@@ -47,6 +47,7 @@ enum pci_access_type {
   PCI_ACCESS_WIN32_KLDBG,		/* Win32 kldbgdrv.sys */
   PCI_ACCESS_WIN32_SYSDBG,		/* Win32 NT SysDbg */
   PCI_ACCESS_MMIO_TYPE1,		/* MMIO ports, type 1 */
+  PCI_ACCESS_MMIO_TYPE1_EXT,		/* MMIO ports, type 1 extended */
   PCI_ACCESS_MAX
 };
 

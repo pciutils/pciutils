@@ -225,21 +225,28 @@ conf1_config(struct pci_access *a)
   pci_define_param(a, "mmio-conf1.addrs", "", "Physical addresses of memory mapped Intel conf1 interface"); /* format: 0xaddr1/0xdata1,0xaddr2/0xdata2,... */
 }
 
-static int
-conf1_detect(struct pci_access *a)
+static void
+conf1_ext_config(struct pci_access *a)
 {
-  char *addrs = pci_get_param(a, "mmio-conf1.addrs");
+  pci_define_param(a, "devmem.path", PCI_PATH_DEVMEM_DEVICE, "Path to the /dev/mem device");
+  pci_define_param(a, "mmio-conf1-ext.addrs", "", "Physical addresses of memory mapped Intel conf1 extended interface"); /* format: 0xaddr1/0xdata1,0xaddr2/0xdata2,... */
+}
+
+static int
+detect(struct pci_access *a, char *addrs_param_name)
+{
+  char *addrs = pci_get_param(a, addrs_param_name);
   char *devmem = pci_get_param(a, "devmem.path");
 
   if (!*addrs)
     {
-      a->debug("mmio-conf1.addrs was not specified");
+      a->debug("%s was not specified", addrs_param_name);
       return 0;
     }
 
   if (!validate_addrs(addrs))
     {
-      a->debug("mmio-conf1.addrs has invalid address format %s", addrs);
+      a->debug("%s has invalid address format %s", addrs_param_name, addrs);
       return 0;
     }
 
@@ -253,10 +260,32 @@ conf1_detect(struct pci_access *a)
   return 1;
 }
 
+static int
+conf1_detect(struct pci_access *a)
+{
+  return detect(a, "mmio-conf1.addrs");
+}
+
+static int
+conf1_ext_detect(struct pci_access *a)
+{
+  return detect(a, "mmio-conf1-ext.addrs");
+}
+
+static char*
+get_addrs_param_name(struct pci_access *a)
+{
+  if (a->methods->config == conf1_ext_config)
+    return "mmio-conf1-ext.addrs";
+  else
+    return "mmio-conf1.addrs";
+}
+
 static void
 conf1_init(struct pci_access *a)
 {
-  char *addrs = pci_get_param(a, "mmio-conf1.addrs");
+  char *addrs_param_name = get_addrs_param_name(a);
+  char *addrs = pci_get_param(a, addrs_param_name);
   char *devmem = pci_get_param(a, "devmem.path");
 
   pagesize = sysconf(_SC_PAGESIZE);
@@ -264,10 +293,10 @@ conf1_init(struct pci_access *a)
     a->error("Cannot get page size: %s", strerror(errno));
 
   if (!*addrs)
-    a->error("Option mmio-conf1.addrs was not specified.");
+    a->error("Option %s was not specified.", addrs_param_name);
 
   if (!validate_addrs(addrs))
-    a->error("Option mmio-conf1.addrs has invalid address format \"%s\".", addrs);
+    a->error("Option %s has invalid address format \"%s\".", addrs_param_name, addrs);
 
   a->fd = open(devmem, O_RDWR | O_DSYNC); /* O_DSYNC bypass CPU cache for mmap() on Linux */
   if (a->fd < 0)
@@ -288,7 +317,8 @@ conf1_cleanup(struct pci_access *a)
 static void
 conf1_scan(struct pci_access *a)
 {
-  char *addrs = pci_get_param(a, "mmio-conf1.addrs");
+  char *addrs_param_name = get_addrs_param_name(a);
+  char *addrs = pci_get_param(a, addrs_param_name);
   int domain_count = get_domain_count(addrs);
   int domain;
 
@@ -297,13 +327,14 @@ conf1_scan(struct pci_access *a)
 }
 
 static int
-conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
+conf1_ext_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  char *addrs = pci_get_param(d->access, "mmio-conf1.addrs");
+  char *addrs_param_name = get_addrs_param_name(d->access);
+  char *addrs = pci_get_param(d->access, addrs_param_name);
   volatile void *addr, *data;
   off_t addr_reg, data_reg;
 
-  if (pos >= 256)
+  if (pos >= 4096)
     return 0;
 
   if (len != 1 && len != 2 && len != 4)
@@ -315,7 +346,7 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (!mmap_regs(d->access, addr_reg, data_reg, pos&3, &addr, &data))
     return 0;
 
-  writel(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
+  writel(0x80000000 | ((pos & 0xf00) << 16) | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
   readl(addr); /* write barrier for address */
 
   switch (len)
@@ -335,13 +366,23 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 static int
-conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
+conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  char *addrs = pci_get_param(d->access, "mmio-conf1.addrs");
+  if (pos >= 256)
+    return 0;
+
+  return conf1_ext_read(d, pos, buf, len);
+}
+
+static int
+conf1_ext_write(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  char *addrs_param_name = get_addrs_param_name(d->access);
+  char *addrs = pci_get_param(d->access, addrs_param_name);
   volatile void *addr, *data;
   off_t addr_reg, data_reg;
 
-  if (pos >= 256)
+  if (pos >= 4096)
     return 0;
 
   if (len != 1 && len != 2 && len != 4)
@@ -353,7 +394,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (!mmap_regs(d->access, addr_reg, data_reg, pos&3, &addr, &data))
     return 0;
 
-  writel(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
+  writel(0x80000000 | ((pos & 0xf00) << 16) | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
   readl(addr); /* write barrier for address */
 
   switch (len)
@@ -383,6 +424,15 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
   return 1;
 }
 
+static int
+conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  if (pos >= 256)
+    return 0;
+
+  return conf1_ext_write(d, pos, buf, len);
+}
+
 struct pci_methods pm_mmio_conf1 = {
   "mmio-conf1",
   "Raw memory mapped I/O port access using Intel conf1 interface",
@@ -394,6 +444,22 @@ struct pci_methods pm_mmio_conf1 = {
   pci_generic_fill_info,
   conf1_read,
   conf1_write,
+  NULL,					/* read_vpd */
+  NULL,					/* init_dev */
+  NULL					/* cleanup_dev */
+};
+
+struct pci_methods pm_mmio_conf1_ext = {
+  "mmio-conf1-ext",
+  "Raw memory mapped I/O port access using Intel conf1 extended interface",
+  conf1_ext_config,
+  conf1_ext_detect,
+  conf1_init,
+  conf1_cleanup,
+  conf1_scan,
+  pci_generic_fill_info,
+  conf1_ext_read,
+  conf1_ext_write,
   NULL,					/* read_vpd */
   NULL,					/* init_dev */
   NULL					/* cleanup_dev */
