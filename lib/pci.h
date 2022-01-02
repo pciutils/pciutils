@@ -148,6 +148,7 @@ struct pci_dev {
   u8 prog_if, rev_id;			/* Programming interface for device_class and revision id */
   u16 subsys_vendor_id, subsys_id;	/* Subsystem vendor id and subsystem id */
   struct pci_dev *parent;		/* Parent device, does not have to be always accessible */
+  int no_config_access;			/* No access to config space for this device */
 
   /* Fields used internally */
   struct pci_access *access;

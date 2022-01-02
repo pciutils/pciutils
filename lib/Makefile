@@ -87,6 +87,7 @@ i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.
 proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
+emulated.o: emulated.c $(INCL)
 syscalls.o: syscalls.c $(INCL)
 obsd-device.o: obsd-device.c $(INCL)
 fbsd-device.o: fbsd-device.c $(INCL)
