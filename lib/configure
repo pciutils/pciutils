@@ -153,6 +153,7 @@ case $sys in
 		# So always set -lcfgmgr32 as a first library parameter which
 		# instruct linker to prefer symbols from cfgmgr32.dll.
 		echo >>$m 'WITH_LIBS+=-lcfgmgr32'
+		case $cpu in i?86|x86_64)
 		echo_n " i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		if [ "$sys" = "cygwin" ] ; then
@@ -162,6 +163,7 @@ case $sys in
 			# advapi32 is windows system library and used only by lib/i386-io-windows.h
 			echo >>$m 'WITH_LIBS+=-ladvapi32'
 		fi
+		;; esac
 		EXEEXT=.exe
 		;;
 	beos|haiku)
