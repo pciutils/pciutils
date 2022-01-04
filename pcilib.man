@@ -66,6 +66,16 @@ parameter. The format corresponds to the output of \fIlspci\fP \fB-x\fP.
 .B darwin
 Access method used on Mac OS X / Darwin. Must be run as root and the system
 must have been booted with debug=0x144.
+.TP
+.B win32-cfgmgr32
+Device listing on Windows systems using the Windows Configuration Manager
+via cfgmgr32.dll system library. This method does not require any special
+Administrator rights or privileges. Configuration Manager provides only basic
+information about devices, assigned resources and device tree structure. There
+is no access to the PCI configuration space but libpci provides read-only
+virtual emulation based on information from Configuration Manager. Starting
+with Windows 8 (NT 6.2) it is not possible to retrieve resources from 32-bit
+application or library on 64-bit system.
 
 .SH PARAMETERS
 
