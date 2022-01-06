@@ -971,7 +971,7 @@ print_header_type_0(int i, int *field_len_ptr)
       field_len--;
       field_len = *field_len_ptr;
       break;
-    }
+  }
   
   *field_len_ptr = field_len;
 }
@@ -1079,19 +1079,130 @@ print_header_type_1(int i, int *field_len_ptr)
       field_len--;
       field_len = *field_len_ptr;
       break;
-    }
+  }
   *field_len_ptr = field_len;
 }
 
-#if 0
 static int
-print_header_type_2(int i)
+print_header_type_2(int i, int *field_len_ptr)
 {
   int field_len=0;
 
+  switch(i)
+  {
+    case PCI_BASE_ADDRESS_0:
+      printf("\tCardbus Base Address:\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_CAPABILITY_LIST:
+      printf("\n\tOffset capabilities:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_CAPABILITY_LIST + 1:
+      printf("\n\tReserved:\t\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_SEC_STATUS:
+      printf("\n\tSecondary status:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_PRIMARY_BUS:
+      printf("\n\tBus number:\t\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_CARD_BUS	:
+      printf("\n\tCard Bus number:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_SUBORDINATE_BUS:
+      printf("\n\tSubordinate Bus number:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_LATENCY_TIMER:
+      printf("\n\tCard Bus latency timer:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_MEMORY_BASE_0:
+      printf("\n\tMemory Base Address 0:\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_MEMORY_LIMIT_0:
+      printf("\tMemory Limit 0:\t\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_MEMORY_BASE_1:
+      printf("\n\tMemory Base Address 1:\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_MEMORY_LIMIT_1:
+      printf("\n\tMemory Limit 1:\t\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_IO_BASE_0:
+      printf("\n\tI/O Base Address 0:\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_IO_BASE_0_HI:
+      printf("\n\tI/O Base 0 High:\t");
+      field_len = sizeof(u32);
+      break;
+    case PCI_CB_IO_LIMIT_0:
+      printf("\tI/O Limit 0:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_IO_LIMIT_0_HI:
+      printf("\n\tI/O Limit 0 Hi:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_IO_BASE_1:
+      printf("\n\tI/O Base 1:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_IO_BASE_1_HI:
+      printf("\n\tI/O Base 1 Hi:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_IO_LIMIT_1:
+      printf("\n\tI/O Limit 1:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_IO_LIMIT_1_HI:
+      printf("\n\tI/O Limit 1 Hi:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_INTERRUPT_LINE:
+      printf("\n\tInterrupt Line:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_INTERRUPT_PIN:
+      printf("\n\tInterrupt PIN:\t");
+      field_len = sizeof(byte);
+      break;
+    case PCI_CB_BRIDGE_CONTROL:
+      printf("\n\tBridge Control:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_SUBSYSTEM_VENDOR_ID:
+      printf("\n\tSubsystem Vendor:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_SUBSYSTEM_ID:
+      printf("\n\tSubsystem Device:\t");
+      field_len = sizeof(word);
+      break;
+    case PCI_CB_LEGACY_MODE_BASE:
+      printf("\n\tLegacy Base Address:\t");
+      field_len = sizeof(u32);
+      break;
+    default:
+      field_len--;
+      field_len = *field_len_ptr;
+      break;
+  }
+  *field_len_ptr = field_len;
+
   return field_len;
 }
-#endif
 
 static void
 show_hex_parsed(struct device *d)
@@ -1169,13 +1280,14 @@ show_hex_parsed(struct device *d)
         {
             switch(header_type & 0x0003)
           {
-            case 0:
+            case PCI_HEADER_TYPE_NORMAL:
               print_header_type_0(i, &field_len);
               break;
-            case 1:
+            case PCI_HEADER_TYPE_BRIDGE:
               print_header_type_1(i, &field_len);
               break;
-            case 2:
+            case PCI_HEADER_TYPE_CARDBUS:
+              print_header_type_2(i, &field_len);
               break;
             default:
               break;
