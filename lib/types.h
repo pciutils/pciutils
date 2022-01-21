@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Types and Format Strings
  *
- *	Copyright (c) 1997--2017 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2022 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -70,6 +70,8 @@ typedef u32 pciaddr_t;
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #define PCI_PRINTF(x,y) __attribute__((format(printf, x, y)))
+#define PCI_NONRET __attribute((noreturn))
 #else
 #define PCI_PRINTF(x,y)
+#define PCI_NONRET
 #endif
