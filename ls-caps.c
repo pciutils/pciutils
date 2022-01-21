@@ -771,13 +771,16 @@ static char *link_speed(int speed)
     }
 }
 
-static char *link_compare(int sta, int cap)
+static char *link_compare(int type, int sta, int cap)
 {
-  if (sta < cap)
-    return "downgraded";
   if (sta > cap)
-    return "strange";
-  return "ok";
+    return " (overdriven)";
+  if (sta == cap)
+    return "";
+  if ((type == PCI_EXP_TYPE_ROOT_PORT) || (type == PCI_EXP_TYPE_DOWNSTREAM) ||
+      (type == PCI_EXP_TYPE_PCIE_BRIDGE))
+    return "";
+  return " (downgraded)";
 }
 
 static char *aspm_support(int code)
@@ -850,11 +853,11 @@ static void cap_express_link(struct device *d, int where, int type)
   w = get_conf_word(d, where + PCI_EXP_LNKSTA);
   sta_speed = w & PCI_EXP_LNKSTA_SPEED;
   sta_width = (w & PCI_EXP_LNKSTA_WIDTH) >> 4;
-  printf("\t\tLnkSta:\tSpeed %s (%s), Width x%d (%s)\n",
+  printf("\t\tLnkSta:\tSpeed %s%s, Width x%d%s\n",
 	link_speed(sta_speed),
-	link_compare(sta_speed, cap_speed),
+	link_compare(type, sta_speed, cap_speed),
 	sta_width,
-	link_compare(sta_width, cap_width));
+	link_compare(type, sta_width, cap_width));
   printf("\t\t\tTrErr%c Train%c SlotClk%c DLActive%c BWMgmt%c ABWMgmt%c\n",
 	FLAG(w, PCI_EXP_LNKSTA_TR_ERR),
 	FLAG(w, PCI_EXP_LNKSTA_TRAIN),
