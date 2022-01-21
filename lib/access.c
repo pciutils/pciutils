@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- User Access
  *
- *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2022 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -198,7 +198,7 @@ pci_fill_info_v35(struct pci_dev *d, int flags)
       pci_reset_properties(d);
     }
   if (uflags & ~d->known_fields)
-    d->known_fields |= d->methods->fill_info(d, flags & ~d->known_fields);
+    d->methods->fill_info(d, uflags);
   return d->known_fields;
 }
 

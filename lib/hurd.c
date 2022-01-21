@@ -328,26 +328,16 @@ hurd_fill_rom(struct pci_dev *d)
   d->rom_size = rom.size;
 }
 
-static unsigned int
+static void
 hurd_fill_info(struct pci_dev *d, unsigned int flags)
 {
-  unsigned int done = 0;
-
   if (!d->access->buscentric)
     {
-      if (flags & (PCI_FILL_BASES | PCI_FILL_SIZES))
-	{
-	  hurd_fill_regions(d);
-	  done |= PCI_FILL_BASES | PCI_FILL_SIZES;
-	}
-      if (flags & PCI_FILL_ROM_BASE)
-	{
-	  hurd_fill_rom(d);
-	  done |= PCI_FILL_ROM_BASE;
-	}
+      if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_SIZES))
+	hurd_fill_regions(d);
+      if (want_fill(d, flags, PCI_FILL_ROM_BASE))
+	hurd_fill_rom(d);
     }
-
-  return done | pci_generic_fill_info(d, flags & ~done);
 }
 
 struct pci_methods pm_hurd = {

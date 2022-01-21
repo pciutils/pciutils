@@ -80,17 +80,16 @@ pci_scan_ext_caps(struct pci_dev *d)
   while (where);
 }
 
-unsigned int
+void
 pci_scan_caps(struct pci_dev *d, unsigned int want_fields)
 {
-  if ((want_fields & PCI_FILL_EXT_CAPS) && !(d->known_fields & PCI_FILL_CAPS))
+  if (want_fields & PCI_FILL_EXT_CAPS)
     want_fields |= PCI_FILL_CAPS;
 
-  if (want_fields & PCI_FILL_CAPS)
+  if (want_fill(d, want_fields, PCI_FILL_CAPS))
     pci_scan_trad_caps(d);
-  if (want_fields & PCI_FILL_EXT_CAPS)
+  if (want_fill(d, want_fields, PCI_FILL_EXT_CAPS))
     pci_scan_ext_caps(d);
-  return want_fields;
 }
 
 void

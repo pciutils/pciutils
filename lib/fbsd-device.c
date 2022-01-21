@@ -159,7 +159,7 @@ fbsd_scan(struct pci_access *a)
   free(matches);
 }
 
-static int
+static void
 fbsd_fill_info(struct pci_dev *d, int flags)
 {
   struct pci_conf_io conf;
@@ -200,16 +200,14 @@ fbsd_fill_info(struct pci_dev *d, int flags)
       d->access->error("fbsd_fill_info: ioctl(PCIOCGETCONF) failed: %s", strerror(errno));
     }
 
-  if (flags & PCI_FILL_IDENT)
+  if (want_fill(d, flags, PCI_FILL_IDENT))
     {
       d->vendor_id = match.pc_vendor;
       d->device_id = match.pc_device;
     }
-  if (flags & PCI_FILL_CLASS)
-    {
-      d->device_class = (match.pc_class << 8) | match.pc_subclass;
-    }
-  if (flags & (PCI_FILL_BASES | PCI_FILL_SIZES))
+  if (want_fill(d, flags, PCI_FILL_CLASS))
+    d->device_class = (match.pc_class << 8) | match.pc_subclass;
+  if (want_fill(d, flags PCI_FILL_BASES | PCI_FILL_SIZES))
     {
       d->rom_base_addr = 0;
       d->rom_size = 0;
@@ -242,9 +240,6 @@ fbsd_fill_info(struct pci_dev *d, int flags)
 	    }
 	}
     }
-
-  return flags & (PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_BASES |
-		  PCI_FILL_SIZES);
 }
 
 static int
