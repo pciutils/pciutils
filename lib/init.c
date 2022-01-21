@@ -96,7 +96,7 @@ static int probe_sequence[] = {
   -1,
 };
 
-static void
+static void PCI_NONRET
 pci_generic_error(char *msg, ...)
 {
   va_list args;

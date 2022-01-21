@@ -62,7 +62,7 @@ struct pci_access {
   int debugging;			/* Turn on debugging messages */
 
   /* Functions you can override: */
-  void (*error)(char *msg, ...) PCI_PRINTF(1,2);	/* Write error message and quit */
+  void (*error)(char *msg, ...) PCI_PRINTF(1,2) PCI_NONRET;	/* Write error message and quit */
   void (*warning)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a warning message */
   void (*debug)(char *msg, ...) PCI_PRINTF(1,2);	/* Write a debugging message */
 
