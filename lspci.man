@@ -167,7 +167,9 @@ Applies only to Linux systems with recent enough module tools.
 Invoke bus mapping mode which performs a thorough scan of all PCI devices, including
 those behind misconfigured bridges, etc. This option gives meaningful results only
 with a direct hardware access mode, which usually requires root privileges.
-Please note that the bus mapper only scans PCI domain 0.
+By default, the bus mapper scans domain. You can use the
+.B -s
+option to select a different domain.
 .TP
 .B --version
 Shows
