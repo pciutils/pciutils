@@ -64,6 +64,7 @@ LIBRESOLV=-lresolv
 LIBEXT=so
 EXEEXT=
 SYSINCLUDE=/usr/include
+LSPCIDIR=SBINDIR
 
 case $sys in
 	linux*)
@@ -79,6 +80,7 @@ case $sys in
 						;;
 		esac
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		LSPCIDIR=BINDIR
 		;;
 	sunos)
 		case $cpu in
@@ -177,6 +179,7 @@ esac
 
 echo >>$m "LIBEXT="$LIBEXT
 echo >>$m "EXEEXT="$EXEEXT
+echo >>$m "LSPCIDIR=\$($LSPCIDIR)"
 echo >>$c '#define PCI_HAVE_PM_DUMP'
 echo " dump"
 
