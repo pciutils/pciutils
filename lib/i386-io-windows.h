@@ -37,10 +37,9 @@
 #define _inpd(x) __indword(x)
 #elif defined(__CRTDLL__)
 /*
- * Old CRTDLL library does not provide I/O port functions. Even it is the oldest
- * CRT library it exists also in 64-bit variant. Implement I/O port functions
- * via inline assembly just for 32-bit mode as 64-bit mode uses above <intrin.h>
- * header.
+ * Old 32-bit CRTDLL library does not provide I/O port functions. As this
+ * library exists only in 32-bit mode variant, implement I/O port functions
+ * via 32-bit inline assembly.
  */
 static inline int _outp(unsigned short port, int databyte)
 {
