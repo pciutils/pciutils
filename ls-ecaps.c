@@ -992,6 +992,41 @@ cap_rebar(struct device *d, int where, int virtual)
     }
 }
 
+static void
+cap_doe(struct device *d, int where)
+{
+  u32 l;
+
+  printf("Data Object Exchange\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_DOE_CAP, 0x14))
+    {
+      printf("\t\t<unreadable>\n");
+      return;
+    }
+
+  l = get_conf_long(d, where + PCI_DOE_CAP);
+  printf("\t\tDOECap: IntSup%c\n",
+	 FLAG(l, PCI_DOE_CAP_INT_SUPP));
+  if (l & PCI_DOE_CAP_INT_SUPP)
+    printf("\t\t\tInterrupt Message Number %03x\n",
+	   PCI_DOE_CAP_INT_MSG(l));
+
+  l = get_conf_long(d, where + PCI_DOE_CTL);
+  printf("\t\tDOECtl: IntEn%c\n",
+	 FLAG(l, PCI_DOE_CTL_INT));
+
+  l = get_conf_long(d, where + PCI_DOE_STS);
+  printf("\t\tDOESta: Busy%c IntSta%c Error%c ObjectReady%c\n",
+	 FLAG(l, PCI_DOE_STS_BUSY),
+	 FLAG(l, PCI_DOE_STS_INT),
+	 FLAG(l, PCI_DOE_STS_ERROR),
+	 FLAG(l, PCI_DOE_STS_OBJECT_READY));
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -1138,6 +1173,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_NPEM:
 	    printf("Native PCIe Enclosure Management <?>\n");
+	    break;
+	  case PCI_EXT_CAP_ID_DOE:
+	    cap_doe(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);

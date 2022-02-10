@@ -252,6 +252,7 @@
 #define PCI_EXT_CAP_ID_LMR	0x27	/* Lane Margining at Receiver */
 #define PCI_EXT_CAP_ID_HIER_ID	0x28	/* Hierarchy ID */
 #define PCI_EXT_CAP_ID_NPEM	0x29	/* Native PCIe Enclosure Management */
+#define PCI_EXT_CAP_ID_DOE	0x2e	/* Data Object Exchange */
 
 /*** Definitions of capabilities ***/
 
@@ -1254,6 +1255,20 @@
 #define  PCI_L1PM_SUBSTAT_CTL1_ASPM_L12	0x4	/* ASPM L1.2 Enable */
 #define  PCI_L1PM_SUBSTAT_CTL1_ASPM_L11	0x8	/* ASPM L1.1 Enable */
 #define PCI_L1PM_SUBSTAT_CTL2	0xC	/* L1 PM Substate Control 2 */
+
+/* Data Object Exchange Extended Capability */
+#define PCI_DOE_CAP		0x4	/* DOE Capabilities Register */
+#define  PCI_DOE_CAP_INT_SUPP		0x1	/* Interrupt Support */
+#define  PCI_DOE_CAP_INT_MSG(x) (((x) >> 1) & 0x7ff) /* DOE Interrupt Message Number */
+#define PCI_DOE_CTL		0x8	/* DOE Control Register */
+#define  PCI_DOE_CTL_ABORT		0x1	/* DOE Abort */
+#define  PCI_DOE_CTL_INT		0x2	/* DOE Interrupt Enable */
+#define  PCI_DOE_CTL_GO			0x80000000 /* DOE Go */
+#define PCI_DOE_STS		0xC	/* DOE Status Register */
+#define  PCI_DOE_STS_BUSY		0x1	/* DOE Busy */
+#define  PCI_DOE_STS_INT		0x2	/* DOE Interrupt Status */
+#define  PCI_DOE_STS_ERROR		0x3	/* DOE Error */
+#define  PCI_DOE_STS_OBJECT_READY	0x80000000 /* Data Object Ready */
 
 /*
  * The PCI interface treats multi-function devices as independent
