@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Generic Direct Access Functions
  *
- *	Copyright (c) 1997--2000 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2022 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -74,39 +74,36 @@ pci_generic_scan(struct pci_access *a)
   pci_generic_scan_bus(a, busmap, 0);
 }
 
-unsigned int
+static int
+get_hdr_type(struct pci_dev *d)
+{
+  if (d->hdrtype < 0)
+    d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
+  return d->hdrtype;
+}
+
+void
 pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 {
   struct pci_access *a = d->access;
-  unsigned int done = 0;
 
-  if ((flags & (PCI_FILL_BASES | PCI_FILL_ROM_BASE)) && d->hdrtype < 0)
-    d->hdrtype = pci_read_byte(d, PCI_HEADER_TYPE) & 0x7f;
-
-  if (flags & PCI_FILL_IDENT)
+  if (want_fill(d, flags, PCI_FILL_IDENT))
     {
       d->vendor_id = pci_read_word(d, PCI_VENDOR_ID);
       d->device_id = pci_read_word(d, PCI_DEVICE_ID);
-      done |= PCI_FILL_IDENT;
     }
 
-  if (flags & PCI_FILL_CLASS)
-    {
-      d->device_class = pci_read_word(d, PCI_CLASS_DEVICE);
-      done |= PCI_FILL_CLASS;
-    }
+  if (want_fill(d, flags, PCI_FILL_CLASS))
+    d->device_class = pci_read_word(d, PCI_CLASS_DEVICE);
 
-  if (flags & PCI_FILL_IRQ)
-    {
-      d->irq = pci_read_byte(d, PCI_INTERRUPT_LINE);
-      done |= PCI_FILL_IRQ;
-    }
+  if (want_fill(d, flags, PCI_FILL_IRQ))
+    d->irq = pci_read_byte(d, PCI_INTERRUPT_LINE);
 
-  if (flags & PCI_FILL_BASES)
+  if (want_fill(d, flags, PCI_FILL_BASES))
     {
       int cnt = 0, i;
       memset(d->base_addr, 0, sizeof(d->base_addr));
-      switch (d->hdrtype)
+      switch (get_hdr_type(d))
 	{
 	case PCI_HEADER_TYPE_NORMAL:
 	  cnt = 6;
@@ -148,14 +145,13 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 		}
 	    }
 	}
-      done |= PCI_FILL_BASES;
     }
 
-  if (flags & PCI_FILL_ROM_BASE)
+  if (want_fill(d, flags, PCI_FILL_ROM_BASE))
     {
       int reg = 0;
       d->rom_base_addr = 0;
-      switch (d->hdrtype)
+      switch (get_hdr_type(d))
 	{
 	case PCI_HEADER_TYPE_NORMAL:
 	  reg = PCI_ROM_ADDRESS;
@@ -170,13 +166,9 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 	  if (u != 0xffffffff)
 	    d->rom_base_addr = u;
 	}
-      done |= PCI_FILL_ROM_BASE;
     }
 
-  if (flags & (PCI_FILL_CAPS | PCI_FILL_EXT_CAPS))
-    done |= pci_scan_caps(d, flags);
-
-  return done;
+  pci_scan_caps(d, flags);
 }
 
 static int

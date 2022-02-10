@@ -288,11 +288,9 @@ sysfs_fill_slots(struct pci_access *a)
   closedir(dir);
 }
 
-static unsigned int
+static void
 sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 {
-  unsigned int done = 0;
-
   if (!d->access->buscentric)
     {
       /*
@@ -300,61 +298,45 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
        *  the kernel's view, which has regions and IRQs remapped and other fields
        *  (most importantly classes) possibly fixed if the device is known broken.
        */
-      if (flags & PCI_FILL_IDENT)
+      if (want_fill(d, flags, PCI_FILL_IDENT))
 	{
 	  d->vendor_id = sysfs_get_value(d, "vendor", 1);
 	  d->device_id = sysfs_get_value(d, "device", 1);
-	  done |= PCI_FILL_IDENT;
 	}
-      if (flags & PCI_FILL_CLASS)
-	{
-	  d->device_class = sysfs_get_value(d, "class", 1) >> 8;
-	  done |= PCI_FILL_CLASS;
-	}
-      if (flags & PCI_FILL_IRQ)
-	{
+      if (want_fill(d, flags, PCI_FILL_CLASS))
+	d->device_class = sysfs_get_value(d, "class", 1) >> 8;
+      if (want_fill(d, flags, PCI_FILL_IRQ))
 	  d->irq = sysfs_get_value(d, "irq", 1);
-	  done |= PCI_FILL_IRQ;
-	}
-      if (flags & (PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS))
-	{
+      if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS))
 	  sysfs_get_resources(d);
-	  done |= PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES | PCI_FILL_IO_FLAGS;
-	}
     }
 
-  if (flags & PCI_FILL_PHYS_SLOT)
+  if (want_fill(d, flags, PCI_FILL_PHYS_SLOT))
     {
       struct pci_dev *pd;
       sysfs_fill_slots(d->access);
       for (pd = d->access->devices; pd; pd = pd->next)
 	pd->known_fields |= PCI_FILL_PHYS_SLOT;
-      done |= PCI_FILL_PHYS_SLOT;
     }
 
-  if (flags & PCI_FILL_MODULE_ALIAS)
+  if (want_fill(d, flags, PCI_FILL_MODULE_ALIAS))
     {
       char buf[OBJBUFSIZE];
       if (sysfs_get_string(d, "modalias", buf, 0))
 	d->module_alias = pci_set_property(d, PCI_FILL_MODULE_ALIAS, buf);
-      done |= PCI_FILL_MODULE_ALIAS;
     }
 
-  if (flags & PCI_FILL_LABEL)
+  if (want_fill(d, flags, PCI_FILL_LABEL))
     {
       char buf[OBJBUFSIZE];
       if (sysfs_get_string(d, "label", buf, 0))
 	d->label = pci_set_property(d, PCI_FILL_LABEL, buf);
-      done |= PCI_FILL_LABEL;
     }
 
-  if (flags & PCI_FILL_NUMA_NODE)
-    {
-      d->numa_node = sysfs_get_value(d, "numa_node", 0);
-      done |= PCI_FILL_NUMA_NODE;
-    }
+  if (want_fill(d, flags, PCI_FILL_NUMA_NODE))
+    d->numa_node = sysfs_get_value(d, "numa_node", 0);
 
-  if (flags & PCI_FILL_IOMMU_GROUP)
+  if (want_fill(d, flags, PCI_FILL_IOMMU_GROUP))
     {
       char *group_link = sysfs_deref_link(d, "iommu_group");
       if (group_link)
@@ -362,10 +344,9 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
           pci_set_property(d, PCI_FILL_IOMMU_GROUP, basename(group_link));
           free(group_link);
         }
-      done |= PCI_FILL_IOMMU_GROUP;
     }
 
-  if (flags & PCI_FILL_DT_NODE)
+  if (want_fill(d, flags, PCI_FILL_DT_NODE))
     {
       char *node = sysfs_deref_link(d, "of_node");
       if (node)
@@ -373,10 +354,9 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	  pci_set_property(d, PCI_FILL_DT_NODE, node);
 	  free(node);
 	}
-      done |= PCI_FILL_DT_NODE;
     }
 
-  return done | pci_generic_fill_info(d, flags & ~done);
+  pci_generic_fill_info(d, flags);
 }
 
 /* Intent of the sysfs_setup() caller */

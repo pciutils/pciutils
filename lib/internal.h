@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Internal Stuff
  *
- *	Copyright (c) 1997--2018 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2022 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -41,7 +41,7 @@ struct pci_methods {
   void (*init)(struct pci_access *);
   void (*cleanup)(struct pci_access *);
   void (*scan)(struct pci_access *);
-  unsigned int (*fill_info)(struct pci_dev *, unsigned int flags);
+  void (*fill_info)(struct pci_dev *, unsigned int flags);
   int (*read)(struct pci_dev *, int pos, byte *buf, int len);
   int (*write)(struct pci_dev *, int pos, byte *buf, int len);
   int (*read_vpd)(struct pci_dev *, int pos, byte *buf, int len);
@@ -52,7 +52,7 @@ struct pci_methods {
 /* generic.c */
 void pci_generic_scan_bus(struct pci_access *, byte *busmap, int bus);
 void pci_generic_scan(struct pci_access *);
-unsigned int pci_generic_fill_info(struct pci_dev *, unsigned int flags);
+void pci_generic_fill_info(struct pci_dev *, unsigned int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
 int pci_generic_block_write(struct pci_dev *, int pos, byte *buf, int len);
 
@@ -75,6 +75,18 @@ int pci_fill_info_v33(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v34(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v35(struct pci_dev *, int flags) VERSIONED_ABI;
 
+static inline int want_fill(struct pci_dev *d, unsigned want_fields, unsigned int try_fields)
+{
+  want_fields &= try_fields;
+  if ((d->known_fields & want_fields) == want_fields)
+    return 0;
+  else
+    {
+      d->known_fields |= try_fields;
+      return 1;
+    }
+}
+
 struct pci_property {
   struct pci_property *next;
   u32 key;
@@ -89,7 +101,7 @@ int pci_set_param_internal(struct pci_access *acc, char *param, char *val, int c
 void pci_free_params(struct pci_access *acc);
 
 /* caps.c */
-unsigned int pci_scan_caps(struct pci_dev *, unsigned int want_fields);
+void pci_scan_caps(struct pci_dev *, unsigned int want_fields);
 void pci_free_caps(struct pci_dev *);
 
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
