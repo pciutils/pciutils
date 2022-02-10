@@ -4,18 +4,28 @@ to Alexander Stock for contributing the port.
 Updated after version 2.2.6 to compile again, and with MinGW, even (only?)
 cross-compiling. (Hopefully it works with MSVC too.)
 
-To use this port on NT-based systems, it is required to have SeTcbPrivilege
+For simple listing PCI devices in system with basic information, there is no
+special requirement. To list PCI resources on Windows 8 and higher versions,
+it is necessary to have architecture-native version (e.g. AMD64 version on
+AMD64 systems).
+
+To access config space on NT-based systems, it is required to have SeTcbPrivilege
 (Act as part of the operating system privilege), which can be enabled in User
 Accounts settings (take effect after next login). By default this privilege is
 not enabled for any non-system user. Or alternatively it is required to be in
 local Administrators group and on Windows 2000 SP4 or higher systems to have
 SeImpersonatePrivilege (Impersonate a client after authentication privilege)
 which is by default enabled for all local Administrators accounts. There is no
-special requirement for DOS-based systems.
+special requirement for DOS-based systems. 64-bit systems do not have to allow
+users to access config space even with SeTcbPrivilege.
 
 To compile this port, run following command:
 
   make CROSS_COMPILE=i586-mingw32msvc- HOST=i386-windows ZLIB=no IDSDIR=""
+
+To build 64-bit version, run:
+
+  make CROSS_COMPILE=x86_64-w64-mingw32- HOST=x86_64-windows ZLIB=no IDSDIR=""
 
 Sometimes compilation may fail due to broken or missing getopt implementation.
 In this case try to compile with additional make option: COMPAT_GETOPT=yes
