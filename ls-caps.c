@@ -659,18 +659,16 @@ static int exp_downstream_port(int type)
 static void show_power_limit(int value, int scale)
 {
   static const float scales[4] = { 1.0, 0.1, 0.01, 0.001 };
-  static const int scale0_values[3] = { 250, 275, 300 };
 
-  if (scale == 0 && value >= 0xF0)
+  if (scale == 0 && value == 0xFF)
     {
-      /* F3h to FFh = Reserved for Slot Power Limit values above 300 W */
-      if (value >= 0xF3)
-        {
-          printf(">300W");
-          return;
-        }
-      value = scale0_values[value - 0xF0];
+      printf(">600W");
+      return;
     }
+
+  if (scale == 0 && value >= 0xF0 && value <= 0xFE)
+    value = 250 + 25 * (value - 0xF0);
+
   printf("%gW", value * scales[scale]);
 }
 
