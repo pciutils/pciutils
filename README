@@ -25,7 +25,7 @@ In runs on the following systems:
 	Solaris/i386	(direct port access)
 	Aix		(via /dev/pci and odmget)
 	GNU Hurd	(direct port access)
-	Windows		(direct port access, see README.Windows for caveats)
+	Windows		(via cfgmgr32 or direct port access, see README.Windows for caveats)
 	CYGWIN		(direct port access)
 	BeOS		(via syscalls)
 	Haiku		(via /dev/misc/poke)
