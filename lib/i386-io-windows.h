@@ -35,11 +35,11 @@
 #define _inp(x) __inbyte(x)
 #define _inpw(x) __inword(x)
 #define _inpd(x) __indword(x)
-#elif defined(__CRTDLL__)
+#elif defined(__CRTDLL__) || (defined(__MSVCRT_VERSION__) && __MSVCRT_VERSION__ < 0x400)
 /*
- * Old 32-bit CRTDLL library does not provide I/O port functions. As this
- * library exists only in 32-bit mode variant, implement I/O port functions
- * via 32-bit inline assembly.
+ * Old 32-bit CRTDLL library and pre-4.00 MSVCRT library do not provide I/O
+ * port functions. As these libraries exist only in 32-bit mode variant,
+ * implement I/O port functions via 32-bit inline assembly.
  */
 static inline int _outp(unsigned short port, int databyte)
 {
