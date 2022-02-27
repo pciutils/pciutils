@@ -239,7 +239,11 @@ tree_printf(char *line, char *p, char *fmt, ...)
       p += space;
     }
   else if (res >= space)
-    p += space;
+    {
+      /* Ancient C libraries do not truncate the output properly. */
+      *(p+space-1) = 0;
+      p += space;
+    }
   else
     p += res;
 
