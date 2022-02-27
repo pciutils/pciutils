@@ -354,7 +354,7 @@ show_size(u64 x)
 }
 
 static void
-show_range(char *prefix, u64 base, u64 limit, int bits, int disabled)
+show_range(const char *prefix, u64 base, u64 limit, int bits, int disabled)
 {
   printf("%s:", prefix);
   if (base <= limit || verbose > 2)
@@ -363,15 +363,39 @@ show_range(char *prefix, u64 base, u64 limit, int bits, int disabled)
     show_size(limit - base + 1);
   else
     printf(" [disabled]");
-  printf(" [%d-bit]", bits);
+  if (bits)
+    printf(" [%d-bit]", bits);
   putchar('\n');
 }
 
+static u32
+ioflg_to_pciflg(pciaddr_t ioflg)
+{
+  u32 flg;
+
+  if (ioflg & PCI_IORESOURCE_IO)
+    flg = PCI_BASE_ADDRESS_SPACE_IO;
+  else if (!(ioflg & PCI_IORESOURCE_MEM))
+    flg = 0;
+  else
+    {
+      flg = PCI_BASE_ADDRESS_SPACE_MEMORY;
+      if (ioflg & PCI_IORESOURCE_MEM_64)
+        flg |= PCI_BASE_ADDRESS_MEM_TYPE_64;
+      else
+        flg |= PCI_BASE_ADDRESS_MEM_TYPE_32;
+      if (ioflg & PCI_IORESOURCE_PREFETCH)
+        flg |= PCI_BASE_ADDRESS_MEM_PREFETCH;
+    }
+
+  return flg;
+}
+
 static void
-show_bases(struct device *d, int cnt)
+show_bases(struct device *d, int cnt, int without_config_data)
 {
   struct pci_dev *p = d->dev;
-  word cmd = get_conf_word(d, PCI_COMMAND);
+  word cmd = without_config_data ? (PCI_COMMAND_IO | PCI_COMMAND_MEMORY) : get_conf_word(d, PCI_COMMAND);
   int i;
   int virtual = 0;
 
@@ -380,7 +404,7 @@ show_bases(struct device *d, int cnt)
       pciaddr_t pos = p->base_addr[i];
       pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
       pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->flags[i] : 0;
-      u32 flg = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+      u32 flg = without_config_data ? ioflg_to_pciflg(ioflg) : get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
       u32 hw_lower;
       u32 hw_upper = 0;
       int broken = 0;
@@ -408,13 +432,14 @@ show_bases(struct device *d, int cnt)
 	      else
 		{
 		  i++;
+		  if (!without_config_data)
 		  hw_upper = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
 		}
 	    }
 	}
 
       /* Detect virtual regions, which are reported by the OS, but unassigned in the device */
-      if (pos && !hw_lower && !hw_upper && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
+      if (!without_config_data && pos && !hw_lower && !hw_upper && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
 	{
 	  flg = pos;
 	  virtual = 1;
@@ -476,14 +501,14 @@ show_rom(struct device *d, int reg)
   pciaddr_t rom = p->rom_base_addr;
   pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->rom_size : 0;
   pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->rom_flags : 0;
-  u32 flg = get_conf_long(d, reg);
-  word cmd = get_conf_word(d, PCI_COMMAND);
+  u32 flg = reg >= 0 ? get_conf_long(d, reg) : ioflg_to_pciflg(ioflg);
+  word cmd = reg >= 0 ? get_conf_word(d, PCI_COMMAND) : PCI_COMMAND_MEMORY;
   int virtual = 0;
 
   if (!rom && !flg && !len)
     return;
 
-  if ((rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK) && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
+  if (reg >= 0 && (rom & PCI_ROM_ADDRESS_MASK) && !(flg & PCI_ROM_ADDRESS_MASK) && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
     {
       flg = rom;
       virtual = 1;
@@ -515,7 +540,7 @@ show_rom(struct device *d, int reg)
 static void
 show_htype0(struct device *d)
 {
-  show_bases(d, 6);
+  show_bases(d, 6, 0);
   show_rom(d, PCI_ROM_ADDRESS);
   show_caps(d, PCI_CAPABILITY_LIST);
 }
@@ -540,7 +565,7 @@ show_htype1(struct device *d)
   int pref_disabled = (p->known_fields & PCI_FILL_BRIDGE_BASES) && !p->bridge_size[2];
   int io_bits, pref_bits;
 
-  show_bases(d, 2);
+  show_bases(d, 2, 0);
   printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
 	 get_conf_byte(d, PCI_PRIMARY_BUS),
 	 get_conf_byte(d, PCI_SECONDARY_BUS),
@@ -667,7 +692,7 @@ show_htype2(struct device *d)
   word exca;
   int verb = verbose > 2;
 
-  show_bases(d, 1);
+  show_bases(d, 1, 0);
   printf("\tBus: primary=%02x, secondary=%02x, subordinate=%02x, sec-latency=%d\n",
 	 get_conf_byte(d, PCI_CB_PRIMARY_BUS),
 	 get_conf_byte(d, PCI_CB_CARD_BUS),
@@ -727,19 +752,56 @@ show_htype2(struct device *d)
 }
 
 static void
+show_htype_unknown(struct device *d)
+{
+  struct pci_dev *p = d->dev;
+  u64 base, limit, flags;
+  const char *str;
+  int i, bits;
+
+  if (pacc->buscentric)
+    return;
+
+  show_bases(d, 6, 1);
+  for (i = 0; i < 4; i++)
+    {
+      if (!p->bridge_base_addr[i])
+        continue;
+      base = p->bridge_base_addr[i];
+      limit = base + p->bridge_size[i] - 1;
+      flags = p->bridge_flags[i];
+      if (flags & PCI_IORESOURCE_IO)
+        {
+          bits = (flags & PCI_IORESOURCE_IO_16BIT_ADDR) ? 16 : 32;
+          str = "\tI/O behind bridge";
+        }
+      else if (flags & PCI_IORESOURCE_MEM)
+        {
+          bits = (flags & PCI_IORESOURCE_MEM_64) ? 64 : 32;
+          if (flags & PCI_IORESOURCE_PREFETCH)
+            str = "\tPrefetchable memory behind bridge";
+          else
+            str = "\tMemory behind bridge";
+        }
+      else
+        {
+          bits = 0;
+          str = "\tUnknown resource behind bridge";
+        }
+      show_range(str, base, limit, bits, 0);
+    }
+  show_rom(d, -1);
+}
+
+static void
 show_verbose(struct device *d)
 {
   struct pci_dev *p = d->dev;
-  word status = get_conf_word(d, PCI_STATUS);
-  word cmd = get_conf_word(d, PCI_COMMAND);
+  int unknown_config_data = 0;
   word class = p->device_class;
-  byte bist = get_conf_byte(d, PCI_BIST);
   byte htype = get_conf_byte(d, PCI_HEADER_TYPE) & 0x7f;
-  byte latency = get_conf_byte(d, PCI_LATENCY_TIMER);
-  byte cache_line = get_conf_byte(d, PCI_CACHE_LINE_SIZE);
+  byte bist;
   byte max_lat, min_gnt;
-  byte int_pin = get_conf_byte(d, PCI_INTERRUPT_PIN);
-  unsigned int irq;
   char *dt_node, *iommu_group;
 
   show_terse(d);
@@ -747,29 +809,33 @@ show_verbose(struct device *d)
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
     PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP |
     PCI_FILL_BRIDGE_BASES | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
-  irq = p->irq;
 
   switch (htype)
     {
     case PCI_HEADER_TYPE_NORMAL:
       if (class == PCI_CLASS_BRIDGE_PCI)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
+      bist = get_conf_byte(d, PCI_BIST);
       max_lat = get_conf_byte(d, PCI_MAX_LAT);
       min_gnt = get_conf_byte(d, PCI_MIN_GNT);
       break;
     case PCI_HEADER_TYPE_BRIDGE:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
+      bist = get_conf_byte(d, PCI_BIST);
       min_gnt = max_lat = 0;
       break;
     case PCI_HEADER_TYPE_CARDBUS:
       if ((class >> 8) != PCI_BASE_CLASS_BRIDGE)
 	printf("\t!!! Invalid class %04x for header type %02x\n", class, htype);
+      bist = get_conf_byte(d, PCI_BIST);
       min_gnt = max_lat = 0;
       break;
     default:
       printf("\t!!! Unknown header type %02x\n", htype);
-      return;
+      bist = 0;
+      min_gnt = max_lat = 0;
+      unknown_config_data = 1;
     }
 
   if (p->phy_slot)
@@ -778,8 +844,10 @@ show_verbose(struct device *d)
   if (dt_node = pci_get_string_property(p, PCI_FILL_DT_NODE))
     printf("\tDevice tree node: %s\n", dt_node);
 
-  if (verbose > 1)
+  if (!unknown_config_data && verbose > 1)
     {
+      word cmd = get_conf_word(d, PCI_COMMAND);
+      word status = get_conf_word(d, PCI_STATUS);
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
 	     FLAG(cmd, PCI_COMMAND_IO),
 	     FLAG(cmd, PCI_COMMAND_MEMORY),
@@ -809,6 +877,8 @@ show_verbose(struct device *d)
 	     FLAG(status, PCI_STATUS_INTx));
       if (cmd & PCI_COMMAND_MASTER)
 	{
+	  byte latency = get_conf_byte(d, PCI_LATENCY_TIMER);
+	  byte cache_line = get_conf_byte(d, PCI_CACHE_LINE_SIZE);
 	  printf("\tLatency: %d", latency);
 	  if (min_gnt || max_lat)
 	    {
@@ -825,16 +895,25 @@ show_verbose(struct device *d)
 	    printf(", Cache Line Size: %d bytes", cache_line * 4);
 	  putchar('\n');
 	}
-      if (int_pin || irq)
+    }
+
+  if (verbose > 1)
+    {
+      byte int_pin = unknown_config_data ? 0 : get_conf_byte(d, PCI_INTERRUPT_PIN);
+      if (int_pin || p->irq)
 	printf("\tInterrupt: pin %c routed to IRQ " PCIIRQ_FMT "\n",
-	       (int_pin ? 'A' + int_pin - 1 : '?'), irq);
+	       (int_pin ? 'A' + int_pin - 1 : '?'), p->irq);
       if (p->numa_node != -1)
 	printf("\tNUMA node: %d\n", p->numa_node);
       if (iommu_group = pci_get_string_property(p, PCI_FILL_IOMMU_GROUP))
 	printf("\tIOMMU group: %s\n", iommu_group);
     }
-  else
+
+  if (!unknown_config_data && verbose <= 1)
     {
+      word cmd = get_conf_word(d, PCI_COMMAND);
+      word status = get_conf_word(d, PCI_STATUS);
+      byte latency = get_conf_byte(d, PCI_LATENCY_TIMER);
       printf("\tFlags: ");
       if (cmd & PCI_COMMAND_MASTER)
 	printf("bus master, ");
@@ -854,8 +933,8 @@ show_verbose(struct device *d)
 	     ((status & PCI_STATUS_DEVSEL_MASK) == PCI_STATUS_DEVSEL_FAST) ? "fast" : "??");
       if (cmd & PCI_COMMAND_MASTER)
 	printf(", latency %d", latency);
-      if (irq)
-	printf(", IRQ " PCIIRQ_FMT, irq);
+      if (p->irq)
+	printf(", IRQ " PCIIRQ_FMT, p->irq);
       if (p->numa_node != -1)
 	printf(", NUMA node %d", p->numa_node);
       if (iommu_group = pci_get_string_property(p, PCI_FILL_IOMMU_GROUP))
@@ -882,6 +961,8 @@ show_verbose(struct device *d)
     case PCI_HEADER_TYPE_CARDBUS:
       show_htype2(d);
       break;
+    default:
+      show_htype_unknown(d);
     }
 }
 
