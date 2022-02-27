@@ -208,7 +208,10 @@ pci_init_name_list_path(struct pci_access *a)
       len = GetModuleFileNameA(NULL, path, MAX_PATH+1);
       sep = (len > 0) ? strrchr(path, '\\') : NULL;
       if (len == 0 || len == MAX_PATH+1 || !sep || MAX_PATH-(size_t)(sep+1-path) < sizeof(PCI_IDS))
-        free(path);
+        {
+          free(path);
+          pci_set_name_list_path(a, PCI_IDS, 0);
+        }
       else
         {
           memcpy(sep+1, PCI_IDS, sizeof(PCI_IDS));
