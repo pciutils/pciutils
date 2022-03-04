@@ -75,7 +75,9 @@ typedef u32 pciaddr_t;
 #if defined(__GNUC__) && __GNUC__ > 2
 #define PCI_PRINTF(x,y) __attribute__((format(printf, x, y)))
 #define PCI_NONRET __attribute((noreturn))
+#define PCI_PACKED __attribute((packed))
 #else
 #define PCI_PRINTF(x,y)
 #define PCI_NONRET
+#define PCI_PACKED
 #endif

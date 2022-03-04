@@ -153,9 +153,10 @@ case $sys in
 		EXEEXT=.exe
 		;;
 	cygwin|windows)
-		echo_n " win32-cfgmgr32 win32-sysdbg"
+		echo_n " win32-cfgmgr32 win32-kldbg win32-sysdbg"
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$c '#define PCI_HAVE_PM_WIN32_CFGMGR32'
+		echo >>$c '#define PCI_HAVE_PM_WIN32_KLDBG'
 		echo >>$c '#define PCI_HAVE_PM_WIN32_SYSDBG'
 		# Warning: MinGW-w64 (incorrectly) provides cfgmgr32 functions
 		# also in other import libraries, not only in libcfgmgr32.a.
