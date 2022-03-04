@@ -59,6 +59,10 @@ OBJS += emulated
 OBJS += win32-cfgmgr32
 endif
 
+ifdef PCI_HAVE_PM_WIN32_KLDBG
+OBJS += win32-kldbg
+endif
+
 ifdef PCI_HAVE_PM_WIN32_SYSDBG
 OBJS += win32-sysdbg
 endif
@@ -112,6 +116,7 @@ filter.o: filter.c $(INCL)
 nbsd-libpci.o: nbsd-libpci.c $(INCL)
 hurd.o: hurd.c $(INCL)
 win32-cfgmgr32.o: win32-cfgmgr32.c $(INCL)
+win32-kldbg.o: win32-kldbg.c $(INCL)
 win32-sysdbg.o: win32-sysdbg.c $(INCL)
 
 # MinGW32 toolchain has some required Win32 header files in /ddk subdirectory.
