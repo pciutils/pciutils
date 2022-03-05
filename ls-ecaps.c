@@ -1041,7 +1041,7 @@ show_ext_caps(struct device *d, int type)
       if (!config_fetch(d, where, 4))
 	break;
       header = get_conf_long(d, where);
-      if (!header)
+      if (!header || header == 0xffffffff)
 	break;
       id = header & 0xffff;
       version = (header >> 16) & 0xf;
