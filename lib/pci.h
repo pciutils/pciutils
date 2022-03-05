@@ -85,6 +85,7 @@ struct pci_access {
   int fd_pos;				/* proc/sys: current position */
   int fd_vpd;				/* sys: fd for VPD */
   struct pci_dev *cached_dev;		/* proc/sys: device the fds are for */
+  void *aux;				/* Auxiliary data for use by the back-end */
 };
 
 /* Initialize PCI access */
