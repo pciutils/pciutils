@@ -1343,7 +1343,8 @@ intel_setup_io(struct pci_access *a)
   /* On NT-based systems issue ProcessUserModeIOPL syscall which changes IOPL to 3. */
   if (!SetProcessUserModeIOPL())
     {
-      a->warning("NT ProcessUserModeIOPL call failed with error: %lu.", (unsigned long int)GetLastError());
+      DWORD error = GetLastError();
+      a->debug("NT ProcessUserModeIOPL call failed: %s.", error == ERROR_INVALID_FUNCTION ? "Not Implemented" : error == ERROR_PRIVILEGE_NOT_HELD ? "Access Denied" : "Operation Failed");
       return 0;
     }
 
