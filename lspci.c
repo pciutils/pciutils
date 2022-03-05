@@ -397,17 +397,17 @@ show_bases(struct device *d, int cnt, int without_config_data)
   struct pci_dev *p = d->dev;
   word cmd = without_config_data ? (PCI_COMMAND_IO | PCI_COMMAND_MEMORY) : get_conf_word(d, PCI_COMMAND);
   int i;
-  int virtual = 0;
 
   for (i=0; i<cnt; i++)
     {
       pciaddr_t pos = p->base_addr[i];
       pciaddr_t len = (p->known_fields & PCI_FILL_SIZES) ? p->size[i] : 0;
       pciaddr_t ioflg = (p->known_fields & PCI_FILL_IO_FLAGS) ? p->flags[i] : 0;
-      u32 flg = without_config_data ? ioflg_to_pciflg(ioflg) : get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-      u32 hw_lower;
+      u32 flg = (p->known_fields & PCI_FILL_IO_FLAGS) ? ioflg_to_pciflg(ioflg) : without_config_data ? 0 : get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+      u32 hw_lower = 0;
       u32 hw_upper = 0;
       int broken = 0;
+      int virtual = 0;
 
       if (flg == 0xffffffff)
 	flg = 0;
@@ -419,30 +419,24 @@ show_bases(struct device *d, int cnt, int without_config_data)
       else
 	putchar('\t');
 
-      /* Read address as seen by the hardware */
-      if (flg & PCI_BASE_ADDRESS_SPACE_IO)
-	hw_lower = flg & PCI_BASE_ADDRESS_IO_MASK;
-      else
-	{
-	  hw_lower = flg & PCI_BASE_ADDRESS_MEM_MASK;
-	  if ((flg & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
-	    {
-	      if (i >= cnt - 1)
-		broken = 1;
-	      else
-		{
-		  i++;
-		  if (!without_config_data)
-		  hw_upper = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
-		}
-	    }
-	}
-
       /* Detect virtual regions, which are reported by the OS, but unassigned in the device */
-      if (!without_config_data && pos && !hw_lower && !hw_upper && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
+      if ((p->known_fields & PCI_FILL_IO_FLAGS) && !without_config_data)
 	{
-	  flg = pos;
-	  virtual = 1;
+	  /* Read address as seen by the hardware */
+	  hw_lower = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i);
+	  if ((hw_lower & PCI_BASE_ADDRESS_SPACE) == (ioflg_to_pciflg(ioflg) & PCI_BASE_ADDRESS_SPACE))
+	    {
+	      if ((ioflg & PCI_IORESOURCE_TYPE_BITS) == PCI_IORESOURCE_MEM &&
+		  (hw_lower & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
+	        {
+		  if (i >= cnt - 1)
+		    broken = 1;
+		  else
+		    hw_upper = get_conf_long(d, PCI_BASE_ADDRESS_0 + 4*i + 1);
+		}
+	      if (pos && !hw_lower && !hw_upper && !(ioflg & PCI_IORESOURCE_PCI_EA_BEI))
+		virtual = 1;
+	    }
 	}
 
       /* Print base address */
