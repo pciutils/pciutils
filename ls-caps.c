@@ -1083,7 +1083,7 @@ device_has_memory_space_bar(struct device *d)
   int i, found = 0;
 
   for (i=0; i<6; i++)
-    if (p->base_addr[i] && p->size[i])
+    if (p->base_addr[i] || p->size[i])
       {
         if (!(p->base_addr[i] & PCI_BASE_ADDRESS_SPACE_IO))
           {
