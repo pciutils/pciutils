@@ -44,8 +44,8 @@ cap_pm(struct device *d, int where, int cap)
   b = get_conf_byte(d, where + PCI_PM_PPB_EXTENSIONS);
   if (b)
     printf("\t\tBridge: PM%c B3%c\n",
-	   FLAG(t, PCI_PM_BPCC_ENABLE),
-	   FLAG(~t, PCI_PM_PPB_B2_B3));
+	   FLAG(b, PCI_PM_BPCC_ENABLE),
+	   FLAG(~b, PCI_PM_PPB_B2_B3));
 }
 
 static void
