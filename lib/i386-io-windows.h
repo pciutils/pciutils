@@ -776,10 +776,13 @@ find_and_open_process_for_query(LPCSTR exe_file)
   EnumProcessesProt MyEnumProcesses;
   HMODULE kernel32, psapi;
   UINT prev_error_mode;
-  WCHAR path[MAX_PATH];
+  DWORD partial_retry;
+  BOOL found_process;
   DWORD size, length;
   DWORD *processes;
   HANDLE process;
+  LPWSTR path;
+  DWORD error;
   DWORD count;
   DWORD i;
 
@@ -873,11 +876,72 @@ retry:
       if (!process)
         continue;
 
+      /*
+       * Set initial buffer size to 256 (wide) characters.
+       * Final path length on the modern NT-based systems can be also larger.
+       */
+      size = 256;
+      found_process = FALSE;
+      partial_retry = 0;
+
+retry_path:
+      path = (LPWSTR)LocalAlloc(LPTR, size * sizeof(*path));
+      if (!path)
+        goto end_path;
+
       if (MyGetProcessImageFileNameW)
-        length = MyGetProcessImageFileNameW(process, path, sizeof(path)/sizeof(*path));
+        length = MyGetProcessImageFileNameW(process, path, size);
       else
-        length = MyGetModuleFileNameExW(process, NULL, path, sizeof(path)/sizeof(*path));
+        length = MyGetModuleFileNameExW(process, NULL, path, size);
+
+      error = GetLastError();
+
+      /*
+       * GetModuleFileNameEx() returns zero and signal error ERROR_PARTIAL_COPY
+       * when remote process is in the middle of updating its module table.
+       * Sleep 10 ms and try again, max 10 attempts.
+       */
+      if (!MyGetProcessImageFileNameW)
+        {
+          if (length == 0 && error == ERROR_PARTIAL_COPY && partial_retry++ < 10)
+            {
+              Sleep(10);
+              goto retry_path;
+            }
+          partial_retry = 0;
+        }
+
+      /*
+       * When buffer is too small then function GetModuleFileNameEx() returns
+       * its size argument on older systems (Windows XP) or its size minus
+       * argument one on new systems (Windows 10) without signalling any error.
+       * Function GetProcessImageFileNameW() on the other hand returns zero
+       * value and signals error ERROR_INSUFFICIENT_BUFFER. So in all these
+       * cases call function again with larger buffer.
+       */
+
+      if (MyGetProcessImageFileNameW && length == 0 && error != ERROR_INSUFFICIENT_BUFFER)
+        goto end_path;
+
+      if ((MyGetProcessImageFileNameW && length == 0) ||
+          (!MyGetProcessImageFileNameW && (length == size || length == size-1)))
+        {
+          LocalFree(path);
+          size *= 2;
+          goto retry_path;
+        }
+
       if (length && check_process_name(path, length, exe_file))
+        found_process = TRUE;
+
+end_path:
+      if (path)
+        {
+          LocalFree(path);
+          path = NULL;
+        }
+
+      if (found_process)
         break;
 
       CloseHandle(process);
