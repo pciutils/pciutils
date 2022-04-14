@@ -160,7 +160,7 @@ fbsd_scan(struct pci_access *a)
 }
 
 static void
-fbsd_fill_info(struct pci_dev *d, int flags)
+fbsd_fill_info(struct pci_dev *d, unsigned int flags)
 {
   struct pci_conf_io conf;
   struct pci_bar_io bar;
@@ -195,9 +195,9 @@ fbsd_fill_info(struct pci_dev *d, int flags)
 
   if (ioctl(d->access->fd, PCIOCGETCONF, &conf) < 0)
     {
-      if (errno == ENODEV)
-        return 0;
-      d->access->error("fbsd_fill_info: ioctl(PCIOCGETCONF) failed: %s", strerror(errno));
+      if (errno != ENODEV)
+	d->access->error("fbsd_fill_info: ioctl(PCIOCGETCONF) failed: %s", strerror(errno));
+      return;
     }
 
   if (want_fill(d, flags, PCI_FILL_IDENT))
@@ -207,7 +207,7 @@ fbsd_fill_info(struct pci_dev *d, int flags)
     }
   if (want_fill(d, flags, PCI_FILL_CLASS))
     d->device_class = (match.pc_class << 8) | match.pc_subclass;
-  if (want_fill(d, flags PCI_FILL_BASES | PCI_FILL_SIZES))
+  if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_SIZES))
     {
       d->rom_base_addr = 0;
       d->rom_size = 0;
