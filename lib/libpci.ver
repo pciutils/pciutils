@@ -86,4 +86,8 @@ LIBPCI_3.7 {
 LIBPCI_3.8 {
 	global:
 		pci_fill_info;
+		pci_filter_init;
+		pci_filter_match;
+		pci_filter_parse_id;
+		pci_filter_parse_slot;
 };
