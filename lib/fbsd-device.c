@@ -224,7 +224,7 @@ fbsd_fill_info(struct pci_dev *d, unsigned int flags)
 	  if (ioctl(d->access->fd, PCIOCGETBAR, &bar) < 0)
 	    {
 	      if (errno == ENODEV)
-		return 0;
+		return;
 	      if (errno == EINVAL)
 	        {
 		  d->base_addr[i] = 0;
