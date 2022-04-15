@@ -1,3 +1,44 @@
+2022-04-16  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.8.0.
+
+	* Filters can now match devices based on partially specified
+	  class code and also on the programming interface.
+
+	* Reporting of link speeds, power limits, and virtual function tags
+	  has been updated to the current PCIe specification.
+
+	* We decode the Data Object Exchange capability.
+
+	* Bus mapping mode works in non-zero domains.
+
+	* pci_fill_info() can fetch more fields: bridge bases, programming
+	  interface, revision, subsystem vendor and device ID, OS driver,
+	  and also parent bridge. Internally, the implementation was rewritten,
+	  significantly reducing the number of corner cases to be handled.
+
+	* The Windows port was revived and greatly improved by Pali Rohár.
+	  It requires less magic to compile. More importantly, it runs on both
+	  old and recent Windows systems (see README.Windows for details).
+
+	* Added a new Windows back-end using the cfgmgr32 interface.
+	  It does not provide direct access to the configuration space,
+	  but basic information about the device is reported via pci_fill_info().
+	  For back-ends of this type, we now provide an emulated read-only
+	  config space.
+
+	* If the configuration space is not readable for some reason
+	  (e.g., the cfgmgr32 back-end, but also badly implemented sleep mode
+	  of some devices), lspci prints only information provided by the OS.
+
+	* The Hurd back-end was greatly improved thanks to Joan Lledó.
+
+	* Various minor bug fixes and improvements.
+
+	* We officially require a working C99 compiler. Sorry, MSVC.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
+
 2020-05-31  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.7.0.
