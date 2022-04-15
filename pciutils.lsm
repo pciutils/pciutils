@@ -9,8 +9,5 @@ Author:         mj@ucw.cz (Martin Mares)
 Maintained-by:  mj@ucw.cz (Martin Mares)
 Primary-site:   ftp.ucw.cz pub/mj/linux/pci/@ALPHADIR@pciutils-@VERSION@.tar.gz
 Alternate-site: ftp.kernel.org pub/software/utils/pciutils/@ALPHADIR@pciutils-@VERSION@.tar.gz
-#ifndef ALPHA_VERSION
-Alternate-site: metalab.unc.edu pub/Linux/hardware/pciutils-@VERSION@.tar.gz
-#endif
 Copying-policy: GPL
 End
