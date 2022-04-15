@@ -106,9 +106,10 @@ hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of 
 on any bus, "0.3" selects third function of device 0 on all buses and ".4" matches only
 the fourth function of each device.
 .TP
-.B -d [<vendor>]:[<device>]
-Select devices with specified vendor and device ID. Both ID's are given in
-hexadecimal and may be omitted or given as "*", both meaning "any value".
+.B -d [<vendor>]:[<device>][:<class>[:<prog-if>]]
+Select devices with specified vendor, device, class ID, and programming interface.
+The ID's are given in hexadecimal and may be omitted or given as "*", both meaning
+"any value". The class ID can contain "x" characters which stand for "any digit".
 .PP
 When
 .B -s
