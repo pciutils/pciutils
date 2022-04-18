@@ -29,7 +29,7 @@ HWDB=
 
 # ABI version suffix in the name of the shared library
 # (as we use proper symbol versioning, this seldom needs changing)
-ABI_VERSION=.3
+ABI_VERSION=3
 
 # Installation directories
 PREFIX=/usr/local
@@ -144,9 +144,9 @@ endif
 	$(INSTALL) -c -m 644 pci.ids.5 $(DESTDIR)$(MANDIR)/man5
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
-	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME)$(ABI_VERSION).$(LIBEXT)
+	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
 else
-	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)$(ABI_VERSION)
+	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
 endif
 endif
 
@@ -164,11 +164,11 @@ install-lib: $(PCIINC_INS) install-pcilib
 	$(INSTALL) -c -m 644 lib/$(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
-	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME)$(ABI_VERSION).$(LIBEXT)
-	ln -sf $(LIBNAME)$(ABI_VERSION).$(LIBEXT) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
+	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
+	ln -sf $(LIBNAME).$(ABI_VERSION).$(LIBEXT) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 else
-	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)$(ABI_VERSION)
-	ln -sf $(LIBNAME).$(LIBEXT)$(ABI_VERSION) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
+	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
+	ln -sf $(LIBNAME).$(LIBEXT).$(ABI_VERSION) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 endif
 endif
 
@@ -188,9 +188,9 @@ endif
 ifeq ($(SHARED),yes)
 	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 ifeq ($(LIBEXT),dylib)
-	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME)$(ABI_VERSION).$(LIBEXT)
+	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
 else
-	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)$(ABI_VERSION)
+	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
 endif
 endif
 
