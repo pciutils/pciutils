@@ -297,8 +297,11 @@ else
 	echo >>$m 'LDLIBS='
 	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
 	echo >>$c '#define PCI_SHARED_LIB'
-	if [ "$SHARED" = yes -a "$LIBEXT" = so ]; then
-		echo >>$m 'SONAME=-Wl,-soname,$(LIBNAME).$(LIBEXT)$(ABI_VERSION)'
+	if [ "$LIBEXT" = so ]; then
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,-soname,$(LIBNAME).$(LIBEXT).$(ABI_VERSION)'
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,--version-script=libpci.ver'
+	elif [ "$LIBEXT" = dylib ]; then
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,-install_name,$(LIBDIR)/$(PCILIB)'
 	fi
 fi
 echo >>$m 'PCILIBPC=$(LIBNAME).pc'
