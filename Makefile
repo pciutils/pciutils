@@ -64,9 +64,9 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
 
-all: lib/$(PCILIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCIIMPLIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
 
-lib/$(PCILIB): $(PCIINC) force
+lib/$(PCIIMPLIB): $(PCIINC) force
 	$(MAKE) -C lib all
 
 force:
@@ -80,8 +80,8 @@ PCIINC+=compat/getopt.h
 COMMON+=compat/getopt.o
 endif
 
-lspci$(EXEEXT): lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o $(COMMON) lib/$(PCILIB)
-setpci$(EXEEXT): setpci.o $(COMMON) lib/$(PCILIB)
+lspci$(EXEEXT): lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o $(COMMON) lib/$(PCIIMPLIB)
+setpci$(EXEEXT): setpci.o $(COMMON) lib/$(PCIIMPLIB)
 
 LSPCIINC=lspci.h pciutils.h $(PCIINC)
 lspci.o: lspci.c $(LSPCIINC)
@@ -104,7 +104,7 @@ update-pciids: update-pciids.sh
 	chmod +x $@
 
 # The example of use of libpci
-example$(EXEEXT): example.o lib/$(PCILIB)
+example$(EXEEXT): example.o lib/$(PCIIMPLIB)
 example.o: example.c $(PCIINC)
 
 %$(EXEEXT): %.o
@@ -162,6 +162,9 @@ install-lib: $(PCIINC_INS) install-pcilib
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(PKGCFDIR)
 	$(INSTALL) -c -m 644 $(PCIINC_INS) $(DESTDIR)$(INCDIR)/pci
 	$(INSTALL) -c -m 644 lib/$(PCILIBPC) $(DESTDIR)$(PKGCFDIR)
+ifneq ($(PCIIMPLIB),$(PCILIB))
+	$(INSTALL) -c -m 644 lib/$(PCIIMPLIB) $(DESTDIR)$(LIBDIR)
+endif
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
@@ -185,6 +188,9 @@ endif
 	rm -f $(DESTDIR)$(LIBDIR)/$(PCILIB)
 	rm -f $(DESTDIR)$(PKGCFDIR)/$(PCILIBPC)
 	rm -f $(addprefix $(DESTDIR)$(INCDIR)/pci/,$(notdir $(PCIINC_INS)))
+ifneq ($(PCIIMPLIB),$(PCILIB))
+	rm -f $(DESTDIR)$(LIBDIR)/$(PCIIMPLIB)
+endif
 ifeq ($(SHARED),yes)
 	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 ifeq ($(LIBEXT),dylib)

@@ -306,5 +306,7 @@ else
 fi
 echo >>$m 'PCILIBPC=$(LIBNAME).pc'
 
+echo >>$m 'PCIIMPLIB=$(PCILIB)'
+
 echo >>$c "#define PCILIB_VERSION \"$VERSION\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m
