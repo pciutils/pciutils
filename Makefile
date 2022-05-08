@@ -54,6 +54,7 @@ endif
 AR=$(CROSS_COMPILE)ar
 RANLIB=$(CROSS_COMPILE)ranlib
 DLLTOOL=$(CROSS_COMPILE)dlltool
+WINDRES=$(CROSS_COMPILE)windres
 
 # Base name of the library (overridden on NetBSD, which has its own libpci)
 LIBNAME=libpci
@@ -124,7 +125,7 @@ TAGS:
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* lib/*.dll lib/*.def tags
+	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* lib/*.dll lib/*.def lib/dllrsrc.rc tags
 	rm -rf maint/dist
 
 distclean: clean

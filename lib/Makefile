@@ -74,6 +74,15 @@ $(PCIIMPDEF): libpci.ver ver2def.pl
 	perl ver2def.pl libpci.ver $(PCILIB) build.def $(PCIIMPDEF)
 $(PCIIMPLIB): $(PCIIMPDEF)
 	$(DLLTOOL) --input-def $< --output-lib $@
+comma := ,
+dllrsrc.rc: dllrsrc.rc.in
+	sed <$< >$@ -e 's,@PCILIB_VERSION@,$(PCILIB_VERSION),' \
+		-e 's,@PCILIB_VERSION_WINRC@,$(subst .,\$(comma),$(PCILIB_VERSION).0),' \
+		-e 's,@PCILIB@,$(PCILIB),' \
+		-e 's,@DEBUG_BUILD@,$(if $(findstring -g,$(CFLAGS)),1,0),'
+dllrsrc.o: dllrsrc.rc
+	$(WINDRES) --input=$< --output=$@ --input-format=rc --output-format=coff
+OBJS += dllrsrc
 endif
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
