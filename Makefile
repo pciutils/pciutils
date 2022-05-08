@@ -53,6 +53,7 @@ CC=cc
 endif
 AR=$(CROSS_COMPILE)ar
 RANLIB=$(CROSS_COMPILE)ranlib
+DLLTOOL=$(CROSS_COMPILE)dlltool
 
 # Base name of the library (overridden on NetBSD, which has its own libpci)
 LIBNAME=libpci
@@ -123,7 +124,7 @@ TAGS:
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* tags
+	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* lib/*.dll lib/*.def tags
 	rm -rf maint/dist
 
 distclean: clean
@@ -145,7 +146,7 @@ endif
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
-else
+else ifeq ($(LIBEXT),so)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
 endif
 endif
@@ -156,7 +157,13 @@ endif
 
 install-pcilib: lib/$(PCILIB)
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(LIBDIR)
+ifeq ($(SHARED)_$(LIBEXT),yes_dll)
+# DLL library must have executable flag on disk and be placed in same directory as where are EXE files
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -c -m 755 lib/$(PCILIB) $(DESTDIR)$(SBINDIR)
+else
 	$(INSTALL) -c -m 644 lib/$(PCILIB) $(DESTDIR)$(LIBDIR)
+endif
 
 install-lib: $(PCIINC_INS) install-pcilib
 	$(DIRINSTALL) -m 755 $(DESTDIR)$(INCDIR)/pci $(DESTDIR)$(PKGCFDIR)
@@ -165,11 +172,14 @@ install-lib: $(PCIINC_INS) install-pcilib
 ifneq ($(PCIIMPLIB),$(PCILIB))
 	$(INSTALL) -c -m 644 lib/$(PCIIMPLIB) $(DESTDIR)$(LIBDIR)
 endif
+ifneq ($(PCIIMPDEF),)
+	$(INSTALL) -c -m 644 lib/$(PCIIMPDEF) $(DESTDIR)$(LIBDIR)
+endif
 ifeq ($(SHARED),yes)
 ifeq ($(LIBEXT),dylib)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
 	ln -sf $(LIBNAME).$(ABI_VERSION).$(LIBEXT) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
-else
+else ifeq ($(LIBEXT),so)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
 	ln -sf $(LIBNAME).$(LIBEXT).$(ABI_VERSION) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 endif
@@ -185,18 +195,27 @@ endif
 	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
 	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
 	rm -f $(DESTDIR)$(MANDIR)/man5/pci.ids.5
+ifeq ($(SHARED)_$(LIBEXT),yes_dll)
+	rm -f $(DESTDIR)$(SBINDIR)/$(PCILIB)
+else
 	rm -f $(DESTDIR)$(LIBDIR)/$(PCILIB)
+endif
 	rm -f $(DESTDIR)$(PKGCFDIR)/$(PCILIBPC)
 	rm -f $(addprefix $(DESTDIR)$(INCDIR)/pci/,$(notdir $(PCIINC_INS)))
 ifneq ($(PCIIMPLIB),$(PCILIB))
 	rm -f $(DESTDIR)$(LIBDIR)/$(PCIIMPLIB)
 endif
+ifneq ($(PCIIMPDEF),)
+	rm -f $(DESTDIR)$(LIBDIR)/$(PCIIMPDEF)
+endif
 ifeq ($(SHARED),yes)
+ifneq ($(LIBEXT),dll)
 	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT)
 ifeq ($(LIBEXT),dylib)
 	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(ABI_VERSION).$(LIBEXT)
 else
 	rm -f $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
+endif
 endif
 endif
 

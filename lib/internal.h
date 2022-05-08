@@ -21,7 +21,14 @@
 #else
 #define STATIC_ALIAS(_decl, _for)
 #define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
+#ifdef _WIN32
+/* GCC does not support asm .symver directive for Windows targets, so define new external global function symbol as alias to internal symbol */
+#define SYMBOL_VERSION(_int, _ext) asm(".globl\t" PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) "\n\t" \
+                                       ".def\t"   PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) ";\t.scl\t2;\t.type\t32;\t.endef\n\t" \
+                                       ".set\t"   PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) "," PCI_STRINGIFY(__MINGW_USYMBOL(_int)))
+#else
 #define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
+#endif
 #endif
 #else
 #define VERSIONED_ABI
@@ -32,6 +39,16 @@
 
 #include "pci.h"
 #include "sysdep.h"
+
+/* Old 32-bit-only versions of MinGW32 do not define __MINGW_USYMBOL macro */
+#ifdef __MINGW32__
+#ifndef __MINGW_USYMBOL
+#define __MINGW_USYMBOL(sym) _##sym
+#endif
+#endif
+
+#define _PCI_STRINGIFY(x) #x
+#define PCI_STRINGIFY(x) _PCI_STRINGIFY(x)
 
 struct pci_methods {
   char *name;

@@ -67,9 +67,20 @@ $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
 else
+ifeq ($(LIBEXT),dll)
+all: $(PCIIMPDEF) $(PCIIMPLIB)
+build.def: $(PCIIMPDEF)
+$(PCIIMPDEF): libpci.ver ver2def.pl
+	perl ver2def.pl libpci.ver $(PCILIB) build.def $(PCIIMPDEF)
+$(PCIIMPLIB): $(PCIIMPDEF)
+	$(DLLTOOL) --input-def $< --output-lib $@
+endif
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(CC) -shared $(CFLAGS) $(LDFLAGS) $(PCILIB_LDFLAGS) -o $@ $^ $(LIB_LDLIBS)
+ifeq ($(LIBEXT),dll)
+$(PCILIB): build.def
+endif
 endif
 
 $(PCILIBPC): libpci.pc.in
