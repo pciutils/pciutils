@@ -537,7 +537,7 @@
 #define PCI_HT_SEC_CMD		2	/* Command Register */
 #define  PCI_HT_SEC_CMD_WR	0x0001	/* Warm Reset */
 #define  PCI_HT_SEC_CMD_DE	0x0002	/* Double-Ended */
-#define  PCI_HT_SEC_CMD_DN	0x0076	/* Device Number */
+#define  PCI_HT_SEC_CMD_DN	0x007c	/* Device Number */
 #define  PCI_HT_SEC_CMD_CS	0x0080	/* Chain Side */
 #define  PCI_HT_SEC_CMD_HH	0x0100	/* Host Hide */
 #define  PCI_HT_SEC_CMD_AS	0x0400	/* Act as Slave */
