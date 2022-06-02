@@ -549,7 +549,7 @@ cap_vc(struct device *d, int where)
       pat_pos = BITS(rcap, 24, 8);
       printf("Caps:\tPATOffset=%02x MaxTimeSlots=%d RejSnoopTrans%c\n",
 	pat_pos,
-	BITS(rcap, 16, 6) + 1,
+	BITS(rcap, 16, 7) + 1,
 	FLAG(rcap, 1 << 15));
 
       printf("\t\t\tArb:");
