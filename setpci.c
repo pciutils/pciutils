@@ -281,6 +281,7 @@ static const struct reg_name pci_reg_names[] = {
   {       0, 0x2c, 2, "SUBSYSTEM_VENDOR_ID" },
   {       0, 0x2e, 2, "SUBSYSTEM_ID" },
   {       0, 0x30, 4, "ROM_ADDRESS" },
+  {       0, 0x34, 1, "CAPABILITIES" },
   {       0, 0x3c, 1, "INTERRUPT_LINE" },
   {       0, 0x3d, 1, "INTERRUPT_PIN" },
   {       0, 0x3e, 1, "MIN_GNT" },
