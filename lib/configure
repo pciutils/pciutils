@@ -268,7 +268,7 @@ if [ "$sys" = linux ] ; then
 	if [ "$HWDB" = yes -o "$HWDB" = no ] ; then
 		echo "$HWDB (set manually)"
 	else
-		if `command -v pkg-config >/dev/null && pkg-config --atleast-version=196 libudev` ; then
+		if `command -v $PKG_CONFIG >/dev/null && $PKG_CONFIG --atleast-version=196 libudev` ; then
 			HWDB=yes
 		else
 			HWDB=no
