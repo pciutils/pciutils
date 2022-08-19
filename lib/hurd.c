@@ -260,7 +260,7 @@ hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 
 /* Get requested info from the server */
 
-static void
+static int
 hurd_fill_regions(struct pci_dev *d)
 {
   mach_port_t device_port = device_port_lookup(d);
@@ -270,7 +270,7 @@ hurd_fill_regions(struct pci_dev *d)
 
   int err = pci_get_dev_regions(device_port, &buf, &size);
   if (err)
-    return;
+    return 0;
 
   if ((char *) &regions != buf)
     {
@@ -278,7 +278,7 @@ hurd_fill_regions(struct pci_dev *d)
       if (size > sizeof(regions))
 	{
 	  vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
-	  return;
+	  return 0;
 	}
 
       memcpy(&regions, buf, size);
@@ -297,9 +297,11 @@ hurd_fill_regions(struct pci_dev *d)
 
       d->size[i] = regions[i].size;
     }
+
+  return 1;
 }
 
-static void
+static int
 hurd_fill_rom(struct pci_dev *d)
 {
   struct pci_xrom_bar rom;
@@ -309,7 +311,7 @@ hurd_fill_rom(struct pci_dev *d)
 
   int err = pci_get_dev_rom(device_port, &buf, &size);
   if (err)
-    return;
+    return 0;
 
   if ((char *) &rom != buf)
     {
@@ -317,7 +319,7 @@ hurd_fill_rom(struct pci_dev *d)
       if (size > sizeof(rom))
 	{
 	  vm_deallocate(mach_task_self(), (vm_address_t) buf, size);
-	  return;
+	  return 0;
 	}
 
       memcpy(&rom, buf, size);
@@ -326,6 +328,8 @@ hurd_fill_rom(struct pci_dev *d)
 
   d->rom_base_addr = rom.base_addr;
   d->rom_size = rom.size;
+
+  return 1;
 }
 
 static void
@@ -334,10 +338,18 @@ hurd_fill_info(struct pci_dev *d, unsigned int flags)
   if (!d->access->buscentric)
     {
       if (want_fill(d, flags, PCI_FILL_BASES | PCI_FILL_SIZES))
-	hurd_fill_regions(d);
+	{
+	  if (hurd_fill_regions(d))
+	    clear_fill(d, PCI_FILL_BASES | PCI_FILL_SIZES);
+	}
       if (want_fill(d, flags, PCI_FILL_ROM_BASE))
-	hurd_fill_rom(d);
+	{
+	  if (hurd_fill_rom(d))
+	    clear_fill(d, PCI_FILL_ROM_BASE);
+	}
     }
+
+  pci_generic_fill_info(d, flags);
 }
 
 struct pci_methods pm_hurd = {
