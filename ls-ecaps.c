@@ -881,6 +881,71 @@ dvsec_cxl_gpf_device(struct device *d, int where)
 }
 
 static void
+dvsec_cxl_flex_bus(struct device *d, int where, int rev)
+{
+  u16 w;
+  u32 l, data;
+
+  if (rev < 1)
+  {
+    printf("\t\tRevision %d not supported\n", rev);
+    return;
+  }
+
+  w = get_conf_word(d, where + PCI_CXL_FB_PORT_CAP);
+  printf("\t\tFBCap:\tCache%c IO%c Mem%c 68BFlit%c MltLogDev%c",
+      FLAG(w, PCI_CXL_FB_CAP_CACHE), FLAG(w, PCI_CXL_FB_CAP_IO),
+      FLAG(w, PCI_CXL_FB_CAP_MEM), FLAG(w, PCI_CXL_FB_CAP_68B_FLIT),
+      FLAG(w, PCI_CXL_FB_CAP_MULT_LOG_DEV));
+
+  if (rev > 1)
+    printf(" 256BFlit%c PBRFlit%c",
+        FLAG(w, PCI_CXL_FB_CAP_256B_FLIT), FLAG(w, PCI_CXL_FB_CAP_PBR_FLIT));
+
+  w = get_conf_word(d, where + PCI_CXL_FB_PORT_CTRL);
+  printf("\n\t\tFBCtl:\tCache%c IO%c Mem%c SynHdrByp%c DrftBuf%c 68BFlit%c MltLogDev%c RCD%c Retimer1%c Retimer2%c",
+      FLAG(w, PCI_CXL_FB_CTRL_CACHE), FLAG(w, PCI_CXL_FB_CTRL_IO),
+      FLAG(w, PCI_CXL_FB_CTRL_MEM), FLAG(w, PCI_CXL_FB_CTRL_SYNC_HDR_BYP),
+      FLAG(w, PCI_CXL_FB_CTRL_DRFT_BUF), FLAG(w, PCI_CXL_FB_CTRL_68B_FLIT),
+      FLAG(w, PCI_CXL_FB_CTRL_MULT_LOG_DEV), FLAG(w, PCI_CXL_FB_CTRL_RCD),
+      FLAG(w, PCI_CXL_FB_CTRL_RETIMER1), FLAG(w, PCI_CXL_FB_CTRL_RETIMER2));
+
+  if (rev > 1)
+    printf(" 256BFlit%c PBRFlit%c",
+        FLAG(w, PCI_CXL_FB_CTRL_256B_FLIT), FLAG(w, PCI_CXL_FB_CTRL_PBR_FLIT));
+
+  w = get_conf_word(d, where + PCI_CXL_FB_PORT_STATUS);
+  printf("\n\t\tFBSta:\tCache%c IO%c Mem%c SynHdrByp%c DrftBuf%c 68BFlit%c MltLogDev%c",
+      FLAG(w, PCI_CXL_FB_STAT_CACHE), FLAG(w, PCI_CXL_FB_STAT_IO),
+      FLAG(w, PCI_CXL_FB_STAT_MEM), FLAG(w, PCI_CXL_FB_STAT_SYNC_HDR_BYP),
+      FLAG(w, PCI_CXL_FB_STAT_DRFT_BUF), FLAG(w, PCI_CXL_FB_STAT_68B_FLIT),
+      FLAG(w, PCI_CXL_FB_STAT_MULT_LOG_DEV));
+
+  if (rev > 1)
+    printf(" 256BFlit%c PBRFlit%c",
+        FLAG(w, PCI_CXL_FB_STAT_256B_FLIT), FLAG(w, PCI_CXL_FB_STAT_PBR_FLIT));
+
+  l = get_conf_long(d, where + PCI_CXL_FB_MOD_TS_DATA);
+  data = BITS(l, 0, 24);
+  printf("\n\t\tFBModTS:\tReceived FB Data: %06x\n", (unsigned int)data);
+
+  if (rev > 1)
+  {
+    u8 nop;
+
+    l = get_conf_long(d, where + PCI_CXL_FB_PORT_CAP2);
+    printf("\t\tFBCap2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CAP2_NOP_HINT));
+
+    l = get_conf_long(d, where + PCI_CXL_FB_PORT_CTRL2);
+    printf("\t\tFBCtl2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CTRL2_NOP_HINT));
+
+    l = get_conf_long(d, where + PCI_CXL_FB_PORT_STATUS2);
+    nop = BITS(l, 0, 2);
+    printf("\t\tFBSta2:\tNOPHintInfo: %x\n", nop);
+    }
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
 {
   printf(": CXL\n");
@@ -908,7 +973,7 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
       dvsec_cxl_gpf_device(d, where);
       break;
     case 7:
-      printf("\t\tPCIe DVSEC Flex Bus Port\n");
+      dvsec_cxl_flex_bus(d, where, rev);
       break;
     case 8:
       dvsec_cxl_register_locator(d, where, len);
