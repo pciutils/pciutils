@@ -839,6 +839,48 @@ dvsec_cxl_register_locator(struct device *d, int where, int len)
 }
 
 static void
+dvsec_cxl_gpf_device(struct device *d, int where)
+{
+  u32 l;
+  u16 w, duration;
+  u8 time_base, time_scale;
+
+  w = get_conf_word(d, where + PCI_CXL_GPF_DEV_PHASE2_DUR);
+  time_base = BITS(w, 0, 4);
+  time_scale = BITS(w, 8, 4);
+
+  switch (time_scale)
+    {
+      case PCI_CXL_GPF_DEV_100US:
+      case PCI_CXL_GPF_DEV_100MS:
+        duration = time_base * 100;
+        break;
+      case PCI_CXL_GPF_DEV_10US:
+      case PCI_CXL_GPF_DEV_10MS:
+      case PCI_CXL_GPF_DEV_10S:
+        duration = time_base * 10;
+        break;
+      case PCI_CXL_GPF_DEV_1US:
+      case PCI_CXL_GPF_DEV_1MS:
+      case PCI_CXL_GPF_DEV_1S:
+        duration = time_base;
+        break;
+      default:
+        /* Reserved */
+        printf("\t\tReserved time scale encoding %x\n", time_scale);
+        duration = time_base;
+    }
+
+  printf("\t\tGPF Phase 2 Duration: %u%s\n", duration,
+      (time_scale < PCI_CXL_GPF_DEV_1MS) ? "us":
+      (time_scale < PCI_CXL_GPF_DEV_1S) ? "ms" :
+      (time_scale == PCI_CXL_GPF_DEV_1S) ? "s" : "<?>");
+
+  l = get_conf_long(d, where + PCI_CXL_GPF_DEV_PHASE2_POW);
+  printf("\t\tGPF Phase 2 Power: %umW\n", (unsigned int)l);
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
 {
   printf(": CXL\n");
@@ -863,7 +905,7 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
       printf("\t\tGPF DVSEC for Port\n");
       break;
     case 5:
-      printf("\t\tGPF DVSEC for Device\n");
+      dvsec_cxl_gpf_device(d, where);
       break;
     case 7:
       printf("\t\tPCIe DVSEC Flex Bus Port\n");

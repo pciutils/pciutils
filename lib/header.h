@@ -1129,6 +1129,19 @@
 /* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Register Locator */
 #define PCI_CXL_RL_BLOCK1_LO 0x0c
 
+/* PCIe CXL Designated Vendor-Specific Capabilities for Global Persistent Flush */
+#define PCI_CXL_GPF_DEV_LEN         0x10
+#define PCI_CXL_GPF_DEV_PHASE2_DUR  0x0a /* GPF Phase 2 Duration Register */
+#define PCI_CXL_GPF_DEV_PHASE2_POW  0x0c /* GPF Phase 2 Power Register */
+#define PCI_CXL_GPF_DEV_1US     0x0
+#define PCI_CXL_GPF_DEV_10US    0x1
+#define PCI_CXL_GPF_DEV_100US   0x2
+#define PCI_CXL_GPF_DEV_1MS     0x3
+#define PCI_CXL_GPF_DEV_10MS    0x4
+#define PCI_CXL_GPF_DEV_100MS   0x5
+#define PCI_CXL_GPF_DEV_1S      0x6
+#define PCI_CXL_GPF_DEV_10S     0x7
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
