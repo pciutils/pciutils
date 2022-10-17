@@ -1141,6 +1141,17 @@
 #define PCI_CXL_GPF_DEV_100MS   0x5
 #define PCI_CXL_GPF_DEV_1S      0x6
 #define PCI_CXL_GPF_DEV_10S     0x7
+#define PCI_CXL_GPF_PORT_LEN    0x10
+#define PCI_CXL_GPF_PORT_PHASE1_CTRL  0x0c /* GPF Phase 1 Control Register */
+#define PCI_CXL_GPF_PORT_PHASE2_CTRL 0x0e /* GPF Phase 2 Control Register */
+#define PCI_CXL_GPF_PORT_1US     0x0
+#define PCI_CXL_GPF_PORT_10US    0x1
+#define PCI_CXL_GPF_PORT_100US   0x2
+#define PCI_CXL_GPF_PORT_1MS     0x3
+#define PCI_CXL_GPF_PORT_10MS    0x4
+#define PCI_CXL_GPF_PORT_100MS   0x5
+#define PCI_CXL_GPF_PORT_1S      0x6
+#define PCI_CXL_GPF_PORT_10S     0x7
 
 /* PCIe CXL Designated Vendor-Specific Capabilities for Flex Bus Port */
 #define PCI_CXL_FB_LEN                0x20

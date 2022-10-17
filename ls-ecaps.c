@@ -881,6 +881,75 @@ dvsec_cxl_gpf_device(struct device *d, int where)
 }
 
 static void
+dvsec_cxl_gpf_port(struct device *d, int where)
+{
+  u16 w, timeout;
+  u8 time_base, time_scale;
+
+  w = get_conf_word(d, where + PCI_CXL_GPF_PORT_PHASE1_CTRL);
+  time_base = BITS(w, 0, 4);
+  time_scale = BITS(w, 8, 4);
+
+  switch (time_scale)
+    {
+      case PCI_CXL_GPF_PORT_100US:
+      case PCI_CXL_GPF_PORT_100MS:
+        timeout = time_base * 100;
+        break;
+      case PCI_CXL_GPF_PORT_10US:
+      case PCI_CXL_GPF_PORT_10MS:
+      case PCI_CXL_GPF_PORT_10S:
+        timeout = time_base * 10;
+        break;
+      case PCI_CXL_GPF_PORT_1US:
+      case PCI_CXL_GPF_PORT_1MS:
+      case PCI_CXL_GPF_PORT_1S:
+        timeout = time_base;
+        break;
+      default:
+        /* Reserved */
+        printf("\t\tReserved time scale encoding %x\n", time_scale);
+        timeout = time_base;
+    }
+
+  printf("\t\tGPF Phase 1 Timeout: %d%s\n", timeout,
+      (time_scale < PCI_CXL_GPF_PORT_1MS) ? "us":
+      (time_scale < PCI_CXL_GPF_PORT_1S) ? "ms" :
+      (time_scale == PCI_CXL_GPF_PORT_1S) ? "s" : "<?>");
+
+  w = get_conf_word(d, where + PCI_CXL_GPF_PORT_PHASE2_CTRL);
+  time_base = BITS(w, 0, 4);
+  time_scale = BITS(w, 8, 4);
+
+  switch (time_scale)
+    {
+      case PCI_CXL_GPF_PORT_100US:
+      case PCI_CXL_GPF_PORT_100MS:
+        timeout = time_base * 100;
+        break;
+      case PCI_CXL_GPF_PORT_10US:
+      case PCI_CXL_GPF_PORT_10MS:
+      case PCI_CXL_GPF_PORT_10S:
+        timeout = time_base * 10;
+        break;
+      case PCI_CXL_GPF_PORT_1US:
+      case PCI_CXL_GPF_PORT_1MS:
+      case PCI_CXL_GPF_PORT_1S:
+        timeout = time_base;
+        break;
+      default:
+        /* Reserved */
+        printf("\t\tReserved time scale encoding %x\n", time_scale);
+        timeout = time_base;
+    }
+
+  printf("\t\tGPF Phase 2 Timeout: %d%s\n", timeout,
+      (time_scale < PCI_CXL_GPF_PORT_1MS) ? "us":
+      (time_scale < PCI_CXL_GPF_PORT_1S) ? "ms" :
+      (time_scale == PCI_CXL_GPF_PORT_1S) ? "s" : "<?>");
+}
+
+static void
 dvsec_cxl_flex_bus(struct device *d, int where, int rev)
 {
   u16 w;
@@ -967,7 +1036,7 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
       dvsec_cxl_port(d, where, len);
       break;
     case 4:
-      printf("\t\tGPF DVSEC for Port\n");
+      dvsec_cxl_gpf_port(d, where);
       break;
     case 5:
       dvsec_cxl_gpf_device(d, where);
