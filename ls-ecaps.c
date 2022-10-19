@@ -1015,6 +1015,18 @@ dvsec_cxl_flex_bus(struct device *d, int where, int rev)
 }
 
 static void
+dvsec_cxl_mld(struct device *d, int where)
+{
+  u16 w;
+
+  w = get_conf_word(d, where + PCI_CXL_MLD_NUM_LD);
+
+  /* Encodings greater than 16 are reserved */
+  if (w && w <= PCI_CXL_MLD_MAX_LD)
+    printf("\t\tNumLogDevs: %d\n", w);
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
 {
   printf(": CXL\n");
@@ -1048,7 +1060,7 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
       dvsec_cxl_register_locator(d, where, len);
       break;
     case 9:
-      printf("\t\tMLD DVSEC\n");
+      dvsec_cxl_mld(d, where);
       break;
     default:
       printf("\t\tUnknown ID %04x\n", id);

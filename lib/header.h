@@ -1193,6 +1193,11 @@
 #define  PCI_CXL_FB_CTRL2_NOP_HINT          0x01    /* NOP Hint Enable */
 #define PCI_CXL_FB_PORT_STATUS2             0x1c    /* CXL Flex Bus Port Status2 Register */
 
+/* PCIe CXL Designated Vendor-Specific Capabilities for Multi-Logical Device */
+#define PCI_CXL_MLD_LEN     0x10
+#define PCI_CXL_MLD_NUM_LD  0xa
+#define PCI_CXL_MLD_MAX_LD  0x10
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
