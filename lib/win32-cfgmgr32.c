@@ -126,7 +126,7 @@ resolve_cfgmgr32_functions(void)
  * cfgmgr32.dll uses custom non-Win32 error numbers which are unsupported by
  * Win32 APIs like GetLastError() and FormatMessage() functions.
  *
- * Windows 7 instroduced new cfgmgr32.dll function CM_MapCrToWin32Err() for
+ * Windows 7 introduced new cfgmgr32.dll function CM_MapCrToWin32Err() for
  * translating mapping CR_* errors to Win32 errors but most error codes are
  * not mapped. So this function is unusable.
  *
