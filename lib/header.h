@@ -1198,6 +1198,17 @@
 #define PCI_CXL_MLD_NUM_LD  0xa
 #define PCI_CXL_MLD_MAX_LD  0x10
 
+/* PCIe CXL Designated Vendor-Specific Capabilities for Non-CXL Function Map */
+#define PCI_CXL_FUN_MAP_LEN     0x2c
+#define PCI_CXL_FUN_MAP_REG_0   0x0c
+#define PCI_CXL_FUN_MAP_REG_1   0x10
+#define PCI_CXL_FUN_MAP_REG_2   0x14
+#define PCI_CXL_FUN_MAP_REG_3   0x18
+#define PCI_CXL_FUN_MAP_REG_4   0x1c
+#define PCI_CXL_FUN_MAP_REG_5   0x20
+#define PCI_CXL_FUN_MAP_REG_6   0x24
+#define PCI_CXL_FUN_MAP_REG_7   0x28
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */

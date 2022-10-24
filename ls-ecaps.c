@@ -1027,6 +1027,35 @@ dvsec_cxl_mld(struct device *d, int where)
 }
 
 static void
+dvsec_cxl_function_map(struct device *d, int where)
+{
+
+  printf("\t\tFuncMap 0: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_0)));
+
+  printf("\t\tFuncMap 1: %08x\n",
+    (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_1)));
+
+  printf("\t\tFuncMap 2: %08x\n",
+    (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_2)));
+
+  printf("\t\tFuncMap 3: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_3)));
+
+  printf("\t\tFuncMap 4: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_4)));
+
+  printf("\t\tFuncMap 5: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_5)));
+
+  printf("\t\tFuncMap 6: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_6)));
+
+  printf("\t\tFuncMap 7: %08x\n",
+      (unsigned int)(get_conf_word(d, where + PCI_CXL_FUN_MAP_REG_7)));
+}
+
+static void
 cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
 {
   printf(": CXL\n");
@@ -1042,7 +1071,7 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
       dvsec_cxl_device(d, rev, where, len);
       break;
     case 2:
-      printf("\t\tNon-CXL Function Map DVSEC\n");
+      dvsec_cxl_function_map(d, where);
       break;
     case 3:
       dvsec_cxl_port(d, where, len);
