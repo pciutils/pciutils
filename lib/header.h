@@ -1068,24 +1068,71 @@
 #define PCI_DVSEC_VENDOR_ID_CXL	0x1e98	/* Designated Vendor-Specific Vendor ID for CXL */
 #define PCI_DVSEC_ID_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
 
-/* PCIe CXL Designated Vendor-Specific Capabilities, Control, Status */
-#define PCI_CXL_CAP		0x0a	/* CXL Capability Register */
-#define  PCI_CXL_CAP_CACHE	0x0001	/* CXL.cache Protocol Support */
-#define  PCI_CXL_CAP_IO		0x0002	/* CXL.io Protocol Support */
-#define  PCI_CXL_CAP_MEM	0x0004	/* CXL.mem Protocol Support */
-#define  PCI_CXL_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initializes with HW/FW Support */
-#define  PCI_CXL_CAP_HDM_CNT(x)	(((x) & (3 << 4)) >> 4)	/* CXL Number of HDM ranges */
-#define  PCI_CXL_CAP_VIRAL	0x4000	/* CXL Viral Handling Support */
-#define PCI_CXL_CTRL		0x0c	/* CXL Control Register */
-#define  PCI_CXL_CTRL_CACHE	0x0001	/* CXL.cache Protocol Enable */
-#define  PCI_CXL_CTRL_IO	0x0002	/* CXL.io Protocol Enable */
-#define  PCI_CXL_CTRL_MEM	0x0004	/* CXL.mem Protocol Enable */
-#define  PCI_CXL_CTRL_CACHE_SF_COV(x)	(((x) & (0x1f << 3)) >> 3) /* Snoop Filter Coverage */
-#define  PCI_CXL_CTRL_CACHE_SF_GRAN(x)	(((x) & (0x7 << 8)) >> 8) /* Snoop Filter Granularity */
-#define  PCI_CXL_CTRL_CACHE_CLN	0x0800	/* CXL.cache Performance Hint on Clean Evictions */
-#define  PCI_CXL_CTRL_VIRAL	0x4000	/* CXL Viral Handling Enable */
-#define PCI_CXL_STATUS		0x0e	/* CXL Status Register */
-#define  PCI_CXL_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
+/* PCIe CXL Designated Vendor-Specific Capabilities for Devices: Control, Status */
+#define PCI_CXL_DEV_LEN 0x38 /* CXL Device DVSEC Length */
+#define PCI_CXL_DEV_CAP			0x0a	/* CXL Capability Register */
+#define  PCI_CXL_DEV_CAP_CACHE		0x0001	/* CXL.cache Protocol Support */
+#define  PCI_CXL_DEV_CAP_IO		0x0002	/* CXL.io Protocol Support */
+#define  PCI_CXL_DEV_CAP_MEM		0x0004	/* CXL.mem Protocol Support */
+#define  PCI_CXL_DEV_CAP_MEM_HWINIT	0x0008	/* CXL.mem Initializes with HW/FW Support */
+#define  PCI_CXL_DEV_CAP_HDM_CNT(x)	(((x) & (3 << 4)) >> 4)	/* CXL Number of HDM ranges */
+#define  PCI_CXL_DEV_CAP_VIRAL		0x4000	/* CXL Viral Handling Support */
+#define PCI_CXL_DEV_CTRL		0x0c	/* CXL Control Register */
+#define  PCI_CXL_DEV_CTRL_CACHE		0x0001	/* CXL.cache Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_IO		0x0002	/* CXL.io Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_MEM		0x0004	/* CXL.mem Protocol Enable */
+#define  PCI_CXL_DEV_CTRL_CACHE_SF_COV(x) (((x) & (0x1f << 3)) >> 3) /* Snoop Filter Coverage */
+#define  PCI_CXL_DEV_CTRL_CACHE_SF_GRAN(x) (((x) & (0x7 << 8)) >> 8) /* Snoop Filter Granularity */
+#define  PCI_CXL_DEV_CTRL_CACHE_CLN	0x0800	/* CXL.cache Performance Hint on Clean Evictions */
+#define  PCI_CXL_DEV_CTRL_VIRAL		0x4000	/* CXL Viral Handling Enable */
+#define PCI_CXL_DEV_STATUS		0x0e	/* CXL Status Register */
+#define  PCI_CXL_DEV_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
+#define PCI_CXL_DEV_STATUS2		0x12
+#define  PCI_CXL_DEV_STATUS_CACHE_INV	0x0001
+#define  PCI_CXL_DEV_STATUS_RC		0x0002  /* Device Reset Complete */
+#define  PCI_CXL_DEV_STATUS_RE		0x0004  /* Device Reset Error */
+#define  PCI_CXL_DEV_STATUS_PMC		0x8000  /* Power Management Init Complete */
+#define PCI_CXL_DEV_CAP2		0x16
+#define  PCI_CXL_DEV_CAP2_CACHE_UNK	0x0000	/* Cache Size Isn't Reported */
+#define  PCI_CXL_DEV_CAP2_CACHE_64K	0x0001  /* Unit Size 64K */
+#define  PCI_CXL_DEV_CAP2_CACHE_1M	0x0002  /* Unit Size 1M */
+#define PCI_CXL_DEV_RANGE1_SIZE_HI	0x18
+#define PCI_CXL_DEV_RANGE1_SIZE_LO	0x1c
+#define  PCI_CXL_RANGE_VALID		0x0001
+#define  PCI_CXL_RANGE_ACTIVE		0x0002
+#define  PCI_CXL_RANGE_TYPE(x)		(((x) >> 2) & 0x7)
+#define  PCI_CXL_RANGE_CLASS(x)		(((x) >> 5) & 0x7)
+#define  PCI_CXL_RANGE_INTERLEAVE(x)	(((x) >> 8) & 0x1f)
+#define  PCI_CXL_RANGE_TIMEOUT(x)	(((x) >> 13) & 0x7)
+#define PCI_CXL_DEV_RANGE1_BASE_HI	0x20
+#define PCI_CXL_DEV_RANGE1_BASE_LO	0x24
+#define PCI_CXL_DEV_RANGE2_SIZE_HI	0x28
+#define PCI_CXL_DEV_RANGE2_SIZE_LO	0x2c
+#define PCI_CXL_DEV_RANGE2_BASE_HI	0x30
+#define PCI_CXL_DEV_RANGE2_BASE_LO	0x34
+
+/* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Ports */
+#define PCI_CXL_PORT_EXT_LEN 0x28 /* CXL Extensions DVSEC for Ports Length */
+#define PCI_CXL_PORT_EXT_STATUS 0x0a		/* Port Extension Status */
+#define  PCI_CXL_PORT_PM_INIT_COMPLETE 0x1	/* Port Power Management Initialization Complete */
+#define PCI_CXL_PORT_CTRL 0x0c			/* Port Control Override */
+#define  PCI_CXL_PORT_UNMASK_SBR 0x0001		/* Unmask SBR */
+#define  PCI_CXL_PORT_UNMASK_LINK 0x0002	/* Unmask Link Disable */
+#define  PCI_CXL_PORT_ALT_MEMORY 0x0004		/* Alt Memory and ID Space Enable */
+#define  PCI_CXL_PORT_ALT_BME 0x0008		/* Alt BME */
+#define  PCI_CXL_PORT_VIRAL_EN 0x4000		/* Viral Enable */
+#define PCI_CXL_PORT_ALT_BUS_BASE 0xe
+#define PCI_CXL_PORT_ALT_BUS_LIMIT 0xf
+#define PCI_CXL_PORT_ALT_MEM_BASE 0x10
+#define PCI_CXL_PORT_ALT_MEM_LIMIT 0x12
+
+/* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Register Locator */
+#define PCI_CXL_RL_BASE0_LO 0x0c
+#define PCI_CXL_RL_BASE0_HI 0x10
+#define PCI_CXL_RL_BASE1_LO 0x14
+#define PCI_CXL_RL_BASE1_HI 0x18
+#define PCI_CXL_RL_BASE2_LO 0x1c
+#define PCI_CXL_RL_BASE2_HI 0x20
 
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */

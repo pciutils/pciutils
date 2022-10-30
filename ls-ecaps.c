@@ -690,30 +690,200 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
-cap_dvsec_cxl(struct device *d, int where)
+cxl_range(u64 base, u64 size, int n)
 {
-  u16 l;
+  u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
+  const char *type[] = { "Volatile", "Non-volatile", "CDAT" };
+  const char *class[] = { "DRAM", "Storage", "CDAT" };
+  u16 w;
+
+  w = (u16) size;
+
+  size &= ~0x0fffffffULL;
+
+  printf("\t\tRange%d: %016"PCI_U64_FMT_X"-%016"PCI_U64_FMT_X"\n", n, base, base + size - 1);
+  printf("\t\t\tValid%c Active%c Type=%s Class=%s interleave=%d timeout=%ds\n",
+    FLAG(w, PCI_CXL_RANGE_VALID), FLAG(w, PCI_CXL_RANGE_ACTIVE),
+    type[PCI_CXL_RANGE_TYPE(w)], class[PCI_CXL_RANGE_CLASS(w)],
+    interleave[PCI_CXL_RANGE_INTERLEAVE(w)],
+    1 << (PCI_CXL_RANGE_TIMEOUT(w) * 2));
+}
+
+static void
+dvsec_cxl_device(struct device *d, int where, int rev)
+{
+  u32 cache_size, cache_unit_size, l;
+  u64 range_base, range_size;
+  u16 w;
+
+  /* Legacy 1.1 revs aren't handled */
+  if (rev < 1)
+    return;
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_CAP);
+  printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
+    FLAG(w, PCI_CXL_DEV_CAP_CACHE), FLAG(w, PCI_CXL_DEV_CAP_IO), FLAG(w, PCI_CXL_DEV_CAP_MEM),
+    FLAG(w, PCI_CXL_DEV_CAP_MEM_HWINIT), PCI_CXL_DEV_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_DEV_CAP_VIRAL));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_CTRL);
+  printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
+    FLAG(w, PCI_CXL_DEV_CTRL_CACHE), FLAG(w, PCI_CXL_DEV_CTRL_IO), FLAG(w, PCI_CXL_DEV_CTRL_MEM),
+    PCI_CXL_DEV_CTRL_CACHE_SF_COV(w), PCI_CXL_DEV_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_DEV_CTRL_CACHE_CLN),
+    FLAG(w, PCI_CXL_DEV_CTRL_VIRAL));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_STATUS);
+  printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_DEV_STATUS_VIRAL));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_STATUS2);
+  printf("\t\tCXLSta2:\tResetComplete%c ResetError%c PMComplete%c\n",
+    FLAG(w, PCI_CXL_DEV_STATUS_RC), FLAG(w,PCI_CXL_DEV_STATUS_RE), FLAG(w, PCI_CXL_DEV_STATUS_PMC));
+
+  w = get_conf_word(d, where + PCI_CXL_DEV_CAP2);
+  cache_unit_size = BITS(w, 0, 4);
+  cache_size = BITS(w, 8, 8);
+  switch (cache_unit_size)
+    {
+      case PCI_CXL_DEV_CAP2_CACHE_1M:
+        printf("\t\tCache Size: %08x\n", cache_size * (1<<20));
+	break;
+      case PCI_CXL_DEV_CAP2_CACHE_64K:
+        printf("\t\tCache Size: %08x\n", cache_size * (64<<10));
+	break;
+      case PCI_CXL_DEV_CAP2_CACHE_UNK:
+        printf("\t\tCache Size Not Reported\n");
+	break;
+      default:
+        printf("\t\tCache Size: %d of unknown unit size (%d)\n", cache_size, cache_unit_size);
+	break;
+    }
+
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI);
+  range_size = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
+  range_size |= l;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI);
+  range_base = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
+  range_base |= l;
+  cxl_range(range_base, range_size, 1);
+
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI);
+  range_size = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
+  range_size |= l;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI);
+  range_base = (u64) l << 32;
+  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
+  range_base |= l;
+  cxl_range(range_base, range_size, 2);
+}
+
+static void
+dvsec_cxl_port(struct device *d, int where)
+{
+  u16 w, m1, m2;
+  u8 b1, b2;
+
+  w = get_conf_word(d, where + PCI_CXL_PORT_EXT_STATUS);
+  printf("\t\tCXLPortSta:\tPMComplete%c\n", FLAG(w, PCI_CXL_PORT_EXT_STATUS));
+
+  w = get_conf_word(d, where + PCI_CXL_PORT_CTRL);
+  printf("\t\tCXLPortCtl:\tUnmaskSBR%c UnmaskLinkDisable%c AltMem%c AltBME%c ViralEnable%c\n",
+    FLAG(w, PCI_CXL_PORT_UNMASK_SBR), FLAG(w, PCI_CXL_PORT_UNMASK_LINK),
+    FLAG(w, PCI_CXL_PORT_ALT_MEMORY), FLAG(w, PCI_CXL_PORT_ALT_BME),
+    FLAG(w, PCI_CXL_PORT_VIRAL_EN));
+
+  b1 = get_conf_byte(d, where + PCI_CXL_PORT_ALT_BUS_BASE);
+  b2 = get_conf_byte(d, where + PCI_CXL_PORT_ALT_BUS_LIMIT);
+  printf("\t\tAlternateBus:\t%02x-%02x\n", b1, b2);
+  m1 = get_conf_word(d, where + PCI_CXL_PORT_ALT_MEM_BASE);
+  m2 = get_conf_word(d, where + PCI_CXL_PORT_ALT_MEM_LIMIT);
+  printf("\t\tAlternateBus:\t%04x-%04x\n", m1, m2);
+}
+
+static const char *id[] = {
+  "empty",
+  "component registers",
+  "BAR virtualization",
+  "CXL device registers"};
+
+static inline void
+dvsec_decode_block(uint32_t lo, uint32_t hi, char which)
+{
+  u64 base_hi = hi, base_lo;
+  u8 bir, block_id;
+
+  bir = BITS(lo, 0, 3);
+  block_id = BITS(lo, 8, 8);
+  base_lo = BITS(lo, 16, 16);
+
+  if (!block_id)
+    return;
+
+  printf("\t\tBlock%c\tBIR: bar%d\tID: %s\n", which, bir, id[block_id]);
+  printf("\t\t\tRegisterOffset: %016" PCI_U64_FMT_X "\n", (base_hi << 32ULL) | base_lo << 16);
+}
+
+static void
+dvsec_cxl_register_locator(struct device *d, int where, int len)
+{
+  int i, j;
+
+  for (i = 0xc, j = 1; i < len; i += 8, j++) {
+    dvsec_decode_block(get_conf_long(d, where + i), get_conf_long(d, where + i + 4), j + 0x31);
+  }
+}
+
+static void
+cap_dvsec_cxl(struct device *d, int id, int where)
+{
+  u16 len;
+  u8 rev;
 
   printf(": CXL\n");
   if (verbose < 2)
     return;
 
-  if (!config_fetch(d, where + PCI_CXL_CAP, 12))
-    return;
+  rev = BITS(get_conf_byte(d, where + 0x6), 0, 4);
 
-  l = get_conf_word(d, where + PCI_CXL_CAP);
-  printf("\t\tCXLCap:\tCache%c IO%c Mem%c Mem HW Init%c HDMCount %d Viral%c\n",
-    FLAG(l, PCI_CXL_CAP_CACHE), FLAG(l, PCI_CXL_CAP_IO), FLAG(l, PCI_CXL_CAP_MEM),
-    FLAG(l, PCI_CXL_CAP_MEM_HWINIT), PCI_CXL_CAP_HDM_CNT(l), FLAG(l, PCI_CXL_CAP_VIRAL));
+  switch (id) {
+    case 0:
+      if (!config_fetch(d, where, PCI_CXL_DEV_LEN))
+        return;
 
-  l = get_conf_word(d, where + PCI_CXL_CTRL);
-  printf("\t\tCXLCtl:\tCache%c IO%c Mem%c Cache SF Cov %d Cache SF Gran %d Cache Clean%c Viral%c\n",
-    FLAG(l, PCI_CXL_CTRL_CACHE), FLAG(l, PCI_CXL_CTRL_IO), FLAG(l, PCI_CXL_CTRL_MEM),
-    PCI_CXL_CTRL_CACHE_SF_COV(l), PCI_CXL_CTRL_CACHE_SF_GRAN(l), FLAG(l, PCI_CXL_CTRL_CACHE_CLN),
-    FLAG(l, PCI_CXL_CTRL_VIRAL));
+      dvsec_cxl_device(d, where, rev);
+      break;
+    case 3:
+      if (!config_fetch(d, where, PCI_CXL_PORT_EXT_LEN))
+        return;
 
-  l = get_conf_word(d, where + PCI_CXL_STATUS);
-  printf("\t\tCXLSta:\tViral%c\n", FLAG(l, PCI_CXL_STATUS_VIRAL));
+      dvsec_cxl_port(d, where);
+      break;
+    case 8:
+      len = BITS(get_conf_word(d, where + 0x6), 4, 12);
+      if (!config_fetch(d, where, len))
+        return;
+
+      dvsec_cxl_register_locator(d, where, len);
+      break;
+    case 2:
+      printf("\t\tNon-CXL Function Map DVSEC\n");
+      break;
+    case 4:
+      printf("\t\tGPF DVSEC for Port\n");
+      break;
+    case 5:
+      printf("\t\tGPF DVSEC for Device\n");
+      break;
+    case 7:
+      printf("\t\tPCIe DVSEC Flex Bus Port\n");
+      break;
+    case 9:
+      printf("\t\tMLD DVSEC\n");
+      break;
+    default:
+      break;
+  }
 }
 
 static void
@@ -734,8 +904,8 @@ cap_dvsec(struct device *d, int where)
   u16 id = get_conf_long(d, where + PCI_DVSEC_HEADER2);
 
   printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
-  if (vendor == PCI_DVSEC_VENDOR_ID_CXL && id == PCI_DVSEC_ID_CXL && len >= 16)
-    cap_dvsec_cxl(d, where);
+  if (vendor == PCI_DVSEC_VENDOR_ID_CXL && len >= 16)
+    cap_dvsec_cxl(d, id, where);
   else
     printf(" <?>\n");
 }
