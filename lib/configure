@@ -166,6 +166,7 @@ case $sys in
 		fi
 		;; esac
 		EXEEXT=.exe
+		LIBEXT=dll
 		;;
 	beos|haiku)
 		case $cpu in
@@ -291,6 +292,8 @@ if [ "$SHARED" = no ] ; then
 else
 	if [ "$LIBEXT" = so ]; then
 		echo >>$m 'PCILIB=$(LIBNAME).$(LIBEXT).$(VERSION)'
+	elif [ "$LIBEXT" = dll ]; then
+		echo >>$m 'PCILIB=$(LIBNAME)$(ABI_VERSION).$(LIBEXT)'
 	else
 		echo >>$m 'PCILIB=$(LIBNAME).$(VERSION).$(LIBEXT)'
 	fi
@@ -298,11 +301,24 @@ else
 	echo >>$m 'LDLIBS='
 	echo >>$m 'LIB_LDLIBS=$(WITH_LIBS)'
 	echo >>$c '#define PCI_SHARED_LIB'
-	if [ "$SHARED" = yes -a "$LIBEXT" = so ]; then
-		echo >>$m 'SONAME=-Wl,-soname,$(LIBNAME).$(LIBEXT)$(ABI_VERSION)'
+	if [ "$LIBEXT" = so ]; then
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,-soname,$(LIBNAME).$(LIBEXT).$(ABI_VERSION)'
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,--version-script=libpci.ver'
+	elif [ "$LIBEXT" = dylib ]; then
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,-install_name,$(LIBDIR)/$(PCILIB)'
+	elif [ "$LIBEXT" = dll ]; then
+		echo >>$m 'PCIIMPDEF=$(LIBNAME)$(ABI_VERSION).def'
+		# GCC's -fvisibility=hidden is broken for Windows targets, use -Wl,--exclude-all-symbols instead (supported since GNU LD 2.21)
+		echo >>$m 'PCILIB_LDFLAGS+=-Wl,--exclude-all-symbols'
 	fi
 fi
 echo >>$m 'PCILIBPC=$(LIBNAME).pc'
+
+if [ "$SHARED" != no ] && [ "$LIBEXT" = dll ]; then
+	echo >>$m 'PCIIMPLIB=$(PCILIB).a'
+else
+	echo >>$m 'PCIIMPLIB=$(PCILIB)'
+fi
 
 echo >>$c "#define PCILIB_VERSION \"$VERSION\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m

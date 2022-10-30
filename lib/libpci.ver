@@ -4,6 +4,13 @@
  *  Visibility declarations in the source take precedence over this script,
  *  so we can boldly declare pci_* as public and still keep the internal
  *  functions properly hidden.
+ *
+ *  To preserve compatibility of Windows DLL file, always add new symbol at
+ *  the end of file and never change order of symbols nor version sections.
+ *  On Windows the last referenced version of the symbol is the default one.
+
+ *  For PE/COFF targets this file is processed by ver2def.pl script and not
+ *  by GNU LD linker like for ELF targets.
  */
 
 LIBPCI_3.0 {

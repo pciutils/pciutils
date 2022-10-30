@@ -71,13 +71,29 @@ $(PCILIB): $(addsuffix .o,$(OBJS))
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
 else
+ifeq ($(LIBEXT),dll)
+all: $(PCIIMPDEF) $(PCIIMPLIB)
+build.def: $(PCIIMPDEF)
+$(PCIIMPDEF): libpci.ver ver2def.pl
+	perl ver2def.pl libpci.ver $(PCILIB) build.def $(PCIIMPDEF)
+$(PCIIMPLIB): $(PCIIMPDEF)
+	$(DLLTOOL) --input-def $< --output-lib $@
+comma := ,
+dllrsrc.rc: dllrsrc.rc.in
+	sed <$< >$@ -e 's,@PCILIB_VERSION@,$(PCILIB_VERSION),' \
+		-e 's,@PCILIB_VERSION_WINRC@,$(subst .,\$(comma),$(PCILIB_VERSION).0),' \
+		-e 's,@PCILIB@,$(PCILIB),' \
+		-e 's,@DEBUG_BUILD@,$(if $(findstring -g,$(CFLAGS)),1,0),'
+dllrsrc.o: dllrsrc.rc
+	$(WINDRES) --input=$< --output=$@ --input-format=rc --output-format=coff
+OBJS += dllrsrc
+endif
 CFLAGS += -fPIC -fvisibility=hidden
 $(PCILIB): $(addsuffix .o,$(OBJS))
- ifdef PCI_HAVE_PM_DARWIN_DEVICE
-	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,-install_name,$(LIBDIR)/$(PCILIB) -o $@ $^ $(LIB_LDLIBS)
- else
-	$(CC) -shared $(LDFLAGS) $(SONAME) -Wl,--version-script=libpci.ver -o $@ $^ $(LIB_LDLIBS)
- endif
+	$(CC) -shared $(CFLAGS) $(LDFLAGS) $(PCILIB_LDFLAGS) -o $@ $^ $(LIB_LDLIBS)
+ifeq ($(LIBEXT),dll)
+$(PCILIB): build.def
+endif
 endif
 
 $(PCILIBPC): libpci.pc.in

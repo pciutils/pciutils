@@ -1,0 +1,35 @@
+#include <windows.h>
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION @PCILIB_VERSION_WINRC@
+PRODUCTVERSION @PCILIB_VERSION_WINRC@
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#if @DEBUG_BUILD@
+FILEFLAGS VS_FF_DEBUG
+#else
+FILEFLAGS 0
+#endif
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_DLL
+FILESUBTYPE 0
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		/*
+		 * GNU windres seems that converts 7-bit ASCII strings to UTF-16,
+		 * so specify UNICODE/UTF-16 encoding (0x04B0) for these strings.
+		 */
+		BLOCK "040904B0" /* Default U.S. English language, UNICODE/UTF-16 codepage */
+		BEGIN
+			VALUE "FileDescription", "libpci"
+			VALUE "FileVersion", "@PCILIB_VERSION@"
+			VALUE "InternalName", "@PCILIB@"
+			VALUE "OriginalFilename", "@PCILIB@"
+			VALUE "ProductName", "pciutils"
+			VALUE "ProductVersion", "@PCILIB_VERSION@"
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x0409, 0x004B0 /* Default U.S. English language, UNICODE/UTF-16 codepage */
+	END
+END
