@@ -44,6 +44,7 @@ enum pci_access_type {
   PCI_ACCESS_SYLIXOS_DEVICE,		/* SylixOS pci */
   PCI_ACCESS_HURD,			/* GNU/Hurd */
   PCI_ACCESS_WIN32_CFGMGR32,		/* Win32 cfgmgr32.dll */
+  PCI_ACCESS_WIN32_SYSDBG,		/* Win32 NT SysDbg */
   PCI_ACCESS_MAX
 };
 

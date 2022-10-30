@@ -76,6 +76,13 @@ is no access to the PCI configuration space but libpci provides read-only
 virtual emulation based on information from Configuration Manager. Starting
 with Windows 8 (NT 6.2) it is not possible to retrieve resources from 32-bit
 application or library on 64-bit system.
+.TP
+.B win32-sysdbg
+Access to the PCI configuration space via NT SysDbg interface on Windows
+systems. Process needs to have Debug privilege, which local Administrators
+have by default. Not available on 64-bit systems and neither on recent 32-bit
+systems. Only devices from the first domain are accessible and only first
+256 bytes of the PCI configuration space is accessible via this method.
 
 .SH PARAMETERS
 
