@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Show Extended Capabilities
  *
- *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2022 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -710,11 +710,14 @@ cxl_range(u64 base, u64 size, int n)
 }
 
 static void
-dvsec_cxl_device(struct device *d, int where, int rev)
+dvsec_cxl_device(struct device *d, int rev, int where, int len)
 {
-  u32 cache_size, cache_unit_size, l;
+  u32 cache_size, cache_unit_size;
   u64 range_base, range_size;
   u16 w;
+
+  if (len < PCI_CXL_DEV_LEN)
+    return;
 
   /* Legacy 1.1 revs aren't handled */
   if (rev < 1)
@@ -757,32 +760,27 @@ dvsec_cxl_device(struct device *d, int where, int rev)
 	break;
     }
 
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI);
-  range_size = (u64) l << 32;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
-  range_size |= l;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI);
-  range_base = (u64) l << 32;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
-  range_base |= l;
+  range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI) << 32;
+  range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
+  range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI) << 32;
+  range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
   cxl_range(range_base, range_size, 1);
 
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI);
-  range_size = (u64) l << 32;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
-  range_size |= l;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI);
-  range_base = (u64) l << 32;
-  l = get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
-  range_base |= l;
+  range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI) << 32;
+  range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
+  range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI) << 32;
+  range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
   cxl_range(range_base, range_size, 2);
 }
 
 static void
-dvsec_cxl_port(struct device *d, int where)
+dvsec_cxl_port(struct device *d, int where, int len)
 {
   u16 w, m1, m2;
   u8 b1, b2;
+
+  if (len < PCI_CXL_PORT_EXT_LEN)
+    return;
 
   w = get_conf_word(d, where + PCI_CXL_PORT_EXT_STATUS);
   printf("\t\tCXLPortSta:\tPMComplete%c\n", FLAG(w, PCI_CXL_PORT_EXT_STATUS));
@@ -801,73 +799,65 @@ dvsec_cxl_port(struct device *d, int where)
   printf("\t\tAlternateBus:\t%04x-%04x\n", m1, m2);
 }
 
-static const char *id[] = {
-  "empty",
-  "component registers",
-  "BAR virtualization",
-  "CXL device registers"};
-
-static inline void
-dvsec_decode_block(uint32_t lo, uint32_t hi, char which)
-{
-  u64 base_hi = hi, base_lo;
-  u8 bir, block_id;
-
-  bir = BITS(lo, 0, 3);
-  block_id = BITS(lo, 8, 8);
-  base_lo = BITS(lo, 16, 16);
-
-  if (!block_id)
-    return;
-
-  printf("\t\tBlock%c\tBIR: bar%d\tID: %s\n", which, bir, id[block_id]);
-  printf("\t\t\tRegisterOffset: %016" PCI_U64_FMT_X "\n", (base_hi << 32ULL) | base_lo << 16);
-}
-
 static void
 dvsec_cxl_register_locator(struct device *d, int where, int len)
 {
-  int i, j;
+  static const char * const id_names[] = {
+    "empty",
+    "component registers",
+    "BAR virtualization",
+    "CXL device registers",
+    "CPMU registers",
+  };
 
-  for (i = 0xc, j = 1; i < len; i += 8, j++) {
-    dvsec_decode_block(get_conf_long(d, where + i), get_conf_long(d, where + i + 4), j + 0x31);
-  }
+  for (int i=0; ; i++)
+    {
+      int pos = where + 8*i;
+      if (pos + 7 >= len)
+	break;
+
+      u32 lo = get_conf_long(d, pos);
+      u32 hi = get_conf_long(d, pos + 4);
+
+      unsigned int bir = BITS(lo, 0, 3);
+      unsigned int block_id = BITS(lo, 8, 8);
+      u64 base = (BITS(lo, 16, 16) << 16) | ((u64) hi << 32);
+
+      if (!block_id)
+	continue;
+
+      const char *id_name;
+      if (block_id < sizeof(id_names) / sizeof(*id_names))
+	id_name = id_names[block_id];
+      else if (block_id == 0xff)
+	id_name = "vendor-specific";
+      else
+	id_name = "<?>";
+
+      printf("\t\tBlock%d: BIR: bar%d, ID: %s, offset: %016" PCI_U64_FMT_X "\n", i, bir, id_name, base);
+    }
 }
 
 static void
-cap_dvsec_cxl(struct device *d, int id, int where)
+cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
 {
-  u16 len;
-  u8 rev;
-
   printf(": CXL\n");
   if (verbose < 2)
     return;
 
-  rev = BITS(get_conf_byte(d, where + 0x6), 0, 4);
+  if (!config_fetch(d, where, len))
+    return;
 
-  switch (id) {
+  switch (id)
+    {
     case 0:
-      if (!config_fetch(d, where, PCI_CXL_DEV_LEN))
-        return;
-
-      dvsec_cxl_device(d, where, rev);
-      break;
-    case 3:
-      if (!config_fetch(d, where, PCI_CXL_PORT_EXT_LEN))
-        return;
-
-      dvsec_cxl_port(d, where);
-      break;
-    case 8:
-      len = BITS(get_conf_word(d, where + 0x6), 4, 12);
-      if (!config_fetch(d, where, len))
-        return;
-
-      dvsec_cxl_register_locator(d, where, len);
+      dvsec_cxl_device(d, rev, where, len);
       break;
     case 2:
       printf("\t\tNon-CXL Function Map DVSEC\n");
+      break;
+    case 3:
+      dvsec_cxl_port(d, where, len);
       break;
     case 4:
       printf("\t\tGPF DVSEC for Port\n");
@@ -878,12 +868,15 @@ cap_dvsec_cxl(struct device *d, int id, int where)
     case 7:
       printf("\t\tPCIe DVSEC Flex Bus Port\n");
       break;
+    case 8:
+      dvsec_cxl_register_locator(d, where, len);
+      break;
     case 9:
       printf("\t\tMLD DVSEC\n");
       break;
     default:
-      break;
-  }
+      printf("\t\tUnknown ID %04x\n", id);
+    }
 }
 
 static void
@@ -905,7 +898,7 @@ cap_dvsec(struct device *d, int where)
 
   printf("Vendor=%04x ID=%04x Rev=%d Len=%d", vendor, id, rev, len);
   if (vendor == PCI_DVSEC_VENDOR_ID_CXL && len >= 16)
-    cap_dvsec_cxl(d, id, where);
+    cap_dvsec_cxl(d, id, rev, where, len);
   else
     printf(" <?>\n");
 }
