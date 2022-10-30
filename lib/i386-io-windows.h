@@ -107,16 +107,13 @@ unsigned long _inpd(unsigned short port);
  * function conflicts with some MSVC intrinsic.
  * MSVC supports inline assembly via __asm keyword in 32-bit mode only.
  * GCC version 4.9.0 and higher provides __builtin_ia32_readeflags_uXX()
- * builtin for XX-mode.
+ * builtin for XX-mode. This builtin is also available as __readeflags()
+ * function indirectly via <x86intrin.h> header file.
  */
 #if defined(_MSC_VER) && (_MSC_VER >= 1500 || (_MSC_VER >= 1400 && defined(__BUILDMACHINE__)))
 #pragma intrinsic(__readeflags)
 #elif defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 9) || (__GNUC__ > 4))
-#ifdef __x86_64__
-#define __readeflags() __builtin_ia32_readeflags_u64()
-#else
-#define __readeflags() __builtin_ia32_readeflags_u32()
-#endif
+#include <x86intrin.h>
 #elif defined(_MSC_VER) && defined(_M_IX86)
 static inline unsigned int
 __readeflags(void)
