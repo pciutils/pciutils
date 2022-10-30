@@ -219,7 +219,7 @@ print_it(char *line, char *p)
       *p = ' ';
 }
 
-static void show_tree_bridge(struct bridge *, char *, char *);
+static void show_tree_bridge(struct pci_filter *filter, struct bridge *, char *, char *);
 
 static char * FORMAT_CHECK(printf, 3, 4)
 tree_printf(char *line, char *p, char *fmt, ...)
@@ -252,7 +252,7 @@ tree_printf(char *line, char *p, char *fmt, ...)
 }
 
 static void
-show_tree_dev(struct device *d, char *line, char *p)
+show_tree_dev(struct pci_filter *filter, struct device *d, char *line, char *p)
 {
   struct pci_dev *q = d->dev;
   struct bridge *b;
@@ -268,7 +268,7 @@ show_tree_dev(struct device *d, char *line, char *p)
 	  p = tree_printf(line, p, "-[%02x]-", b->secondary);
 	else
 	  p = tree_printf(line, p, "-[%02x-%02x]-", b->secondary, b->subordinate);
-        show_tree_bridge(b, line, p);
+        show_tree_bridge(filter, b, line, p);
         return;
       }
   if (verbose)
@@ -279,53 +279,127 @@ show_tree_dev(struct device *d, char *line, char *p)
   print_it(line, p);
 }
 
+static int
+check_bus_filter(struct pci_filter *filter, struct bus *b);
+
+static int
+check_dev_filter(struct pci_filter *filter, struct device *d)
+{
+  struct bridge *br;
+  struct bus *b;
+
+  if (!filter)
+    return 1;
+
+  if (pci_filter_match(filter, d->dev))
+    return 1;
+
+  for (br = &host_bridge; br; br = br->chain)
+    if (br->br_dev == d)
+      {
+        for (b = br->first_bus; b; b = b->sibling)
+          if (check_bus_filter(filter, b))
+            return 1;
+        break;
+      }
+
+  return 0;
+}
+
+static int
+check_bus_filter(struct pci_filter *filter, struct bus *b)
+{
+  struct device *d;
+
+  if (!filter)
+    return 1;
+
+  for (d = b->first_dev; d; d = d->bus_next)
+    if (check_dev_filter(filter, d))
+      return 1;
+
+  return 0;
+}
+
 static void
-show_tree_bus(struct bus *b, char *line, char *p)
+show_tree_bus(struct pci_filter *filter, struct bus *b, char *line, char *p)
 {
   if (!b->first_dev)
     print_it(line, p);
   else if (!b->first_dev->bus_next)
     {
-      p = tree_printf(line, p, "--");
-      show_tree_dev(b->first_dev, line, p);
+      if (check_dev_filter(filter, b->first_dev))
+        {
+          p = tree_printf(line, p, "--");
+          show_tree_dev(filter, b->first_dev, line, p);
+        }
+      else
+        print_it(line, p);
     }
   else
     {
+      int empty = 1;
       struct device *d = b->first_dev;
       while (d->bus_next)
 	{
-	  char *p2 = tree_printf(line, p, "+-");
-	  show_tree_dev(d, line, p2);
+	  if (check_dev_filter(filter, d))
+	    {
+	      char *p2 = tree_printf(line, p, "+-");
+	      show_tree_dev(filter, d, line, p2);
+	      empty = 0;
+	    }
 	  d = d->bus_next;
 	}
-      p = tree_printf(line, p, "\\-");
-      show_tree_dev(d, line, p);
+      if (check_dev_filter(filter, d))
+        {
+          p = tree_printf(line, p, "\\-");
+          show_tree_dev(filter, d, line, p);
+          empty = 0;
+        }
+      if (empty)
+        print_it(line, p);
     }
 }
 
 static void
-show_tree_bridge(struct bridge *b, char *line, char *p)
+show_tree_bridge(struct pci_filter *filter, struct bridge *b, char *line, char *p)
 {
   *p++ = '-';
   if (!b->first_bus->sibling)
     {
-      if (b == &host_bridge)
-        p = tree_printf(line, p, "[%04x:%02x]-", b->domain, b->first_bus->number);
-      show_tree_bus(b->first_bus, line, p);
+      if (check_bus_filter(filter, b->first_bus))
+        {
+          if (b == &host_bridge)
+            p = tree_printf(line, p, "[%04x:%02x]-", b->domain, b->first_bus->number);
+          show_tree_bus(filter, b->first_bus, line, p);
+        }
+      else
+        print_it(line, p);
     }
   else
     {
+      int empty = 1;
       struct bus *u = b->first_bus;
       char *k;
 
       while (u->sibling)
         {
-          k = tree_printf(line, p, "+-[%04x:%02x]-", u->domain, u->number);
-          show_tree_bus(u, line, k);
+          if (check_bus_filter(filter, u))
+            {
+              k = tree_printf(line, p, "+-[%04x:%02x]-", u->domain, u->number);
+              show_tree_bus(filter, u, line, k);
+              empty = 0;
+            }
           u = u->sibling;
         }
-      k = tree_printf(line, p, "\\-[%04x:%02x]-", u->domain, u->number);
-      show_tree_bus(u, line, k);
+      if (check_bus_filter(filter, u))
+        {
+          k = tree_printf(line, p, "\\-[%04x:%02x]-", u->domain, u->number);
+          show_tree_bus(filter, u, line, k);
+          empty = 0;
+        }
+      if (empty)
+        print_it(line, p);
     }
 }
 
@@ -333,20 +407,5 @@ void
 show_forest(struct pci_filter *filter)
 {
   char line[LINE_BUF_SIZE];
-  if (filter == NULL)
-    show_tree_bridge(&host_bridge, line, line);
-  else
-    {
-      struct bridge *b;
-      for (b=&host_bridge; b; b=b->chain)
-        {
-          if (b->br_dev && pci_filter_match(filter, b->br_dev->dev))
-            {
-                struct pci_dev *d = b->br_dev->dev;
-                char *p = line;
-                p = tree_printf(line, p, "%04x:%02x:", d->domain_16, d->bus);
-                show_tree_dev(b->br_dev, line, p);
-            }
-        }
-    }
+  show_tree_bridge(filter, &host_bridge, line, line);
 }
