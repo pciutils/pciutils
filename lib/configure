@@ -239,7 +239,7 @@ if [ "$sys" = linux ] ; then
 		PKG_CONFIG=pkg-config
 	fi
 	if [ "$LIBKMOD" != no ] ; then
-		if ! which $PKG_CONFIG >/dev/null ; then
+		if ! command -v $PKG_CONFIG >/dev/null ; then
 			echo_n "($PKG_CONFIG not found) "
 		elif $PKG_CONFIG libkmod ; then
 			LIBKMOD_DETECTED=1
@@ -269,7 +269,7 @@ if [ "$sys" = linux ] ; then
 	if [ "$HWDB" = yes -o "$HWDB" = no ] ; then
 		echo "$HWDB (set manually)"
 	else
-		if `which pkg-config >/dev/null && pkg-config --atleast-version=196 libudev` ; then
+		if `command -v $PKG_CONFIG >/dev/null && $PKG_CONFIG --atleast-version=196 libudev` ; then
 			HWDB=yes
 		else
 			HWDB=no
