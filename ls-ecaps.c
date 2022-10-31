@@ -812,8 +812,8 @@ dvsec_cxl_register_locator(struct device *d, int where, int len)
 
   for (int i=0; ; i++)
     {
-      int pos = where + 8*i;
-      if (pos + 7 >= len)
+      int pos = where + PCI_CXL_RL_BLOCK1_LO + 8*i;
+      if (pos + 7 >= where + len)
 	break;
 
       u32 lo = get_conf_long(d, pos);
@@ -834,7 +834,7 @@ dvsec_cxl_register_locator(struct device *d, int where, int len)
       else
 	id_name = "<?>";
 
-      printf("\t\tBlock%d: BIR: bar%d, ID: %s, offset: %016" PCI_U64_FMT_X "\n", i, bir, id_name, base);
+      printf("\t\tBlock%d: BIR: bar%d, ID: %s, offset: %016" PCI_U64_FMT_X "\n", i + 1, bir, id_name, base);
     }
 }
 

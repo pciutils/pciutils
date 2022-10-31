@@ -1127,12 +1127,7 @@
 #define PCI_CXL_PORT_ALT_MEM_LIMIT 0x12
 
 /* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Register Locator */
-#define PCI_CXL_RL_BASE0_LO 0x0c
-#define PCI_CXL_RL_BASE0_HI 0x10
-#define PCI_CXL_RL_BASE1_LO 0x14
-#define PCI_CXL_RL_BASE1_HI 0x18
-#define PCI_CXL_RL_BASE2_LO 0x1c
-#define PCI_CXL_RL_BASE2_HI 0x20
+#define PCI_CXL_RL_BLOCK1_LO 0x0c
 
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
