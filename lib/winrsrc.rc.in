@@ -9,7 +9,11 @@ FILEFLAGS VS_FF_DEBUG
 FILEFLAGS 0
 #endif
 FILEOS VOS_NT_WINDOWS32
+#if @LIBRARY_BUILD@
 FILETYPE VFT_DLL
+#else
+FILETYPE VFT_APP
+#endif
 FILESUBTYPE 0
 BEGIN
 	BLOCK "StringFileInfo"
@@ -20,10 +24,10 @@ BEGIN
 		 */
 		BLOCK "040904B0" /* Default U.S. English language, UNICODE/UTF-16 codepage */
 		BEGIN
-			VALUE "FileDescription", "libpci"
+			VALUE "FileDescription", "@DESCRIPTION@"
 			VALUE "FileVersion", "@PCILIB_VERSION@"
-			VALUE "InternalName", "@PCILIB@"
-			VALUE "OriginalFilename", "@PCILIB@"
+			VALUE "InternalName", "@FILENAME@"
+			VALUE "OriginalFilename", "@FILENAME@"
 			VALUE "ProductName", "pciutils"
 			VALUE "ProductVersion", "@PCILIB_VERSION@"
 		END

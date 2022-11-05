@@ -79,10 +79,12 @@ $(PCIIMPDEF): libpci.ver ver2def.pl
 $(PCIIMPLIB): $(PCIIMPDEF)
 	$(DLLTOOL) --input-def $< --output-lib $@
 comma := ,
-dllrsrc.rc: dllrsrc.rc.in
+dllrsrc.rc: winrsrc.rc.in
 	sed <$< >$@ -e 's,@PCILIB_VERSION@,$(PCILIB_VERSION),' \
 		-e 's,@PCILIB_VERSION_WINRC@,$(subst .,\$(comma),$(PCILIB_VERSION).0),' \
-		-e 's,@PCILIB@,$(PCILIB),' \
+		-e 's,@FILENAME@,$(PCILIB),' \
+		-e 's,@DESCRIPTION@,libpci,' \
+		-e 's,@LIBRARY_BUILD@,1,' \
 		-e 's,@DEBUG_BUILD@,$(if $(findstring -g,$(CFLAGS)),1,0),'
 dllrsrc.o: dllrsrc.rc
 	$(WINDRES) --input=$< --output=$@ --input-format=rc --output-format=coff
