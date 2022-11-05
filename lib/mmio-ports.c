@@ -243,9 +243,9 @@ conf1_detect(struct pci_access *a)
       return 0;
     }
 
-  if (access(devmem, R_OK))
+  if (access(devmem, R_OK | W_OK))
     {
-      a->debug("cannot access %s", devmem);
+      a->debug("cannot access %s: %s", devmem, strerror(errno));
       return 0;
     }
 
