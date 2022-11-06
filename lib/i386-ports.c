@@ -136,6 +136,9 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (d->domain || pos >= 256)
     return 0;
 
+  if (len != 1 && len != 2 && len != 4)
+    return pci_generic_block_read(d, pos, buf, len);
+
   intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
@@ -150,8 +153,6 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
     case 4:
       ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
       break;
-    default:
-      res = pci_generic_block_read(d, pos, buf, len);
     }
 
   intel_io_unlock();
@@ -167,6 +168,9 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (d->domain || pos >= 256)
     return 0;
 
+  if (len != 1 && len != 2 && len != 4)
+    return pci_generic_block_write(d, pos, buf, len);
+
   intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
@@ -181,8 +185,6 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
     case 4:
       outl(le32_to_cpu(((u32 *) buf)[0]), addr);
       break;
-    default:
-      res = pci_generic_block_write(d, pos, buf, len);
     }
   intel_io_unlock();
   return res;
@@ -228,6 +230,9 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
     /* conf2 supports only 16 devices per bus */
     return 0;
 
+  if (len != 1 && len != 2 && len != 4)
+    return pci_generic_block_read(d, pos, buf, len);
+
   intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
@@ -242,8 +247,6 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
     case 4:
       ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
       break;
-    default:
-      res = pci_generic_block_read(d, pos, buf, len);
     }
   outb(0, 0xcf8);
   intel_io_unlock();
@@ -263,6 +266,9 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
     /* conf2 supports only 16 devices per bus */
     return 0;
 
+  if (len != 1 && len != 2 && len != 4)
+    return pci_generic_block_write(d, pos, buf, len);
+
   intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
@@ -277,8 +283,6 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
     case 4:
       outl(le32_to_cpu(* (u32 *) buf), addr);
       break;
-    default:
-      res = pci_generic_block_write(d, pos, buf, len);
     }
 
   outb(0, 0xcf8);
