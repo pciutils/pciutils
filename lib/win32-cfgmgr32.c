@@ -126,7 +126,7 @@ resolve_cfgmgr32_functions(void)
  * cfgmgr32.dll uses custom non-Win32 error numbers which are unsupported by
  * Win32 APIs like GetLastError() and FormatMessage() functions.
  *
- * Windows 7 instroduced new cfgmgr32.dll function CM_MapCrToWin32Err() for
+ * Windows 7 introduced new cfgmgr32.dll function CM_MapCrToWin32Err() for
  * translating mapping CR_* errors to Win32 errors but most error codes are
  * not mapped. So this function is unusable.
  *
@@ -498,18 +498,28 @@ retry_service_config:
         service_image_path[systemroot_len++] = L'\\';
       wcscpy(service_image_path + systemroot_len, service_config->lpBinaryPathName + sizeof("\\SystemRoot\\")-1);
     }
-  else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\UNC\\", sizeof("\\??\\UNC\\")-1) == 0)
+  else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\UNC\\", sizeof("\\??\\UNC\\")-1) == 0 ||
+           wcsncmp(service_config->lpBinaryPathName, L"\\??\\\\UNC\\", sizeof("\\??\\\\UNC\\")-1) == 0)
     {
       /* ImagePath is in NT UNC namespace, convert to Win32 UNC path via "\\\\" prefix. */
       service_image_path = pci_malloc(a, sizeof(WCHAR) * (sizeof("\\\\") + wcslen(service_config->lpBinaryPathName) - (sizeof("\\??\\UNC\\")-1)));
+      /* Namespace separator may be single or double backslash. */
+      driver_path_len = sizeof("\\??\\")-1;
+      if (service_config->lpBinaryPathName[driver_path_len] == L'\\')
+        driver_path_len++;
+      driver_path_len += sizeof("UNC\\")-1;
       wcscpy(service_image_path, L"\\\\");
-      wcscpy(service_image_path + sizeof("\\\\")-1, service_config->lpBinaryPathName + sizeof("\\??\\UNC\\")-1);
+      wcscpy(service_image_path + sizeof("\\\\")-1, service_config->lpBinaryPathName + driver_path_len);
     }
   else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\", sizeof("\\??\\")-1) == 0)
     {
       /* ImagePath is in NT Global?? namespace, root of the Win32 file namespace, so just remove "\\??\\" prefix to get Win32 path. */
       service_image_path = pci_malloc(a, sizeof(WCHAR) * (wcslen(service_config->lpBinaryPathName) - (sizeof("\\??\\")-1)));
-      wcscpy(service_image_path, service_config->lpBinaryPathName + sizeof("\\??\\")-1);
+      /* Namespace separator may be single or double backslash. */
+      driver_path_len = sizeof("\\??\\")-1;
+      if (service_config->lpBinaryPathName[driver_path_len] == L'\\')
+        driver_path_len++;
+      wcscpy(service_image_path, service_config->lpBinaryPathName + driver_path_len);
     }
   else if (service_config->lpBinaryPathName[0] != L'\\')
     {
