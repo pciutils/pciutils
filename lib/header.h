@@ -1129,6 +1129,86 @@
 /* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Register Locator */
 #define PCI_CXL_RL_BLOCK1_LO 0x0c
 
+/* PCIe CXL Designated Vendor-Specific Capabilities for Global Persistent Flush */
+#define PCI_CXL_GPF_DEV_LEN         0x10
+#define PCI_CXL_GPF_DEV_PHASE2_DUR  0x0a /* GPF Phase 2 Duration Register */
+#define PCI_CXL_GPF_DEV_PHASE2_POW  0x0c /* GPF Phase 2 Power Register */
+#define PCI_CXL_GPF_DEV_1US     0x0
+#define PCI_CXL_GPF_DEV_10US    0x1
+#define PCI_CXL_GPF_DEV_100US   0x2
+#define PCI_CXL_GPF_DEV_1MS     0x3
+#define PCI_CXL_GPF_DEV_10MS    0x4
+#define PCI_CXL_GPF_DEV_100MS   0x5
+#define PCI_CXL_GPF_DEV_1S      0x6
+#define PCI_CXL_GPF_DEV_10S     0x7
+#define PCI_CXL_GPF_PORT_LEN    0x10
+#define PCI_CXL_GPF_PORT_PHASE1_CTRL  0x0c /* GPF Phase 1 Control Register */
+#define PCI_CXL_GPF_PORT_PHASE2_CTRL 0x0e /* GPF Phase 2 Control Register */
+#define PCI_CXL_GPF_PORT_1US     0x0
+#define PCI_CXL_GPF_PORT_10US    0x1
+#define PCI_CXL_GPF_PORT_100US   0x2
+#define PCI_CXL_GPF_PORT_1MS     0x3
+#define PCI_CXL_GPF_PORT_10MS    0x4
+#define PCI_CXL_GPF_PORT_100MS   0x5
+#define PCI_CXL_GPF_PORT_1S      0x6
+#define PCI_CXL_GPF_PORT_10S     0x7
+
+/* PCIe CXL Designated Vendor-Specific Capabilities for Flex Bus Port */
+#define PCI_CXL_FB_LEN                0x20
+#define PCI_CXL_FB_PORT_CAP           0x0a    /* CXL Flex Bus Port Capability Register */
+#define  PCI_CXL_FB_CAP_CACHE         0x0001  /* CXL.cache Capable */
+#define  PCI_CXL_FB_CAP_IO            0x0002  /* CXL.io Capable */
+#define  PCI_CXL_FB_CAP_MEM           0x0004  /* CXL.mem Capable */
+#define  PCI_CXL_FB_CAP_68B_FLIT      0x0020  /* CXL 68B Flit and VH Capable */
+#define  PCI_CXL_FB_CAP_MULT_LOG_DEV  0x0040  /* CXL Multi-Logical Device Capable */
+#define  PCI_CXL_FB_CAP_256B_FLIT     0x2000  /* CXL Latency Optimized 256B Flit Capable */
+#define  PCI_CXL_FB_CAP_PBR_FLIT      0x4000  /* CXL PBR Flit Capable */
+#define PCI_CXL_FB_PORT_CTRL            0x0c    /* CXL Flex Bus Port Control Register */
+#define  PCI_CXL_FB_CTRL_CACHE          0x0001  /* CXL.cache Enable */
+#define  PCI_CXL_FB_CTRL_IO             0x0002  /* CXL.io Enable */
+#define  PCI_CXL_FB_CTRL_MEM            0x0004  /* CXL.mem Enable */
+#define  PCI_CXL_FB_CTRL_SYNC_HDR_BYP   0x0008  /* CXL Sync Header Bypass Enable */
+#define  PCI_CXL_FB_CTRL_DRFT_BUF       0x0010  /* Drift Buffer Enable */
+#define  PCI_CXL_FB_CTRL_68B_FLIT       0x0020  /* CXL 68B Flit and VH Enable */
+#define  PCI_CXL_FB_CTRL_MULT_LOG_DEV   0x0040  /* CXL Multi Logical Device Enable */
+#define  PCI_CXL_FB_CTRL_RCD            0x0080  /* Disable RCD Training */
+#define  PCI_CXL_FB_CTRL_RETIMER1       0x0100  /* Retimer1 Present */
+#define  PCI_CXL_FB_CTRL_RETIMER2       0x0200  /* Retimer2 Present */
+#define  PCI_CXL_FB_CTRL_256B_FLIT      0x2000  /* CXL Latency Optimized 256B Flit Enable */
+#define  PCI_CXL_FB_CTRL_PBR_FLIT       0x4000  /* CXL PBR Flit Enable */
+#define PCI_CXL_FB_PORT_STATUS            0x0e    /* CXL Flex Bus Port Status Register */
+#define  PCI_CXL_FB_STAT_CACHE            0x0001  /* CXL.cache Enabled */
+#define  PCI_CXL_FB_STAT_IO               0x0002  /* CXL.io Enabled */
+#define  PCI_CXL_FB_STAT_MEM              0x0004  /* CXL.mem Enabled */
+#define  PCI_CXL_FB_STAT_SYNC_HDR_BYP     0x0008  /* CXL Sync Header Bypass Enabled */
+#define  PCI_CXL_FB_STAT_DRFT_BUF         0x0010  /* Drift Buffer Enabled */
+#define  PCI_CXL_FB_STAT_68B_FLIT         0x0020  /* CXL 68B Flit and VH Enabled */
+#define  PCI_CXL_FB_STAT_MULT_LOG_DEV     0x0040  /* CXL Multi Logical Device Enabled */
+#define  PCI_CXL_FB_STAT_256B_FLIT        0x2000  /* CXL Latency Optimized 256B Flit Enabled */
+#define  PCI_CXL_FB_STAT_PBR_FLIT         0x4000  /* CXL PBR Flit Enabled */
+#define PCI_CXL_FB_MOD_TS_DATA              0x10    /* CXL Flex Bus Port Received Modified TS Data Phase1 Register */
+#define PCI_CXL_FB_PORT_CAP2                0x14    /* CXL Flex Bus Port Capability2 Register */
+#define  PCI_CXL_FB_CAP2_NOP_HINT           0x01    /* NOP Hint Capable */
+#define PCI_CXL_FB_PORT_CTRL2               0x18    /* CXL Flex Bus Port Control2 Register */
+#define  PCI_CXL_FB_CTRL2_NOP_HINT          0x01    /* NOP Hint Enable */
+#define PCI_CXL_FB_PORT_STATUS2             0x1c    /* CXL Flex Bus Port Status2 Register */
+
+/* PCIe CXL Designated Vendor-Specific Capabilities for Multi-Logical Device */
+#define PCI_CXL_MLD_LEN     0x10
+#define PCI_CXL_MLD_NUM_LD  0xa
+#define PCI_CXL_MLD_MAX_LD  0x10
+
+/* PCIe CXL Designated Vendor-Specific Capabilities for Non-CXL Function Map */
+#define PCI_CXL_FUN_MAP_LEN     0x2c
+#define PCI_CXL_FUN_MAP_REG_0   0x0c
+#define PCI_CXL_FUN_MAP_REG_1   0x10
+#define PCI_CXL_FUN_MAP_REG_2   0x14
+#define PCI_CXL_FUN_MAP_REG_3   0x18
+#define PCI_CXL_FUN_MAP_REG_4   0x1c
+#define PCI_CXL_FUN_MAP_REG_5   0x20
+#define PCI_CXL_FUN_MAP_REG_6   0x24
+#define PCI_CXL_FUN_MAP_REG_7   0x28
+
 /* Access Control Services */
 #define PCI_ACS_CAP		0x04	/* ACS Capability Register */
 #define PCI_ACS_CAP_VALID	0x0001	/* ACS Source Validation */
