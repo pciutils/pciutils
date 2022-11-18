@@ -13,6 +13,10 @@
 
 #include "internal.h"
 
+#ifdef PCI_OS_DJGPP
+#include <crt0.h> /* for __dos_argv0 */
+#endif
+
 #ifdef PCI_OS_WINDOWS
 
 #include <windows.h>
@@ -262,7 +266,7 @@ pci_get_method_name(int index)
     return pci_methods[index]->name;
 }
 
-#ifdef PCI_OS_WINDOWS
+#if defined(PCI_OS_WINDOWS) || defined(PCI_OS_DJGPP)
 
 static void
 pci_init_name_list_path(struct pci_access *a)
@@ -274,7 +278,7 @@ pci_init_name_list_path(struct pci_access *a)
       char *path, *sep;
       size_t len;
 
-#if defined(_WIN32) || defined(_WINDLL) || defined(_WINDOWS)
+#if defined(PCI_OS_WINDOWS) && (defined(_WIN32) || defined(_WINDLL) || defined(_WINDOWS))
 
       HMODULE module;
       size_t size;
@@ -309,11 +313,15 @@ retry:
       else if (len == 0)
         path[0] = '\0';
 
-#else
+#elif defined(PCI_OS_DJGPP) || defined(PCI_OS_WINDOWS)
 
       const char *exe_path;
 
+#ifdef PCI_OS_DJGPP
+      exe_path = __dos_argv0;
+#else
       exe_path = _pgmptr;
+#endif
 
       len = strlen(exe_path);
       path = pci_malloc(a, len+sizeof(PCI_IDS));
