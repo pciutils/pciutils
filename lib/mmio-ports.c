@@ -243,9 +243,9 @@ conf1_detect(struct pci_access *a)
       return 0;
     }
 
-  if (access(devmem, R_OK))
+  if (access(devmem, R_OK | W_OK))
     {
-      a->debug("cannot access %s", devmem);
+      a->debug("cannot access %s: %s", devmem, strerror(errno));
       return 0;
     }
 
@@ -269,7 +269,7 @@ conf1_init(struct pci_access *a)
   if (!validate_addrs(addrs))
     a->error("Option mmio-conf1.addrs has invalid address format \"%s\".", addrs);
 
-  a->fd = open(devmem, O_RDWR);
+  a->fd = open(devmem, O_RDWR | O_DSYNC); /* O_DSYNC bypass CPU cache for mmap() on Linux */
   if (a->fd < 0)
     a->error("Cannot open %s: %s.", devmem, strerror(errno));
 }
@@ -316,6 +316,7 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
     return 0;
 
   writel(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
+  readl(addr); /* write barrier for address */
 
   switch (len)
     {
@@ -353,6 +354,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
     return 0;
 
   writel(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos & 0xfc), addr);
+  readl(addr); /* write barrier for address */
 
   switch (len)
     {
@@ -366,6 +368,17 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
       writel(((u32 *) buf)[0], data);
       break;
     }
+
+  /*
+   * write barrier for data
+   * Note that we cannot read from data port because it may have side effect.
+   * Instead we read from address port (which should not have side effect) to
+   * create a barrier between two conf1_write() calls. But this does not have
+   * to be 100% correct as it does not ensure barrier on data port itself.
+   * Correct way is to issue CPU instruction for full hw sync barrier but gcc
+   * does not provide any (builtin) function yet.
+   */
+  readl(addr);
 
   return 1;
 }

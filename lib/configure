@@ -97,7 +97,7 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	freebsd*|kfreebsd*)
-		echo_n " fbsd-device"
+		echo_n " fbsd-device mem-ports"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
@@ -107,7 +107,7 @@ case $sys in
 		fi
 		;;
         openbsd)
-	        echo_n " obsd-device"
+	        echo_n " obsd-device mem-ports"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
@@ -132,7 +132,7 @@ case $sys in
 		echo >>$m 'DIRINSTALL=mkdir -p'
 		;;
 	netbsd)
-		echo_n " nbsd-libpci"
+		echo_n " nbsd-libpci mem-ports"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
