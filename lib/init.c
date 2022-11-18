@@ -223,12 +223,33 @@ pci_init_name_list_path(struct pci_access *a)
   else
     {
       char *path, *sep;
-      DWORD len;
+      size_t len;
+      size_t size;
 
-      path = pci_malloc(a, MAX_PATH+1);
-      len = GetModuleFileNameA(NULL, path, MAX_PATH+1);
-      sep = (len > 0) ? strrchr(path, '\\') : NULL;
-      if (len == 0 || len == MAX_PATH+1 || !sep || MAX_PATH-(size_t)(sep+1-path) < sizeof(PCI_IDS))
+      /*
+       * Module file name can have arbitrary length despite all MS examples say
+       * about MAX_PATH upper limit. This limit does not apply for example when
+       * executable is running from network disk with very long UNC paths or
+       * when using "\\??\\" prefix for specifying executable binary path.
+       * Function GetModuleFileName() returns passed size argument when passed
+       * buffer is too small and does not signal any error. In this case retry
+       * again with larger buffer.
+       */
+      size = 256; /* initial buffer size (more than sizeof(PCI_IDS)) */
+retry:
+      path = pci_malloc(a, size);
+      len = GetModuleFileNameA(module, path, size-sizeof(PCI_IDS));
+      if (len >= size-sizeof(PCI_IDS))
+        {
+          free(path);
+          size *= 2;
+          goto retry;
+        }
+      else if (len == 0)
+        path[0] = '\0';
+
+      sep = strrchr(path, '\\');
+      if (!sep)
         {
           free(path);
           pci_set_name_list_path(a, PCI_IDS, 0);
