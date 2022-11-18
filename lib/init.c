@@ -336,9 +336,16 @@ retry:
        * directory, hence something completely different. So prepend missing
        * "\\\\?\\" prefix to make path valid again.
        * Reproduce: CreateProcessW("\\??\\UNC\\10.0.2.4\\qemu\\lspci.exe", ...)
+       *
+       * If path starts with DOS drive letter and with appended PCI_IDS is
+       * longer than 260 bytes and is without "\\\\?\\" prefix then append it.
+       * This prefix is required for paths and file names with DOS drive letter
+       * longer than 260 bytes.
        */
       if (strncmp(path, "\\UNC\\", 5) == 0 ||
-          strncmp(path, "UNC\\", 4) == 0)
+          strncmp(path, "UNC\\", 4) == 0 ||
+          (((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z')) &&
+           len + sizeof(PCI_IDS) >= 260))
         {
           memmove(path+4, path, len);
           memcpy(path, "\\\\?\\", 4);
