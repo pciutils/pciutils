@@ -300,11 +300,11 @@ pci_init_name_list_path(struct pci_access *a)
        * buffer is too small and does not signal any error. In this case retry
        * again with larger buffer.
        */
-      size = 256; /* initial buffer size (more than sizeof(PCI_IDS)) */
+      size = 256; /* initial buffer size (more than sizeof(PCI_IDS)-4) */
 retry:
       path = pci_malloc(a, size);
-      len = GetModuleFileName(module, path, size-sizeof(PCI_IDS));
-      if (len >= size-sizeof(PCI_IDS))
+      len = GetModuleFileName(module, path, size-sizeof(PCI_IDS)-4); /* 4 for "\\\\?\\" */
+      if (len >= size-sizeof(PCI_IDS)-4)
         {
           free(path);
           size *= 2;
@@ -312,6 +312,39 @@ retry:
         }
       else if (len == 0)
         path[0] = '\0';
+
+      /*
+       * GetModuleFileName() has bugs. On Windows 10 it prepends current drive
+       * letter if path is just pure NT namespace (with "\\??\\" prefix). Such
+       * extra drive letter makes path fully invalid and unusable. So remove
+       * extra drive letter to make path valid again.
+       * Reproduce: CreateProcessW("\\??\\C:\\lspci.exe", ...)
+       */
+      if (((path[0] >= 'a' && path[0] <= 'z') ||
+           (path[0] >= 'A' && path[0] <= 'Z')) &&
+          strncmp(path+1, ":\\??\\", 5) == 0)
+        {
+          memmove(path, path+2, len-2);
+          len -= 2;
+          path[len] = '\0';
+        }
+
+      /*
+       * GetModuleFileName() has bugs. On Windows 10 it does not add "\\\\?\\"
+       * prefix when path is in native NT UNC namespace. Such path is treated by
+       * WinAPI/DOS functions as standard DOS path relative to the current
+       * directory, hence something completely different. So prepend missing
+       * "\\\\?\\" prefix to make path valid again.
+       * Reproduce: CreateProcessW("\\??\\UNC\\10.0.2.4\\qemu\\lspci.exe", ...)
+       */
+      if (strncmp(path, "\\UNC\\", 5) == 0 ||
+          strncmp(path, "UNC\\", 4) == 0)
+        {
+          memmove(path+4, path, len);
+          memcpy(path, "\\\\?\\", 4);
+          len += 4;
+          path[len] = '\0';
+        }
 
 #elif defined(PCI_OS_DJGPP) || defined(PCI_OS_WINDOWS)
 
