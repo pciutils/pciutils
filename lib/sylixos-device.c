@@ -25,7 +25,7 @@ sylixos_scan(struct pci_access *a)
 
   for (bus = 0; bus < PCI_MAX_BUS; bus++)
     if (!busmap[bus])
-      pci_generic_scan_bus(a, busmap, bus);
+      pci_generic_scan_bus(a, busmap, 0, bus);
 }
 
 static void

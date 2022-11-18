@@ -67,7 +67,8 @@ struct pci_methods {
 };
 
 /* generic.c */
-void pci_generic_scan_bus(struct pci_access *, byte *busmap, int bus);
+void pci_generic_scan_bus(struct pci_access *, byte *busmap, int domain, int bus);
+void pci_generic_scan_domain(struct pci_access *, int domain);
 void pci_generic_scan(struct pci_access *);
 void pci_generic_fill_info(struct pci_dev *, unsigned int flags);
 int pci_generic_block_read(struct pci_dev *, int pos, byte *buf, int len);
@@ -133,4 +134,5 @@ void pci_free_caps(struct pci_dev *);
 extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
 	pm_fbsd_device, pm_aix_device, pm_nbsd_libpci, pm_obsd_device,
 	pm_dump, pm_linux_sysfs, pm_darwin, pm_sylixos_device, pm_hurd,
+	pm_mmio_conf1,
 	pm_win32_cfgmgr32, pm_win32_sysdbg;

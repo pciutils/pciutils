@@ -86,6 +86,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+#ifdef PCI_HAVE_PM_MMIO_CONF
+  &pm_mmio_conf1,
+#else
+  NULL,
+#endif
 };
 
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
@@ -105,6 +110,7 @@ static int probe_sequence[] = {
   // Low-level methods poking the hardware directly
   PCI_ACCESS_I386_TYPE1,
   PCI_ACCESS_I386_TYPE2,
+  PCI_ACCESS_MMIO_TYPE1,
   -1,
 };
 

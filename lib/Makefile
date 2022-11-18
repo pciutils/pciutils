@@ -18,6 +18,10 @@ ifdef PCI_HAVE_PM_INTEL_CONF
 OBJS += i386-ports
 endif
 
+ifdef PCI_HAVE_PM_MMIO_CONF
+OBJS += mmio-ports
+endif
+
 ifdef PCI_HAVE_PM_DUMP
 OBJS += dump
 endif
@@ -111,6 +115,7 @@ init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 params.o: params.c $(INCL)
 i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
+mmio-ports.o: mmio-ports.c $(INCL)
 proc.o: proc.c $(INCL) pread.h
 sysfs.o: sysfs.c $(INCL) pread.h
 generic.o: generic.c $(INCL)
