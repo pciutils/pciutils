@@ -118,8 +118,6 @@ case $sys in
         darwin*)
 	        echo_n " darwin"
 		echo >>$c '#define PCI_HAVE_PM_DARWIN_DEVICE'
-		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
-		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$m 'WITH_LIBS+=-lresolv -framework CoreFoundation -framework IOKit'
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		LIBRESOLV=
@@ -129,8 +127,6 @@ case $sys in
 	aix)
 		echo_n " aix-device"
 		echo >>$c '#define PCI_HAVE_PM_AIX_DEVICE'
-		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
-		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$m 'CFLAGS=-g'
 		echo >>$m 'INSTALL=installbsd'
 		echo >>$m 'DIRINSTALL=mkdir -p'
@@ -150,8 +146,6 @@ case $sys in
 		echo_n " hurd i386-ports"
 		echo >>$c '#define PCI_HAVE_PM_HURD_CONF'
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
-		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
-		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		;;
 	djgpp)
 		echo_n " i386-ports"
@@ -188,8 +182,6 @@ case $sys in
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						;;
 		esac
-		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
-		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/misc/mem"'
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	sylixos)
