@@ -1,6 +1,6 @@
-2022-11-18  Martin Mares <mj@ucw.cz>
+2022-11-20  Martin Mares <mj@ucw.cz>
 
-	* XXX: To be released as 3.9.0.
+	* Released as 3.9.0.
 
 	* We decode Compute Express Link (CXL) capabilities.
 
@@ -21,9 +21,11 @@
 
 	* Hurd: The Hurd back-end works again.
 
-	* mmio-ports: Added a new back-end implementing the intel-conf1
+	* mmio-conf1(-ext): Added a new back-end implementing the intel-conf1
 	  interface over MMIO. This is useful on some ARM machines, but it
 	  requires manual configuration of the MMIO addresses.
+
+	* As usually, updated pci.ids to the current snapshot of the database.
 
 2022-04-18  Martin Mares <mj@ucw.cz>
 
