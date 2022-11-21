@@ -21,7 +21,7 @@ users to access config space even with SeTcbPrivilege.
 
 To compile this port, run following command:
 
-  make CROSS_COMPILE=i586-mingw32msvc- HOST=i386-windows ZLIB=no IDSDIR=""
+  make CROSS_COMPILE=i586-mingw32msvc- HOST=i586-windows ZLIB=no IDSDIR=""
 
 To build 64-bit version, run:
 
