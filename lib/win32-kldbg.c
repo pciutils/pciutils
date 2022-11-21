@@ -15,6 +15,10 @@
 #include "internal.h"
 #include "i386-io-windows.h"
 
+#ifndef ERROR_NOT_FOUND
+#define ERROR_NOT_FOUND 1168
+#endif
+
 #ifndef LOAD_LIBRARY_AS_IMAGE_RESOURCE
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE 0x20
 #endif
