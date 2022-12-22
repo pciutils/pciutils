@@ -20,23 +20,23 @@ if [ "$PCI_COMPRESSED_IDS" = 1 ] ; then
 	DECOMP="cat"
 	SRC="$SRC.gz"
 	GREP=zgrep
-elif which bzip2 >/dev/null 2>&1 ; then
+elif bzip2 --help >/dev/null 2>&1 ; then
 	DECOMP="bzip2 -d"
 	SRC="$SRC.bz2"
-elif which gzip >/dev/null 2>&1 ; then
+elif gzip --help >/dev/null 2>&1 ; then
 	DECOMP="gzip -d"
 	SRC="$SRC.gz"
 else
 	DECOMP="cat"
 fi
 
-if which curl >/dev/null 2>&1 ; then
+if curl --version >/dev/null 2>&1 ; then
 	DL="curl -o $DEST.new $SRC"
 	${quiet} && DL="$DL -s -S"
-elif which wget >/dev/null 2>&1 ; then
+elif wget --version >/dev/null 2>&1 ; then
 	DL="wget --no-timestamping -O $DEST.new $SRC"
 	${quiet} && DL="$DL -q"
-elif which lynx >/dev/null 2>&1 ; then
+elif lynx --version >/dev/null 2>&1 ; then
 	DL="eval lynx -source $SRC >$DEST.new"
 else
 	echo >&2 "update-pciids: cannot find curl, wget or lynx"
