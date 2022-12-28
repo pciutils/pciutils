@@ -15,12 +15,12 @@
 // optimizations is happy to optimize them away, leading to linker failures.
 #define VERSIONED_ABI __attribute__((used)) PCI_ABI
 #ifdef __APPLE__
-#define STATIC_ALIAS(_decl, _for) _decl PCI_ABI { return _for; }
+#define STATIC_ALIAS(_decl, _for) _decl VERSIONED_ABI { return _for; }
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
 #else
 #define STATIC_ALIAS(_decl, _for)
-#define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for)))
+#define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for))) VERSIONED_ABI
 #ifdef _WIN32
 /* GCC does not support asm .symver directive for Windows targets, so define new external global function symbol as alias to internal symbol */
 #define SYMBOL_VERSION(_int, _ext) asm(".globl\t" PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) "\n\t" \
