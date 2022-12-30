@@ -86,8 +86,12 @@ Device listing on Windows systems using the Windows Configuration Manager
 via cfgmgr32.dll system library. This method does not require any special
 Administrator rights or privileges. Configuration Manager provides only basic
 information about devices, assigned resources and device tree structure. There
-is no access to the PCI configuration space but libpci provides read-only
-virtual emulation based on information from Configuration Manager. Starting
+is no access to the PCI configuration space but libpci either tries to use
+other access method to access configuration space or it provides read-only
+virtual emulation based on information from Configuration Manager. Other
+access method can be chosen by the
+.B win32.cfgmethod
+parameter. By default the first working one is selected (if any). Starting
 with Windows 8 (NT 6.2) it is not possible to retrieve resources from 32-bit
 application or library on 64-bit system.
 .TP
@@ -165,6 +169,15 @@ Physical addresses of memory-mapped I/O ports for Extended PCIe Intel configurat
 It has same format as
 .B mmio-conf1.addrs
 parameter.
+.TP
+.B win32.cfgmethod
+Config space access method for win32-cfgmgr32 on Windows systems. Value
+.I auto
+or emtpy string probe and choose the first access method which supports access
+to the config space access on Windows. Value
+.I win32-cfgmgr32
+only builds read-only virtual emulated config space with information from the
+Configuration Manager.
 
 .SS Parameters for resolving of ID's via DNS
 .TP
