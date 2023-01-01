@@ -32,11 +32,13 @@
 #elif defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 9) || (__GNUC__ > 4))
 #include <x86intrin.h>
 #elif defined(_MSC_VER) && defined(_M_IX86)
-static inline unsigned int
+static unsigned int
 __readeflags(void)
 {
-  __asm pushfd;
-  __asm pop eax;
+  __asm {
+    pushfd
+    pop eax
+  }
 }
 #elif defined(__GNUC__)
 static inline unsigned
