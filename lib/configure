@@ -68,14 +68,17 @@ LSPCIDIR=SBINDIR
 
 case $sys in
 	linux*)
-		echo_n " sysfs proc mem-ports"
+		echo_n " sysfs proc mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_PM_LINUX_SYSFS'
 		echo >>$c '#define PCI_HAVE_PM_LINUX_PROC'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
 		echo >>$c '#define PCI_HAVE_LINUX_BYTEORDER_H'
 		echo >>$c '#define PCI_PATH_PROC_BUS_PCI "/proc/bus/pci"'
 		echo >>$c '#define PCI_PATH_SYS_BUS_PCI "/sys/bus/pci"'
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG "/sys/firmware/acpi/tables/MCFG"'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB "/sys/firmware/efi/systab"'
 		case $cpu in
 				i?86|x86_64)	echo_n " i386-ports"
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
@@ -97,21 +100,27 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	freebsd*|kfreebsd*)
-		echo_n " fbsd-device mem-ports"
+		echo_n " fbsd-device mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		if [ "$sys" != "kfreebsd" ] ; then
 			LIBRESOLV=
 		fi
 		;;
         openbsd)
-	        echo_n " obsd-device mem-ports"
+	        echo_n " obsd-device mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_PM_OBSD_DEVICE'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
 		echo >>$c '#define PCI_PATH_OBSD_DEVICE "/dev/pci"'
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG "/var/db/acpi/MCFG.*"'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		LIBRESOLV=
 		;;
 
@@ -132,11 +141,14 @@ case $sys in
 		echo >>$m 'DIRINSTALL=mkdir -p'
 		;;
 	netbsd)
-		echo_n " nbsd-libpci mem-ports"
+		echo_n " nbsd-libpci mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_PM_NBSD_LIBPCI'
 		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
 		echo >>$c '#define PCI_PATH_NBSD_DEVICE "/dev/pci0"'
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$m 'LIBNAME=libpciutils'
 		echo >>$m 'WITH_LIBS+=-lpci'

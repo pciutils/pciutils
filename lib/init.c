@@ -151,6 +151,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
   NULL,
   NULL,
 #endif
+#if defined(PCI_HAVE_PM_ECAM)
+  &pm_ecam,
+#else
+  NULL,
+#endif
 };
 
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
@@ -169,6 +174,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_WIN32_KLDBG,
   PCI_ACCESS_WIN32_SYSDBG,
   // Low-level methods poking the hardware directly
+  PCI_ACCESS_ECAM,
   PCI_ACCESS_I386_TYPE1,
   PCI_ACCESS_I386_TYPE2,
   PCI_ACCESS_MMIO_TYPE1_EXT,

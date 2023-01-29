@@ -54,6 +54,26 @@ needs to be properly configured via the
 .B mmio-conf1-ext.addrs
 parameter.
 .TP
+.B ecam
+Direct hardware access via PCIe ECAM (Enhanced Configuration Access Mechanism).
+Available on all PCIe-compliant hardware. Requires root privileges and access
+to physical memory (on Linux systems disabled CONFIG_STRICT_DEVMEM option). On
+ACPI compatible systems is ECAM mapping read from the MCFG table specified by the
+.B ecam.acpimcfg
+parameter. On EFI compatible systems, ACPI MCFG table can be located in physical
+memory via EFI system table specified by the
+.B ecam.efisystab
+parameter. On FreeBSD/NetBSD systems, physical address of ACPI MCFG table can be
+located by kenv or sysctl interface when the
+.B ecam.bsd
+parameter is not disabled. On x86 BIOS compatible systems, ACPI MCFG table can
+be located in physical memory by scanning x86 BIOS memory when the
+.B ecam.x86bios
+parameter is not disabled. Alternatively ECAM mappings can be specified by the
+.B ecam.addrs
+parameter which takes precedence over ACPI MCFG table. This option is required
+on systems without ACPI and also on systems without EFI or x86 BIOS.
+.TP
 .B fbsd-device
 The
 .B /dev/pci
@@ -169,6 +189,33 @@ Physical addresses of memory-mapped I/O ports for Extended PCIe Intel configurat
 It has same format as
 .B mmio-conf1.addrs
 parameter.
+.TP
+.B ecam.addrs
+Physical addresses of PCIe ECAM mappings. Each mapping must contains first PCI
+bus number and physical address where mapping starts. And then it may contain
+the length of the mapping, the last PCI bus number and PCI domain number. When
+the last PCI bus number is not provided then it is calculated from the length
+of the mapping or it is assumed 0xff. When length of the mapping is provided
+then it is calculated from the last PCI bus number. And when PCI domain is not
+provided then 0x0 is assumed. All numbers must be supplied in hexadecimal form
+(leading prefix 0x is not required). Multiple mappings are separated by commas.
+Format: [domain:]start_bus[-end_bus]:start_addr[+length],...
+.TP
+.B ecam.acpimcfg
+Path to the ACPI MCFG table. Processed by the
+.BR glob (3)
+function, so it may contain wildcards (*).
+.TP
+.B ecam.efisystab
+Path to the EFI system table.
+.TP
+.B ecam.bsd
+When not set to 0 then use BSD kenv or sysctl to find ACPI MCFG table. Default
+value is 1 on BSD systems.
+.TP
+.B ecam.x86bios
+When not set to 0 then scan x86 BIOS memory for ACPI MCFG table. Default value
+is 1 on x86 systems.
 .TP
 .B win32.cfgmethod
 Config space access method to use with win32-cfgmgr32 on Windows systems. Value
