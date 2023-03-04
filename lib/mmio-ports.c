@@ -124,9 +124,9 @@ writew(unsigned short value, volatile void *addr)
 }
 
 static void
-writel(unsigned long value, volatile void *addr)
+writel(u32 value, volatile void *addr)
 {
-  *(volatile unsigned long *)addr = value;
+  *(volatile u32 *)addr = value;
 }
 
 static unsigned char
@@ -141,10 +141,10 @@ readw(volatile void *addr)
   return *(volatile unsigned short *)addr;
 }
 
-static unsigned long
+static u32
 readl(volatile void *addr)
 {
-  return *(volatile unsigned long *)addr;
+  return *(volatile u32 *)addr;
 }
 
 static int
