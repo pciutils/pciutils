@@ -13,8 +13,61 @@
 
 #include "internal.h"
 
+#ifdef PCI_OS_DJGPP
+#include <crt0.h> /* for __dos_argv0 */
+#endif
+
 #ifdef PCI_OS_WINDOWS
+
 #include <windows.h>
+
+/* Force usage of ANSI (char*) variant of GetModuleFileName() function */
+#ifdef _WIN32
+#ifdef GetModuleFileName
+#undef GetModuleFileName
+#endif
+#define GetModuleFileName GetModuleFileNameA
+#endif
+
+/* Define __ImageBase for all linkers */
+#ifdef _WIN32
+/* GNU LD provides __ImageBase symbol since 2.19, in previous versions it is
+ * under name _image_base__, so add weak alias for compatibility. */
+#ifdef __GNUC__
+asm(".weak\t" PCI_STRINGIFY(__MINGW_USYMBOL(__ImageBase)) "\n\t"
+    ".set\t"  PCI_STRINGIFY(__MINGW_USYMBOL(__ImageBase)) "," PCI_STRINGIFY(__MINGW_USYMBOL(_image_base__)));
+#endif
+/*
+ * MSVC link.exe provides __ImageBase symbol since 12.00 (MSVC 6.0), for
+ * previous versions resolve it at runtime via GetModuleHandleA() which
+ * returns base for main executable or via VirtualQuery() for DLL builds.
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1200
+static HMODULE
+get_current_module_handle(void)
+{
+#ifdef PCI_SHARED_LIB
+  MEMORY_BASIC_INFORMATION info;
+  size_t len = VirtualQuery(&get_current_module_handle, &info, sizeof(info));
+  if (len != sizeof(info))
+    return NULL;
+  return (HMODULE)info.AllocationBase;
+#else
+  return GetModuleHandleA(NULL);
+#endif
+}
+#define __ImageBase (*(IMAGE_DOS_HEADER *)get_current_module_handle())
+#else
+extern IMAGE_DOS_HEADER __ImageBase;
+#endif
+#endif
+
+#if defined(_WINDLL)
+extern HINSTANCE _hModule;
+#elif defined(_WINDOWS)
+extern HINSTANCE _hInstance;
+#endif
+
 #endif
 
 static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
@@ -213,7 +266,7 @@ pci_get_method_name(int index)
     return pci_methods[index]->name;
 }
 
-#ifdef PCI_OS_WINDOWS
+#if defined(PCI_OS_WINDOWS) || defined(PCI_OS_DJGPP)
 
 static void
 pci_init_name_list_path(struct pci_access *a)
@@ -223,13 +276,107 @@ pci_init_name_list_path(struct pci_access *a)
   else
     {
       char *path, *sep;
-      DWORD len;
+      size_t len;
 
-      path = pci_malloc(a, MAX_PATH+1);
-      len = GetModuleFileNameA(NULL, path, MAX_PATH+1);
-      sep = (len > 0) ? strrchr(path, '\\') : NULL;
-      if (len == 0 || len == MAX_PATH+1 || !sep || MAX_PATH-(size_t)(sep+1-path) < sizeof(PCI_IDS))
+#if defined(PCI_OS_WINDOWS) && (defined(_WIN32) || defined(_WINDLL) || defined(_WINDOWS))
+
+      HMODULE module;
+      size_t size;
+
+#if defined(_WIN32)
+      module = (HINSTANCE)&__ImageBase;
+#elif defined(_WINDLL)
+      module = _hModule;
+#elif defined(_WINDOWS)
+      module = _hInstance;
+#endif
+
+      /*
+       * Module file name can have arbitrary length despite all MS examples say
+       * about MAX_PATH upper limit. This limit does not apply for example when
+       * executable is running from network disk with very long UNC paths or
+       * when using "\\??\\" prefix for specifying executable binary path.
+       * Function GetModuleFileName() returns passed size argument when passed
+       * buffer is too small and does not signal any error. In this case retry
+       * again with larger buffer.
+       */
+      size = 256; /* initial buffer size (more than sizeof(PCI_IDS)-4) */
+retry:
+      path = pci_malloc(a, size);
+      len = GetModuleFileName(module, path, size-sizeof(PCI_IDS)-4); /* 4 for "\\\\?\\" */
+      if (len >= size-sizeof(PCI_IDS)-4)
         {
+          free(path);
+          size *= 2;
+          goto retry;
+        }
+      else if (len == 0)
+        path[0] = '\0';
+
+      /*
+       * GetModuleFileName() has bugs. On Windows 10 it prepends current drive
+       * letter if path is just pure NT namespace (with "\\??\\" prefix). Such
+       * extra drive letter makes path fully invalid and unusable. So remove
+       * extra drive letter to make path valid again.
+       * Reproduce: CreateProcessW("\\??\\C:\\lspci.exe", ...)
+       */
+      if (((path[0] >= 'a' && path[0] <= 'z') ||
+           (path[0] >= 'A' && path[0] <= 'Z')) &&
+          strncmp(path+1, ":\\??\\", 5) == 0)
+        {
+          memmove(path, path+2, len-2);
+          len -= 2;
+          path[len] = '\0';
+        }
+
+      /*
+       * GetModuleFileName() has bugs. On Windows 10 it does not add "\\\\?\\"
+       * prefix when path is in native NT UNC namespace. Such path is treated by
+       * WinAPI/DOS functions as standard DOS path relative to the current
+       * directory, hence something completely different. So prepend missing
+       * "\\\\?\\" prefix to make path valid again.
+       * Reproduce: CreateProcessW("\\??\\UNC\\10.0.2.4\\qemu\\lspci.exe", ...)
+       *
+       * If path starts with DOS drive letter and with appended PCI_IDS is
+       * longer than 260 bytes and is without "\\\\?\\" prefix then append it.
+       * This prefix is required for paths and file names with DOS drive letter
+       * longer than 260 bytes.
+       */
+      if (strncmp(path, "\\UNC\\", 5) == 0 ||
+          strncmp(path, "UNC\\", 4) == 0 ||
+          (((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z')) &&
+           len + sizeof(PCI_IDS) >= 260))
+        {
+          memmove(path+4, path, len);
+          memcpy(path, "\\\\?\\", 4);
+          len += 4;
+          path[len] = '\0';
+        }
+
+#elif defined(PCI_OS_DJGPP) || defined(PCI_OS_WINDOWS)
+
+      const char *exe_path;
+
+#ifdef PCI_OS_DJGPP
+      exe_path = __dos_argv0;
+#else
+      exe_path = _pgmptr;
+#endif
+
+      len = strlen(exe_path);
+      path = pci_malloc(a, len+sizeof(PCI_IDS));
+      memcpy(path, exe_path, len+1);
+
+#endif
+
+      sep = strrchr(path, '\\');
+      if (!sep)
+        {
+          /*
+           * If current module path (current executable for static builds or
+           * current DLL library for shared build) cannot be determined then
+           * fallback to the current directory.
+           */
           free(path);
           pci_set_name_list_path(a, PCI_IDS, 0);
         }
