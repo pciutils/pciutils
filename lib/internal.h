@@ -81,6 +81,7 @@ int pci_emulated_read(struct pci_dev *d, int pos, byte *buf, int len);
 void *pci_malloc(struct pci_access *, int);
 void pci_mfree(void *);
 char *pci_strdup(struct pci_access *a, const char *s);
+void pci_init_internal(struct pci_access *a, int throw_errors, int skip_method);
 
 void pci_init_v30(struct pci_access *a) VERSIONED_ABI;
 void pci_init_v35(struct pci_access *a) VERSIONED_ABI;

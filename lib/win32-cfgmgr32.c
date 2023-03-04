@@ -1531,7 +1531,8 @@ scan_devinst_id(struct pci_access *a, DEVINSTID_A devinst_id)
 
   d = pci_get_dev(a, domain, bus, dev, func);
   pci_link_dev(a, d);
-  d->no_config_access = 1;
+  if (!d->access->aux)
+    d->no_config_access = 1;
   d->aux = (void *)devinst;
 
   /* Parse device id part of devinst id and fill details into pci_dev. */
@@ -1633,6 +1634,12 @@ win32_cfgmgr32_scan(struct pci_access *a)
   pci_mfree(devinst_id_list);
 }
 
+static void
+win32_cfgmgr32_config(struct pci_access *a)
+{
+  pci_define_param(a, "win32.cfgmethod", "auto", "PCI config space access method");
+}
+
 static int
 win32_cfgmgr32_detect(struct pci_access *a)
 {
@@ -1666,43 +1673,129 @@ win32_cfgmgr32_detect(struct pci_access *a)
 }
 
 static void
-win32_cfgmgr32_fill_info(struct pci_dev *d UNUSED, unsigned int flags UNUSED)
+win32_cfgmgr32_fill_info(struct pci_dev *d, unsigned int flags)
 {
   /*
-   * All available flags were filled by win32_cfgmgr32_scan()
-   * and reading config space is not supported via cfgmgr32.
+   * All available flags were filled by win32_cfgmgr32_scan().
+   * Filling more flags is possible only from config space.
    */
+  if (!d->access->aux)
+    return;
+
+  pci_generic_fill_info(d, flags);
 }
 
 static int
-win32_cfgmgr32_write(struct pci_dev *d UNUSED, int pos UNUSED, byte *buf UNUSED, int len UNUSED)
+win32_cfgmgr32_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-  /* Writing to config space is not supported via cfgmgr32. */
-  return 0;
+  struct pci_access *a = d->access;
+  struct pci_access *acfg = a->aux;
+  struct pci_dev *dcfg = d->aux;
+
+  if (!acfg)
+    return pci_emulated_read(d, pos, buf, len);
+
+  if (!dcfg)
+    d->aux = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
+
+  return pci_read_block(dcfg, pos, buf, len);
+}
+
+static int
+win32_cfgmgr32_write(struct pci_dev *d, int pos, byte *buf, int len)
+{
+  struct pci_access *a = d->access;
+  struct pci_access *acfg = a->aux;
+  struct pci_dev *dcfg = d->aux;
+
+  if (!acfg)
+    return 0;
+
+  if (!dcfg)
+    d->aux = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
+
+  return pci_write_block(dcfg, pos, buf, len);
 }
 
 static void
-win32_cfgmgr32_init(struct pci_access *a UNUSED)
+win32_cfgmgr32_cleanup_dev(struct pci_dev *d)
 {
+  struct pci_dev *dcfg = d->aux;
+
+  if (dcfg)
+    pci_free_dev(dcfg);
 }
 
 static void
-win32_cfgmgr32_cleanup(struct pci_access *a UNUSED)
+win32_cfgmgr32_init(struct pci_access *a)
 {
+  char *cfgmethod = pci_get_param(a, "win32.cfgmethod");
+  struct pci_access *acfg;
+
+  if (strcmp(cfgmethod, "") == 0 ||
+      strcmp(cfgmethod, "auto") == 0)
+    {
+      acfg = pci_alloc();
+      acfg->method = PCI_ACCESS_AUTO;
+    }
+  else if (strcmp(cfgmethod, "none") != 0 &&
+           strcmp(cfgmethod, "win32-cfgmgr32") != 0)
+    {
+      int m = pci_lookup_method(cfgmethod);
+      if (m < 0)
+        a->error("Option win32.cfgmethod is set to unknown access method \"%s\".", cfgmethod);
+      acfg = pci_alloc();
+      acfg->method = m;
+    }
+  else
+    {
+      if (a->writeable)
+        a->error("Write access requested but option win32.cfgmethod was not set.");
+      return;
+    }
+
+  acfg->writeable = a->writeable;
+  acfg->buscentric = a->buscentric;
+  acfg->debugging = a->debugging;
+  acfg->error = a->error;
+  acfg->warning = a->warning;
+  acfg->debug = a->debug;
+
+  a->debug("Loading config space access method...\n");
+  pci_init_internal(acfg, 0, PCI_ACCESS_WIN32_CFGMGR32);
+  if (!acfg->methods)
+    {
+      pci_cleanup(acfg);
+      a->debug("Cannot find any working config space access method.\n");
+      if (a->writeable)
+        a->error("Write access requested but no usable access method.");
+      return;
+    }
+
+  a->aux = acfg;
+}
+
+static void
+win32_cfgmgr32_cleanup(struct pci_access *a)
+{
+  struct pci_access *acfg = a->aux;
+
+  if (acfg)
+    pci_cleanup(acfg);
 }
 
 struct pci_methods pm_win32_cfgmgr32 = {
   "win32-cfgmgr32",
   "Win32 device listing via Configuration Manager",
-  NULL,                                 /* config */
+  win32_cfgmgr32_config,
   win32_cfgmgr32_detect,
   win32_cfgmgr32_init,
   win32_cfgmgr32_cleanup,
   win32_cfgmgr32_scan,
   win32_cfgmgr32_fill_info,
-  pci_emulated_read,                    /* Reading of config space is not supported via cfgmgr32. */
+  win32_cfgmgr32_read,
   win32_cfgmgr32_write,
   NULL,                                 /* read_vpd */
   NULL,                                 /* init_dev */
-  NULL,                                 /* cleanup_dev */
+  win32_cfgmgr32_cleanup_dev,
 };
