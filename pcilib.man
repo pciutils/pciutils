@@ -171,12 +171,12 @@ It has same format as
 parameter.
 .TP
 .B win32.cfgmethod
-Config space access method for win32-cfgmgr32 on Windows systems. Value
+Config space access method to use with win32-cfgmgr32 on Windows systems. Value
 .I auto
-or emtpy string probe and choose the first access method which supports access
-to the config space access on Windows. Value
+or an empty string selects the first access method which supports access
+to the config space on Windows. Value
 .I win32-cfgmgr32
-only builds read-only virtual emulated config space with information from the
+only builds a read-only virtual emulated config space with information from the
 Configuration Manager.
 
 .SS Parameters for resolving of ID's via DNS
