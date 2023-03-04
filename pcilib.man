@@ -176,6 +176,8 @@ Config space access method to use with win32-cfgmgr32 on Windows systems. Value
 or an empty string selects the first access method which supports access
 to the config space on Windows. Value
 .I win32-cfgmgr32
+or
+.I none
 only builds a read-only virtual emulated config space with information from the
 Configuration Manager.
 

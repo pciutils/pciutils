@@ -420,8 +420,8 @@ pci_alloc(void)
   return a;
 }
 
-void
-pci_init_internal(struct pci_access *a, int throw_errors, int skip_method)
+int
+pci_init_internal(struct pci_access *a, int skip_method)
 {
   if (!a->error)
     a->error = pci_generic_error;
@@ -432,14 +432,10 @@ pci_init_internal(struct pci_access *a, int throw_errors, int skip_method)
   if (!a->debugging)
     a->debug = pci_null_debug;
 
-  if (a->method)
+  if (a->method != PCI_ACCESS_AUTO)
     {
       if (a->method >= PCI_ACCESS_MAX || !pci_methods[a->method])
-        {
-          if (throw_errors)
-            a->error("This access method is not supported.");
-          return;
-        }
+	a->error("This access method is not supported.");
       a->methods = pci_methods[a->method];
     }
   else
@@ -463,26 +459,39 @@ pci_init_internal(struct pci_access *a, int throw_errors, int skip_method)
 	  a->debug("...No.\n");
 	}
       if (!a->methods)
-        {
-          if (throw_errors)
-            a->error("Cannot find any working access method.");
-          return;
-        }
+	return 0;
     }
   a->debug("Decided to use %s\n", a->methods->name);
   a->methods->init(a);
+  return 1;
 }
 
 void
 pci_init_v35(struct pci_access *a)
 {
-  pci_init_internal(a, 1, -1);
+  if (!pci_init_internal(a, 1, -1))
+    a->error("Cannot find any working access method.");
 }
 
 STATIC_ALIAS(void pci_init(struct pci_access *a), pci_init_v35(a));
 DEFINE_ALIAS(void pci_init_v30(struct pci_access *a), pci_init_v35);
 SYMBOL_VERSION(pci_init_v30, pci_init@LIBPCI_3.0);
 SYMBOL_VERSION(pci_init_v35, pci_init@@LIBPCI_3.5);
+
+struct pci_access *
+pci_clone_access(struct pci_access *a)
+{
+  struct pci_access *b = pci_alloc();
+
+  b->writeable = a->writeable;
+  b->buscentric = a->buscentric;
+  b->debugging = a->debugging;
+  b->error = a->error;
+  b->warning = a->warning;
+  b->debug = a->debug;
+
+  return b;
+}
 
 void
 pci_cleanup(struct pci_access *a)

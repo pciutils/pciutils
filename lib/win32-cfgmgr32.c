@@ -1735,40 +1735,32 @@ win32_cfgmgr32_init(struct pci_access *a)
   if (strcmp(cfgmethod, "") == 0 ||
       strcmp(cfgmethod, "auto") == 0)
     {
-      acfg = pci_alloc();
+      acfg = pci_clone_access(a);
       acfg->method = PCI_ACCESS_AUTO;
     }
-  else if (strcmp(cfgmethod, "none") != 0 &&
-           strcmp(cfgmethod, "win32-cfgmgr32") != 0)
-    {
-      int m = pci_lookup_method(cfgmethod);
-      if (m < 0)
-        a->error("Option win32.cfgmethod is set to unknown access method \"%s\".", cfgmethod);
-      acfg = pci_alloc();
-      acfg->method = m;
-    }
-  else
+  else if (strcmp(cfgmethod, "none") == 0 ||
+           strcmp(cfgmethod, "win32-cfgmgr32") == 0)
     {
       if (a->writeable)
         a->error("Write access requested but option win32.cfgmethod was not set.");
       return;
     }
-
-  acfg->writeable = a->writeable;
-  acfg->buscentric = a->buscentric;
-  acfg->debugging = a->debugging;
-  acfg->error = a->error;
-  acfg->warning = a->warning;
-  acfg->debug = a->debug;
+  else
+    {
+      int m = pci_lookup_method(cfgmethod);
+      if (m < 0)
+        a->error("Option win32.cfgmethod is set to an unknown access method \"%s\".", cfgmethod);
+      acfg = pci_clone_access(a);
+      acfg->method = m;
+    }
 
   a->debug("Loading config space access method...\n");
-  pci_init_internal(acfg, 0, PCI_ACCESS_WIN32_CFGMGR32);
-  if (!acfg->methods)
+  if (!pci_init_internal(acfg, PCI_ACCESS_WIN32_CFGMGR32))
     {
       pci_cleanup(acfg);
       a->debug("Cannot find any working config space access method.\n");
       if (a->writeable)
-        a->error("Write access requested but no usable access method.");
+        a->error("Write access requested but no usable access method found.");
       return;
     }
 
