@@ -76,6 +76,11 @@ parse_hex_field(char *str, int *outp, unsigned int *maskp, unsigned int max)
   if (!field_defined(str))
     return 1;	// and keep the defaults
 
+  // Historically, filters allowed writing hexadecimal numbers with leading "0x".
+  // This was never intentional nor documented, but some people relied on it.
+  if (!maskp && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+    str += 2;
+
   while (*str)
     {
       int c = *str++;
