@@ -469,7 +469,7 @@ pci_init_internal(struct pci_access *a, int skip_method)
 void
 pci_init_v35(struct pci_access *a)
 {
-  if (!pci_init_internal(a, 1, -1))
+  if (!pci_init_internal(a, -1))
     a->error("Cannot find any working access method.");
 }
 
