@@ -83,9 +83,9 @@ intel_sanity_check(struct pci_access *a, struct pci_methods *m)
     {
       u16 class, vendor;
       if (m->read(&d, PCI_CLASS_DEVICE, (byte *) &class, sizeof(class)) &&
-	  (class == cpu_to_le16(PCI_CLASS_BRIDGE_HOST) || class == cpu_to_le16(PCI_CLASS_DISPLAY_VGA)) ||
+	  (class == PCI_CLASS_BRIDGE_HOST || class == PCI_CLASS_DISPLAY_VGA) ||
 	  m->read(&d, PCI_VENDOR_ID, (byte *) &vendor, sizeof(vendor)) &&
-	  (vendor == cpu_to_le16(PCI_VENDOR_ID_INTEL) || vendor == cpu_to_le16(PCI_VENDOR_ID_COMPAQ)))
+	  (vendor == PCI_VENDOR_ID_INTEL || vendor == PCI_VENDOR_ID_COMPAQ))
 	{
 	  a->debug("...outside the Asylum at 0/%02x/0", d.dev);
 	  return 1;
@@ -148,10 +148,10 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
       buf[0] = inb(addr);
       break;
     case 2:
-      ((u16 *) buf)[0] = cpu_to_le16(inw(addr));
+      ((u16 *) buf)[0] = inw(addr);
       break;
     case 4:
-      ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
+      ((u32 *) buf)[0] = inl(addr);
       break;
     }
 
@@ -180,10 +180,10 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
       outb(buf[0], addr);
       break;
     case 2:
-      outw(le16_to_cpu(((u16 *) buf)[0]), addr);
+      outw(((u16 *) buf)[0], addr);
       break;
     case 4:
-      outl(le32_to_cpu(((u32 *) buf)[0]), addr);
+      outl(((u32 *) buf)[0], addr);
       break;
     }
   intel_io_unlock();
@@ -242,10 +242,10 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
       buf[0] = inb(addr);
       break;
     case 2:
-      ((u16 *) buf)[0] = cpu_to_le16(inw(addr));
+      ((u16 *) buf)[0] = inw(addr);
       break;
     case 4:
-      ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
+      ((u32 *) buf)[0] = inl(addr);
       break;
     }
   outb(0, 0xcf8);
@@ -278,10 +278,10 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
       outb(buf[0], addr);
       break;
     case 2:
-      outw(le16_to_cpu(* (u16 *) buf), addr);
+      outw(* (u16 *) buf, addr);
       break;
     case 4:
-      outl(le32_to_cpu(* (u32 *) buf), addr);
+      outl(* (u32 *) buf, addr);
       break;
     }
 
