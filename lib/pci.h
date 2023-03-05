@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2020 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2023 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL.
  */
@@ -172,14 +172,17 @@ struct pci_dev {
 #define PCI_ADDR_MEM_MASK (~(pciaddr_t) 0xf)
 #define PCI_ADDR_FLAG_MASK 0xf
 
-u8 pci_read_byte(struct pci_dev *, int pos) PCI_ABI; /* Access to configuration space */
+/* Access to configuration space */
+u8 pci_read_byte(struct pci_dev *, int pos) PCI_ABI;
 u16 pci_read_word(struct pci_dev *, int pos) PCI_ABI;
 u32 pci_read_long(struct pci_dev *, int pos) PCI_ABI;
-int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 int pci_read_vpd(struct pci_dev *d, int pos, u8 *buf, int len) PCI_ABI;
 int pci_write_byte(struct pci_dev *, int pos, u8 data) PCI_ABI;
 int pci_write_word(struct pci_dev *, int pos, u16 data) PCI_ABI;
 int pci_write_long(struct pci_dev *, int pos, u32 data) PCI_ABI;
+
+/* Configuration space as a sequence of bytes (little-endian) */
+int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 
 /*
