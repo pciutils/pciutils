@@ -902,6 +902,22 @@ fill_drivers(struct pci_access *a)
     CloseServiceHandle(manager);
 }
 
+static const char *
+res_id_to_str(RESOURCEID res_id)
+{
+  static char hex_res_id[sizeof("0xffffffff")];
+
+  if (res_id == ResType_IO)
+    return "IO";
+  else if (res_id == ResType_Mem)
+    return "MEM";
+  else if (res_id == ResType_IRQ)
+    return "IRQ";
+
+  sprintf(hex_res_id, "0x%lx", res_id);
+  return hex_res_id;
+}
+
 static void
 fill_resources(struct pci_dev *d, DEVINST devinst, DEVINSTID_A devinst_id)
 {
@@ -1034,13 +1050,13 @@ fill_resources(struct pci_dev *d, DEVINST devinst, DEVINSTID_A devinst_id)
       cr = CM_Get_Res_Des_Data_Size(&res_des_data_size, res_des, 0);
       if (cr != CR_SUCCESS)
         {
-          a->warning("Cannot retrieve resource data of PCI device %s: %s.", devinst_id, cr_strerror(cr));
+          a->warning("Cannot retrieve %s resource data of PCI device %s: %s.", res_id_to_str(res_id), devinst_id, cr_strerror(cr));
           continue;
         }
 
       if (!res_des_data_size)
         {
-          a->warning("Cannot retrieve resource data of PCI device %s: %s.", devinst_id, "Empty data");
+          a->warning("Cannot retrieve %s resource data of PCI device %s: %s.", res_id_to_str(res_id), devinst_id, "Empty data");
           continue;
         }
 
@@ -1048,7 +1064,7 @@ fill_resources(struct pci_dev *d, DEVINST devinst, DEVINSTID_A devinst_id)
       cr = CM_Get_Res_Des_Data(res_des, res_des_data, res_des_data_size, 0);
       if (cr != CR_SUCCESS)
         {
-          a->warning("Cannot retrieve resource data of PCI device %s: %s.", devinst_id, cr_strerror(cr));
+          a->warning("Cannot retrieve %s resource data of PCI device %s: %s.", res_id_to_str(res_id), devinst_id, cr_strerror(cr));
           pci_mfree(res_des_data);
           continue;
         }
