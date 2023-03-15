@@ -1047,6 +1047,10 @@ fill_resources(struct pci_dev *d, DEVINST devinst, DEVINSTID_A devinst_id)
 
       prev_res_des = res_des;
 
+      /* Skip other resources early */
+      if (res_id != ResType_IO && res_id != ResType_Mem && res_id != ResType_IRQ)
+        continue;
+
       cr = CM_Get_Res_Des_Data_Size(&res_des_data_size, res_des, 0);
       if (cr != CR_SUCCESS)
         {
