@@ -76,7 +76,7 @@ insert_dev(struct device *d, struct bridge *b)
   if (!bus && ! (bus = find_bus(b, p->domain, p->bus)))
     {
       struct bridge *c;
-      for (c=b->child; c; c=c->next)
+      for (c=b->child; c; c=c->prev)
 	if (c->domain == (unsigned)p->domain && c->secondary <= p->bus && p->bus <= c->subordinate)
           {
             insert_dev(d, c);
@@ -126,7 +126,7 @@ grow_tree(void)
 	    }
 	  *last_br = b;
 	  last_br = &b->chain;
-	  b->next = b->child = NULL;
+	  b->prev = b->child = NULL;
 	  b->first_bus = NULL;
 	  b->last_bus = NULL;
 	  b->br_dev = d;
@@ -154,7 +154,7 @@ grow_tree(void)
       b->subordinate = b->secondary;
       *last_br = b;
       last_br = &b->chain;
-      b->next = b->child = NULL;
+      b->prev = b->child = NULL;
       b->first_bus = NULL;
       b->last_bus = NULL;
       b->br_dev = parent;
@@ -184,7 +184,7 @@ grow_tree(void)
 	  best = c;
       if (best)
 	{
-	  b->next = best->child;
+	  b->prev = best->child;
 	  best->child = b;
 	}
     }
