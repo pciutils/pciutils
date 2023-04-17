@@ -113,15 +113,14 @@ grow_tree(void)
 	{
 	  b = xmalloc(sizeof(struct bridge));
 	  b->domain = dd->domain;
+	  b->primary = dd->bus;
 	  if (ht == PCI_HEADER_TYPE_BRIDGE)
 	    {
-	      b->primary = get_conf_byte(d, PCI_PRIMARY_BUS);
 	      b->secondary = get_conf_byte(d, PCI_SECONDARY_BUS);
 	      b->subordinate = get_conf_byte(d, PCI_SUBORDINATE_BUS);
 	    }
 	  else
 	    {
-	      b->primary = get_conf_byte(d, PCI_CB_PRIMARY_BUS);
 	      b->secondary = get_conf_byte(d, PCI_CB_CARD_BUS);
 	      b->subordinate = get_conf_byte(d, PCI_CB_SUBORDINATE_BUS);
 	    }
