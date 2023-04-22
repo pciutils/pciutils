@@ -73,6 +73,15 @@ insert_dev(struct device *d, struct bridge *b)
         bus = new_bus(parent->bridge, p->domain, p->bus);
     }
 
+  if (!bus && b == &host_bridge)
+    {
+      for (b=b->child; b; b=b->prev)
+        if (b->domain == (unsigned)p->domain)
+          break;
+      if (!b)
+        b = &host_bridge;
+    }
+
   if (!bus && ! (bus = find_bus(b, p->domain, p->bus)))
     {
       struct bridge *c;
@@ -100,9 +109,34 @@ grow_tree(void)
   struct device *d;
   struct bridge **last_br, *b;
 
+  last_br = &host_bridge.chain;
+
+  /* Build list of top level domain bridges */
+
+  for (d=first_dev; d; d=d->next)
+    {
+      for (b=host_bridge.chain; b; b=b->chain)
+        if (b->domain == (unsigned)d->dev->domain)
+          break;
+      if (b)
+        continue;
+      b = xmalloc(sizeof(struct bridge));
+      b->domain = d->dev->domain;
+      b->primary = ~0;
+      b->secondary = 0;
+      b->subordinate = ~0;
+      *last_br = b;
+      last_br = &b->chain;
+      b->prev = b->child = NULL;
+      b->first_bus = NULL;
+      b->last_bus = NULL;
+      b->br_dev = NULL;
+      b->chain = NULL;
+      pacc->debug("Tree: domain %04x\n", b->domain);
+    }
+
   /* Build list of bridges */
 
-  last_br = &host_bridge.chain;
   for (d=first_dev; d; d=d->next)
     {
       struct pci_dev *dd = d->dev;
@@ -166,7 +200,7 @@ grow_tree(void)
 
   /* Create a bridge tree */
 
-  for (b=&host_bridge; b; b=b->chain)
+  for (b=host_bridge.chain; b; b=b->chain)
     {
       struct device *br_dev = b->br_dev;
       struct bridge *c, *best = NULL;
@@ -180,7 +214,7 @@ grow_tree(void)
       for (c=&host_bridge; c; c=c->chain)
 	if (c != b && (c == &host_bridge || b->domain == c->domain) &&
 	    b->primary >= c->secondary && b->primary <= c->subordinate &&
-	    (!best || best->subordinate - best->primary > c->subordinate - c->primary))
+	    (!best || best == &host_bridge || best->subordinate - best->primary > c->subordinate - c->primary))
 	  best = c;
       if (best)
 	{
@@ -191,8 +225,8 @@ grow_tree(void)
 
   /* Insert secondary bus for each bridge */
 
-  for (b=&host_bridge; b; b=b->chain)
-    if (!find_bus(b, b->domain, b->secondary))
+  for (b=host_bridge.chain; b; b=b->chain)
+    if (b->br_dev && !find_bus(b, b->domain, b->secondary))
       new_bus(b, b->domain, b->secondary);
 
   /* Create bus structs and link devices */
@@ -258,7 +292,7 @@ show_tree_dev(struct pci_filter *filter, struct device *d, char *line, char *p)
   char namebuf[256];
 
   p = tree_printf(line, p, "%02x.%x", q->dev, q->func);
-  for (b=&host_bridge; b; b=b->chain)
+  for (b=host_bridge.chain; b; b=b->chain)
     if (b->br_dev == d)
       {
 	if (b->secondary == 0)
@@ -305,7 +339,7 @@ check_dev_filter(struct pci_filter *filter, struct device *d)
   if (pci_filter_match(filter, d->dev))
     return 1;
 
-  for (br = &host_bridge; br; br = br->chain)
+  for (br = host_bridge.chain; br; br = br->chain)
     if (br->br_dev == d)
       {
         for (b = br->first_bus; b; b = b->sibling)
@@ -382,8 +416,8 @@ show_tree_bridge(struct pci_filter *filter, struct bridge *b, char *line, char *
     {
       if (check_bus_filter(filter, b->first_bus))
         {
-          if (b == &host_bridge)
-            p = tree_printf(line, p, "[%04x:%02x]-", b->domain, b->first_bus->number);
+          if (!b->br_dev)
+            p = tree_printf(line, p, "[%04x:%02x]-", b->first_bus->domain, b->first_bus->number);
           show_tree_bus(filter, b->first_bus, line, p);
         }
       else
@@ -421,5 +455,10 @@ void
 show_forest(struct pci_filter *filter)
 {
   char line[LINE_BUF_SIZE];
-  show_tree_bridge(filter, &host_bridge, line, line);
+  struct bridge *b;
+  if (host_bridge.child)
+    {
+      for (b=host_bridge.child; b->prev; b=b->prev)
+        show_tree_bridge(filter, b, line, line);
+    }
 }
