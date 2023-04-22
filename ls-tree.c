@@ -12,7 +12,7 @@
 
 #include "lspci.h"
 
-struct bridge host_bridge = { NULL, NULL, NULL, NULL, NULL, 0, ~0, 0, ~0, NULL };
+struct bridge host_bridge = { NULL, NULL, NULL, NULL, NULL, NULL, ~0, ~0, ~0, ~0, NULL };
 
 static struct bus *
 find_bus(struct bridge *b, unsigned int domain, unsigned int n)
@@ -127,7 +127,7 @@ grow_tree(void)
       b->subordinate = ~0;
       *last_br = b;
       last_br = &b->chain;
-      b->prev = b->child = NULL;
+      b->prev = b->next = b->child = NULL;
       b->first_bus = NULL;
       b->last_bus = NULL;
       b->br_dev = NULL;
@@ -160,7 +160,7 @@ grow_tree(void)
 	    }
 	  *last_br = b;
 	  last_br = &b->chain;
-	  b->prev = b->child = NULL;
+	  b->prev = b->next = b->child = NULL;
 	  b->first_bus = NULL;
 	  b->last_bus = NULL;
 	  b->br_dev = d;
@@ -188,7 +188,7 @@ grow_tree(void)
       b->subordinate = b->secondary;
       *last_br = b;
       last_br = &b->chain;
-      b->prev = b->child = NULL;
+      b->prev = b->next = b->child = NULL;
       b->first_bus = NULL;
       b->last_bus = NULL;
       b->br_dev = parent;
@@ -459,6 +459,8 @@ show_forest(struct pci_filter *filter)
   if (host_bridge.child)
     {
       for (b=host_bridge.child; b->prev; b=b->prev)
+        b->prev->next = b;
+      for (; b; b=b->next)
         show_tree_bridge(filter, b, line, line);
     }
 }
