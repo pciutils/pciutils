@@ -88,7 +88,7 @@ void show_kernel_cleanup(void);
 
 struct bridge {
   struct bridge *chain;			/* Single-linked list of bridges */
-  struct bridge *next, *child;		/* Tree of bridges */
+  struct bridge *next, *prev, *child;	/* Tree of bridges */
   struct bus *first_bus, *last_bus;	/* List of buses connected to this bridge */
   unsigned int domain;
   unsigned int primary, secondary, subordinate;	/* Bus numbers */
