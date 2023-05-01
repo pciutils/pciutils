@@ -290,7 +290,7 @@ show_terse(struct device *d)
 {
   int c;
   struct pci_dev *p = d->dev;
-  char classbuf[128], devbuf[128];
+  char classbuf[256], devbuf[256];
 
   show_slot_name(d);
   printf(" %s: %s",
@@ -1009,7 +1009,7 @@ static void
 show_machine(struct device *d)
 {
   struct pci_dev *p = d->dev;
-  char classbuf[128], vendbuf[128], devbuf[128], svbuf[128], sdbuf[128];
+  char classbuf[256], vendbuf[256], devbuf[256], svbuf[256], sdbuf[256];
   char *dt_node, *iommu_group;
 
   if (verbose)
