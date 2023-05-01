@@ -1,3 +1,31 @@
+2023-05-01  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.10.0.
+
+	* Fixed bug in definition of versioned symbol aliases
+	  in shared libpci, which made compiling with link-time
+	  optimization fail.
+
+	* Filters now accept "0x..." syntax for backward compatibility.
+
+	* Windows: The cfgmgr32 back-end which provides the list of devices
+	  can be combined with another back-end which provides access
+	  to configuration space.
+
+	* ECAM (Enhanced Configuration Access Mechanism), which is defined
+	  by the PCIe standard, is now supported. It requires root privileges,
+	  access to physical memory, and also manual configuration on some
+	  systems.
+
+	* lspci: Tree view now works on multi-domain systems. It now respects
+	  filters properly.
+
+	* Last but not least, pci.ids were updated to the current snapshot
+	  of the database. This includes overall cleanup of entries with
+	  non-ASCII characters in their names -- such characters are allowed,
+	  but only if they convey interesting information (e.g., umlauts
+	  in German company names, but not the "registered trade mark" sign).
+
 2022-11-20  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.9.0.
