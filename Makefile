@@ -45,10 +45,11 @@ PKGCFDIR=$(LIBDIR)/pkgconfig
 # Commands
 INSTALL=install
 DIRINSTALL=install -d
-STRIP=-s
 ifdef CROSS_COMPILE
+STRIP=--strip-program $(CROSS_COMPILE)-strip
 CC=$(CROSS_COMPILE)gcc
 else
+STRIP=-s
 CC=cc
 endif
 AR=$(CROSS_COMPILE)ar
