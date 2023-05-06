@@ -1143,7 +1143,7 @@ SetProcessUserModeIOPL(VOID)
    */
 
   if (!LookupPrivilegeValue(NULL, SE_TCB_NAME, &luid_tcb_privilege))
-    goto err_not_implemented;
+    goto err_privilege_not_held;
 
   /*
    * If the current thread has already Tcb privilege enabled then there
