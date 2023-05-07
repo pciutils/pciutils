@@ -129,6 +129,7 @@ typedef BOOL (WINAPI *SetThreadErrorModeProt)(DWORD dwNewMode, LPDWORD lpOldMode
 #define ProcessUserModeIOPL 16
 #endif
 typedef NTSTATUS (NTAPI *NtSetInformationProcessProt)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength);
+typedef ULONG (NTAPI *RtlNtStatusToDosErrorProt)(NTSTATUS Status);
 
 /*
  * Check if the current thread has particular privilege in current active access
@@ -1183,16 +1184,25 @@ ret:
 static BOOL
 SetProcessUserModeIOPLFunc(LPVOID Arg)
 {
-  NtSetInformationProcessProt NtSetInformationProcessPtr = (NtSetInformationProcessProt)Arg;
+  RtlNtStatusToDosErrorProt RtlNtStatusToDosErrorPtr = (RtlNtStatusToDosErrorProt)(((LPVOID *)Arg)[1]);
+  NtSetInformationProcessProt NtSetInformationProcessPtr = (NtSetInformationProcessProt)(((LPVOID *)Arg)[0]);
   NTSTATUS nt_status = NtSetInformationProcessPtr(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
   if (nt_status >= 0)
     return TRUE;
 
-  if (nt_status == STATUS_NOT_IMPLEMENTED)
+  /*
+   * If we have optional RtlNtStatusToDosError() function then use it for
+   * translating NT status to Win32 error. If we do not have it then translate
+   * two important status codes which we use later STATUS_NOT_IMPLEMENTED and
+   * STATUS_PRIVILEGE_NOT_HELD.
+   */
+  if (RtlNtStatusToDosErrorPtr)
+    SetLastError(RtlNtStatusToDosErrorPtr(nt_status));
+  else if (nt_status == STATUS_NOT_IMPLEMENTED)
     SetLastError(ERROR_INVALID_FUNCTION);
   else if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
     SetLastError(ERROR_PRIVILEGE_NOT_HELD);
-  else /* TODO: convert NT STATUS to WIN32 ERROR */
+  else
     SetLastError(ERROR_GEN_FAILURE);
 
   return FALSE;
@@ -1207,7 +1217,7 @@ SetProcessUserModeIOPLFunc(LPVOID Arg)
 static BOOL
 SetProcessUserModeIOPL(VOID)
 {
-  NtSetInformationProcessProt NtSetInformationProcessPtr;
+  LPVOID Arg[2];
   UINT prev_error_mode;
   HMODULE ntdll;
   BOOL ret;
@@ -1227,16 +1237,19 @@ SetProcessUserModeIOPL(VOID)
     }
 
   /* Retrieve pointer to NtSetInformationProcess() function. */
-  NtSetInformationProcessPtr = (NtSetInformationProcessProt)(LPVOID)GetProcAddress(ntdll, "NtSetInformationProcess");
-  if (!NtSetInformationProcessPtr)
+  Arg[0] = (LPVOID)GetProcAddress(ntdll, "NtSetInformationProcess");
+  if (!Arg[0])
     {
       FreeLibrary(ntdll);
       SetLastError(ERROR_INVALID_FUNCTION);
       return FALSE;
     }
 
+  /* Retrieve pointer to optional RtlNtStatusToDosError() function, it may be NULL. */
+  Arg[1] = (LPVOID)GetProcAddress(ntdll, "RtlNtStatusToDosError");
+
   /* Call ProcessUserModeIOPL with Tcb privilege. */
-  ret = CallFuncWithTcbPrivilege(SetProcessUserModeIOPLFunc, (LPVOID)NtSetInformationProcessPtr);
+  ret = CallFuncWithTcbPrivilege(SetProcessUserModeIOPLFunc, (LPVOID)&Arg);
 
   FreeLibrary(ntdll);
 
