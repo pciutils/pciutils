@@ -12,6 +12,7 @@
 
 #include "internal.h"
 #include "i386-io-windows.h"
+#include "win32-helpers.h"
 
 #ifndef NTSTATUS
 #define NTSTATUS LONG

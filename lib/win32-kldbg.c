@@ -16,6 +16,7 @@
 
 #include "internal.h"
 #include "i386-io-windows.h"
+#include "win32-helpers.h"
 
 #ifndef ERROR_NOT_FOUND
 #define ERROR_NOT_FOUND 1168
@@ -107,53 +108,6 @@ static HANDLE kldbg_dev = INVALID_HANDLE_VALUE;
 
 static BOOL
 win32_kldbg_pci_bus_data(BOOL WriteBusData, USHORT SegmentNumber, BYTE BusNumber, BYTE DeviceNumber, BYTE FunctionNumber, USHORT Address, PVOID Buffer, ULONG BufferSize, LPDWORD Length);
-
-static const char *
-win32_strerror(DWORD win32_error_id)
-{
-  /*
-   * Use static buffer which is large enough.
-   * Hopefully no Win32 API error message string is longer than 4 kB.
-   */
-  static char buffer[4096];
-  DWORD len;
-
-  len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, win32_error_id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buffer, sizeof(buffer), NULL);
-
-  /* FormatMessage() automatically appends ".\r\n" to the error message. */
-  if (len && buffer[len-1] == '\n')
-    buffer[--len] = '\0';
-  if (len && buffer[len-1] == '\r')
-    buffer[--len] = '\0';
-  if (len && buffer[len-1] == '.')
-    buffer[--len] = '\0';
-
-  if (!len)
-    sprintf(buffer, "Unknown Win32 error %lu", win32_error_id);
-
-  return buffer;
-}
-
-static BOOL
-win32_is_32bit_on_64bit_system(void)
-{
-  BOOL (WINAPI *MyIsWow64Process)(HANDLE, PBOOL);
-  HMODULE kernel32;
-  BOOL is_wow64;
-
-  kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-  if (!kernel32)
-    return FALSE;
-
-  MyIsWow64Process = (void *)GetProcAddress(kernel32, "IsWow64Process");
-  if (!MyIsWow64Process)
-    return FALSE;
-
-  if (!MyIsWow64Process(GetCurrentProcess(), &is_wow64))
-    return FALSE;
-
-  return is_wow64;
-}
 
 static WORD
 win32_get_current_process_machine(void)

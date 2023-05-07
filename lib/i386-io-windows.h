@@ -12,6 +12,7 @@
 
 #include <windows.h>
 #include <aclapi.h>
+#include "win32-helpers.h"
 
 #include "i386-io-access.h"
 
@@ -1276,9 +1277,7 @@ intel_setup_io(struct pci_access *a)
 {
 #ifndef _WIN64
   /* 16/32-bit non-NT systems allow applications to access PCI I/O ports without any special setup. */
-  OSVERSIONINFOA version;
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (GetVersionExA(&version) && version.dwPlatformId < VER_PLATFORM_WIN32_NT)
+  if (win32_is_non_nt_system())
     {
       a->debug("Detected 16/32-bit non-NT system, skipping NT setup...");
       return 1;
@@ -1296,7 +1295,7 @@ intel_setup_io(struct pci_access *a)
   if (!SetProcessUserModeIOPL())
     {
       DWORD error = GetLastError();
-      a->debug("NT ProcessUserModeIOPL call failed: %s.", error == ERROR_INVALID_FUNCTION ? "Not Implemented" : error == ERROR_PRIVILEGE_NOT_HELD ? "Access Denied" : "Operation Failed");
+      a->debug("NT ProcessUserModeIOPL call failed: %s.", error == ERROR_INVALID_FUNCTION ? "Call is not supported" : win32_strerror(error));
       return 0;
     }
 
