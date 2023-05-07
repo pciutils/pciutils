@@ -984,16 +984,13 @@ open_process_token_with_rights(HANDLE process, DWORD rights)
 }
 
 /*
- * Set x86 I/O Privilege Level to 3 for the whole current NT process. Do it via
- * NtSetInformationProcess() call with ProcessUserModeIOPL information class,
- * which is supported by 32-bit Windows NT kernel versions and requires Tcb
- * privilege.
+ * Call supplied function Func with its Arg and if it fails with
+ * ERROR_PRIVILEGE_NOT_HELD then try to enable Tcb privilege and
+ * call Func with its Arg again.
  */
 static BOOL
-SetProcessUserModeIOPL(VOID)
+CallFuncWithTcbPrivilege(BOOL (*Func)(LPVOID), LPVOID Arg)
 {
-  NtSetInformationProcessProt MyNtSetInformationProcess;
-
   LUID luid_tcb_privilege;
   LUID luid_impersonate_privilege;
 
@@ -1011,9 +1008,6 @@ SetProcessUserModeIOPL(VOID)
   HANDLE lsass_process;
   HANDLE lsass_token;
 
-  UINT prev_error_mode;
-  NTSTATUS nt_status;
-  HMODULE ntdll;
   BOOL ret;
 
   impersonate_privilege_enabled = FALSE;
@@ -1021,49 +1015,13 @@ SetProcessUserModeIOPL(VOID)
   lsass_token = NULL;
   old_token = NULL;
 
-  /* Fast path when ProcessUserModeIOPL was already called. */
-  if (read_iopl() == 3)
-    return TRUE;
+  /* Call supplied function. */
+  ret = Func(Arg);
+  if (ret || GetLastError() != ERROR_PRIVILEGE_NOT_HELD)
+    goto ret;
 
   /*
-   * Load ntdll.dll library with disabled critical-error-handler message box.
-   * It means that NT kernel does not show unwanted GUI message box to user
-   * when LoadLibrary() function fails.
-   */
-  prev_error_mode = change_error_mode(SEM_FAILCRITICALERRORS);
-  ntdll = LoadLibrary(TEXT("ntdll.dll"));
-  change_error_mode(prev_error_mode);
-  if (!ntdll)
-    goto err_not_implemented;
-
-  /* Retrieve pointer to NtSetInformationProcess() function. */
-  MyNtSetInformationProcess = (NtSetInformationProcessProt)(LPVOID)GetProcAddress(ntdll, "NtSetInformationProcess");
-  if (!MyNtSetInformationProcess)
-    goto err_not_implemented;
-
-  /*
-   * ProcessUserModeIOPL is syscall for NT kernel to change x86 IOPL
-   * of the current running process to 3.
-   *
-   * Process handle argument for ProcessUserModeIOPL is ignored and
-   * IOPL is always changed for the current running process. So pass
-   * GetCurrentProcess() handle for documentation purpose. Process
-   * information buffer and length are unused for ProcessUserModeIOPL.
-   *
-   * ProcessUserModeIOPL may success (return value >= 0) or may fail
-   * because it is not implemented or because of missing privilege.
-   * Other errors are not defined, so handle them as unknown.
-   */
-  nt_status = MyNtSetInformationProcess(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
-  if (nt_status >= 0)
-    goto verify;
-  else if (nt_status == STATUS_NOT_IMPLEMENTED)
-    goto err_not_implemented;
-  else if (nt_status != STATUS_PRIVILEGE_NOT_HELD)
-    goto err_unknown;
-
-  /*
-   * If ProcessUserModeIOPL call failed with STATUS_PRIVILEGE_NOT_HELD
+   * If function call failed with ERROR_PRIVILEGE_NOT_HELD
    * error then it means that the current thread token does not have
    * Tcb privilege enabled. Try to enable it.
    */
@@ -1078,24 +1036,17 @@ SetProcessUserModeIOPL(VOID)
   if (have_privilege(luid_tcb_privilege))
     goto err_privilege_not_held;
 
-  /* Try to enable Tcb privilege and try ProcessUserModeIOPL call again. */
+  /* Try to enable Tcb privilege and try function call again. */
   if (enable_privilege(luid_tcb_privilege, &revert_token_tcb_privilege, &revert_only_tcb_privilege))
     {
-      nt_status = MyNtSetInformationProcess(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
+      ret = Func(Arg);
       revert_privilege(luid_tcb_privilege, revert_token_tcb_privilege, revert_only_tcb_privilege);
-      if (nt_status >= 0)
-        goto verify;
-      else if (nt_status == STATUS_NOT_IMPLEMENTED)
-        goto err_not_implemented;
-      else if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
-        goto err_privilege_not_held;
-      else
-        goto err_unknown;
+      goto ret;
     }
 
   /*
    * If enabling of Tcb privilege failed then it means that current thread
-   * does not this privilege. But current process may have it. So try it
+   * does not have this privilege. But current process may have it. So try it
    * again with primary process access token.
    */
 
@@ -1138,16 +1089,9 @@ SetProcessUserModeIOPL(VOID)
        */
       if (enable_privilege(luid_tcb_privilege, &revert_token_tcb_privilege, &revert_only_tcb_privilege))
         {
-          nt_status = MyNtSetInformationProcess(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
+          ret = Func(Arg);
           revert_privilege(luid_tcb_privilege, revert_token_tcb_privilege, revert_only_tcb_privilege);
-          if (nt_status >= 0)
-            goto verify;
-          else if (nt_status == STATUS_NOT_IMPLEMENTED)
-            goto err_not_implemented;
-          else if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
-            goto err_privilege_not_held;
-          else
-            goto err_unknown;
+          goto ret;
         }
     }
 
@@ -1187,54 +1131,26 @@ SetProcessUserModeIOPL(VOID)
 
   revert_to_old_token = TRUE;
 
-  nt_status = MyNtSetInformationProcess(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
-  if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
-    {
-      /*
-       * Now current thread is not using primary process token anymore
-       * but is using custom access token. There is no need to revert
-       * enabled Tcb privilege as the whole custom access token would
-       * be reverted. So there is no need to setup revert method for
-       * enabling privilege.
-       */
-      if (have_privilege(luid_tcb_privilege) ||
-          !enable_privilege(luid_tcb_privilege, NULL, NULL))
-        goto err_privilege_not_held;
-      nt_status = MyNtSetInformationProcess(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
-    }
-  if (nt_status >= 0)
-    goto verify;
-  else if (nt_status == STATUS_NOT_IMPLEMENTED)
-    goto err_not_implemented;
-  else if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
-    goto err_privilege_not_held;
-  else
-    goto err_unknown;
+  ret = Func(Arg);
+  if (ret || GetLastError() != ERROR_PRIVILEGE_NOT_HELD)
+    goto ret;
 
-verify:
   /*
-   * Some Windows NT kernel versions (e.g. Windows 2003 x64) do not
-   * implement ProcessUserModeIOPL syscall at all but incorrectly
-   * returns success when it is called by user process. So always
-   * after this call verify that IOPL is set to 3.
+   * Now current thread is not using primary process token anymore
+   * but is using custom access token. There is no need to revert
+   * enabled Tcb privilege as the whole custom access token would
+   * be reverted. So there is no need to setup revert method for
+   * enabling privilege.
    */
-  if (read_iopl() != 3)
-    goto err_not_implemented;
-  ret = TRUE;
-  goto ret;
+  if (have_privilege(luid_tcb_privilege) ||
+      !enable_privilege(luid_tcb_privilege, NULL, NULL))
+    goto err_privilege_not_held;
 
-err_not_implemented:
-  SetLastError(ERROR_INVALID_FUNCTION);
-  ret = FALSE;
+  ret = Func(Arg);
   goto ret;
 
 err_privilege_not_held:
   SetLastError(ERROR_PRIVILEGE_NOT_HELD);
-  ret = FALSE;
-  goto ret;
-
-err_unknown:
-  SetLastError(ERROR_GEN_FAILURE);
   ret = FALSE;
   goto ret;
 
@@ -1248,10 +1164,98 @@ ret:
   if (lsass_token)
     CloseHandle(lsass_token);
 
-  if (ntdll)
-    FreeLibrary(ntdll);
-
   return ret;
+}
+
+/*
+ * ProcessUserModeIOPL is syscall for NT kernel to change x86 IOPL
+ * of the current running process to 3.
+ *
+ * Process handle argument for ProcessUserModeIOPL is ignored and
+ * IOPL is always changed for the current running process. So pass
+ * GetCurrentProcess() handle for documentation purpose. Process
+ * information buffer and length are unused for ProcessUserModeIOPL.
+ *
+ * ProcessUserModeIOPL may success (return value >= 0) or may fail
+ * because it is not implemented or because of missing privilege.
+ * Other errors are not defined, so handle them as unknown.
+ */
+static BOOL
+SetProcessUserModeIOPLFunc(LPVOID Arg)
+{
+  NtSetInformationProcessProt NtSetInformationProcessPtr = (NtSetInformationProcessProt)Arg;
+  NTSTATUS nt_status = NtSetInformationProcessPtr(GetCurrentProcess(), ProcessUserModeIOPL, NULL, 0);
+  if (nt_status >= 0)
+    return TRUE;
+
+  if (nt_status == STATUS_NOT_IMPLEMENTED)
+    SetLastError(ERROR_INVALID_FUNCTION);
+  else if (nt_status == STATUS_PRIVILEGE_NOT_HELD)
+    SetLastError(ERROR_PRIVILEGE_NOT_HELD);
+  else /* TODO: convert NT STATUS to WIN32 ERROR */
+    SetLastError(ERROR_GEN_FAILURE);
+
+  return FALSE;
+}
+
+/*
+ * Set x86 I/O Privilege Level to 3 for the whole current NT process. Do it via
+ * NtSetInformationProcess() call with ProcessUserModeIOPL information class,
+ * which is supported by 32-bit Windows NT kernel versions and requires Tcb
+ * privilege.
+ */
+static BOOL
+SetProcessUserModeIOPL(VOID)
+{
+  NtSetInformationProcessProt NtSetInformationProcessPtr;
+  UINT prev_error_mode;
+  HMODULE ntdll;
+  BOOL ret;
+
+  /*
+   * Load ntdll.dll library with disabled critical-error-handler message box.
+   * It means that NT kernel does not show unwanted GUI message box to user
+   * when LoadLibrary() function fails.
+   */
+  prev_error_mode = change_error_mode(SEM_FAILCRITICALERRORS);
+  ntdll = LoadLibrary(TEXT("ntdll.dll"));
+  change_error_mode(prev_error_mode);
+  if (!ntdll)
+    {
+      SetLastError(ERROR_INVALID_FUNCTION);
+      return FALSE;
+    }
+
+  /* Retrieve pointer to NtSetInformationProcess() function. */
+  NtSetInformationProcessPtr = (NtSetInformationProcessProt)(LPVOID)GetProcAddress(ntdll, "NtSetInformationProcess");
+  if (!NtSetInformationProcessPtr)
+    {
+      FreeLibrary(ntdll);
+      SetLastError(ERROR_INVALID_FUNCTION);
+      return FALSE;
+    }
+
+  /* Call ProcessUserModeIOPL with Tcb privilege. */
+  ret = CallFuncWithTcbPrivilege(SetProcessUserModeIOPLFunc, (LPVOID)NtSetInformationProcessPtr);
+
+  FreeLibrary(ntdll);
+
+  if (!ret)
+    return FALSE;
+
+  /*
+   * Some Windows NT kernel versions (e.g. Windows 2003 x64) do not
+   * implement ProcessUserModeIOPL syscall at all but incorrectly
+   * returns success when it is called by user process. So always
+   * after this call verify that IOPL is set to 3.
+   */
+  if (read_iopl() != 3)
+    {
+      SetLastError(ERROR_INVALID_FUNCTION);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 static int
@@ -1267,6 +1271,13 @@ intel_setup_io(struct pci_access *a)
       return 1;
     }
 #endif
+
+  /* Check if we have I/O permission */
+  if (read_iopl() == 3)
+    {
+      a->debug("IOPL is already set to 3, skipping NT setup...");
+      return 1;
+    }
 
   /* On NT-based systems issue ProcessUserModeIOPL syscall which changes IOPL to 3. */
   if (!SetProcessUserModeIOPL())
