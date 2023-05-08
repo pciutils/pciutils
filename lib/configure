@@ -88,15 +88,17 @@ case $sys in
 		LSPCIDIR=BINDIR
 		;;
 	sunos)
+		echo_n " mem-ports ecam"
 		case $cpu in
 				i?86)		echo_n " i386-ports"
 						echo >>$c "#define PCI_HAVE_PM_INTEL_CONF"
 						;;
-				*)
-						echo " The PCI library does not support Solaris for this architecture: $cpu"
-						exit 1
-						;;
 		esac
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/xsvc"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		;;
 	freebsd*|kfreebsd*)
 		echo_n " fbsd-device mem-ports ecam"
@@ -195,11 +197,17 @@ case $sys in
 		LIBEXT=dll
 		;;
 	beos|haiku)
+		echo_n " mem-ports ecam"
 		case $cpu in
 				i?86|x86_64)	echo_n " i386-ports"
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						;;
 		esac
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/misc/mem"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		;;
 	sylixos)
 		echo >>$c '#define PCI_PATH_SYLIXOS_DEVICE "/proc/pci"'
