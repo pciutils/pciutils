@@ -167,8 +167,12 @@ case $sys in
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 		;;
 	djgpp)
-		echo_n " i386-ports"
+		echo_n " i386-ports mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		EXEEXT=.exe
 		;;
 	cygwin|windows)

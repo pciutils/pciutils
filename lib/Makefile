@@ -83,7 +83,9 @@ endif
 
 ifdef PCI_USE_PHYSMEM
 ifndef PCI_OS_WINDOWS
-ifndef PCI_OS_DJGPP
+ifdef PCI_OS_DJGPP
+OBJS += physmem-djgpp
+else
 OBJS += physmem-posix
 endif
 endif
