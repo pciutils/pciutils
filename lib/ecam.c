@@ -790,6 +790,7 @@ ecam_detect(struct pci_access *a)
   const char *x86bios = pci_get_param(a, "ecam.x86bios");
 #endif
   const char *addrs = pci_get_param(a, "ecam.addrs");
+  struct ecam_access *eacc;
   glob_t mcfg_glob;
   int ret;
 
@@ -863,6 +864,44 @@ ecam_detect(struct pci_access *a)
     {
       a->debug("cannot access physical memory: %s", strerror(errno));
       return 0;
+    }
+
+  if (!use_addrs)
+    {
+      eacc = pci_malloc(a, sizeof(*eacc));
+
+      eacc->physmem = physmem_open(a, a->writeable);
+      if (!eacc->physmem)
+        {
+          a->debug("cannot open physcal memory: %s.", strerror(errno));
+          pci_mfree(eacc);
+          return 0;
+        }
+
+      eacc->pagesize = physmem_get_pagesize(eacc->physmem);
+      if (eacc->pagesize <= 0)
+        {
+          a->debug("Cannot get page size: %s.", strerror(errno));
+          physmem_close(eacc->physmem);
+          pci_mfree(eacc);
+          return 0;
+        }
+
+      eacc->mcfg = NULL;
+      eacc->cache = NULL;
+      a->backend_data = eacc;
+      eacc->mcfg = find_mcfg(a, acpimcfg, efisystab, use_bsd, use_x86bios);
+      if (!eacc->mcfg)
+        {
+          physmem_close(eacc->physmem);
+          pci_mfree(eacc);
+          a->backend_data = NULL;
+          return 0;
+        }
+      pci_mfree(eacc->mcfg);
+      physmem_close(eacc->physmem);
+      pci_mfree(eacc);
+      a->backend_data = NULL;
     }
 
   if (use_addrs)
