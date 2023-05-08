@@ -176,11 +176,16 @@ case $sys in
 		EXEEXT=.exe
 		;;
 	cygwin|windows)
-		echo_n " win32-cfgmgr32 win32-kldbg win32-sysdbg"
+		echo_n " win32-cfgmgr32 win32-kldbg win32-sysdbg mem-ports ecam"
 		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		echo >>$c '#define PCI_HAVE_PM_WIN32_CFGMGR32'
 		echo >>$c '#define PCI_HAVE_PM_WIN32_KLDBG'
 		echo >>$c '#define PCI_HAVE_PM_WIN32_SYSDBG'
+		echo >>$c '#define PCI_HAVE_PM_MMIO_CONF'
+		echo >>$c '#define PCI_HAVE_PM_ECAM'
+		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "\\\\Device\\\\PhysicalMemory"'
+		echo >>$c '#define PCI_PATH_ACPI_MCFG "GetSystemFirmwareTable()"'
+		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
 		# Warning: MinGW-w64 (incorrectly) provides cfgmgr32 functions
 		# also in other import libraries, not only in libcfgmgr32.a.
 		# So always set -lcfgmgr32 as a first library parameter which

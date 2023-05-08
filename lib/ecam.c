@@ -19,8 +19,10 @@
 #include <string.h>
 #include <limits.h>
 
+#ifndef PCI_OS_WINDOWS
 #include <glob.h>
 #include <unistd.h>
+#endif
 
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
 #include <sys/sysctl.h>
@@ -28,6 +30,10 @@
 
 #if defined (__FreeBSD__) || defined (__DragonFly__)
 #include <kenv.h>
+#endif
+
+#ifdef _WIN32
+#include "win32-helpers.h"
 #endif
 
 struct acpi_rsdp {
@@ -371,6 +377,62 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
   return 0;
 }
 
+#ifdef PCI_OS_WINDOWS
+#ifndef ERROR_NOT_FOUND
+#define ERROR_NOT_FOUND 1168
+#endif
+static struct acpi_mcfg *
+get_system_firmware_table_acpi_mcfg(struct pci_access *a)
+{
+  UINT (*WINAPI MyGetSystemFirmwareTable)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
+  struct acpi_mcfg *mcfg;
+  HMODULE kernel32;
+  DWORD error;
+  DWORD size;
+
+  kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+  if (!kernel32)
+    return NULL;
+
+  /* Function GetSystemFirmwareTable() is available since Windows Vista. */
+  MyGetSystemFirmwareTable = (void *)GetProcAddress(kernel32, "GetSystemFirmwareTable");
+  if (!MyGetSystemFirmwareTable)
+    return NULL;
+
+  /* 0x41435049 = 'ACPI', 0x4746434D = 'MCFG' */
+  size = MyGetSystemFirmwareTable(0x41435049, 0x4746434D, NULL, 0);
+  if (size == 0)
+    {
+      error = GetLastError();
+      if (error == ERROR_INVALID_FUNCTION) /* ACPI is not present. */
+        return NULL;
+      else if (error == ERROR_NOT_FOUND) /* MCFG table is not present. */
+        return NULL;
+      a->debug("Cannot retrieve ACPI MCFG table: %s.\n", win32_strerror(error));
+      return NULL;
+    }
+
+  mcfg = pci_malloc(a, size);
+
+  if (MyGetSystemFirmwareTable(0x41435049, 0x4746434D, mcfg, size) != size)
+    {
+      error = GetLastError();
+      a->debug("Cannot retrieve ACPI MCFG table: %s.\n", win32_strerror(error));
+      pci_mfree(mcfg);
+      return NULL;
+    }
+
+  if (size < sizeof(*mcfg) || size < mcfg->sdt.length || calculate_checksum((u8 *)mcfg, mcfg->sdt.length) != 0)
+    {
+      a->debug("ACPI MCFG table is broken.\n");
+      pci_mfree(mcfg);
+      return NULL;
+    }
+
+  return mcfg;
+}
+#endif
+
 static struct acpi_mcfg *
 find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int use_bsd, int use_x86bios)
 {
@@ -392,18 +454,38 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
   long length;
   FILE *mcfg_file;
   const char *path;
+#ifndef PCI_OS_WINDOWS
   glob_t mcfg_glob;
   int ret;
+#endif
 
   if (acpimcfg[0])
     {
+#ifdef PCI_OS_WINDOWS
+      if (strcmp(acpimcfg, "GetSystemFirmwareTable()") == 0)
+        {
+          a->debug("reading acpi mcfg via GetSystemFirmwareTable()...");
+          mcfg = get_system_firmware_table_acpi_mcfg(a);
+          if (mcfg)
+            return mcfg;
+          a->debug("failed...");
+        }
+      else
+        {
+          path = acpimcfg;
+#else
       ret = glob(acpimcfg, GLOB_NOCHECK, NULL, &mcfg_glob);
-      if (ret == 0)
+      if (ret != 0)
+        a->debug("glob(%s) failed: %d...", acpimcfg, ret);
+      else
         {
           path = mcfg_glob.gl_pathv[0];
+#endif
           a->debug("reading acpi mcfg file: %s...", path);
           mcfg_file = fopen(path, "rb");
+#ifndef PCI_OS_WINDOWS
           globfree(&mcfg_glob);
+#endif
           if (mcfg_file)
             {
               if (fseek(mcfg_file, 0, SEEK_END) == 0)
@@ -427,8 +509,6 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
             }
           a->debug("failed...");
         }
-      else
-        a->debug("glob(%s) failed: %d...", acpimcfg, ret);
     }
 
   a->debug("searching for ACPI RSDP...");
@@ -809,8 +889,10 @@ ecam_detect(struct pci_access *a)
 #endif
   const char *addrs = pci_get_param(a, "ecam.addrs");
   struct ecam_access *eacc;
+#ifndef PCI_OS_WINDOWS
   glob_t mcfg_glob;
   int ret;
+#endif
 
   if (!*addrs)
     {
@@ -820,6 +902,7 @@ ecam_detect(struct pci_access *a)
 
   if (acpimcfg[0])
     {
+#ifndef PCI_OS_WINDOWS
       ret = glob(acpimcfg, GLOB_NOCHECK, NULL, &mcfg_glob);
       if (ret == 0)
         {
@@ -835,16 +918,19 @@ ecam_detect(struct pci_access *a)
           a->debug("glob(%s) failed: %d...", acpimcfg, ret);
           use_acpimcfg = 0;
         }
+#endif
     }
   else
     use_acpimcfg = 0;
 
+#ifndef PCI_OS_WINDOWS
   if (!efisystab[0] || access(efisystab, R_OK))
     {
       if (efisystab[0])
         a->debug("cannot access efisystab: %s: %s...", efisystab, strerror(errno));
       use_efisystab = 0;
     }
+#endif
 
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
   if (strcmp(bsd, "0") == 0)
