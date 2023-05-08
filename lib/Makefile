@@ -79,6 +79,12 @@ ifdef PCI_OS_WINDOWS
 OBJS += win32-helpers
 endif
 
+ifndef PCI_OS_WINDOWS
+ifndef PCI_OS_DJGPP
+OBJS += physmem-posix
+endif
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)

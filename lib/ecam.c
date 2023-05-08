@@ -8,14 +8,9 @@
  *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-/*
- * Tell 32-bit platforms that we are interested in 64-bit variant of off_t type
- * as 32-bit variant of off_t type is signed and so it cannot represent all
- * possible 32-bit offsets. It is required because off_t type is used by mmap().
- */
-#define _FILE_OFFSET_BITS 64
-
 #include "internal.h"
+#include "physmem.h"
+#include "physmem-access.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -24,9 +19,6 @@
 #include <string.h>
 #include <limits.h>
 
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <fcntl.h>
 #include <glob.h>
 #include <unistd.h>
 
@@ -37,12 +29,6 @@
 #if defined (__FreeBSD__) || defined (__DragonFly__)
 #include <kenv.h>
 #endif
-
-#ifndef OFF_MAX
-#define OFF_MAX (off_t)((1ULL << (sizeof(off_t) * CHAR_BIT - 1)) - 1)
-#endif
-
-static long pagesize;
 
 struct acpi_rsdp {
   char signature[8];
@@ -92,6 +78,23 @@ struct acpi_mcfg {
   } allocations[0];
 } PCI_PACKED;
 
+struct mmap_cache {
+  void *map;
+  u64 addr;
+  u32 length;
+  int domain;
+  u8 bus;
+  int w;
+};
+
+// Back-end data linked to struct pci_access
+struct ecam_access {
+  struct acpi_mcfg *mcfg;
+  struct mmap_cache *cache;
+  struct physmem *physmem;
+  long pagesize;
+};
+
 static unsigned int
 get_rsdt_addresses_count(struct acpi_rsdt *rsdt)
 {
@@ -121,40 +124,40 @@ calculate_checksum(const u8 *bytes, int len)
 }
 
 static struct acpi_sdt *
-check_and_map_sdt(int fd, u64 addr, const char *signature, void **map_addr, u32 *map_length)
+check_and_map_sdt(struct physmem *physmem, long pagesize, u64 addr, const char *signature, void **map_addr, u32 *map_length)
 {
   struct acpi_sdt *sdt;
   char sdt_signature[sizeof(sdt->signature)];
   u32 length;
   void *map;
 
-  if (addr > OFF_MAX - sizeof(*sdt))
+  if (addr + sizeof(*sdt) < addr)
     return NULL;
 
-  map = mmap(NULL, sizeof(*sdt) + (addr & (pagesize-1)), PROT_READ, MAP_SHARED, fd, addr & ~(pagesize-1));
-  if (map == MAP_FAILED)
+  map = physmem_map(physmem, addr & ~(pagesize-1), sizeof(*sdt) + (addr & (pagesize-1)), 0);
+  if (map == (void *)-1)
     return NULL;
 
   sdt = (struct acpi_sdt *)((unsigned char *)map + (addr & (pagesize-1)));
   length = sdt->length;
   memcpy(sdt_signature, sdt->signature, sizeof(sdt->signature));
 
-  munmap(map, sizeof(*sdt) + (addr & (pagesize-1)));
+  physmem_unmap(physmem, map, sizeof(*sdt) + (addr & (pagesize-1)));
 
   if (memcmp(sdt_signature, signature, sizeof(sdt_signature)) != 0)
     return NULL;
   if (length < sizeof(*sdt))
     return NULL;
 
-  map = mmap(NULL, length + (addr & (pagesize-1)), PROT_READ, MAP_SHARED, fd, addr & ~(pagesize-1));
-  if (map == MAP_FAILED)
+  map = physmem_map(physmem, addr & ~(pagesize-1), length + (addr & (pagesize-1)), 0);
+  if (map == (void *)-1)
     return NULL;
 
   sdt = (struct acpi_sdt *)((unsigned char *)map + (addr & (pagesize-1)));
 
   if (calculate_checksum((u8 *)sdt, sdt->length) != 0)
     {
-      munmap(map, length + (addr & (pagesize-1)));
+      physmem_unmap(physmem, map, length + (addr & (pagesize-1)));
       return NULL;
     }
 
@@ -174,20 +177,20 @@ check_rsdp(struct acpi_rsdp *rsdp)
 }
 
 static int
-check_and_parse_rsdp(int fd, off_t addr, u32 *rsdt_address, u64 *xsdt_address)
+check_and_parse_rsdp(struct physmem *physmem, long pagesize, u64 addr, u32 *rsdt_address, u64 *xsdt_address)
 {
   struct acpi_rsdp *rsdp;
   unsigned char buf[sizeof(*rsdp) + sizeof(*rsdp->rsdp20)];
   void *map;
 
-  map = mmap(NULL, sizeof(buf) + (addr & (pagesize-1)), PROT_READ, MAP_SHARED, fd, addr & ~(pagesize-1));
-  if (map == MAP_FAILED)
+  map = physmem_map(physmem, addr & ~(pagesize-1), sizeof(buf) + (addr & (pagesize-1)), 0);
+  if (map == (void *)-1)
     return 0;
 
   rsdp = (struct acpi_rsdp *)buf;
   memcpy(rsdp, (unsigned char *)map + (addr & (pagesize-1)), sizeof(buf));
 
-  munmap(map, sizeof(buf));
+  physmem_unmap(physmem, map, sizeof(buf));
 
   if (!check_rsdp(rsdp))
     return 0;
@@ -204,20 +207,22 @@ check_and_parse_rsdp(int fd, off_t addr, u32 *rsdt_address, u64 *xsdt_address)
   return 1;
 }
 
-static off_t
+static u64
 find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSED, int use_x86bios UNUSED)
 {
-  unsigned long long ullnum;
+  u64 ullnum;
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
   unsigned long ulnum;
 #endif
   char buf[1024];
   char *endptr;
-  off_t acpi20;
-  off_t acpi;
+  u64 acpi20;
+  u64 acpi;
 #if defined(__amd64__) || defined(__i386__)
-  off_t rsdp_addr;
-  off_t addr;
+  struct ecam_access *eacc = a->backend_data;
+  struct physmem *physmem = eacc->physmem;
+  u64 rsdp_addr;
+  u64 addr;
   void *map;
 #endif
   size_t len;
@@ -240,19 +245,21 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
                 {
                   errno = 0;
                   ullnum = strtoull(buf+7, &endptr, 16);
-                  if (!errno && !*endptr && ullnum <= OFF_MAX)
+                  if (!errno && !*endptr)
                     acpi20 = ullnum;
                 }
               else if (strncmp(buf, "ACPI=", 5) == 0 && isxdigit(buf[5]))
                 {
                   errno = 0;
                   ullnum = strtoull(buf+5, &endptr, 16);
-                  if (!errno && !*endptr && ullnum <= OFF_MAX)
+                  if (!errno && !*endptr)
                     acpi = ullnum;
                 }
             }
           fclose(f);
         }
+      else
+        a->debug("opening failed: %s...", strerror(errno));
 
       if (acpi20)
         return acpi20;
@@ -269,14 +276,14 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
         {
           errno = 0;
           ullnum = strtoull(buf, &endptr, 16);
-          if (!errno && !*endptr && ullnum <= OFF_MAX)
+          if (!errno && !*endptr)
             return ullnum;
         }
 
       /* Then try FreeBSD sysctl machdep.acpi_root */
       a->debug("calling sysctl machdep.acpi_root...");
       len = sizeof(ulnum);
-      if (sysctlbyname("machdep.acpi_root", &ulnum, &len, NULL, 0) == 0 && ulnum <= OFF_MAX)
+      if (sysctlbyname("machdep.acpi_root", &ulnum, &len, NULL, 0) == 0)
         return ulnum;
     }
 #endif
@@ -287,7 +294,7 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
       /* Try NetBSD sysctl hw.acpi.root */
       a->debug("calling sysctl hw.acpi.root...");
       len = sizeof(ulnum);
-      if (sysctlbyname("hw.acpi.root", &ulnum, &len, NULL, 0) == 0 && ulnum <= OFF_MAX)
+      if (sysctlbyname("hw.acpi.root", &ulnum, &len, NULL, 0) == 0)
         return ulnum;
     }
 #endif
@@ -299,8 +306,8 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
 
       /* Scan first kB of Extended BIOS Data Area */
       a->debug("scanning first kB of EBDA...");
-      map = mmap(NULL, 0x40E + 1024, PROT_READ, MAP_SHARED, a->fd, 0);
-      if (map != MAP_FAILED)
+      map = physmem_map(physmem, 0, 0x40E + 1024, 0);
+      if (map != (void *)-1)
         {
           for (addr = 0x40E; addr < 0x40E + 1024; addr += 16)
             {
@@ -310,16 +317,19 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
                   break;
                 }
             }
-          munmap(map, 0x40E + 1024);
+          if (physmem_unmap(physmem, map, 0x40E + 1024) != 0)
+            a->debug("unmapping of EBDA failed: %s...", strerror(errno));
         }
+      else
+        a->debug("mapping of EBDA failed: %s...", strerror(errno));
 
       if (rsdp_addr)
         return rsdp_addr;
 
       /* Scan the main BIOS area below 1 MB */
       a->debug("scanning BIOS below 1 MB...");
-      map = mmap(NULL, 0x20000, PROT_READ, MAP_SHARED, a->fd, 0xE0000);
-      if (map != MAP_FAILED)
+      map = physmem_map(physmem, 0xE0000, 0x20000, 0);
+      if (map != (void *)-1)
         {
           for (addr = 0x0; addr < 0x20000; addr += 16)
             {
@@ -329,8 +339,11 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
                   break;
                 }
             }
-          munmap(map, 0x20000);
+          if (physmem_unmap(physmem, map, 0x20000) != 0)
+            a->debug("unmapping of BIOS failed: %s...", strerror(errno));
         }
+      else
+        a->debug("mapping of BIOS failed: %s...", strerror(errno));
 
       if (rsdp_addr)
         return rsdp_addr;
@@ -343,20 +356,24 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
 static struct acpi_mcfg *
 find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int use_bsd, int use_x86bios)
 {
+  struct ecam_access *eacc = a->backend_data;
+  struct physmem *physmem = eacc->physmem;
+  long pagesize = eacc->pagesize;
   struct acpi_xsdt *xsdt;
   struct acpi_rsdt *rsdt;
   struct acpi_mcfg *mcfg;
   struct acpi_sdt *sdt;
   unsigned int i, count;
-  off_t rsdp_address;
+  u64 rsdp_address;
   u64 xsdt_address;
   u32 rsdt_address;
   void *map_addr;
   u32 map_length;
   void *map2_addr;
   u32 map2_length;
-  off_t length;
-  int mcfg_fd;
+  long length;
+  FILE *mcfg_file;
+  const char *path;
   glob_t mcfg_glob;
   int ret;
 
@@ -365,26 +382,30 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
       ret = glob(acpimcfg, GLOB_NOCHECK, NULL, &mcfg_glob);
       if (ret == 0)
         {
-          a->debug("reading acpi mcfg file: %s...", mcfg_glob.gl_pathv[0]);
-          mcfg_fd = open(mcfg_glob.gl_pathv[0], O_RDONLY);
+          path = mcfg_glob.gl_pathv[0];
+          a->debug("reading acpi mcfg file: %s...", path);
+          mcfg_file = fopen(path, "rb");
           globfree(&mcfg_glob);
-          if (mcfg_fd >= 0)
+          if (mcfg_file)
             {
-              length = lseek(mcfg_fd, 0, SEEK_END);
-              if (length != (off_t)-1 && length > (off_t)sizeof(*mcfg))
+              if (fseek(mcfg_file, 0, SEEK_END) == 0)
+                length = ftell(mcfg_file);
+              else
+                length = -1;
+              if (length > 0 && (size_t)length > sizeof(*mcfg))
                 {
-                  lseek(mcfg_fd, 0, SEEK_SET);
+                  rewind(mcfg_file);
                   mcfg = pci_malloc(a, length);
-                  if (read(mcfg_fd, mcfg, length) == length &&
+                  if (fread(mcfg, 1, length, mcfg_file) == (size_t)length &&
                       memcmp(mcfg->sdt.signature, "MCFG", 4) == 0 &&
-                      mcfg->sdt.length <= length &&
+                      mcfg->sdt.length <= (size_t)length &&
                       calculate_checksum((u8 *)mcfg, mcfg->sdt.length) == 0)
                     {
-                      close(mcfg_fd);
+                      fclose(mcfg_file);
                       return mcfg;
                     }
                 }
-              close(mcfg_fd);
+              fclose(mcfg_file);
             }
           a->debug("failed...");
         }
@@ -399,34 +420,34 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
       a->debug("not found...");
       return NULL;
     }
-  a->debug("found at 0x%llx...", (unsigned long long)rsdp_address);
+  a->debug("found at 0x%" PCI_U64_FMT_X "...", rsdp_address);
 
-  if (!check_and_parse_rsdp(a->fd, rsdp_address, &rsdt_address, &xsdt_address))
+  if (!check_and_parse_rsdp(physmem, pagesize, rsdp_address, &rsdt_address, &xsdt_address))
     {
       a->debug("invalid...");
       return NULL;
     }
 
   mcfg = NULL;
-  a->debug("searching for ACPI MCFG (XSDT=0x%llx, RSDT=0x%x)...", (unsigned long long)xsdt_address, rsdt_address);
+  a->debug("searching for ACPI MCFG (XSDT=0x%" PCI_U64_FMT_X ", RSDT=0x%lx)...", xsdt_address, (unsigned long)rsdt_address);
 
-  xsdt = xsdt_address ? (struct acpi_xsdt *)check_and_map_sdt(a->fd, xsdt_address, "XSDT", &map_addr, &map_length) : NULL;
+  xsdt = xsdt_address ? (struct acpi_xsdt *)check_and_map_sdt(physmem, pagesize, xsdt_address, "XSDT", &map_addr, &map_length) : NULL;
   if (xsdt)
     {
       a->debug("via XSDT...");
       count = get_xsdt_addresses_count(xsdt);
       for (i = 0; i < count; i++)
         {
-          sdt = check_and_map_sdt(a->fd, xsdt->sdt_addresses[i], "MCFG", &map2_addr, &map2_length);
+          sdt = check_and_map_sdt(physmem, pagesize, xsdt->sdt_addresses[i], "MCFG", &map2_addr, &map2_length);
           if (sdt)
             {
               mcfg = pci_malloc(a, sdt->length);
               memcpy(mcfg, sdt, sdt->length);
-              munmap(map2_addr, map2_length);
+              physmem_unmap(physmem, map2_addr, map2_length);
               break;
             }
         }
-      munmap(map_addr, map_length);
+      physmem_unmap(physmem, map_addr, map_length);
       if (mcfg)
         {
           a->debug("found...");
@@ -434,23 +455,23 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
         }
     }
 
-  rsdt = (struct acpi_rsdt *)check_and_map_sdt(a->fd, rsdt_address, "RSDT", &map_addr, &map_length);
+  rsdt = (struct acpi_rsdt *)check_and_map_sdt(physmem, pagesize, rsdt_address, "RSDT", &map_addr, &map_length);
   if (rsdt)
     {
       a->debug("via RSDT...");
       count = get_rsdt_addresses_count(rsdt);
       for (i = 0; i < count; i++)
         {
-          sdt = check_and_map_sdt(a->fd, rsdt->sdt_addresses[i], "MCFG", &map2_addr, &map2_length);
+          sdt = check_and_map_sdt(physmem, pagesize, rsdt->sdt_addresses[i], "MCFG", &map2_addr, &map2_length);
           if (sdt)
             {
               mcfg = pci_malloc(a, sdt->length);
               memcpy(mcfg, sdt, sdt->length);
-              munmap(map2_addr, map2_length);
+              physmem_unmap(physmem, map2_addr, map2_length);
               break;
             }
         }
-      munmap(map_addr, map_length);
+      physmem_unmap(physmem, map_addr, map_length);
       if (mcfg)
         {
           a->debug("found...");
@@ -463,7 +484,7 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
 }
 
 static void
-get_mcfg_allocation(struct acpi_mcfg *mcfg, unsigned int i, int *domain, u8 *start_bus, u8 *end_bus, off_t *addr, u32 *length)
+get_mcfg_allocation(struct acpi_mcfg *mcfg, unsigned int i, int *domain, u8 *start_bus, u8 *end_bus, u64 *addr, u32 *length)
 {
   int buses = (int)mcfg->allocations[i].end_bus_number - (int)mcfg->allocations[i].start_bus_number + 1;
 
@@ -480,15 +501,15 @@ get_mcfg_allocation(struct acpi_mcfg *mcfg, unsigned int i, int *domain, u8 *sta
 }
 
 static int
-parse_next_addrs(const char *addrs, const char **next, int *domain, u8 *start_bus, u8 *end_bus, off_t *addr, u32 *length)
+parse_next_addrs(const char *addrs, const char **next, int *domain, u8 *start_bus, u8 *end_bus, u64 *addr, u32 *length)
 {
-  unsigned long long ullnum;
+  u64 ullnum;
   const char *sep1, *sep2;
   int addr_len;
   char *endptr;
   long num;
   int buses;
-  unsigned long long start_addr;
+  u64 start_addr;
 
   if (!*addrs)
     {
@@ -563,7 +584,7 @@ parse_next_addrs(const char *addrs, const char **next, int *domain, u8 *start_bu
 
   errno = 0;
   ullnum = strtoull(sep2+1, &endptr, 16);
-  if (errno || (ullnum & 3) || ullnum > OFF_MAX)
+  if (errno || (ullnum & 3))
     return 0;
   if (addr)
     *addr = ullnum;
@@ -577,7 +598,7 @@ parse_next_addrs(const char *addrs, const char **next, int *domain, u8 *start_bu
           if (end_bus)
             *end_bus = 0xff;
         }
-      if ((unsigned)buses * 32 * 8 * 4096 > OFF_MAX - start_addr)
+      if (start_addr + (unsigned)buses * 32 * 8 * 4096 < start_addr)
         return 0;
       if (length)
         *length = buses * 32 * 8 * 4096;
@@ -588,9 +609,9 @@ parse_next_addrs(const char *addrs, const char **next, int *domain, u8 *start_bu
         return 0;
       errno = 0;
       ullnum = strtoull(endptr+1, &endptr, 16);
-      if (errno || endptr != addrs + addr_len || (ullnum & 3) || ullnum > OFF_MAX || ullnum > 256 * 32 * 8 * 4096)
+      if (errno || endptr != addrs + addr_len || (ullnum & 3) || ullnum > 256 * 32 * 8 * 4096)
         return 0;
-      if (ullnum > OFF_MAX - start_addr)
+      if (start_addr + ullnum < start_addr)
         return 0;
       if (buses > 0 && ullnum > (unsigned)buses * 32 * 8 * 4096)
         return 0;
@@ -619,7 +640,7 @@ validate_addrs(const char *addrs)
 }
 
 static int
-calculate_bus_addr(u8 start_bus, off_t start_addr, u32 total_length, u8 bus, off_t *addr, u32 *length)
+calculate_bus_addr(u8 start_bus, u64 start_addr, u32 total_length, u8 bus, u64 *addr, u32 *length)
 {
   u32 offset;
 
@@ -637,12 +658,12 @@ calculate_bus_addr(u8 start_bus, off_t start_addr, u32 total_length, u8 bus, off
 }
 
 static int
-get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_t *addr, u32 *length)
+get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, u64 *addr, u32 *length)
 {
   int cur_domain;
   u8 start_bus;
   u8 end_bus;
-  off_t start_addr;
+  u64 start_addr;
   u32 total_length;
   int i, count;
 
@@ -670,33 +691,18 @@ get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_
     }
 }
 
-struct mmap_cache
-{
-  void *map;
-  off_t addr;
-  u32 length;
-  int domain;
-  u8 bus;
-  int w;
-};
-
-// Back-end data linked to struct pci_access
-struct ecam_access
-{
-  struct acpi_mcfg *mcfg;
-  struct mmap_cache *cache;
-};
-
 static void
 munmap_reg(struct pci_access *a)
 {
   struct ecam_access *eacc = a->backend_data;
   struct mmap_cache *cache = eacc->cache;
+  struct physmem *physmem = eacc->physmem;
+  long pagesize = eacc->pagesize;
 
   if (!cache)
     return;
 
-  munmap(cache->map, cache->length + (cache->addr & (pagesize-1)));
+  physmem_unmap(physmem, cache->map, cache->length + (cache->addr & (pagesize-1)));
   pci_mfree(cache);
   eacc->cache = NULL;
 }
@@ -706,9 +712,11 @@ mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int p
 {
   struct ecam_access *eacc = a->backend_data;
   struct mmap_cache *cache = eacc->cache;
+  struct physmem *physmem = eacc->physmem;
+  long pagesize = eacc->pagesize;
   const char *addrs;
   void *map;
-  off_t addr;
+  u64 addr;
   u32 length;
   u32 offset;
 
@@ -724,12 +732,12 @@ mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int p
       if (!get_bus_addr(eacc->mcfg, addrs, domain, bus, &addr, &length))
         return 0;
 
-      map = mmap(NULL, length + (addr & (pagesize-1)), w ? PROT_WRITE : PROT_READ, MAP_SHARED, a->fd, addr & ~(pagesize-1));
-      if (map == MAP_FAILED)
+      map = physmem_map(physmem, addr & ~(pagesize-1), length + (addr & (pagesize-1)), w);
+      if (map == (void *)-1)
         return 0;
 
       if (cache)
-        munmap(cache->map, cache->length + (cache->addr & (pagesize-1)));
+        physmem_unmap(physmem, cache->map, cache->length + (cache->addr & (pagesize-1)));
       else
         cache = eacc->cache = pci_malloc(a, sizeof(*cache));
 
@@ -755,45 +763,9 @@ mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int p
 }
 
 static void
-writeb(unsigned char value, volatile void *addr)
-{
-  *(volatile unsigned char *)addr = value;
-}
-
-static void
-writew(unsigned short value, volatile void *addr)
-{
-  *(volatile unsigned short *)addr = value;
-}
-
-static void
-writel(unsigned int value, volatile void *addr)
-{
-  *(volatile unsigned int *)addr = value;
-}
-
-static unsigned char
-readb(volatile void *addr)
-{
-  return *(volatile unsigned char *)addr;
-}
-
-static unsigned short
-readw(volatile void *addr)
-{
-  return *(volatile unsigned short *)addr;
-}
-
-static unsigned int
-readl(volatile void *addr)
-{
-  return *(volatile unsigned int *)addr;
-}
-
-static void
 ecam_config(struct pci_access *a)
 {
-  pci_define_param(a, "devmem.path", PCI_PATH_DEVMEM_DEVICE, "Path to the /dev/mem device");
+  physmem_init_config(a);
   pci_define_param(a, "ecam.acpimcfg", PCI_PATH_ACPI_MCFG, "Path to the ACPI MCFG table");
   pci_define_param(a, "ecam.efisystab", PCI_PATH_EFI_SYSTAB, "Path to the EFI system table");
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
@@ -809,7 +781,6 @@ static int
 ecam_detect(struct pci_access *a)
 {
   int use_addrs = 1, use_acpimcfg = 1, use_efisystab = 1, use_bsd = 1, use_x86bios = 1;
-  const char *devmem = pci_get_param(a, "devmem.path");
   const char *acpimcfg = pci_get_param(a, "ecam.acpimcfg");
   const char *efisystab = pci_get_param(a, "ecam.efisystab");
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
@@ -849,7 +820,7 @@ ecam_detect(struct pci_access *a)
   else
     use_acpimcfg = 0;
 
-  if (access(efisystab, R_OK))
+  if (!efisystab[0] || access(efisystab, R_OK))
     {
       if (efisystab[0])
         a->debug("cannot access efisystab: %s: %s...", efisystab, strerror(errno));
@@ -888,16 +859,16 @@ ecam_detect(struct pci_access *a)
       return 0;
     }
 
-  if (access(devmem, R_OK))
+  if (physmem_access(a, 0))
     {
-      a->debug("cannot access physical memory via %s: %s", devmem, strerror(errno));
+      a->debug("cannot access physical memory: %s", strerror(errno));
       return 0;
     }
 
   if (use_addrs)
-    a->debug("using %s with ecam addresses %s", devmem, addrs);
+    a->debug("using with ecam addresses %s", addrs);
   else
-    a->debug("using %s with%s%s%s%s%s%s", devmem, use_acpimcfg ? " acpimcfg=" : "", use_acpimcfg ? acpimcfg : "", use_efisystab ? " efisystab=" : "", use_efisystab ? efisystab : "", use_bsd ? " bsd" : "", use_x86bios ? " x86bios" : "");
+    a->debug("using with%s%s%s%s%s%s", use_acpimcfg ? " acpimcfg=" : "", use_acpimcfg ? acpimcfg : "", use_efisystab ? " efisystab=" : "", use_efisystab ? efisystab : "", use_bsd ? " bsd" : "", use_x86bios ? " x86bios" : "");
 
   return 1;
 }
@@ -905,7 +876,6 @@ ecam_detect(struct pci_access *a)
 static void
 ecam_init(struct pci_access *a)
 {
-  const char *devmem = pci_get_param(a, "devmem.path");
   const char *acpimcfg = pci_get_param(a, "ecam.acpimcfg");
   const char *efisystab = pci_get_param(a, "ecam.efisystab");
 #if defined (__FreeBSD__) || defined (__DragonFly__) || defined(__NetBSD__)
@@ -915,24 +885,32 @@ ecam_init(struct pci_access *a)
   const char *x86bios = pci_get_param(a, "ecam.x86bios");
 #endif
   const char *addrs = pci_get_param(a, "ecam.addrs");
-  struct acpi_mcfg *mcfg = NULL;
+  struct physmem *physmem = NULL;
   struct ecam_access *eacc = NULL;
+  long pagesize = 0;
   int use_bsd = 0;
   int use_x86bios = 0;
   int test_domain = 0;
   u8 test_bus = 0;
   volatile void *test_reg;
 
-  pagesize = sysconf(_SC_PAGESIZE);
-  if (pagesize < 0)
-    a->error("Cannot get page size: %s.", strerror(errno));
-
   if (!validate_addrs(addrs))
     a->error("Option ecam.addrs has invalid address format \"%s\".", addrs);
 
-  a->fd = open(devmem, (a->writeable ? O_RDWR : O_RDONLY) | O_DSYNC);
-  if (a->fd < 0)
-    a->error("Cannot open %s: %s.", devmem, strerror(errno));
+  physmem = physmem_open(a, a->writeable);
+  if (!physmem)
+    a->error("Cannot open physcal memory: %s.", strerror(errno));
+
+  pagesize = physmem_get_pagesize(physmem);
+  if (pagesize <= 0)
+    a->error("Cannot get page size: %s.", strerror(errno));
+
+  eacc = pci_malloc(a, sizeof(*eacc));
+  eacc->mcfg = NULL;
+  eacc->cache = NULL;
+  eacc->physmem = physmem;
+  eacc->pagesize = pagesize;
+  a->backend_data = eacc;
 
   if (!*addrs)
     {
@@ -944,18 +922,13 @@ ecam_init(struct pci_access *a)
       if (strcmp(x86bios, "0") != 0)
         use_x86bios = 1;
 #endif
-      mcfg = find_mcfg(a, acpimcfg, efisystab, use_bsd, use_x86bios);
-      if (!mcfg)
+      eacc->mcfg = find_mcfg(a, acpimcfg, efisystab, use_bsd, use_x86bios);
+      if (!eacc->mcfg)
         a->error("Option ecam.addrs was not specified and ACPI MCFG table cannot be found.");
     }
 
-  eacc = pci_malloc(a, sizeof(*eacc));
-  eacc->mcfg = mcfg;
-  eacc->cache = NULL;
-  a->backend_data = eacc;
-
-  if (mcfg)
-    get_mcfg_allocation(mcfg, 0, &test_domain, &test_bus, NULL, NULL, NULL);
+  if (eacc->mcfg)
+    get_mcfg_allocation(eacc->mcfg, 0, &test_domain, &test_bus, NULL, NULL, NULL);
   else
     parse_next_addrs(addrs, NULL, &test_domain, &test_bus, NULL, NULL, NULL);
 
@@ -969,16 +942,11 @@ ecam_cleanup(struct pci_access *a)
 {
   struct ecam_access *eacc = a->backend_data;
 
-  if (a->fd < 0)
-    return;
-
   munmap_reg(a);
+  physmem_close(eacc->physmem);
   pci_mfree(eacc->mcfg);
   pci_mfree(eacc);
   a->backend_data = NULL;
-
-  close(a->fd);
-  a->fd = -1;
 }
 
 static void
@@ -1037,13 +1005,13 @@ ecam_read(struct pci_dev *d, int pos, byte *buf, int len)
   switch (len)
     {
     case 1:
-      buf[0] = readb(reg);
+      buf[0] = physmem_readb(reg);
       break;
     case 2:
-      ((u16 *) buf)[0] = readw(reg);
+      ((u16 *) buf)[0] = physmem_readw(reg);
       break;
     case 4:
-      ((u32 *) buf)[0] = readl(reg);
+      ((u32 *) buf)[0] = physmem_readl(reg);
       break;
     }
 
@@ -1067,13 +1035,13 @@ ecam_write(struct pci_dev *d, int pos, byte *buf, int len)
   switch (len)
     {
     case 1:
-      writeb(buf[0], reg);
+      physmem_writeb(buf[0], reg);
       break;
     case 2:
-      writew(((u16 *) buf)[0], reg);
+      physmem_writew(((u16 *) buf)[0], reg);
       break;
     case 4:
-      writel(((u32 *) buf)[0], reg);
+      physmem_writel(((u32 *) buf)[0], reg);
       break;
     }
 
