@@ -15,7 +15,6 @@
 #include <string.h> /* for memset() and memcpy() */
 
 #include "internal.h"
-#include "i386-io-windows.h"
 #include "win32-helpers.h"
 
 #ifndef ERROR_NOT_FOUND
@@ -480,7 +479,7 @@ win32_kldbg_setup(struct pci_access *a)
       return 0;
     }
 
-  if (!enable_privilege(luid_debug_privilege, &revert_token, &revert_only_privilege))
+  if (!win32_enable_privilege(luid_debug_privilege, &revert_token, &revert_only_privilege))
     {
       a->debug("Process does not have right to enable Debug privilege.");
       CloseHandle(kldbg_dev);
@@ -502,7 +501,7 @@ win32_kldbg_setup(struct pci_access *a)
   CloseHandle(kldbg_dev);
   kldbg_dev = INVALID_HANDLE_VALUE;
 
-  revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
+  win32_revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
   revert_token = NULL;
   revert_only_privilege = FALSE;
   return 0;
@@ -538,7 +537,7 @@ win32_kldbg_cleanup(struct pci_access *a UNUSED)
 
   if (debug_privilege_enabled)
     {
-      revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
+      win32_revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
       revert_token = NULL;
       revert_only_privilege = FALSE;
       debug_privilege_enabled = FALSE;

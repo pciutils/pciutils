@@ -11,7 +11,6 @@
 #include <windows.h>
 
 #include "internal.h"
-#include "i386-io-windows.h"
 #include "win32-helpers.h"
 
 #ifndef NTSTATUS
@@ -126,9 +125,9 @@ win32_sysdbg_setup(struct pci_access *a)
   if (win32_sysdbg_initialized)
     return 1;
 
-  prev_error_mode = change_error_mode(SEM_FAILCRITICALERRORS);
+  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS);
   ntdll = LoadLibrary(TEXT("ntdll.dll"));
-  change_error_mode(prev_error_mode);
+  win32_change_error_mode(prev_error_mode);
   if (!ntdll)
     {
       a->debug("Cannot open ntdll.dll library.");
@@ -180,7 +179,7 @@ win32_sysdbg_setup(struct pci_access *a)
       return 0;
     }
 
-  if (!enable_privilege(luid_debug_privilege, &revert_token, &revert_only_privilege))
+  if (!win32_enable_privilege(luid_debug_privilege, &revert_token, &revert_only_privilege))
     {
       a->debug("Cannot enable Debug privilege.");
       FreeLibrary(ntdll);
@@ -198,7 +197,7 @@ win32_sysdbg_setup(struct pci_access *a)
       return 1;
     }
 
-  revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
+  win32_revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
   revert_token = NULL;
   revert_only_privilege = FALSE;
 
@@ -245,7 +244,7 @@ win32_sysdbg_cleanup(struct pci_access *a UNUSED)
 
   if (debug_privilege_enabled)
     {
-      revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
+      win32_revert_privilege(luid_debug_privilege, revert_token, revert_only_privilege);
       revert_token = NULL;
       revert_only_privilege = FALSE;
       debug_privilege_enabled = FALSE;
