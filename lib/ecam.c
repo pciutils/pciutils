@@ -619,6 +619,21 @@ validate_addrs(const char *addrs)
 }
 
 static int
+calculate_bus_addr(u8 start_bus, off_t start_addr, u32 total_length, u8 bus, off_t *addr, u32 *length)
+{
+  u32 offset;
+
+  offset = 32*8*4096 * (bus - start_bus);
+  if (offset >= total_length)
+    return 0;
+
+  *addr = start_addr + offset;
+  *length = total_length - offset;
+
+  return 1;
+}
+
+static int
 get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_t *addr, u32 *length)
 {
   int cur_domain;
@@ -626,7 +641,6 @@ get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_
   u8 end_bus;
   off_t start_addr;
   u32 total_length;
-  u32 offset;
   int i, count;
 
   if (mcfg)
@@ -636,14 +650,7 @@ get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_
         {
           get_mcfg_allocation(mcfg, i, &cur_domain, &start_bus, &end_bus, &start_addr, &total_length);
           if (domain == cur_domain && bus >= start_bus && bus <= end_bus)
-            {
-              offset = 32*8*4096 * (bus - start_bus);
-              if (offset >= total_length)
-                return 0;
-              *addr = start_addr + offset;
-              *length = total_length - offset;
-              return 1;
-            }
+            return calculate_bus_addr(start_bus, start_addr, total_length, bus, addr, length);
         }
       return 0;
     }
@@ -654,14 +661,7 @@ get_bus_addr(struct acpi_mcfg *mcfg, const char *addrs, int domain, u8 bus, off_
           if (!parse_next_addrs(addrs, &addrs, &cur_domain, &start_bus, &end_bus, &start_addr, &total_length))
             return 0;
           if (domain == cur_domain && bus >= start_bus && bus <= end_bus)
-            {
-              offset = 32*8*4096 * (bus - start_bus);
-              if (offset >= total_length)
-                return 0;
-              *addr = start_addr + offset;
-              *length = total_length - offset;
-              return 1;
-            }
+            return calculate_bus_addr(start_bus, start_addr, total_length, bus, addr, length);
         }
       return 0;
     }
