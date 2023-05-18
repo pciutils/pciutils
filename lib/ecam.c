@@ -630,6 +630,9 @@ calculate_bus_addr(u8 start_bus, off_t start_addr, u32 total_length, u8 bus, off
   *addr = start_addr + offset;
   *length = total_length - offset;
 
+  if (*length > 32*8*4096)
+    *length = 32*8*4096;
+
   return 1;
 }
 
