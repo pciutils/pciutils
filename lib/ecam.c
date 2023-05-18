@@ -898,10 +898,6 @@ ecam_detect(struct pci_access *a)
           a->backend_data = NULL;
           return 0;
         }
-      pci_mfree(eacc->mcfg);
-      physmem_close(eacc->physmem);
-      pci_mfree(eacc);
-      a->backend_data = NULL;
     }
 
   if (use_addrs)
@@ -925,7 +921,7 @@ ecam_init(struct pci_access *a)
 #endif
   const char *addrs = pci_get_param(a, "ecam.addrs");
   struct physmem *physmem = NULL;
-  struct ecam_access *eacc = NULL;
+  struct ecam_access *eacc = a->backend_data;
   long pagesize = 0;
   int use_bsd = 0;
   int use_x86bios = 0;
@@ -936,20 +932,23 @@ ecam_init(struct pci_access *a)
   if (!validate_addrs(addrs))
     a->error("Option ecam.addrs has invalid address format \"%s\".", addrs);
 
-  physmem = physmem_open(a, a->writeable);
-  if (!physmem)
-    a->error("Cannot open physcal memory: %s.", strerror(errno));
+  if (!eacc)
+    {
+      physmem = physmem_open(a, a->writeable);
+      if (!physmem)
+        a->error("Cannot open physcal memory: %s.", strerror(errno));
 
-  pagesize = physmem_get_pagesize(physmem);
-  if (pagesize <= 0)
-    a->error("Cannot get page size: %s.", strerror(errno));
+      pagesize = physmem_get_pagesize(physmem);
+      if (pagesize <= 0)
+        a->error("Cannot get page size: %s.", strerror(errno));
 
-  eacc = pci_malloc(a, sizeof(*eacc));
-  eacc->mcfg = NULL;
-  eacc->cache = NULL;
-  eacc->physmem = physmem;
-  eacc->pagesize = pagesize;
-  a->backend_data = eacc;
+      eacc = pci_malloc(a, sizeof(*eacc));
+      eacc->mcfg = NULL;
+      eacc->cache = NULL;
+      eacc->physmem = physmem;
+      eacc->pagesize = pagesize;
+      a->backend_data = eacc;
+    }
 
   if (!*addrs)
     {
@@ -961,7 +960,8 @@ ecam_init(struct pci_access *a)
       if (strcmp(x86bios, "0") != 0)
         use_x86bios = 1;
 #endif
-      eacc->mcfg = find_mcfg(a, acpimcfg, efisystab, use_bsd, use_x86bios);
+      if (!eacc->mcfg)
+        eacc->mcfg = find_mcfg(a, acpimcfg, efisystab, use_bsd, use_x86bios);
       if (!eacc->mcfg)
         a->error("Option ecam.addrs was not specified and ACPI MCFG table cannot be found.");
     }
