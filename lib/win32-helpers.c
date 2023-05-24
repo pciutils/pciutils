@@ -19,6 +19,11 @@
 #define PROCESS_QUERY_LIMITED_INFORMATION 0x1000
 #endif
 
+/* Unfortunately some toolchains do not provide this constant. */
+#ifndef SE_IMPERSONATE_NAME
+#define SE_IMPERSONATE_NAME TEXT("SeImpersonatePrivilege")
+#endif
+
 /*
  * These psapi functions are available in kernel32.dll library with K32 prefix
  * on Windows 7 and higher systems. On older Windows systems these functions are
@@ -980,4 +985,188 @@ win32_open_process_token_with_rights(HANDLE process, DWORD rights)
    * not implemented yet.
    */
   return NULL;
+}
+
+/*
+ * Call supplied function with its argument and if it fails with
+ * ERROR_PRIVILEGE_NOT_HELD then try to enable Tcb privilege and
+ * call function with its argument again.
+ */
+BOOL
+win32_call_func_with_tcb_privilege(BOOL (*function)(LPVOID), LPVOID argument)
+{
+  LUID luid_tcb_privilege;
+  LUID luid_impersonate_privilege;
+
+  HANDLE revert_token_tcb_privilege;
+  BOOL revert_only_tcb_privilege;
+
+  HANDLE revert_token_impersonate_privilege;
+  BOOL revert_only_impersonate_privilege;
+
+  BOOL impersonate_privilege_enabled;
+
+  BOOL revert_to_old_token;
+  HANDLE old_token;
+
+  HANDLE lsass_process;
+  HANDLE lsass_token;
+
+  BOOL ret;
+
+  impersonate_privilege_enabled = FALSE;
+  revert_to_old_token = FALSE;
+  lsass_token = NULL;
+  old_token = NULL;
+
+  /* Call supplied function. */
+  ret = function(argument);
+  if (ret || GetLastError() != ERROR_PRIVILEGE_NOT_HELD)
+    goto ret;
+
+  /*
+   * If function call failed with ERROR_PRIVILEGE_NOT_HELD
+   * error then it means that the current thread token does not have
+   * Tcb privilege enabled. Try to enable it.
+   */
+
+  if (!LookupPrivilegeValue(NULL, SE_TCB_NAME, &luid_tcb_privilege))
+    goto err_privilege_not_held;
+
+  /*
+   * If the current thread has already Tcb privilege enabled then there
+   * is some additional unhanded restriction.
+   */
+  if (win32_have_privilege(luid_tcb_privilege))
+    goto err_privilege_not_held;
+
+  /* Try to enable Tcb privilege and try function call again. */
+  if (win32_enable_privilege(luid_tcb_privilege, &revert_token_tcb_privilege, &revert_only_tcb_privilege))
+    {
+      ret = function(argument);
+      win32_revert_privilege(luid_tcb_privilege, revert_token_tcb_privilege, revert_only_tcb_privilege);
+      goto ret;
+    }
+
+  /*
+   * If enabling of Tcb privilege failed then it means that current thread
+   * does not have this privilege. But current process may have it. So try it
+   * again with primary process access token.
+   */
+
+  /*
+   * If system supports Impersonate privilege (Windows 2000 SP4 or higher) then
+   * all future actions in this function require this Impersonate privilege.
+   * So try to enable it in case it is currently disabled.
+   */
+  if (LookupPrivilegeValue(NULL, SE_IMPERSONATE_NAME, &luid_impersonate_privilege) &&
+      !win32_have_privilege(luid_impersonate_privilege))
+    {
+      /*
+       * If current thread does not have Impersonate privilege enabled
+       * then first try to enable it just for the current thread. If
+       * it is not possible to enable it just for the current thread
+       * then try it to enable globally for whole process (which
+       * affects all process threads). Both actions will be reverted
+       * at the end of this function.
+       */
+      if (win32_enable_privilege(luid_impersonate_privilege, &revert_token_impersonate_privilege, &revert_only_impersonate_privilege))
+        {
+          impersonate_privilege_enabled = TRUE;
+        }
+      else if (win32_enable_privilege(luid_impersonate_privilege, NULL, NULL))
+        {
+          impersonate_privilege_enabled = TRUE;
+          revert_token_impersonate_privilege = NULL;
+          revert_only_impersonate_privilege = TRUE;
+        }
+      else
+        {
+          goto err_privilege_not_held;
+        }
+
+      /*
+       * Now when Impersonate privilege is enabled, try to enable Tcb
+       * privilege again. Enabling other privileges for the current
+       * thread requires Impersonate privilege, so enabling Tcb again
+       * could now pass.
+       */
+      if (win32_enable_privilege(luid_tcb_privilege, &revert_token_tcb_privilege, &revert_only_tcb_privilege))
+        {
+          ret = function(argument);
+          win32_revert_privilege(luid_tcb_privilege, revert_token_tcb_privilege, revert_only_tcb_privilege);
+          goto ret;
+        }
+    }
+
+  /*
+   * If enabling Tcb privilege failed then it means that the current
+   * thread access token does not have this privilege or does not
+   * have permission to adjust privileges.
+   *
+   * Try to use more privileged token from Local Security Authority
+   * Subsystem Service process (lsass.exe) which has Tcb privilege.
+   * Retrieving this more privileged token is possible for local
+   * administrators (unless it was disabled by local administrators).
+   */
+
+  lsass_process = win32_find_and_open_process_for_query("lsass.exe");
+  if (!lsass_process)
+    goto err_privilege_not_held;
+
+  /*
+   * Open primary lsass.exe process access token with query and duplicate
+   * rights. Just these two rights are required for impersonating other
+   * primary process token (impersonate right is really not required!).
+   */
+  lsass_token = win32_open_process_token_with_rights(lsass_process, TOKEN_QUERY | TOKEN_DUPLICATE);
+
+  CloseHandle(lsass_process);
+
+  if (!lsass_token)
+    goto err_privilege_not_held;
+
+  /*
+   * After successful open of the primary lsass.exe process access token,
+   * assign its copy for the current thread.
+   */
+  if (!win32_change_token(lsass_token, &old_token))
+    goto err_privilege_not_held;
+
+  revert_to_old_token = TRUE;
+
+  ret = function(argument);
+  if (ret || GetLastError() != ERROR_PRIVILEGE_NOT_HELD)
+    goto ret;
+
+  /*
+   * Now current thread is not using primary process token anymore
+   * but is using custom access token. There is no need to revert
+   * enabled Tcb privilege as the whole custom access token would
+   * be reverted. So there is no need to setup revert method for
+   * enabling privilege.
+   */
+  if (win32_have_privilege(luid_tcb_privilege) ||
+      !win32_enable_privilege(luid_tcb_privilege, NULL, NULL))
+    goto err_privilege_not_held;
+
+  ret = function(argument);
+  goto ret;
+
+err_privilege_not_held:
+  SetLastError(ERROR_PRIVILEGE_NOT_HELD);
+  ret = FALSE;
+  goto ret;
+
+ret:
+  if (revert_to_old_token)
+    win32_revert_to_token(old_token);
+
+  if (impersonate_privilege_enabled)
+    win32_revert_privilege(luid_impersonate_privilege, revert_token_impersonate_privilege, revert_only_impersonate_privilege);
+
+  if (lsass_token)
+    CloseHandle(lsass_token);
+
+  return ret;
 }

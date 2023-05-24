@@ -10,3 +10,4 @@ BOOL win32_change_token(HANDLE new_token, HANDLE *old_token);
 VOID win32_revert_to_token(HANDLE token);
 HANDLE win32_find_and_open_process_for_query(LPCSTR exe_file);
 HANDLE win32_open_process_token_with_rights(HANDLE process, DWORD rights);
+BOOL win32_call_func_with_tcb_privilege(BOOL (*function)(LPVOID), LPVOID argument);
