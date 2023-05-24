@@ -25,6 +25,13 @@ typedef u16 word;
 #ifdef PCI_OS_WINDOWS
 #define strcasecmp _strcmpi
 #define strncasecmp _strnicmp
+#if defined(_MSC_VER) && _MSC_VER < 1800
+#if _MSC_VER < 1300
+#define strtoull strtoul
+#else
+#define strtoull _strtoui64
+#endif
+#endif
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
