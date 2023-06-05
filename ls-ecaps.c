@@ -950,17 +950,33 @@ dvsec_cxl_gpf_port(struct device *d, int where)
 }
 
 static void
-dvsec_cxl_flex_bus(struct device *d, int where, int rev)
+dvsec_cxl_flex_bus(struct device *d, int where, int rev, int len)
 {
   u16 w;
   u32 l, data;
 
-  if (rev < 1)
-  {
-    printf("\t\tRevision %d not supported\n", rev);
-    return;
+  // Sanity check: Does the length correspond to its revision?
+  switch (rev) {
+    case 0:
+      if (len != PCI_CXL_FB_MOD_TS_DATA) {
+        printf("\t\t<Wrong length for Revision %d>\n", rev);
+      }
+      break;
+    case 1:
+      if (len != PCI_CXL_FB_PORT_CAP2) {
+        printf("\t\t<Wrong length for Revision %d>\n", rev);
+      }
+      break;
+    case 2:
+      if (len != PCI_CXL_FB_NEXT_UNSUPPORTED) {
+        printf("\t\t<Wrong length for Revision %d>\n", rev);
+      }
+      break;
+    default:
+      break;
   }
 
+  // From Rev 0
   w = get_conf_word(d, where + PCI_CXL_FB_PORT_CAP);
   printf("\t\tFBCap:\tCache%c IO%c Mem%c 68BFlit%c MltLogDev%c",
       FLAG(w, PCI_CXL_FB_CAP_CACHE), FLAG(w, PCI_CXL_FB_CAP_IO),
@@ -993,12 +1009,18 @@ dvsec_cxl_flex_bus(struct device *d, int where, int rev)
   if (rev > 1)
     printf(" 256BFlit%c PBRFlit%c",
         FLAG(w, PCI_CXL_FB_STAT_256B_FLIT), FLAG(w, PCI_CXL_FB_STAT_PBR_FLIT));
+  printf("\n");
 
-  l = get_conf_long(d, where + PCI_CXL_FB_MOD_TS_DATA);
-  data = BITS(l, 0, 24);
-  printf("\n\t\tFBModTS:\tReceived FB Data: %06x\n", (unsigned int)data);
+  // From Rev 1
+  if (rev >= 1)
+  {
+    l = get_conf_long(d, where + PCI_CXL_FB_MOD_TS_DATA);
+    data = BITS(l, 0, 24);
+    printf("\t\tFBModTS:\tReceived FB Data: %06x\n", (unsigned int)data);
+  }
 
-  if (rev > 1)
+  // From Rev 2
+  if (rev >= 2)
   {
     u8 nop;
 
@@ -1011,7 +1033,12 @@ dvsec_cxl_flex_bus(struct device *d, int where, int rev)
     l = get_conf_long(d, where + PCI_CXL_FB_PORT_STATUS2);
     nop = BITS(l, 0, 2);
     printf("\t\tFBSta2:\tNOPHintInfo: %x\n", nop);
-    }
+  }
+
+  // Unparsed data
+  if (len > PCI_CXL_FB_LEN) {
+    printf("\t\t<?>\n");
+  }
 }
 
 static void
@@ -1068,28 +1095,39 @@ cap_dvsec_cxl(struct device *d, int id, int rev, int where, int len)
   switch (id)
     {
     case 0:
+      printf("\t\tPCIe DVSEC for CXL Devices\n");
       dvsec_cxl_device(d, rev, where, len);
       break;
     case 2:
+      printf("\t\tNon-CXL Function Map DVSEC\n");
       dvsec_cxl_function_map(d, where);
       break;
     case 3:
+      printf("\t\tCXL Extensions DVSEC for Ports\n");
       dvsec_cxl_port(d, where, len);
       break;
     case 4:
+      printf("\t\tGPF DVSEC for CXL Ports\n");
       dvsec_cxl_gpf_port(d, where);
       break;
     case 5:
+      printf("\t\tGPF DVSEC for CXL Devices\n");
       dvsec_cxl_gpf_device(d, where);
       break;
     case 7:
-      dvsec_cxl_flex_bus(d, where, rev);
+      printf("\t\tPCIe DVSEC for Flex Bus Port\n");
+      dvsec_cxl_flex_bus(d, where, rev, len);
       break;
     case 8:
+      printf("\t\tRegister Locator DVSEC\n");
       dvsec_cxl_register_locator(d, where, len);
       break;
     case 9:
+      printf("\t\tMLD DVSEC\n");
       dvsec_cxl_mld(d, where);
+      break;
+    case 0xa:
+      printf("\t\tPCIe DVSEC for Test Capability <?>\n");
       break;
     default:
       printf("\t\tUnknown ID %04x\n", id);

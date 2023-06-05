@@ -1192,6 +1192,7 @@
 #define PCI_CXL_FB_PORT_CTRL2               0x18    /* CXL Flex Bus Port Control2 Register */
 #define  PCI_CXL_FB_CTRL2_NOP_HINT          0x01    /* NOP Hint Enable */
 #define PCI_CXL_FB_PORT_STATUS2             0x1c    /* CXL Flex Bus Port Status2 Register */
+#define PCI_CXL_FB_NEXT_UNSUPPORTED         0x20
 
 /* PCIe CXL Designated Vendor-Specific Capabilities for Multi-Logical Device */
 #define PCI_CXL_MLD_LEN     0x10
