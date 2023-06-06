@@ -1069,7 +1069,7 @@
 #define PCI_DVSEC_ID_CXL	0	/* Designated Vendor-Specific ID for Intel CXL */
 
 /* PCIe CXL Designated Vendor-Specific Capabilities for Devices: Control, Status */
-#define PCI_CXL_DEV_LEN 0x38 /* CXL Device DVSEC Length */
+#define PCI_CXL_DEV_LEN 0x3c /* CXL Device DVSEC Length */
 #define PCI_CXL_DEV_CAP			0x0a	/* CXL Capability Register */
 #define  PCI_CXL_DEV_CAP_CACHE		0x0001	/* CXL.cache Protocol Support */
 #define  PCI_CXL_DEV_CAP_IO		0x0002	/* CXL.io Protocol Support */
@@ -1087,6 +1087,12 @@
 #define  PCI_CXL_DEV_CTRL_VIRAL		0x4000	/* CXL Viral Handling Enable */
 #define PCI_CXL_DEV_STATUS		0x0e	/* CXL Status Register */
 #define  PCI_CXL_DEV_STATUS_VIRAL	0x4000	/* CXL Viral Handling Status */
+#define PCI_CXL_DEV_CTRL2		0x10	/* CXL Control Register 2 */
+#define  PCI_CXL_DEV_CTRL2_DISABLE_CACHING            0x0001
+#define  PCI_CXL_DEV_CTRL2_INIT_WB_INVAL              0x0002
+#define  PCI_CXL_DEV_CTRL2_INIT_CXL_RST               0x0003
+#define  PCI_CXL_DEV_CTRL2_INIT_CXL_RST_CLR_EN        0x0004
+#define  PCI_CXL_DEV_CTRL2_INIT_CXL_HDM_STATE_HOTRST  0x0005
 #define PCI_CXL_DEV_STATUS2		0x12
 #define  PCI_CXL_DEV_STATUS_CACHE_INV	0x0001
 #define  PCI_CXL_DEV_STATUS_RC		0x0002  /* Device Reset Complete */
@@ -1110,6 +1116,13 @@
 #define PCI_CXL_DEV_RANGE2_SIZE_LO	0x2c
 #define PCI_CXL_DEV_RANGE2_BASE_HI	0x30
 #define PCI_CXL_DEV_RANGE2_BASE_LO	0x34
+/* From Rev2 */
+#define PCI_CXL_DEV_CAP3  0x38
+#define  PCI_CXL_DEV_CAP3_HDM_STATE_RST_COLD     0x0001
+#define  PCI_CXL_DEV_CAP3_HDM_STATE_RST_WARM     0x0002
+#define  PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT      0x0003
+#define  PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT_CFG  0x0004
+
 
 /* PCIe CXL 2.0 Designated Vendor-Specific Capabilities for Ports */
 #define PCI_CXL_PORT_EXT_LEN 0x28 /* CXL Extensions DVSEC for Ports Length */
