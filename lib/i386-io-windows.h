@@ -592,12 +592,14 @@ grant_process_token_dacl_permissions(HANDLE process, DWORD permissions, HANDLE *
 
   if (MySetSecurityInfo(*token, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, new_dacl, NULL) != ERROR_SUCCESS)
     {
+      LocalFree(new_dacl);
       LocalFree(*security_descriptor);
       LocalFree(owner);
       CloseHandle(*token);
       return FALSE;
     }
 
+  LocalFree(new_dacl);
   LocalFree(owner);
   return TRUE;
 }
