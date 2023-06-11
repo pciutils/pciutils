@@ -714,7 +714,7 @@ retry_subname:
             {
               error = GetLastError();
               if (error == 0)
-                a->warning("Cannot read driver %s key for PCI device %s: DevLoader key is stored as unknown type 0x%lx.", subname, devinst_id, unkn_reg_type);
+                a->warning("Cannot read driver %s key for PCI device %s: %s key is stored as unknown type 0x%lx.", subname, devinst_id, subname, unkn_reg_type);
               else if (error != ERROR_FILE_NOT_FOUND)
                 a->warning("Cannot read driver %s key for PCI device %s: %s.", subname, devinst_id, win32_strerror(error));
               else if (strcmp(subname, "minivdd") == 0)
