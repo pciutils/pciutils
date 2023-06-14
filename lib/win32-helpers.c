@@ -9,7 +9,7 @@
  */
 
 #include <windows.h>
-#include <aclapi.h>
+
 #include <stdio.h> /* for sprintf() */
 
 #include "win32-helpers.h"
@@ -22,6 +22,20 @@
 /* Unfortunately some toolchains do not provide this constant. */
 #ifndef SE_IMPERSONATE_NAME
 #define SE_IMPERSONATE_NAME TEXT("SeImpersonatePrivilege")
+#endif
+
+/* Unfortunately some toolchains do not provide these constants. */
+#ifndef SE_DACL_AUTO_INHERIT_REQ
+#define SE_DACL_AUTO_INHERIT_REQ 0x0100
+#endif
+#ifndef SE_SACL_AUTO_INHERIT_REQ
+#define SE_SACL_AUTO_INHERIT_REQ 0x0200
+#endif
+#ifndef SE_DACL_AUTO_INHERITED
+#define SE_DACL_AUTO_INHERITED 0x0400
+#endif
+#ifndef SE_SACL_AUTO_INHERITED
+#define SE_SACL_AUTO_INHERITED 0x0800
 #endif
 
 /*
@@ -37,12 +51,10 @@ typedef DWORD (WINAPI *GetProcessImageFileNameWProt)(HANDLE hProcess, LPWSTR lpI
 typedef DWORD (WINAPI *GetModuleFileNameExWProt)(HANDLE hProcess, HMODULE hModule, LPWSTR lpImageFileName, DWORD nSize);
 
 /*
- * These aclapi functions are available in advapi.dll library on Windows NT 4.0
+ * These aclapi function is available in advapi.dll library on Windows 2000
  * and higher systems.
  */
-typedef DWORD (WINAPI *GetSecurityInfoProt)(HANDLE handle, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID *ppsidOwner, PSID *ppsidGroup, PACL *ppDacl, PACL *ppSacl, PSECURITY_DESCRIPTOR *ppSecurityDescriptor);
-typedef DWORD (WINAPI *SetSecurityInfoProt)(HANDLE handle, SE_OBJECT_TYPE ObjectType, SECURITY_INFORMATION SecurityInfo, PSID psidOwner, PSID psidGroup, PACL pDacl, PACL pSacl);
-typedef DWORD (WINAPI *SetEntriesInAclProt)(ULONG cCountOfExplicitEntries, PEXPLICIT_ACCESS pListOfExplicitEntries, PACL OldAcl, PACL *NewAcl);
+typedef BOOL (WINAPI *SetSecurityDescriptorControlProt)(PSECURITY_DESCRIPTOR pSecurityDescriptor, SECURITY_DESCRIPTOR_CONTROL ControlBitsOfInterest, SECURITY_DESCRIPTOR_CONTROL ControlBitsToSet);
 
 /*
  * This errhandlingapi function is available in kernel32.dll library on
@@ -466,40 +478,138 @@ retry:
 }
 
 /*
+ * Create a new security descriptor in absolute form from relative form.
+ * Newly created security descriptor in absolute form is stored in linear buffer.
+ */
+static PSECURITY_DESCRIPTOR
+create_relsd_from_abssd(PSECURITY_DESCRIPTOR rel_security_descriptor)
+{
+  PBYTE abs_security_descriptor_buffer;
+  DWORD abs_security_descriptor_size=0, abs_dacl_size=0, abs_sacl_size=0, abs_owner_size=0, abs_primary_group_size=0;
+
+  if (!MakeAbsoluteSD(rel_security_descriptor,
+        NULL, &abs_security_descriptor_size,
+        NULL, &abs_dacl_size,
+        NULL, &abs_sacl_size,
+        NULL, &abs_owner_size,
+        NULL, &abs_primary_group_size) && GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    return NULL;
+
+  abs_security_descriptor_buffer = (PBYTE)LocalAlloc(LPTR, abs_security_descriptor_size+abs_dacl_size+abs_sacl_size+abs_owner_size+abs_primary_group_size);
+  if (!abs_security_descriptor_buffer)
+    return NULL;
+
+  if (!MakeAbsoluteSD(rel_security_descriptor,
+        (PSECURITY_DESCRIPTOR)abs_security_descriptor_buffer, &abs_security_descriptor_size,
+        (PACL)(abs_security_descriptor_buffer+abs_security_descriptor_size), &abs_dacl_size,
+        (PACL)(abs_security_descriptor_buffer+abs_security_descriptor_size+abs_dacl_size), &abs_sacl_size,
+        (PSID)(abs_security_descriptor_buffer+abs_security_descriptor_size+abs_dacl_size+abs_sacl_size), &abs_owner_size,
+        (PSID)(abs_security_descriptor_buffer+abs_security_descriptor_size+abs_dacl_size+abs_sacl_size+abs_owner_size), &abs_primary_group_size))
+    return NULL;
+
+  return (PSECURITY_DESCRIPTOR)abs_security_descriptor_buffer;
+}
+
+/*
+ * Prepare security descriptor obtained by GetKernelObjectSecurity() so it can be
+ * passed to SetKernelObjectSecurity() as identity operation. It modifies control
+ * flags of security descriptor, which is needed for Windows 2000 and new.
+ */
+static BOOL
+prepare_security_descriptor_for_set_operation(PSECURITY_DESCRIPTOR security_descriptor)
+{
+  SetSecurityDescriptorControlProt MySetSecurityDescriptorControl;
+  SECURITY_DESCRIPTOR_CONTROL bits_mask;
+  SECURITY_DESCRIPTOR_CONTROL bits_set;
+  SECURITY_DESCRIPTOR_CONTROL control;
+  OSVERSIONINFO version;
+  HMODULE advapi32;
+  DWORD revision;
+
+  /*
+   * SE_DACL_AUTO_INHERITED and SE_SACL_AUTO_INHERITED are flags introduced in
+   * Windows 2000 to control client-side automatic inheritance (client - user
+   * process - is responsible for propagating inherited ACEs to subobjects).
+   * To prevent applications which do not understand client-side automatic
+   * inheritance (applications created prior Windows 2000 or which use low
+   * level API like SetKernelObjectSecurity()) to unintentionally set those
+   * SE_DACL_AUTO_INHERITED and SE_SACL_AUTO_INHERITED control flags when
+   * coping them from other security descriptor.
+   *
+   * As we are not modifying existing ACEs, we are compatible with Windows 2000
+   * client-side automatic inheritance model and therefore prepare security
+   * descriptor for SetKernelObjectSecurity() to not clear existing automatic
+   * inheritance control flags.
+   *
+   * Control flags SE_DACL_AUTO_INHERITED and SE_SACL_AUTO_INHERITED are set
+   * into security object only when they are set together with set-only flags
+   * SE_DACL_AUTO_INHERIT_REQ and SE_SACL_AUTO_INHERIT_REQ. Those flags are
+   * never received by GetKernelObjectSecurity() and are just commands for
+   * SetKernelObjectSecurity() how to interpret SE_DACL_AUTO_INHERITED and
+   * SE_SACL_AUTO_INHERITED flags.
+   *
+   * Function symbol SetSecurityDescriptorControl is not available in the
+   * older versions of advapi32.dll library, so resolve it at runtime.
+   */
+
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (!GetVersionEx(&version) ||
+      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
+      version.dwMajorVersion < 5)
+    return TRUE;
+
+  if (!GetSecurityDescriptorControl(security_descriptor, &control, &revision))
+    return FALSE;
+
+  bits_mask = 0;
+  bits_set = 0;
+
+  if (control & SE_DACL_AUTO_INHERITED)
+    {
+      bits_mask |= SE_DACL_AUTO_INHERIT_REQ;
+      bits_set |= SE_DACL_AUTO_INHERIT_REQ;
+    }
+
+  if (control & SE_SACL_AUTO_INHERITED)
+    {
+      bits_mask |= SE_SACL_AUTO_INHERIT_REQ;
+      bits_set |= SE_SACL_AUTO_INHERIT_REQ;
+    }
+
+  if (!bits_mask)
+    return TRUE;
+
+  advapi32 = GetModuleHandle(TEXT("advapi32.dll"));
+  if (!advapi32)
+    return FALSE;
+
+  MySetSecurityDescriptorControl = (SetSecurityDescriptorControlProt)(LPVOID)GetProcAddress(advapi32, "SetSecurityDescriptorControl");
+  if (!MySetSecurityDescriptorControl)
+    return FALSE;
+
+  if (!MySetSecurityDescriptorControl(security_descriptor, bits_mask, bits_set))
+    return FALSE;
+
+  return TRUE;
+}
+
+/*
  * Grant particular permissions in the primary access token of the specified
  * process for the owner of current thread token and set old DACL of the
  * process access token for reverting permissions. Security descriptor is
  * just memory buffer for old DACL.
  */
 static BOOL
-grant_process_token_dacl_permissions(HANDLE process, DWORD permissions, HANDLE *token, PACL *old_dacl, PSECURITY_DESCRIPTOR *security_descriptor)
+grant_process_token_dacl_permissions(HANDLE process, DWORD permissions, HANDLE *token, PSECURITY_DESCRIPTOR *old_security_descriptor)
 {
-  GetSecurityInfoProt MyGetSecurityInfo;
-  SetSecurityInfoProt MySetSecurityInfo;
-  SetEntriesInAclProt MySetEntriesInAcl;
-  EXPLICIT_ACCESS explicit_access;
   TOKEN_OWNER *owner;
-  HMODULE advapi32;
+  PACL old_dacl;
+  BOOL old_dacl_present;
+  BOOL old_dacl_defaulted;
   PACL new_dacl;
-
-  /*
-   * This source file already uses advapi32.dll library, so it is
-   * linked to executable and automatically loaded when starting
-   * current running process.
-   */
-  advapi32 = GetModuleHandle(TEXT("advapi32.dll"));
-  if (!advapi32)
-    return FALSE;
-
-  /*
-   * It does not matter if SetEntriesInAclA() or SetEntriesInAclW() is
-   * called as no string is passed to SetEntriesInAcl function.
-   */
-  MyGetSecurityInfo = (GetSecurityInfoProt)(LPVOID)GetProcAddress(advapi32, "GetSecurityInfo");
-  MySetSecurityInfo = (SetSecurityInfoProt)(LPVOID)GetProcAddress(advapi32, "SetSecurityInfo");
-  MySetEntriesInAcl = (SetEntriesInAclProt)(LPVOID)GetProcAddress(advapi32, "SetEntriesInAclA");
-  if (!MyGetSecurityInfo || !MySetSecurityInfo || !MySetEntriesInAcl)
-    return FALSE;
+  WORD new_dacl_size;
+  PSECURITY_DESCRIPTOR new_security_descriptor;
+  DWORD length;
 
   owner = get_current_token_owner();
   if (!owner)
@@ -515,48 +625,153 @@ grant_process_token_dacl_permissions(HANDLE process, DWORD permissions, HANDLE *
       return FALSE;
     }
 
-  if (MyGetSecurityInfo(*token, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, old_dacl, NULL, security_descriptor) != ERROR_SUCCESS)
+  if (!GetKernelObjectSecurity(*token, DACL_SECURITY_INFORMATION, NULL, 0, &length) && GetLastError() != ERROR_INSUFFICIENT_BUFFER)
     {
       LocalFree(owner);
       CloseHandle(*token);
       return FALSE;
     }
 
+retry:
+  *old_security_descriptor = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR, length);
+  if (!*old_security_descriptor)
+    {
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  if (!GetKernelObjectSecurity(*token, DACL_SECURITY_INFORMATION, *old_security_descriptor, length, &length))
+    {
+      /*
+       * Length of the security descriptor between two get calls
+       * may changes (e.g. by another thread of process), so retry.
+       */
+      if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+          LocalFree(*old_security_descriptor);
+          goto retry;
+        }
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  if (!prepare_security_descriptor_for_set_operation(*old_security_descriptor))
+    {
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  /* Retrieve the current DACL from security descriptor including present and defaulted properties. */
+  if (!GetSecurityDescriptorDacl(*old_security_descriptor, &old_dacl_present, &old_dacl, &old_dacl_defaulted))
+    {
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
   /*
+   * If DACL is not present then system grants full access to everyone. It this
+   * case do not modify DACL as it just adds one ACL allow rule for us, which
+   * automatically disallow access to anybody else which had access before.
+   */
+  if (!old_dacl_present || !old_dacl)
+    {
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      *old_security_descriptor = NULL;
+      return TRUE;
+    }
+
+  /* Create new DACL which would be copy of the current old one. */
+  new_dacl_size = old_dacl->AclSize + sizeof(ACCESS_ALLOWED_ACE) + GetLengthSid(owner->Owner) - sizeof(DWORD);
+  new_dacl = (PACL)LocalAlloc(LPTR, new_dacl_size);
+  if (!new_dacl)
+    {
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  /*
+   * Initialize new DACL structure to the same format as was the old one.
    * Set new explicit access for the owner of the current thread access
    * token with non-inherited granting access to specified permissions.
+   * This permission is added in the first ACE, so has the highest priority.
    */
-  explicit_access.grfAccessPermissions = permissions;
-  explicit_access.grfAccessMode = GRANT_ACCESS;
-  explicit_access.grfInheritance = NO_PROPAGATE_INHERIT_ACE;
-  explicit_access.Trustee.pMultipleTrustee = NULL;
-  explicit_access.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
-  explicit_access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-  explicit_access.Trustee.TrusteeType = TRUSTEE_IS_USER;
-  /*
-   * Unfortunately i586-mingw32msvc toolchain does not have pSid pointer
-   * member in Trustee union. So assign owner SID to ptstrName pointer
-   * member which aliases with pSid pointer member in the same union.
-   */
-  explicit_access.Trustee.ptstrName = (PVOID)owner->Owner;
-
-  if (MySetEntriesInAcl(1, &explicit_access, *old_dacl, &new_dacl) != ERROR_SUCCESS)
-    {
-      LocalFree(*security_descriptor);
-      LocalFree(owner);
-      CloseHandle(*token);
-      return FALSE;
-    }
-
-  if (MySetSecurityInfo(*token, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, new_dacl, NULL) != ERROR_SUCCESS)
+  if (!InitializeAcl(new_dacl, new_dacl_size, old_dacl->AclRevision) ||
+      !AddAccessAllowedAce(new_dacl, ACL_REVISION2, permissions, owner->Owner))
     {
       LocalFree(new_dacl);
-      LocalFree(*security_descriptor);
+      LocalFree(*old_security_descriptor);
       LocalFree(owner);
       CloseHandle(*token);
       return FALSE;
     }
 
+  /*
+   * Now (after setting our new permissions) append all ACE entries from the
+   * old DACL to the new DACL, which preserve all other existing permissions.
+   */
+  if (old_dacl->AceCount > 0)
+    {
+      WORD ace_index;
+      LPVOID ace;
+
+      for (ace_index = 0; ace_index < old_dacl->AceCount; ace_index++)
+        {
+          if (!GetAce(old_dacl, ace_index, &ace) ||
+              !AddAce(new_dacl, old_dacl->AclRevision, MAXDWORD, ace, ((PACE_HEADER)ace)->AceSize))
+            {
+              LocalFree(new_dacl);
+              LocalFree(*old_security_descriptor);
+              LocalFree(owner);
+              CloseHandle(*token);
+              return FALSE;
+            }
+        }
+    }
+
+  /*
+   * Create copy of the old security descriptor, so we can modify its DACL.
+   * Function SetSecurityDescriptorDacl() works only with security descriptors
+   * in absolute format. So use our helper function create_relsd_from_abssd()
+   * for converting security descriptor from relative format (which is returned
+   * by GetKernelObjectSecurity() function) to the absolute format.
+   */
+  new_security_descriptor = create_relsd_from_abssd(*old_security_descriptor);
+  if (!new_security_descriptor)
+    {
+      LocalFree(new_dacl);
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  /*
+   * In the new security descriptor replace old DACL by the new DACL (which has
+   * new permissions) and then set this new security descriptor to the token,
+   * so token would have new access permissions.
+   */
+  if (!SetSecurityDescriptorDacl(new_security_descriptor, TRUE, new_dacl, FALSE) ||
+      !SetKernelObjectSecurity(*token, DACL_SECURITY_INFORMATION, new_security_descriptor))
+    {
+      LocalFree(new_security_descriptor);
+      LocalFree(new_dacl);
+      LocalFree(*old_security_descriptor);
+      LocalFree(owner);
+      CloseHandle(*token);
+      return FALSE;
+    }
+
+  LocalFree(new_security_descriptor);
   LocalFree(new_dacl);
   LocalFree(owner);
   return TRUE;
@@ -567,24 +782,10 @@ grant_process_token_dacl_permissions(HANDLE process, DWORD permissions, HANDLE *
  * grant_process_token_dacl_permissions() call.
  */
 static VOID
-revert_token_dacl_permissions(HANDLE token, PACL old_dacl, PSECURITY_DESCRIPTOR security_descriptor)
+revert_token_dacl_permissions(HANDLE token, PSECURITY_DESCRIPTOR old_security_descriptor)
 {
-  SetSecurityInfoProt MySetSecurityInfo;
-  HMODULE advapi32;
-
-  /*
-   * This source file already uses advapi32.dll library, so it is
-   * linked to executable and automatically loaded when starting
-   * current running process.
-   */
-  advapi32 = GetModuleHandle(TEXT("advapi32.dll"));
-  if (advapi32)
-    {
-      MySetSecurityInfo = (SetSecurityInfoProt)(LPVOID)GetProcAddress(advapi32, "SetSecurityInfo");
-      MySetSecurityInfo(token, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, old_dacl, NULL);
-    }
-
-  LocalFree(security_descriptor);
+  SetKernelObjectSecurity(token, DACL_SECURITY_INFORMATION, old_security_descriptor);
+  LocalFree(old_security_descriptor);
   CloseHandle(token);
 }
 
@@ -896,9 +1097,8 @@ end_path:
 static HANDLE
 try_grant_permissions_and_open_process_token(HANDLE process, DWORD rights)
 {
-  PSECURITY_DESCRIPTOR security_descriptor;
+  PSECURITY_DESCRIPTOR old_security_descriptor;
   HANDLE grant_token;
-  PACL old_dacl;
   HANDLE token;
   DWORD retry;
   DWORD error;
@@ -910,14 +1110,15 @@ try_grant_permissions_and_open_process_token(HANDLE process, DWORD rights)
    */
   for (retry = 0; retry < 10; retry++)
     {
-      if (!grant_process_token_dacl_permissions(process, rights, &grant_token, &old_dacl, &security_descriptor))
+      if (!grant_process_token_dacl_permissions(process, rights, &grant_token, &old_security_descriptor))
         return NULL;
       if (!OpenProcessToken(process, rights, &token))
         {
           token = NULL;
           error = GetLastError();
         }
-      revert_token_dacl_permissions(grant_token, old_dacl, security_descriptor);
+      if (old_security_descriptor)
+        revert_token_dacl_permissions(grant_token, old_security_descriptor);
       if (token)
         return token;
       else if (error != ERROR_ACCESS_DENIED)
