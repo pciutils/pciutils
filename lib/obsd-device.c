@@ -3,7 +3,9 @@
  *
  *	Adapted from fbsd-device.c by Matthieu Herrb <matthieu.herrb@laas.fr>, 2006
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <fcntl.h>

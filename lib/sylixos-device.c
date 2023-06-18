@@ -1,9 +1,11 @@
 /*
- *  The PCI Library -- Direct Configuration access via SylixOS Ports
+ *	The PCI Library -- Direct Configuration access via SylixOS Ports
  *
- *  Copyright (c) 2018 YuJian.Gong <gongyujian@acoinfo.com>
+ *	Copyright (c) 2018 YuJian.Gong <gongyujian@acoinfo.com>
  *
- *  Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #define _GNU_SOURCE

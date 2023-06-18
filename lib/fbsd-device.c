@@ -5,7 +5,9 @@
  *	Updated in 2003 by Samy Al Bahra <samy@kerneled.com>
  *	Updated in 2017 by Imre Vadász <imrevdsz@gmail.com>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <errno.h>

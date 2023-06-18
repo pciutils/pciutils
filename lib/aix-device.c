@@ -3,7 +3,9 @@
  *
  *	Copyright (c) 1999 Jari Kirma <kirma@cs.hut.fi>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 /*

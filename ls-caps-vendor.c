@@ -3,7 +3,9 @@
  *
  *	Copyright (c) 2014 Gerd Hoffmann <kraxel@redhat.com>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <stdio.h>

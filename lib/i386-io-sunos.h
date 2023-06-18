@@ -4,7 +4,9 @@
  *	Copyright (c) 2003 Bill Moore <billm@eng.sun.com>
  *	Copyright (c) 2003--2006 Martin Mares <mj@ucw.cz>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <sys/sysi86.h>

@@ -3,7 +3,9 @@
  *
  *	Copyright (c) 2010, 2017 Rudolf Marek <r.marek@assembler.cz>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <pc.h>

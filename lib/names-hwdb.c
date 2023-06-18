@@ -4,7 +4,9 @@
  *	Copyright (c) 2013--2014 Tom Gundersen <teg@jklm.no>
  *	Copyright (c) 2014 Martin Mares <mj@ucw.cz>
  *
- *	Can be freely distributed and used under the terms of the GNU GPL.
+ *	Can be freely distributed and used under the terms of the GNU GPL v2+.
+ *
+ *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include <string.h>
