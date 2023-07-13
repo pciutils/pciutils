@@ -1393,6 +1393,12 @@
 #define  PCI_DOE_STS_INT		0x2	/* DOE Interrupt Status */
 #define  PCI_DOE_STS_ERROR		0x3	/* DOE Error */
 #define  PCI_DOE_STS_OBJECT_READY	0x80000000 /* Data Object Ready */
+#define PCI_DOE_WRITE_MAILBOX		0x10	/* DOE Write Data Mailbox Register */
+#define PCI_DOE_READ_MAILBOX		0x14	/* DOE Read Data Mailbox Register */
+
+#define PCI_DOE_DISCOVERY_RESPONSE_VENDOR_ID	0xFFFF
+#define PCI_DOE_DISCOVERY_RESPONSE_OBJ_PROTOCOL	0xFF0000
+#define PCI_DOE_DISCOVERY_RESPONSE_NEXT_INDX	0xFF000000
 
 /*
  * The PCI interface treats multi-function devices as independent

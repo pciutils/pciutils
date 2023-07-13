@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "lspci.h"
 
@@ -1375,6 +1376,77 @@ cap_rebar(struct device *d, int where, int virtual)
 }
 
 static void
+doe_discovery(struct device *d, int where)
+{
+  u32 l, index = 0, dop;
+
+  while (true) {
+    // header1
+    //  VendorID = 0x01
+    //  Data Object Type = 0x00
+    pci_write_long(d->dev, where + PCI_DOE_WRITE_MAILBOX, 0x00000001);
+
+    // header2
+    //  Length = 0x03
+    pci_write_long(d->dev, where + PCI_DOE_WRITE_MAILBOX, 0x00000003);
+
+    // dword0
+    //  DWORD = index
+    pci_write_long(d->dev, where + PCI_DOE_WRITE_MAILBOX, index);
+
+    pci_write_long(d->dev, where + PCI_DOE_CTL, PCI_DOE_CTL_GO);
+
+    while (pci_read_long(d->dev, where + PCI_DOE_STS) & PCI_DOE_STS_OBJECT_READY != 0x00) {
+      if ((pci_read_long(d->dev, where + PCI_DOE_STS) & PCI_DOE_STS_ERROR) == PCI_DOE_STS_ERROR) {
+        return;
+      }
+    }
+
+    l = pci_read_long(d->dev, where + PCI_DOE_READ_MAILBOX);
+    pci_write_long(d->dev, where + PCI_DOE_READ_MAILBOX, 0xDEADBEEF);
+    if (l != 0x01) {
+      break;
+    }
+
+    l = pci_read_long(d->dev, where + PCI_DOE_READ_MAILBOX);
+    pci_write_long(d->dev, where + PCI_DOE_READ_MAILBOX, 0xDEADBEEF);
+    if (l != 0x03) {
+      break;
+    }
+
+    // DOE discovery response data object
+    l = pci_read_long(d->dev, where + PCI_DOE_READ_MAILBOX);
+    pci_write_long(d->dev, where + PCI_DOE_READ_MAILBOX, 0xDEADBEEF);
+
+    if ((l & PCI_DOE_DISCOVERY_RESPONSE_VENDOR_ID) != 0x01) {
+      break;
+    }
+
+    dop = (l & PCI_DOE_DISCOVERY_RESPONSE_OBJ_PROTOCOL) >> 16;
+
+    switch (dop) {
+    case 0x00:
+      printf("\t\tDOE Protocol:\tDOE Discovery\n");
+      break;
+    case 0x01:
+      printf("\t\tDOE Protocol:\tCMA/SPDM\n");
+      break;
+    case 0x02:
+      printf("\t\tDOE Protocol:\tSecured CMA/SPDM\n");
+      break;
+    default:
+      printf("\t\tDOE Protocol:\t0x%x\n", dop);
+    }
+
+    if ((l & PCI_DOE_DISCOVERY_RESPONSE_NEXT_INDX) == 0x00) {
+      break;
+    }
+
+    index = (l & PCI_DOE_DISCOVERY_RESPONSE_NEXT_INDX) >> 24;
+  }
+}
+
+static void
 cap_doe(struct device *d, int where)
 {
   u32 l;
@@ -1407,6 +1479,8 @@ cap_doe(struct device *d, int where)
 	 FLAG(l, PCI_DOE_STS_INT),
 	 FLAG(l, PCI_DOE_STS_ERROR),
 	 FLAG(l, PCI_DOE_STS_OBJECT_READY));
+
+  doe_discovery(d, where);
 }
 
 void
