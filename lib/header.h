@@ -1391,7 +1391,7 @@
 #define PCI_DOE_STS		0xC	/* DOE Status Register */
 #define  PCI_DOE_STS_BUSY		0x1	/* DOE Busy */
 #define  PCI_DOE_STS_INT		0x2	/* DOE Interrupt Status */
-#define  PCI_DOE_STS_ERROR		0x3	/* DOE Error */
+#define  PCI_DOE_STS_ERROR		0x4	/* DOE Error */
 #define  PCI_DOE_STS_OBJECT_READY	0x80000000 /* Data Object Ready */
 
 /*
