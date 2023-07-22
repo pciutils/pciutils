@@ -20,6 +20,9 @@ if [ "$PCI_COMPRESSED_IDS" = 1 ] ; then
 	DECOMP="cat"
 	SRC="$SRC.gz"
 	GREP=zgrep
+elif command -v xz >/dev/null 2>&1 ; then
+	DECOMP="xz -d"
+	SRC="$SRC.xz"
 elif command -v bzip2 >/dev/null 2>&1 ; then
 	DECOMP="bzip2 -d"
 	SRC="$SRC.bz2"
