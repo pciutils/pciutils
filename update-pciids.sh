@@ -16,11 +16,7 @@ if ! touch ${DEST} >/dev/null 2>&1 ; then
 	exit 1
 fi
 
-if [ "$PCI_COMPRESSED_IDS" = 1 ] ; then
-	DECOMP="cat"
-	SRC="$SRC.gz"
-	GREP=zgrep
-elif command -v xz >/dev/null 2>&1 ; then
+if command -v xz >/dev/null 2>&1 ; then
 	DECOMP="xz -d"
 	SRC="$SRC.xz"
 elif command -v bzip2 >/dev/null 2>&1 ; then
@@ -52,12 +48,12 @@ if ! $DL ; then
 	exit 1
 fi
 
-if ! $DECOMP <$DEST.new >$DEST.neww ; then
+if ! $DECOMP <$DEST.new >$DEST.new.plain ; then
 	echo >&2 "update-pciids: decompression failed, probably truncated file"
 	exit 1
 fi
 
-if ! $GREP >/dev/null "^C " $DEST.neww ; then
+if ! $GREP >/dev/null "^C " $DEST.new.plain ; then
 	echo >&2 "update-pciids: missing class info, probably truncated file"
 	exit 1
 fi
@@ -65,10 +61,20 @@ fi
 if [ -f $DEST ] ; then
 	ln -f $DEST $DEST.old
 	# --reference is supported only by chmod from GNU file, so let's ignore any errors
-	chmod -f --reference=$DEST.old $DEST.neww 2>/dev/null || true
+	chmod -f --reference=$DEST.old $DEST.new $DEST.new.plain 2>/dev/null || true
 fi
-mv $DEST.neww $DEST
-rm $DEST.new
+
+if [ "$PCI_COMPRESSED_IDS" = 1 ] ; then
+	if [ "${SRC%.gz}" != .gz ] ; then
+		# Recompress to gzip
+		gzip <$DEST.new.plain >$DEST.new
+	fi
+	mv $DEST.new $DEST
+	rm -f $DEST.new.plain
+else
+	mv $DEST.new.plain $DEST
+	rm -f $DEST.new
+fi
 
 # Older versions did not compress the ids file, so let's make sure we
 # clean that up.
