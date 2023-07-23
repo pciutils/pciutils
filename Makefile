@@ -103,7 +103,7 @@ lspci$(EXEEXT): LDLIBS+=$(LIBKMOD_LIBS)
 ls-kernel.o: CFLAGS+=$(LIBKMOD_CFLAGS)
 
 update-pciids: update-pciids.sh
-	sed <$< >$@ "s@^DEST=.*@DEST=$(if $(IDSDIR),$(IDSDIR)/,)$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@"
+	sed <$< >$@ "s@^DEST=.*@DEST=$(if $(IDSDIR),$(IDSDIR)/,)$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@;s@VERSION=.*@VERSION=$(VERSION)@"
 	chmod +x $@
 
 # The example of use of libpci

@@ -6,6 +6,9 @@ SRC="https://pci-ids.ucw.cz/v2.2/pci.ids"
 DEST=pci.ids
 PCI_COMPRESSED_IDS=
 GREP=grep
+VERSION=unknown
+USER_AGENT=update-pciids/$VERSION
+QUIET=
 
 [ "$1" = "-q" ] && quiet=true || quiet=false
 
@@ -30,19 +33,28 @@ else
 fi
 
 if command -v curl >/dev/null 2>&1 ; then
-	DL="curl -o $DEST.new $SRC"
-	${quiet} && DL="$DL -s -S"
+	${quiet} && QUIET="-s -S"
+	dl ()
+	{
+		curl -o $DEST.new --user-agent "$USER_AGENT curl" $QUIET $SRC
+	}
 elif command -v wget >/dev/null 2>&1 ; then
-	DL="wget --no-timestamping -O $DEST.new $SRC"
-	${quiet} && DL="$DL -q"
+	${quiet} && QUIET="-q"
+	dl ()
+	{
+		wget --no-timestamping -O $DEST.new --user-agent "$USER_AGENT wget" $QUIET $SRC
+	}
 elif command -v lynx >/dev/null 2>&1 ; then
-	DL="eval lynx -source $SRC >$DEST.new"
+	dl ()
+	{
+		lynx -source -useragent="$USER_AGENT lynx" $SRC >$DEST.new
+	}
 else
 	echo >&2 "update-pciids: cannot find curl, wget or lynx"
 	exit 1
 fi
 
-if ! $DL ; then
+if ! dl ; then
 	echo >&2 "update-pciids: download failed"
 	rm -f $DEST.new
 	exit 1
