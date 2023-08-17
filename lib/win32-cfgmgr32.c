@@ -403,9 +403,12 @@ get_driver_path_for_service(struct pci_access *a, LPCWSTR service_name, SC_HANDL
   SERVICE_STATUS service_status;
   SC_HANDLE service = NULL;
   char *driver_path = NULL;
+  int trim_system32 = 0;
   UINT systemroot_len;
   int driver_path_len;
+  UINT system32_len;
   HMODULE kernel32;
+  WCHAR *trim_ptr;
   DWORD error;
 
   service = OpenServiceW(manager, service_name, SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS);
@@ -466,36 +469,42 @@ retry_service_config:
    */
 
   /*
-   * Old Windows versions return path to NT SystemRoot namespace via
-   * GetWindowsDirectoryW() function. New Windows versions via
-   * GetSystemWindowsDirectoryW(). GetSystemWindowsDirectoryW() is not
-   * provided in old Windows versions, so use GetProcAddress() for
-   * compatibility with all Windows versions.
+   * GetSystemWindowsDirectoryW() returns path to NT SystemRoot namespace.
+   * Alternativelly path to NT SystemRoot namespace can be constructed by
+   * GetSystemDirectoryW() by trimming "\\system32" from the end of path.
+   * GetSystemWindowsDirectoryW() is not provided in old Windows versions,
+   * so use GetProcAddress() for compatibility with all Windows versions.
    */
   kernel32 = GetModuleHandleW(L"kernel32.dll");
   if (kernel32)
     get_system_root_path = (void *)GetProcAddress(kernel32, "GetSystemWindowsDirectoryW");
-  if (!get_system_root_path)
-    get_system_root_path = &GetWindowsDirectoryW;
-
-  systemroot_len = get_system_root_path(NULL, 0);
+  else
+    {
+      get_system_root_path = &GetSystemDirectoryW;
+      trim_system32 = 1;
+    }
 
   if (!service_config->lpBinaryPathName || !service_config->lpBinaryPathName[0])
     {
-      /* No ImagePath is specified, NT kernel assumes implicit kernel driver path by service name. */
-      service_image_path = pci_malloc(a, sizeof(WCHAR) * (systemroot_len + sizeof("\\System32\\drivers\\")-1 + wcslen(service_name) + sizeof(".sys")-1 + 1));
-      systemroot_len = get_system_root_path(service_image_path, systemroot_len+1);
-      if (systemroot_len && service_image_path[systemroot_len-1] != L'\\')
-        service_image_path[systemroot_len++] = L'\\';
-      wcscpy(service_image_path + systemroot_len, L"System32\\drivers\\");
-      wcscpy(service_image_path + systemroot_len + sizeof("System32\\drivers\\")-1, service_name);
-      wcscpy(service_image_path + systemroot_len + sizeof("System32\\drivers\\")-1 + wcslen(service_name), L".sys");
+      /* No ImagePath is specified, NT kernel assumes implicit kernel driver path by service name, which is relative to "\\system32\\drivers". */
+      /* GetSystemDirectoryW() returns path to "\\system32" directory on all Windows versions. */
+      system32_len = GetSystemDirectoryW(NULL, 0); /* Returns number of WCHARs plus 1 for nul-term. */
+      service_image_path = pci_malloc(a, sizeof(WCHAR) * (system32_len + sizeof("\\drivers\\")-1 + wcslen(service_name) + sizeof(".sys")-1));
+      system32_len = GetSystemDirectoryW(service_image_path, system32_len); /* Now it returns number of WCHARs without nul-term. */
+      if (system32_len && service_image_path[system32_len-1] != L'\\')
+        service_image_path[system32_len++] = L'\\';
+      wcscpy(service_image_path + system32_len, L"drivers\\");
+      wcscpy(service_image_path + system32_len + sizeof("drivers\\")-1, service_name);
+      wcscpy(service_image_path + system32_len + sizeof("drivers\\")-1 + wcslen(service_name), L".sys");
     }
   else if (wcsncmp(service_config->lpBinaryPathName, L"\\SystemRoot\\", sizeof("\\SystemRoot\\")-1) == 0)
     {
-      /* ImagePath is in NT SystemRoot namespace, convert to Win32 path via GetSystemWindowsDirectoryW()/GetWindowsDirectoryW(). */
+      /* ImagePath is in NT SystemRoot namespace, convert to Win32 path via GetSystemWindowsDirectoryW()/GetSystemDirectoryW(). */
+      systemroot_len = get_system_root_path(NULL, 0); /* Returns number of WCHARs plus 1 for nul-term. */
       service_image_path = pci_malloc(a, sizeof(WCHAR) * (systemroot_len + wcslen(service_config->lpBinaryPathName) - (sizeof("\\SystemRoot")-1)));
-      systemroot_len = get_system_root_path(service_image_path, systemroot_len+1);
+      systemroot_len = get_system_root_path(service_image_path, systemroot_len); /* Now it returns number of WCHARs without nul-term. */
+      if (trim_system32 && systemroot_len && (trim_ptr = wcsrchr(service_image_path, L'\\')) != NULL)
+        systemroot_len = trim_ptr - service_image_path;
       if (systemroot_len && service_image_path[systemroot_len-1] != L'\\')
         service_image_path[systemroot_len++] = L'\\';
       wcscpy(service_image_path + systemroot_len, service_config->lpBinaryPathName + sizeof("\\SystemRoot\\")-1);
@@ -525,9 +534,12 @@ retry_service_config:
     }
   else if (service_config->lpBinaryPathName[0] != L'\\')
     {
-      /* ImagePath is relative to the NT SystemRoot namespace, convert to Win32 path via GetSystemWindowsDirectoryW()/GetWindowsDirectoryW(). */
-      service_image_path = pci_malloc(a, sizeof(WCHAR) * (systemroot_len + sizeof("\\") + wcslen(service_config->lpBinaryPathName)));
-      systemroot_len = get_system_root_path(service_image_path, systemroot_len+1);
+      /* ImagePath is relative to the NT SystemRoot namespace, convert to Win32 path via GetSystemWindowsDirectoryW()/GetSystemDirectoryW(). */
+      systemroot_len = get_system_root_path(NULL, 0); /* Returns number of WCHARs plus 1 for nul-term. */
+      service_image_path = pci_malloc(a, sizeof(WCHAR) * (systemroot_len + sizeof("\\")-1 + wcslen(service_config->lpBinaryPathName)));
+      systemroot_len = get_system_root_path(service_image_path, systemroot_len); /* Now it returns number of WCHARs without nul-term. */
+      if (trim_system32 && systemroot_len && (trim_ptr = wcsrchr(service_image_path, L'\\')) != NULL)
+        systemroot_len = trim_ptr - service_image_path;
       if (systemroot_len && service_image_path[systemroot_len-1] != L'\\')
         service_image_path[systemroot_len++] = L'\\';
       wcscpy(service_image_path + systemroot_len, service_config->lpBinaryPathName);
