@@ -213,7 +213,7 @@ win32_check_driver(BYTE *driver_data)
 }
 
 static int
-win32_kldbg_unpack_driver(struct pci_access *a, void *driver_path)
+win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
 {
   BOOL use_kd_exe = FALSE;
   HMODULE exe_with_driver = NULL;
@@ -323,58 +323,34 @@ out:
 static int
 win32_kldbg_register_driver(struct pci_access *a, SC_HANDLE manager, SC_HANDLE *service)
 {
-  UINT (WINAPI *get_system_root_path)(void *buffer, UINT size) = NULL;
-  UINT systemroot_len;
-  void *driver_path;
+  UINT system32_len;
+  LPTSTR driver_path;
   HANDLE driver_handle;
-  HMODULE kernel32;
 
   /*
-   * COM library dbgeng.dll unpacks kldbg driver to file \\system32\\kldbgdrv.sys
+   * COM library dbgeng.dll unpacks kldbg driver to file "\\system32\\kldbgdrv.sys"
    * and register this driver with service name kldbgdrv. Implement same behavior.
+   * GetSystemDirectory() returns path to "\\system32" directory on all Windows versions.
    */
 
-  /*
-   * Old Windows versions return path to NT SystemRoot namespace via
-   * GetWindowsDirectory() function. New Windows versions via
-   * GetSystemWindowsDirectory(). GetSystemWindowsDirectory() is not
-   * provided in old Windows versions, so use GetProcAddress() for
-   * compatibility with all Windows versions.
-   */
+  system32_len = GetSystemDirectory(NULL, 0); /* Returns number of TCHARs plus 1 for nul-term. */
+  if (!system32_len)
+    system32_len = sizeof("C:\\Windows\\System32");
 
-  kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-  if (kernel32)
-    get_system_root_path = (void *)GetProcAddress(kernel32, "GetSystemWindowsDirectory"
-#ifdef UNICODE
-      "W"
-#else
-      "A"
-#endif
-    );
+  driver_path = pci_malloc(a, (system32_len + sizeof("\\kldbgdrv.sys")-1) * sizeof(TCHAR));
 
-  if (!get_system_root_path)
-    get_system_root_path = (void *)&GetWindowsDirectory;
-
-  systemroot_len = get_system_root_path(NULL, 0);
-  if (!systemroot_len)
-    systemroot_len = sizeof(TEXT("C:\\Windows\\"));
-
-  driver_path = pci_malloc(a, systemroot_len + sizeof(TEXT("\\system32\\kldbgdrv.sys")));
-
-  systemroot_len = get_system_root_path(driver_path, systemroot_len + sizeof(TEXT("")));
-  if (!systemroot_len)
+  system32_len = GetSystemDirectory(driver_path, system32_len); /* Now it returns number of TCHARs without nul-term. */
+  if (!system32_len)
     {
-      systemroot_len = sizeof(TEXT("C:\\Windows\\"));
-      memcpy(driver_path, TEXT("C:\\Windows\\"), systemroot_len);
+      system32_len = sizeof("C:\\Windows\\System32")-1;
+      memcpy(driver_path, TEXT("C:\\Windows\\System32"), system32_len);
     }
 
-  if (((char *)driver_path)[systemroot_len-sizeof(TEXT(""))+1] != '\\')
-    {
-      ((char *)driver_path)[systemroot_len-sizeof(TEXT(""))+1] = '\\';
-      systemroot_len += sizeof(TEXT(""));
-    }
+  /* GetSystemDirectory returns path without backslash unless the system directory is the root directory. */
+  if (driver_path[system32_len-1] != '\\')
+    driver_path[system32_len++] = '\\';
 
-  memcpy((char *)driver_path + systemroot_len, TEXT("system32\\kldbgdrv.sys"), sizeof(TEXT("system32\\kldbgdrv.sys")));
+  memcpy(driver_path + system32_len, TEXT("kldbgdrv.sys"), sizeof(TEXT("kldbgdrv.sys")));
 
   driver_handle = CreateFile(driver_path, 0, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (driver_handle != INVALID_HANDLE_VALUE)
