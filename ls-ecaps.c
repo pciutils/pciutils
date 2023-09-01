@@ -1556,6 +1556,9 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_NPEM:
 	    printf("Native PCIe Enclosure Management <?>\n");
 	    break;
+      case PCI_EXT_CAP_ID_32GT:
+	    printf("Physical Layer 32.0 GT/s <?>\n");
+        break;
 	  case PCI_EXT_CAP_ID_DOE:
 	    cap_doe(d, where);
 	    break;
