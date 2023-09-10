@@ -566,7 +566,7 @@ static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
 
 /* pread() is not available and do_read() only works for a single fd, so we
  * cannot implement read_vpd properly. */
-static int sysfs_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
+static int sysfs_read_vpd(struct pci_dev *d UNUSED, int pos UNUSED, byte *buf UNUSED, int len UNUSED)
 {
   return 0;
 }
