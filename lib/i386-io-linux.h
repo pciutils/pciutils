@@ -11,6 +11,8 @@
 #include <sys/io.h>
 #include <errno.h>
 
+#include "i386-io-access.h"
+
 static int ioperm_enabled;
 static int iopl_enabled;
 

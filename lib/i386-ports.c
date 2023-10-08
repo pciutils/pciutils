@@ -116,12 +116,12 @@ conf1_detect(struct pci_access *a)
     }
 
   intel_io_lock();
-  outb (0x01, 0xCFB);
-  tmp = inl (0xCF8);
-  outl (0x80000000, 0xCF8);
-  if (inl (0xCF8) == 0x80000000)
+  intel_outb (0x01, 0xCFB);
+  tmp = intel_inl (0xCF8);
+  intel_outl (0x80000000, 0xCF8);
+  if (intel_inl (0xCF8) == 0x80000000)
     res = 1;
-  outl (tmp, 0xCF8);
+  intel_outl (tmp, 0xCF8);
   intel_io_unlock();
 
   if (res)
@@ -142,18 +142,18 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
     return pci_generic_block_read(d, pos, buf, len);
 
   intel_io_lock();
-  outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
+  intel_outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
     {
     case 1:
-      buf[0] = inb(addr);
+      buf[0] = intel_inb(addr);
       break;
     case 2:
-      ((u16 *) buf)[0] = cpu_to_le16(inw(addr));
+      ((u16 *) buf)[0] = cpu_to_le16(intel_inw(addr));
       break;
     case 4:
-      ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
+      ((u32 *) buf)[0] = cpu_to_le32(intel_inl(addr));
       break;
     }
 
@@ -174,18 +174,18 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
     return pci_generic_block_write(d, pos, buf, len);
 
   intel_io_lock();
-  outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
+  intel_outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
     {
     case 1:
-      outb(buf[0], addr);
+      intel_outb(buf[0], addr);
       break;
     case 2:
-      outw(le16_to_cpu(((u16 *) buf)[0]), addr);
+      intel_outw(le16_to_cpu(((u16 *) buf)[0]), addr);
       break;
     case 4:
-      outl(le32_to_cpu(((u32 *) buf)[0]), addr);
+      intel_outl(le32_to_cpu(((u32 *) buf)[0]), addr);
       break;
     }
   intel_io_unlock();
@@ -210,10 +210,10 @@ conf2_detect(struct pci_access *a)
   /* This is ugly and tends to produce false positives. Beware. */
 
   intel_io_lock();
-  outb(0x00, 0xCFB);
-  outb(0x00, 0xCF8);
-  outb(0x00, 0xCFA);
-  if (inb(0xCF8) == 0x00 && inb(0xCFA) == 0x00)
+  intel_outb(0x00, 0xCFB);
+  intel_outb(0x00, 0xCF8);
+  intel_outb(0x00, 0xCFA);
+  if (intel_inb(0xCF8) == 0x00 && intel_inb(0xCFA) == 0x00)
     res = intel_sanity_check(a, &pm_intel_conf2);
   intel_io_unlock();
   return res;
@@ -236,21 +236,21 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
     return pci_generic_block_read(d, pos, buf, len);
 
   intel_io_lock();
-  outb((d->func << 1) | 0xf0, 0xcf8);
-  outb(d->bus, 0xcfa);
+  intel_outb((d->func << 1) | 0xf0, 0xcf8);
+  intel_outb(d->bus, 0xcfa);
   switch (len)
     {
     case 1:
-      buf[0] = inb(addr);
+      buf[0] = intel_inb(addr);
       break;
     case 2:
-      ((u16 *) buf)[0] = cpu_to_le16(inw(addr));
+      ((u16 *) buf)[0] = cpu_to_le16(intel_inw(addr));
       break;
     case 4:
-      ((u32 *) buf)[0] = cpu_to_le32(inl(addr));
+      ((u32 *) buf)[0] = cpu_to_le32(intel_inl(addr));
       break;
     }
-  outb(0, 0xcf8);
+  intel_outb(0, 0xcf8);
   intel_io_unlock();
   return res;
 }
@@ -272,22 +272,22 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
     return pci_generic_block_write(d, pos, buf, len);
 
   intel_io_lock();
-  outb((d->func << 1) | 0xf0, 0xcf8);
-  outb(d->bus, 0xcfa);
+  intel_outb((d->func << 1) | 0xf0, 0xcf8);
+  intel_outb(d->bus, 0xcfa);
   switch (len)
     {
     case 1:
-      outb(buf[0], addr);
+      intel_outb(buf[0], addr);
       break;
     case 2:
-      outw(le16_to_cpu(* (u16 *) buf), addr);
+      intel_outw(le16_to_cpu(* (u16 *) buf), addr);
       break;
     case 4:
-      outl(le32_to_cpu(* (u32 *) buf), addr);
+      intel_outl(le32_to_cpu(* (u32 *) buf), addr);
       break;
     }
 
-  outb(0, 0xcf8);
+  intel_outb(0, 0xcf8);
   intel_io_unlock();
   return res;
 }

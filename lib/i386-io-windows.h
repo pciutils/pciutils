@@ -10,95 +10,10 @@
  *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#include <io.h>
 #include <windows.h>
 #include <aclapi.h>
 
-#ifdef _MSC_VER
-/* MSVC compiler provides I/O port intrinsics for both 32 and 64-bit modes. */
-#pragma intrinsic(_outp)
-#pragma intrinsic(_outpw)
-#pragma intrinsic(_outpd)
-#pragma intrinsic(_inp)
-#pragma intrinsic(_inpw)
-#pragma intrinsic(_inpd)
-#elif defined(_WIN64) || defined(_UCRT)
-/*
- * For other compilers I/O port intrinsics are available in <intrin.h> header
- * file either as inline/external functions or macros. Beware that <intrin.h>
- * names are different than MSVC intrinsics names and glibc function names.
- * Usage of <intrin.h> is also the prefered way for 64-bit mode or when using
- * new UCRT library.
- */
-#include <intrin.h>
-#define _outp(x,y) __outbyte(x,y)
-#define _outpw(x,y) __outword(x,y)
-#define _outpd(x,y) __outdword(x,y)
-#define _inp(x) __inbyte(x)
-#define _inpw(x) __inword(x)
-#define _inpd(x) __indword(x)
-#elif defined(__CRTDLL__) || (defined(__MSVCRT_VERSION__) && __MSVCRT_VERSION__ < 0x400)
-/*
- * Old 32-bit CRTDLL library and pre-4.00 MSVCRT library do not provide I/O
- * port functions. As these libraries exist only in 32-bit mode variant,
- * implement I/O port functions via 32-bit inline assembly.
- */
-static inline int _outp(unsigned short port, int databyte)
-{
-  asm volatile ("outb %b0, %w1" : : "a" (databyte), "Nd" (port));
-  return databyte;
-}
-static inline unsigned short _outpw(unsigned short port, unsigned short dataword)
-{
-  asm volatile ("outw %w0, %w1" : : "a" (dataword), "Nd" (port));
-  return dataword;
-}
-static inline unsigned long _outpd(unsigned short port, unsigned long dataword)
-{
-  asm volatile ("outl %0, %w1" : : "a" (dataword), "Nd" (port));
-  return dataword;
-}
-static inline int _inp(unsigned short port)
-{
-  unsigned char ret;
-  asm volatile ("inb %w1, %0" : "=a" (ret) : "Nd" (port));
-  return ret;
-}
-static inline unsigned short _inpw(unsigned short port)
-{
-  unsigned short ret;
-  asm volatile ("inw %w1, %0" : "=a" (ret) : "Nd" (port));
-  return ret;
-}
-static inline unsigned long _inpd(unsigned short port)
-{
-  unsigned long ret;
-  asm volatile ("inl %w1, %0" : "=a" (ret) : "Nd" (port));
-  return ret;
-}
-#elif !defined(__GNUC__)
-/*
- * Old 32-bit MSVCRT (non-UCRT) library provides I/O port functions. Function
- * prototypes are defined in <conio.h> header file but they are missing in
- * some MinGW toolchains. So for GCC compiler define them manually.
- */
-#include <conio.h>
-#else
-int _outp(unsigned short port, int databyte);
-unsigned short _outpw(unsigned short port, unsigned short dataword);
-unsigned long _outpd(unsigned short port, unsigned long dataword);
-int _inp(unsigned short port);
-unsigned short _inpw(unsigned short port);
-unsigned long _inpd(unsigned short port);
-#endif
-
-#define outb(x,y) _outp(y,x)
-#define outw(x,y) _outpw(y,x)
-#define outl(x,y) _outpd(y,x)
-
-#define inb(x) _inp(x)
-#define inw(x) _inpw(x)
-#define inl(x) _inpd(x)
+#include "i386-io-access.h"
 
 /*
  * Define __readeflags() for MSVC and GCC compilers.
