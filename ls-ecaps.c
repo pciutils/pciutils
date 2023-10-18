@@ -1245,7 +1245,7 @@ cap_ptm(struct device *d, int where)
 
   buff = get_conf_long(d, where + 4);
   printf("\t\tPTMCap: ");
-  printf("Requester:%c Responder:%c Root:%c\n",
+  printf("Requester%c Responder%c Root%c\n",
     FLAG(buff, 0x1),
     FLAG(buff, 0x2),
     FLAG(buff, 0x4));
@@ -1266,7 +1266,7 @@ cap_ptm(struct device *d, int where)
 
   buff = get_conf_long(d, where + 8);
   printf("\t\tPTMControl: ");
-  printf("Enabled:%c RootSelected:%c\n",
+  printf("Enabled%c RootSelected%c\n",
     FLAG(buff, 0x1),
     FLAG(buff, 0x2));
 
