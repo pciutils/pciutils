@@ -135,7 +135,7 @@ are hexadecimal numbers. In the latter case, only the bits corresponding to bina
 ones in the \fImask\fP are changed (technically, this is a read-modify-write operation).
 
 .PP
-There are several ways how to identity a register:
+There are several ways to identify a register:
 .IP \(bu
 Tell its address in hexadecimal.
 .IP \(bu
