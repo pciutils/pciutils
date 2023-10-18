@@ -191,7 +191,7 @@ cap_aer(struct device *d, int where, int type)
 
       l = get_conf_long(d, where + PCI_ERR_ROOT_STATUS);
       printf("\t\tRootSta: CERcvd%c MultCERcvd%c UERcvd%c MultUERcvd%c\n"
-	    "\t\t\t FirstFatal%c NonFatalMsg%c FatalMsg%c IntMsg %d\n",
+	    "\t\t\t FirstFatal%c NonFatalMsg%c FatalMsg%c IntMsgNum %d\n",
 	    FLAG(l, PCI_ERR_ROOT_COR_RCV),
 	    FLAG(l, PCI_ERR_ROOT_MULTI_COR_RCV),
 	    FLAG(l, PCI_ERR_ROOT_UNCOR_RCV),
@@ -221,7 +221,7 @@ static void cap_dpc(struct device *d, int where)
     return;
 
   l = get_conf_word(d, where + PCI_DPC_CAP);
-  printf("\t\tDpcCap:\tINT Msg #%d, RPExt%c PoisonedTLP%c SwTrigger%c RP PIO Log %d, DL_ActiveErr%c\n",
+  printf("\t\tDpcCap:\tIntMsgNum %d, RPExt%c PoisonedTLP%c SwTrigger%c RP PIO Log %d, DL_ActiveErr%c\n",
     PCI_DPC_CAP_INT_MSG(l), FLAG(l, PCI_DPC_CAP_RP_EXT), FLAG(l, PCI_DPC_CAP_TLP_BLOCK),
     FLAG(l, PCI_DPC_CAP_SW_TRIGGER), PCI_DPC_CAP_RP_LOG(l), FLAG(l, PCI_DPC_CAP_DL_ACT_ERR));
 
@@ -371,7 +371,7 @@ cap_sriov(struct device *d, int where)
     return;
 
   l = get_conf_long(d, where + PCI_IOV_CAP);
-  printf("\t\tIOVCap:\tMigration%c 10BitTagReq%c Interrupt Message Number: %03x\n",
+  printf("\t\tIOVCap:\tMigration%c 10BitTagReq%c IntMsgNum %d\n",
 	FLAG(l, PCI_IOV_CAP_VFM), FLAG(l, PCI_IOV_CAP_VF_10BIT_TAG_REQ), PCI_IOV_CAP_IMN(l));
   w = get_conf_word(d, where + PCI_IOV_CTRL);
   printf("\t\tIOVCtl:\tEnable%c Migration%c Interrupt%c MSE%c ARIHierarchy%c 10BitTagReq%c\n",
@@ -1394,7 +1394,7 @@ cap_doe(struct device *d, int where)
   printf("\t\tDOECap: IntSup%c\n",
 	 FLAG(l, PCI_DOE_CAP_INT_SUPP));
   if (l & PCI_DOE_CAP_INT_SUPP)
-    printf("\t\t\tInterrupt Message Number %03x\n",
+    printf("\t\t\tIntMsgNum %d\n",
 	   PCI_DOE_CAP_INT_MSG(l));
 
   l = get_conf_long(d, where + PCI_DOE_CTL);

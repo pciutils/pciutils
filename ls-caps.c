@@ -1436,7 +1436,7 @@ cap_express(struct device *d, int where, int cap)
     default:
       printf("Unknown type %d", type);
   }
-  printf(", MSI %02x\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
+  printf(", IntMsgNum %d\n", (cap & PCI_EXP_FLAGS_IRQ) >> 9);
   if (verbose < 2)
     return type;
 
