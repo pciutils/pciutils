@@ -909,6 +909,7 @@
 #define  PCI_EXP_DEVCTL2_EPR_REQ	0x0800	/* Emergency Power Reduction Request */
 #define  PCI_EXP_DEVCTL2_10BIT_TAG_REQ	0x1000 /* 10 Bit Tag Requester enabled */
 #define  PCI_EXP_DEVCTL2_OBFF(x)		(((x) >> 13) & 3) /* OBFF enabled */
+#define  PCI_EXP_DEVCTL2_EE_TLP_BLK	0x8000	/* End-End TLP Prefix Blocking */
 #define PCI_EXP_DEVSTA2			0x2a	/* Device Status */
 #define PCI_EXP_LNKCAP2			0x2c	/* Link Capabilities */
 #define  PCI_EXP_LNKCAP2_SPEED(x)	(((x) >> 1) & 0x7f)

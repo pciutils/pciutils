@@ -1178,9 +1178,10 @@ static void cap_express_dev2(struct device *d, int where, int type)
 	FLAG(w, PCI_EXP_DEVCTL2_IDO_CMP_EN),
 	FLAG(w, PCI_EXP_DEVCTL2_LTR),
 	FLAG(w, PCI_EXP_DEVCTL2_EPR_REQ));
-  printf("\t\t\t 10BitTagReq%c OBFF %s\n",
+  printf("\t\t\t 10BitTagReq%c OBFF %s, EETLPPrefixBlk%c\n",
 	FLAG(w, PCI_EXP_DEVCTL2_10BIT_TAG_REQ),
-	cap_express_devctl2_obff(PCI_EXP_DEVCTL2_OBFF(w)));
+	cap_express_devctl2_obff(PCI_EXP_DEVCTL2_OBFF(w)),
+	FLAG(w, PCI_EXP_DEVCTL2_EE_TLP_BLK));
 }
 
 static const char *cap_express_link2_speed_cap(int vector)
