@@ -1305,9 +1305,10 @@
 #define  PCI_PRI_CTRL_ENABLE	0x01	/* Enable */
 #define  PCI_PRI_CTRL_RESET	0x02	/* Reset */
 #define PCI_PRI_STATUS		0x06	/* PRI status register */
-#define  PCI_PRI_STATUS_RF	0x001	/* Response Failure */
-#define  PCI_PRI_STATUS_UPRGI	0x002	/* Unexpected PRG index */
-#define  PCI_PRI_STATUS_STOPPED	0x100	/* PRI Stopped */
+#define  PCI_PRI_STATUS_RF	0x0001	/* Response Failure */
+#define  PCI_PRI_STATUS_UPRGI	0x0002	/* Unexpected PRG index */
+#define  PCI_PRI_STATUS_STOPPED	0x0100	/* PRI Stopped */
+#define  PCI_PRI_STATUS_PASID	0x8000	/* PASID required in PRG response */
 #define PCI_PRI_MAX_REQ		0x08	/* PRI max reqs supported */
 #define PCI_PRI_ALLOC_REQ	0x0c	/* PRI max reqs allowed */
 

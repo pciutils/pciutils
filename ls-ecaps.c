@@ -324,9 +324,9 @@ cap_pri(struct device *d, int where)
   printf("\t\tPRICtl: Enable%c Reset%c\n",
 	FLAG(w, PCI_PRI_CTRL_ENABLE), FLAG(w, PCI_PRI_CTRL_RESET));
   w = get_conf_word(d, where + PCI_PRI_STATUS);
-  printf("\t\tPRISta: RF%c UPRGI%c Stopped%c\n",
+  printf("\t\tPRISta: RF%c UPRGI%c Stopped%c PASID%c\n",
 	FLAG(w, PCI_PRI_STATUS_RF), FLAG(w, PCI_PRI_STATUS_UPRGI),
-	FLAG(w, PCI_PRI_STATUS_STOPPED));
+	FLAG(w, PCI_PRI_STATUS_STOPPED), FLAG(w, PCI_PRI_STATUS_PASID));
   l = get_conf_long(d, where + PCI_PRI_MAX_REQ);
   printf("\t\tPage Request Capacity: %08x, ", l);
   l = get_conf_long(d, where + PCI_PRI_ALLOC_REQ);
