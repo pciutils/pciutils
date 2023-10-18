@@ -1173,7 +1173,9 @@ static void cap_express_dev2(struct device *d, int where, int type)
         printf(" EgressBlck%c", FLAG(w, PCI_EXP_DEVCTL2_ATOMICOP_EGRESS_BLOCK));
       printf("\n");
     }
-  printf("\t\t\t LTR%c 10BitTagReq%c OBFF %s\n",
+  printf("\t\t\t IDOReq%c IDOCompl%c LTR%c 10BitTagReq%c OBFF %s\n",
+	FLAG(w, PCI_EXP_DEVCTL2_IDO_REQ_EN),
+	FLAG(w, PCI_EXP_DEVCTL2_IDO_CMP_EN),
 	FLAG(w, PCI_EXP_DEVCTL2_LTR),
 	FLAG(w, PCI_EXP_DEVCTL2_10BIT_TAG_REQ),
 	cap_express_devctl2_obff(PCI_EXP_DEVCTL2_OBFF(w)));
