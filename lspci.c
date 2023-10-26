@@ -806,6 +806,8 @@ show_verbose(struct device *d)
     PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP |
     PCI_FILL_BRIDGE_BASES | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
 
+  printf("\tClassCode=%#x ProgIf=%#x RevId=%#x\n", class, p->prog_if, p->rev_id);
+
   switch (htype)
     {
     case PCI_HEADER_TYPE_NORMAL:
