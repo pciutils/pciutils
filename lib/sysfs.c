@@ -409,12 +409,18 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
 	      path_canon = realpath(path_rel, NULL);
 	      if (!path_canon || strcmp(path_canon, path_abs) != 0)
 	        parent = NULL;
+
+	      if (path_canon)
+		free(path_canon);
 	    }
 
 	  if (parent)
 	    d->parent = parent;
 	  else
 	    clear_fill(d, PCI_FILL_PARENT);
+
+	  if (path_abs)
+	    free(path_abs);
 	}
     }
 
