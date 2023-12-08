@@ -1191,8 +1191,10 @@ static const char *cap_express_link2_speed_cap(int vector)
    * permitted to skip support for any data rates between 2.5GT/s and the
    * highest supported rate.
    */
-  if (vector & 0x60)
+  if (vector & 0x40)
     return "RsvdP";
+  if (vector & 0x20)
+    return "2.5-64GT/s";
   if (vector & 0x10)
     return "2.5-32GT/s";
   if (vector & 0x08)
