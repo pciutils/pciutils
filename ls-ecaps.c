@@ -725,83 +725,82 @@ dvsec_cxl_device(struct device *d, int rev, int where, int len)
   if (rev == 0)
     return;
 
-  if (rev >= 1) {
-    w = get_conf_word(d, where + PCI_CXL_DEV_CAP);
-    printf("\t\tCXLCap:\tCache%c IO%c Mem%c MemHWInit%c HDMCount %d Viral%c\n",
-      FLAG(w, PCI_CXL_DEV_CAP_CACHE), FLAG(w, PCI_CXL_DEV_CAP_IO), FLAG(w, PCI_CXL_DEV_CAP_MEM),
-      FLAG(w, PCI_CXL_DEV_CAP_MEM_HWINIT), PCI_CXL_DEV_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_DEV_CAP_VIRAL));
+  if (rev >= 1)
+    {
+      w = get_conf_word(d, where + PCI_CXL_DEV_CAP);
+      printf("\t\tCXLCap:\tCache%c IO%c Mem%c MemHWInit%c HDMCount %d Viral%c\n",
+	FLAG(w, PCI_CXL_DEV_CAP_CACHE), FLAG(w, PCI_CXL_DEV_CAP_IO), FLAG(w, PCI_CXL_DEV_CAP_MEM),
+	FLAG(w, PCI_CXL_DEV_CAP_MEM_HWINIT), PCI_CXL_DEV_CAP_HDM_CNT(w), FLAG(w, PCI_CXL_DEV_CAP_VIRAL));
 
-    w = get_conf_word(d, where + PCI_CXL_DEV_CTRL);
-    printf("\t\tCXLCtl:\tCache%c IO%c Mem%c CacheSFCov %d CacheSFGran %d CacheClean%c Viral%c\n",
-      FLAG(w, PCI_CXL_DEV_CTRL_CACHE), FLAG(w, PCI_CXL_DEV_CTRL_IO), FLAG(w, PCI_CXL_DEV_CTRL_MEM),
-      PCI_CXL_DEV_CTRL_CACHE_SF_COV(w), PCI_CXL_DEV_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_DEV_CTRL_CACHE_CLN),
-      FLAG(w, PCI_CXL_DEV_CTRL_VIRAL));
+      w = get_conf_word(d, where + PCI_CXL_DEV_CTRL);
+      printf("\t\tCXLCtl:\tCache%c IO%c Mem%c CacheSFCov %d CacheSFGran %d CacheClean%c Viral%c\n",
+	FLAG(w, PCI_CXL_DEV_CTRL_CACHE), FLAG(w, PCI_CXL_DEV_CTRL_IO), FLAG(w, PCI_CXL_DEV_CTRL_MEM),
+	PCI_CXL_DEV_CTRL_CACHE_SF_COV(w), PCI_CXL_DEV_CTRL_CACHE_SF_GRAN(w), FLAG(w, PCI_CXL_DEV_CTRL_CACHE_CLN),
+	FLAG(w, PCI_CXL_DEV_CTRL_VIRAL));
 
-    w = get_conf_word(d, where + PCI_CXL_DEV_STATUS);
-    printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_DEV_STATUS_VIRAL));
+      w = get_conf_word(d, where + PCI_CXL_DEV_STATUS);
+      printf("\t\tCXLSta:\tViral%c\n", FLAG(w, PCI_CXL_DEV_STATUS_VIRAL));
 
-    w = get_conf_word(d, where + PCI_CXL_DEV_CTRL2);
-    printf("\t\tCXLCtl2:\tDisableCaching%c InitCacheWB&Inval%c InitRst%c RstMemClrEn%c",
-      FLAG(w, PCI_CXL_DEV_CTRL2_DISABLE_CACHING),
-      FLAG(w, PCI_CXL_DEV_CTRL2_INIT_WB_INVAL),
-      FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_RST),
-      FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_RST_CLR_EN));
-    if (rev >= 2) {
-      printf(" DesiredVolatileHDMStateAfterHotReset%c", FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_HDM_STATE_HOTRST));
+      w = get_conf_word(d, where + PCI_CXL_DEV_CTRL2);
+      printf("\t\tCXLCtl2:\tDisableCaching%c InitCacheWB&Inval%c InitRst%c RstMemClrEn%c",
+	FLAG(w, PCI_CXL_DEV_CTRL2_DISABLE_CACHING),
+	FLAG(w, PCI_CXL_DEV_CTRL2_INIT_WB_INVAL),
+	FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_RST),
+	FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_RST_CLR_EN));
+      if (rev >= 2)
+	  printf(" DesiredVolatileHDMStateAfterHotReset%c", FLAG(w, PCI_CXL_DEV_CTRL2_INIT_CXL_HDM_STATE_HOTRST));
+      printf("\n");
+
+      w = get_conf_word(d, where + PCI_CXL_DEV_STATUS2);
+      printf("\t\tCXLSta2:\tResetComplete%c ResetError%c PMComplete%c\n",
+	FLAG(w, PCI_CXL_DEV_STATUS_RC), FLAG(w,PCI_CXL_DEV_STATUS_RE), FLAG(w, PCI_CXL_DEV_STATUS_PMC));
+
+      w = get_conf_word(d, where + PCI_CXL_DEV_CAP2);
+      printf("\t\tCXLCap2:\t");
+      cache_unit_size = BITS(w, 0, 4);
+      cache_size = BITS(w, 8, 8);
+      switch (cache_unit_size)
+	{
+	case PCI_CXL_DEV_CAP2_CACHE_1M:
+	  printf("Cache Size: %08x\n", cache_size * (1<<20));
+	  break;
+	case PCI_CXL_DEV_CAP2_CACHE_64K:
+	  printf("Cache Size: %08x\n", cache_size * (64<<10));
+	  break;
+	case PCI_CXL_DEV_CAP2_CACHE_UNK:
+	  printf("Cache Size Not Reported\n");
+	  break;
+	default:
+	  printf("Cache Size: %d of unknown unit size (%d)\n", cache_size, cache_unit_size);
+	  break;
+	}
+
+      range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI) << 32;
+      range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
+      range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI) << 32;
+      range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
+      cxl_range(range_base, range_size, 1);
+
+      range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI) << 32;
+      range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
+      range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI) << 32;
+      range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
+      cxl_range(range_base, range_size, 2);
     }
-    printf("\n");
 
-    w = get_conf_word(d, where + PCI_CXL_DEV_STATUS2);
-    printf("\t\tCXLSta2:\tResetComplete%c ResetError%c PMComplete%c\n",
-      FLAG(w, PCI_CXL_DEV_STATUS_RC), FLAG(w,PCI_CXL_DEV_STATUS_RE), FLAG(w, PCI_CXL_DEV_STATUS_PMC));
-
-    w = get_conf_word(d, where + PCI_CXL_DEV_CAP2);
-    printf("\t\tCXLCap2:\t");
-    cache_unit_size = BITS(w, 0, 4);
-    cache_size = BITS(w, 8, 8);
-    switch (cache_unit_size)
-      {
-        case PCI_CXL_DEV_CAP2_CACHE_1M:
-          printf("Cache Size: %08x\n", cache_size * (1<<20));
-    break;
-        case PCI_CXL_DEV_CAP2_CACHE_64K:
-          printf("Cache Size: %08x\n", cache_size * (64<<10));
-    break;
-        case PCI_CXL_DEV_CAP2_CACHE_UNK:
-          printf("Cache Size Not Reported\n");
-    break;
-        default:
-          printf("Cache Size: %d of unknown unit size (%d)\n", cache_size, cache_unit_size);
-    break;
-      }
-
-    range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_HI) << 32;
-    range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_SIZE_LO);
-    range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_HI) << 32;
-    range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE1_BASE_LO);
-    cxl_range(range_base, range_size, 1);
-
-    range_size = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_HI) << 32;
-    range_size |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_SIZE_LO);
-    range_base = (u64) get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_HI) << 32;
-    range_base |= get_conf_long(d, where + PCI_CXL_DEV_RANGE2_BASE_LO);
-    cxl_range(range_base, range_size, 2);
-  }
-
-  if (rev >= 2) {
-    w = get_conf_word(d, where + PCI_CXL_DEV_CAP3);
-    printf("\t\tCXLCap3:\tDefaultVolatile HDM State After:\tColdReset%c WarmReset%c HotReset%c HotResetConfigurability%c\n",
-      FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_COLD),
-      FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_WARM),
-      FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT),
-      FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT_CFG));
-  }
+  if (rev >= 2)
+    {
+      w = get_conf_word(d, where + PCI_CXL_DEV_CAP3);
+      printf("\t\tCXLCap3:\tDefaultVolatile HDM State After:\tColdReset%c WarmReset%c HotReset%c HotResetConfigurability%c\n",
+	FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_COLD),
+	FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_WARM),
+	FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT),
+	FLAG(w, PCI_CXL_DEV_CAP3_HDM_STATE_RST_HOT_CFG));
+    }
 
   // Unparsed data
-  if (len > PCI_CXL_DEV_LEN) {
+  if (len > PCI_CXL_DEV_LEN)
     printf("\t\t<?>\n");
-  }
-
 }
 
 static void
@@ -989,19 +988,16 @@ dvsec_cxl_flex_bus(struct device *d, int where, int rev, int len)
   // Sanity check: Does the length correspond to its revision?
   switch (rev) {
     case 0:
-      if (len != PCI_CXL_FB_MOD_TS_DATA) {
+      if (len != PCI_CXL_FB_MOD_TS_DATA)
         printf("\t\t<Wrong length for Revision %d>\n", rev);
-      }
       break;
     case 1:
-      if (len != PCI_CXL_FB_PORT_CAP2) {
+      if (len != PCI_CXL_FB_PORT_CAP2)
         printf("\t\t<Wrong length for Revision %d>\n", rev);
-      }
       break;
     case 2:
-      if (len != PCI_CXL_FB_NEXT_UNSUPPORTED) {
+      if (len != PCI_CXL_FB_NEXT_UNSUPPORTED)
         printf("\t\t<Wrong length for Revision %d>\n", rev);
-      }
       break;
     default:
       break;
@@ -1044,32 +1040,31 @@ dvsec_cxl_flex_bus(struct device *d, int where, int rev, int len)
 
   // From Rev 1
   if (rev >= 1)
-  {
-    l = get_conf_long(d, where + PCI_CXL_FB_MOD_TS_DATA);
-    data = BITS(l, 0, 24);
-    printf("\t\tFBModTS:\tReceived FB Data: %06x\n", (unsigned int)data);
-  }
+    {
+      l = get_conf_long(d, where + PCI_CXL_FB_MOD_TS_DATA);
+      data = BITS(l, 0, 24);
+      printf("\t\tFBModTS:\tReceived FB Data: %06x\n", (unsigned int)data);
+    }
 
   // From Rev 2
   if (rev >= 2)
-  {
-    u8 nop;
+    {
+      u8 nop;
 
-    l = get_conf_long(d, where + PCI_CXL_FB_PORT_CAP2);
-    printf("\t\tFBCap2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CAP2_NOP_HINT));
+      l = get_conf_long(d, where + PCI_CXL_FB_PORT_CAP2);
+      printf("\t\tFBCap2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CAP2_NOP_HINT));
 
-    l = get_conf_long(d, where + PCI_CXL_FB_PORT_CTRL2);
-    printf("\t\tFBCtl2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CTRL2_NOP_HINT));
+      l = get_conf_long(d, where + PCI_CXL_FB_PORT_CTRL2);
+      printf("\t\tFBCtl2:\tNOPHint%c\n", FLAG(l, PCI_CXL_FB_CTRL2_NOP_HINT));
 
-    l = get_conf_long(d, where + PCI_CXL_FB_PORT_STATUS2);
-    nop = BITS(l, 0, 2);
-    printf("\t\tFBSta2:\tNOPHintInfo: %x\n", nop);
-  }
+      l = get_conf_long(d, where + PCI_CXL_FB_PORT_STATUS2);
+      nop = BITS(l, 0, 2);
+      printf("\t\tFBSta2:\tNOPHintInfo: %x\n", nop);
+    }
 
   // Unparsed data
-  if (len > PCI_CXL_FB_LEN) {
+  if (len > PCI_CXL_FB_LEN)
     printf("\t\t<?>\n");
-  }
 }
 
 static void
