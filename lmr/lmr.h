@@ -17,6 +17,10 @@
 
 #define MARGIN_STEP_MS 1000
 
+#define MARGIN_TIM_MIN       20
+#define MARGIN_TIM_RECOMMEND 30
+#define MARGIN_VOLT_MIN      50
+
 /* PCI Device wrapper for margining functions */
 struct margin_dev {
   struct pci_dev *dev;
@@ -204,5 +208,9 @@ void margin_log_receiver(struct margin_recv *recv);
 
 /* Margining in progress log */
 void margin_log_margining(struct margin_lanes_data arg);
+
+/* margin_results */
+
+void margin_results_print_brief(struct margin_results *results, u8 recvs_n);
 
 #endif
