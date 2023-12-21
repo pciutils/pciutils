@@ -692,6 +692,26 @@ cap_rcec(struct device *d, int where)
 }
 
 static void
+cap_lmr(struct device *d, int where)
+{
+  printf("Lane Margining at the Receiver\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where, 8))
+    return;
+
+  u16 port_caps = get_conf_word(d, where + PCI_LMR_CAPS);
+  u16 port_status = get_conf_word(d, where + PCI_LMR_PORT_STS);
+
+  printf("\t\tPortCap: Uses Driver%c\n", FLAG(port_caps, PCI_LMR_CAPS_DRVR));
+  printf("\t\tPortSta: MargReady%c MargSoftReady%c\n",
+         FLAG(port_status, PCI_LMR_PORT_STS_READY),
+         FLAG(port_status, PCI_LMR_PORT_STS_SOFT_READY));
+}
+
+static void
 cxl_range(u64 base, u64 size, int n)
 {
   u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
@@ -1607,7 +1627,7 @@ show_ext_caps(struct device *d, int type)
 	    printf("Physical Layer 16.0 GT/s <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_LMR:
-	    printf("Lane Margining at the Receiver <?>\n");
+	    cap_lmr(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_HIER_ID:
 	    printf("Hierarchy ID <?>\n");
