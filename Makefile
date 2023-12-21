@@ -62,7 +62,7 @@ LIBNAME=libpci
 
 -include lib/config.mk
 
-PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
+PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h lib/bitops.h
 PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
