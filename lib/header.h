@@ -1415,6 +1415,13 @@
 #define  PCI_DOE_STS_ERROR		0x4	/* DOE Error */
 #define  PCI_DOE_STS_OBJECT_READY	0x80000000 /* Data Object Ready */
 
+/* Lane Margining at the Receiver Extended Capability */
+#define PCI_LMR_CAPS			0x4 /* Margining Port Capabilities Register */
+#define PCI_LMR_CAPS_DRVR		0x1 /* Margining uses Driver Software */
+#define PCI_LMR_PORT_STS		0x6 /* Margining Port Status Register */
+#define PCI_LMR_PORT_STS_READY		0x1 /* Margining Ready */
+#define PCI_LMR_PORT_STS_SOFT_READY	0x2 /* Margining Software Ready */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
