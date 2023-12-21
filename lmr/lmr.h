@@ -181,4 +181,28 @@ struct margin_results *margin_test_link(struct margin_link *link, struct margin_
 
 void margin_free_results(struct margin_results *results, u8 results_n);
 
+/* margin_log */
+
+extern bool margin_global_logging;
+extern bool margin_print_domain;
+
+void margin_log(char *format, ...);
+
+/* b:d.f -> b:d.f */
+void margin_log_bdfs(struct pci_dev *down_port, struct pci_dev *up_port);
+
+/* Print Link header (bdfs, width, speed) */
+void margin_log_link(struct margin_link *link);
+
+void margin_log_params(struct margin_params *params);
+
+/* Print receiver number */
+void margin_log_recvn(struct margin_recv *recv);
+
+/* Print full info from Receiver struct */
+void margin_log_receiver(struct margin_recv *recv);
+
+/* Margining in progress log */
+void margin_log_margining(struct margin_lanes_data arg);
+
 #endif
