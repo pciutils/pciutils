@@ -20,7 +20,8 @@ const char program_name[] = "pcilmr";
 enum mode { MARGIN, FULL, SCAN };
 
 static const char usage_msg[]
-  = "Usage:\n"
+  = "! Utility requires preliminary preparation of the system. Refer to the pcilmr man page !\n\n"
+    "Usage:\n"
     "pcilmr [--margin] [<margining options>] <downstream component> ...\n"
     "pcilmr --full [<margining options>]\n"
     "pcilmr --scan\n\n"
