@@ -219,4 +219,7 @@ void margin_log_hw_quirks(struct margin_recv *recv);
 
 void margin_results_print_brief(struct margin_results *results, u8 recvs_n);
 
+void margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
+                             struct pci_dev *up_port);
+
 #endif

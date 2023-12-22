@@ -52,7 +52,12 @@ static const char usage_msg[]
     "-v <steps>\t\tSpecify maximum number of steps for Voltage Margining.\n"
     "Use only one of -T/-t options at the same time (same for -V/-v).\n"
     "Without these options utility will use MaxSteps from Device\n"
-    "capabilities as test limit.\n\n";
+    "capabilities as test limit.\n\n"
+    "Margining Log settings:\n"
+    "-o <directory>\t\tSave margining results in csv form into the\n"
+    "\t\t\tspecified directory. Utility will generate file with the\n"
+    "\t\t\tname in form of 'lmr_<downstream component>_Rx#_<timestamp>.csv'\n"
+    "\t\t\tfor each successfully tested receiver.\n";
 
 static struct pci_dev *
 dev_for_filter(struct pci_access *pacc, char *filter)
@@ -197,6 +202,9 @@ main(int argc, char **argv)
 
   bool run_margin = true;
 
+  char *dir_for_csv = NULL;
+  bool save_csv = false;
+
   u64 total_steps = 0;
 
   pacc = pci_alloc();
@@ -246,7 +254,7 @@ main(int argc, char **argv)
         break;
     }
 
-  while ((c = getopt(argc, argv, ":r:e:l:cp:t:v:VT")) != -1)
+  while ((c = getopt(argc, argv, ":r:e:l:cp:t:v:VTo:")) != -1)
     {
       switch (c)
         {
@@ -276,6 +284,10 @@ main(int argc, char **argv)
             break;
           case 'r':
             recvs_n = parse_csv_arg(optarg, recvs_arg);
+            break;
+          case 'o':
+            dir_for_csv = optarg;
+            save_csv = true;
             break;
           default:
             die("Invalid arguments\n\n%s", usage_msg);
@@ -449,6 +461,8 @@ main(int argc, char **argv)
           margin_log_bdfs(down_ports[i], up_ports[i]);
           printf(":\n\n");
           margin_results_print_brief(results[i], results_n[i]);
+          if (save_csv)
+            margin_results_save_csv(results[i], results_n[i], dir_for_csv, up_ports[i]);
           printf("\n");
         }
     }

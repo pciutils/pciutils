@@ -157,3 +157,114 @@ margin_results_print_brief(struct margin_results *results, u8 recvs_n)
       printf("\n");
     }
 }
+
+void
+margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
+                        struct pci_dev *up_port)
+{
+  char timestamp[64];
+  time_t tim = time(NULL);
+  strftime(timestamp, sizeof(timestamp), "%FT%H.%M.%S", gmtime(&tim));
+
+  size_t pathlen = strlen(dir) + 128;
+  char *path = xmalloc(pathlen);
+  FILE *csv;
+
+  struct margin_res_lane *lane;
+  struct margin_results *res;
+  struct margin_params params;
+
+  enum lane_rating lane_rating;
+  u8 link_speed;
+
+  for (int i = 0; i < recvs_n; i++)
+    {
+      res = &(results[i]);
+      params = res->params;
+      link_speed = res->link_speed - 4;
+
+      if (res->test_status != MARGIN_TEST_OK)
+        continue;
+      snprintf(path, pathlen, "%s/lmr_%0*x.%02x.%02x.%x_Rx%X_%s.csv", dir,
+               up_port->domain_16 == 0xffff ? 8 : 4, up_port->domain, up_port->bus, up_port->dev,
+               up_port->func, 10 + res->recvn - 1, timestamp);
+      csv = fopen(path, "w");
+      if (!csv)
+        die("Error while saving %s\n", path);
+
+      fprintf(csv, "Lane,Lane Status,Left %% UI,Left ps,Left Steps,Left Status,"
+                   "Right %% UI,Right ps,Right Steps,Right Status,"
+                   "Time %% UI,Time ps,Time Steps,Time Status,"
+                   "Up mV,Up Steps,Up Status,Down mV,Down Steps,Down Status,"
+                   "Voltage mV,Voltage Steps,Voltage Status\n");
+
+      if (check_recv_weird(res, MARGIN_TIM_MIN, MARGIN_VOLT_MIN))
+        lane_rating = WEIRD;
+      else
+        lane_rating = INIT;
+
+      for (int j = 0; j < res->lanes_n; j++)
+        {
+          lane = &(res->lanes[j]);
+          double left_ui = lane->steps[TIM_LEFT] * res->tim_coef;
+          double right_ui = lane->steps[TIM_RIGHT] * res->tim_coef;
+          double up_volt = lane->steps[VOLT_UP] * res->volt_coef;
+          double down_volt = lane->steps[VOLT_DOWN] * res->volt_coef;
+
+          if (lane_rating != WEIRD)
+            {
+              lane_rating = rate_lane(left_ui, MARGIN_TIM_MIN, MARGIN_TIM_RECOMMEND, INIT);
+              if (params.ind_left_right_tim)
+                lane_rating
+                  = rate_lane(right_ui, MARGIN_TIM_MIN, MARGIN_TIM_RECOMMEND, lane_rating);
+              if (params.volt_support)
+                {
+                  lane_rating = rate_lane(up_volt, MARGIN_VOLT_MIN, MARGIN_VOLT_MIN, lane_rating);
+                  if (params.ind_up_down_volt)
+                    lane_rating
+                      = rate_lane(down_volt, MARGIN_VOLT_MIN, MARGIN_VOLT_MIN, lane_rating);
+                }
+            }
+
+          fprintf(csv, "%d,%s,", lane->lane, grades[lane_rating]);
+          if (params.ind_left_right_tim)
+            {
+              fprintf(csv, "%f,%f,%d,%s,%f,%f,%d,%s,NA,NA,NA,NA,", left_ui,
+                      left_ui * ui[link_speed], lane->steps[TIM_LEFT],
+                      sts_strings[lane->statuses[TIM_LEFT]], right_ui, right_ui * ui[link_speed],
+                      lane->steps[TIM_RIGHT], sts_strings[lane->statuses[TIM_RIGHT]]);
+            }
+          else
+            {
+              for (int k = 0; k < 8; k++)
+                fprintf(csv, "NA,");
+              fprintf(csv, "%f,%f,%d,%s,", left_ui, left_ui * ui[link_speed], lane->steps[TIM_LEFT],
+                      sts_strings[lane->statuses[TIM_LEFT]]);
+            }
+          if (params.volt_support)
+            {
+              if (params.ind_up_down_volt)
+                {
+                  fprintf(csv, "%f,%d,%s,%f,%d,%s,NA,NA,NA\n", up_volt, lane->steps[VOLT_UP],
+                          sts_strings[lane->statuses[VOLT_UP]], down_volt, lane->steps[VOLT_DOWN],
+                          sts_strings[lane->statuses[VOLT_DOWN]]);
+                }
+              else
+                {
+                  for (int k = 0; k < 6; k++)
+                    fprintf(csv, "NA,");
+                  fprintf(csv, "%f,%d,%s\n", up_volt, lane->steps[VOLT_UP],
+                          sts_strings[lane->statuses[VOLT_UP]]);
+                }
+            }
+          else
+            {
+              for (int k = 0; k < 8; k++)
+                fprintf(csv, "NA,");
+              fprintf(csv, "NA\n");
+            }
+        }
+      fclose(csv);
+    }
+  free(path);
+}
