@@ -328,8 +328,13 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
   margin_apply_hw_quirks(&recv);
   margin_log_hw_quirks(&recv);
 
-  results->tim_coef = (double)params.timing_offset / (double)params.timing_steps;
-  results->volt_coef = (double)params.volt_offset / (double)params.volt_steps * 10.0;
+  results->tim_off_reported = params.timing_offset != 0;
+  results->volt_off_reported = params.volt_offset != 0;
+  double tim_offset = results->tim_off_reported ? (double)params.timing_offset : 50.0;
+  double volt_offset = results->volt_off_reported ? (double)params.volt_offset : 50.0;
+
+  results->tim_coef = tim_offset / (double)params.timing_steps;
+  results->volt_coef = volt_offset / (double)params.volt_steps * 10.0;
 
   results->lane_reversal = recv.lane_reversal;
   results->link_speed = dev->link_speed;
