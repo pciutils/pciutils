@@ -127,6 +127,20 @@ margin_report_cmd(struct margin_dev *dev, u8 lane, margin_cmd cmd, margin_cmd *r
          && margin_set_cmd(dev, lane, NO_COMMAND);
 }
 
+static void
+margin_apply_hw_quirks(struct margin_recv *recv)
+{
+  switch (recv->dev->hw)
+    {
+      case MARGIN_ICE_LAKE_RC:
+        if (recv->recvn == 1)
+          recv->params->volt_offset = 12;
+        break;
+      default:
+        break;
+    }
+}
+
 static bool
 read_params_internal(struct margin_dev *dev, u8 recvn, bool lane_reversal,
                      struct margin_params *params)
@@ -311,6 +325,8 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
 
   if (recv.parallel_lanes > params.max_lanes + 1)
     recv.parallel_lanes = params.max_lanes + 1;
+  margin_apply_hw_quirks(&recv);
+  margin_log_hw_quirks(&recv);
 
   results->tim_coef = (double)params.timing_offset / (double)params.timing_steps;
   results->volt_coef = (double)params.volt_offset / (double)params.volt_steps * 10.0;
