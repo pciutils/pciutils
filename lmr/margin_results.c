@@ -105,6 +105,19 @@ margin_results_print_brief(struct margin_results *results, u8 recvs_n)
       if (res->lane_reversal)
         printf("Rx(%X) - Lane Reversal\n", 10 + res->recvn - 1);
 
+      if (!res->tim_off_reported)
+        printf("Rx(%X) - Attention: Vendor chose not to report the Max Timing Offset.\n"
+               "Utility used its max possible value (50%% UI) for calculations of %% UI and ps.\n"
+               "Keep in mind that for timing results of this receiver only steps values are "
+               "reliable.\n\n",
+               10 + res->recvn - 1);
+      if (params.volt_support && !res->volt_off_reported)
+        printf("Rx(%X) - Attention: Vendor chose not to report the Max Voltage Offset.\n"
+               "Utility used its max possible value (500 mV) for calculations of mV.\n"
+               "Keep in mind that for voltage results of this receiver only steps values are "
+               "reliable.\n\n",
+               10 + res->recvn - 1);
+
       if (check_recv_weird(res, MARGIN_TIM_MIN, MARGIN_VOLT_MIN))
         lane_rating = WEIRD;
       else

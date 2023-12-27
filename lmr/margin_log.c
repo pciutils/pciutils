@@ -86,6 +86,13 @@ margin_log_receiver(struct margin_recv *recv)
       margin_log("\nWarning: device uses Lane Reversal.\n");
       margin_log("However, utility uses logical lane numbers in arguments and for logging.\n");
     }
+
+  if (recv->params->timing_offset == 0)
+    margin_log("\nWarning: Vendor chose not to report the Max Timing Offset.\n"
+               "Utility will use its max possible value - 50 (50%% UI).\n");
+  if (recv->params->volt_support && recv->params->volt_offset == 0)
+    margin_log("\nWarning: Vendor chose not to report the Max Voltage Offset.\n"
+               "Utility will use its max possible value - 50 (500 mV).\n");
 }
 
 void

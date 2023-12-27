@@ -107,6 +107,9 @@ struct margin_results {
   double tim_coef;
   double volt_coef;
 
+  bool tim_off_reported;
+  bool volt_off_reported;
+
   u8 lanes_n;
   struct margin_res_lane *lanes;
 };
