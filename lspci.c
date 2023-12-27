@@ -107,6 +107,7 @@ config_fetch(struct device *d, unsigned int pos, unsigned int len)
       d->config = xrealloc(d->config, d->config_bufsize);
       d->present = xrealloc(d->present, d->config_bufsize);
       memset(d->present + orig_size, 0, d->config_bufsize - orig_size);
+      pci_setup_cache(d->dev, d->config, d->dev->cache_len);
     }
   result = pci_read_block(d->dev, pos, d->config + pos, len);
   if (result)
