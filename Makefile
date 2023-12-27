@@ -65,9 +65,13 @@ LIBNAME=libpci
 PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h lib/bitops.h
 PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
+LMR=margin_hw.o margin.o margin_log.o margin_results.o
+LMROBJS=$(addprefix lmr/,$(LMR))
+LMRINC=lmr/lmr.h
+
 export
 
-all: lib/$(PCIIMPLIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCIIMPLIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS) pcilmr
 
 lib/$(PCIIMPLIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -110,6 +114,12 @@ update-pciids: update-pciids.sh
 example$(EXEEXT): example.o lib/$(PCIIMPLIB)
 example.o: example.c $(PCIINC)
 
+$(LMROBJS) pcilmr.o: CFLAGS+=-I .
+$(LMROBJS): %.o: %.c $(LMRINC) $(PCIINC) pciutils.h
+
+pcilmr: pcilmr.o lib/$(PCIIMPLIB) $(LMROBJS) $(COMMON)
+pcilmr.o: pcilmr.c $(LMRINC) $(PCIINC) pciutils.h
+
 %$(EXEEXT): %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
@@ -141,7 +151,7 @@ TAGS:
 
 clean:
 	rm -f `find . -name "*~" -o -name "*.[oa]" -o -name "\#*\#" -o -name TAGS -o -name core -o -name "*.orig"`
-	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* lib/*.dll lib/*.def lib/dllrsrc.rc *-rsrc.rc tags
+	rm -f update-pciids lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lib/config.* *.[578] pci.ids.gz lib/*.pc lib/*.so lib/*.so.* lib/*.dll lib/*.def lib/dllrsrc.rc *-rsrc.rc tags pcilmr
 	rm -rf maint/dist
 
 distclean: clean
