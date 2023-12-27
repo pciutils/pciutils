@@ -10,6 +10,27 @@
 
 #include "lmr.h"
 
+static u16 special_hw[][4] =
+  // Vendor ID, Device ID, Revision ID, margin_hw
+  { { 0x8086, 0x347A, 0x4, MARGIN_ICE_LAKE_RC }, 
+    { 0xFFFF, 0, 0, MARGIN_HW_DEFAULT } 
+  };
+
+static enum margin_hw
+detect_unique_hw(struct pci_dev *dev)
+{
+  u16 vendor = pci_read_word(dev, PCI_VENDOR_ID);
+  u16 device = pci_read_word(dev, PCI_DEVICE_ID);
+  u8 revision = pci_read_byte(dev, PCI_REVISION_ID);
+
+  for (int i = 0; special_hw[i][0] != 0xFFFF; i++)
+    {
+      if (vendor == special_hw[i][0] && device == special_hw[i][1] && revision == special_hw[i][2])
+        return special_hw[i][3];
+    }
+  return MARGIN_HW_DEFAULT;
+}
+
 bool
 margin_verify_link(struct pci_dev *down_port, struct pci_dev *up_port)
 {
@@ -56,7 +77,8 @@ fill_dev_wrapper(struct pci_dev *dev)
         .retimers_n
         = (!!(pci_read_word(dev, cap->addr + PCI_EXP_LNKSTA2) & PCI_EXP_LINKSTA2_RETIMER))
           + (!!(pci_read_word(dev, cap->addr + PCI_EXP_LNKSTA2) & PCI_EXP_LINKSTA2_2RETIMERS)),
-        .link_speed = (pci_read_word(dev, cap->addr + PCI_EXP_LNKSTA) & PCI_EXP_LNKSTA_SPEED) };
+        .link_speed = (pci_read_word(dev, cap->addr + PCI_EXP_LNKSTA) & PCI_EXP_LNKSTA_SPEED),
+        .hw = detect_unique_hw(dev) };
   return res;
 }
 

@@ -133,3 +133,19 @@ margin_log_margining(struct margin_lanes_data arg)
       fflush(stdout);
     }
 }
+
+void
+margin_log_hw_quirks(struct margin_recv *recv)
+{
+  switch (recv->dev->hw)
+    {
+      case MARGIN_ICE_LAKE_RC:
+        if (recv->recvn == 1)
+          margin_log("\nRx(A) is Intel Ice Lake RC port.\n"
+                     "Applying next quirks for margining process:\n"
+                     "  - Set MaxVoltageOffset to 12 (120 mV).\n");
+        break;
+      default:
+        break;
+    }
+}

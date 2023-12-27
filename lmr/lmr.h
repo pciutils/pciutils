@@ -21,6 +21,8 @@
 #define MARGIN_TIM_RECOMMEND 30
 #define MARGIN_VOLT_MIN      50
 
+enum margin_hw { MARGIN_HW_DEFAULT, MARGIN_ICE_LAKE_RC };
+
 /* PCI Device wrapper for margining functions */
 struct margin_dev {
   struct pci_dev *dev;
@@ -28,6 +30,8 @@ struct margin_dev {
   u8 width;
   u8 retimers_n;
   u8 link_speed;
+
+  enum margin_hw hw;
 
   /* Saved Device settings to restore after margining */
   u8 aspm;
@@ -208,6 +212,8 @@ void margin_log_receiver(struct margin_recv *recv);
 
 /* Margining in progress log */
 void margin_log_margining(struct margin_lanes_data arg);
+
+void margin_log_hw_quirks(struct margin_recv *recv);
 
 /* margin_results */
 
