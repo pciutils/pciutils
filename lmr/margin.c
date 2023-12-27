@@ -256,6 +256,7 @@ margin_test_lanes(struct margin_lanes_data arg)
         }
 
       arg.steps_lane_done = steps_done;
+      margin_log_margining(arg);
     }
 
   for (int i = 0; i < arg.lanes_n; i++)
@@ -286,9 +287,11 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
 
   results->recvn = recvn;
   results->lanes_n = lanes_n;
+  margin_log_recvn(&recv);
 
   if (!margin_check_ready_bit(dev->dev))
     {
+      margin_log("\nMargining Ready bit is Clear.\n");
       results->test_status = MARGIN_TEST_READY_BIT;
       return false;
     }
@@ -298,6 +301,7 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
       recv.lane_reversal = true;
       if (!read_params_internal(dev, recvn, recv.lane_reversal, &params))
         {
+          margin_log("\nError during caps reading.\n");
           results->test_status = MARGIN_TEST_CAPS;
           return false;
         }
@@ -315,6 +319,8 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
   results->link_speed = dev->link_speed;
   results->test_status = MARGIN_TEST_OK;
 
+  margin_log_receiver(&recv);
+
   results->lanes = xmalloc(sizeof(struct margin_res_lane) * lanes_n);
   for (int i = 0; i < lanes_n; i++)
     {
@@ -324,6 +330,8 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
 
   if (args->run_margin)
     {
+      if (args->verbosity > 0)
+        margin_log("\n");
       struct margin_lanes_data lanes_data
         = { .recv = &recv, .verbosity = args->verbosity, .steps_utility = args->steps_utility };
 
@@ -363,6 +371,8 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_args *args,
             }
           lanes_done += use_lanes;
         }
+      if (args->verbosity > 0)
+        margin_log("\n");
       if (recv.lane_reversal)
         {
           for (int i = 0; i < lanes_n; i++)
@@ -504,11 +514,14 @@ margin_test_link(struct margin_link *link, struct margin_args *args, u8 *recvs_n
   u8 receivers_n = status ? args->recvs_n : 1;
   u8 *receivers = args->recvs;
 
+  margin_log_link(link);
+
   struct margin_results *results = xmalloc(sizeof(*results) * receivers_n);
 
   if (!status)
     {
       results[0].test_status = MARGIN_TEST_ASPM;
+      margin_log("\nCouldn't disable ASPM on the given Link.\n");
     }
 
   if (status)
