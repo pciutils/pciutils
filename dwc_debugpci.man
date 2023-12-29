@@ -1,0 +1,69 @@
+.TH dwc_debugpci 8 "@TODAY@" "@VERSION@" "The PCI Utilities"
+.SH NAME
+dwc_debugpci \- PCIe debug tool for DesignWare Controllers
+.SH SYNOPSIS
+.B dwc_debugpci
+.RB [ options ]
+.B devices
+.BR operations ...
+
+.SH DESCRIPTION
+.PP
+.B dwc_debugpci
+is a debug utility to diagnose PCIe link errors where controller is Synopsys DesignWare Controller
+
+The toold uses a Synopsys specific vendor capability called RAS DES to dump all major error details. Hence, this tool is applicable to DesignWare controllers only. Root privileges are necessary for all operations as reading and writing to vendor specific capability list is required
+Please see
+.BR lspci(8)
+for details on access rights.
+
+.SH OPTIONS
+
+.SS General options
+.TP
+.B c
+Tells
+.I dwc_debugpci
+to start capturing the RAS DES statistical error counters in Hardware.
+.B d
+Tells
+.I dwc_debugpci
+to dump the captured error data in a report format and print analysis of the reported errors along with error description and further debug steps if any 
+.TP
+.TP
+.B --version
+Show
+.I dwc_debugpci
+version. This option should be used stand-alone.
+.TP
+.B --help
+Show detailed help on available options. This option should be used stand-alone.
+
+.SH DEVICE SELECTION
+.PP
+Before each sequence of operations you need to select which devices you wish that
+operation to affect.
+.TP
+.B [[[[<domain>]:]<bus>]:][<slot>][.[<func>]]
+Consider only devices in the specified domain (in case your machine has several host bridges,
+they can either share a common bus number space or each of them can address a PCI domain
+of its own; domains are numbered from 0 to ffff), bus (0 to ff), slot (0 to 1f) and function (0 to 7).
+Each component of the device address can be omitted or set to "*", both meaning "any value". All numbers are
+hexadecimal.  E.g., "0:" means all devices on bus 0, "0" means all functions of device 0
+on any bus, "0.3" selects third function of device 0 on all buses and ".4" matches only
+the fourth function of each device.
+
+.SH
+EXAMPLES
+
+.dwc_debugpci 0000:00:00.0 c
+enables registers to start the capture of all possible error counters in hardware
+.dwc_debugpci 0000:00:00.0 d
+dumps list of all errors and alongisde prints the number of times that particular error occured. It also prints some debug information related to equalization and flow control. Post this report print, it also mentions the description of the error occured and some debug steps that can be used if applicable
+
+.SH SEE ALSO
+.BR lspci (8),
+.BR pcilib (7)
+
+.SH AUTHOR
+The PCI Utilities are maintained by Martin Mares <mj@ucw.cz>.

@@ -67,7 +67,7 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 export
 
-all: lib/$(PCIIMPLIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) lspci.8 setpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
+all: lib/$(PCIIMPLIB) lspci$(EXEEXT) setpci$(EXEEXT) example$(EXEEXT) dwc_debugpci$(EXEEXT) lspci.8 setpci.8 dwc_debugpci.8 pcilib.7 pci.ids.5 update-pciids update-pciids.8 $(PCI_IDS)
 
 lib/$(PCIIMPLIB): $(PCIINC) force
 	$(MAKE) -C lib all
@@ -109,6 +109,9 @@ update-pciids: update-pciids.sh
 # The example of use of libpci
 example$(EXEEXT): example.o lib/$(PCIIMPLIB)
 example.o: example.c $(PCIINC)
+
+dwc_debugpci$(EXEEXT): dwc_debugpci.o lib/$(PCILIB)
+dwc_debugpci.o: dwc_debugpci.c $(PCIINC)
 
 %$(EXEEXT): %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
@@ -157,7 +160,7 @@ ifneq ($(IDSDIR),)
 else
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(SBINDIR)
 endif
-	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 $(DESTDIR)$(MANDIR)/man8
+	$(INSTALL) -c -m 644 lspci.8 setpci.8 update-pciids.8 dwc_debugpci.8 $(DESTDIR)$(MANDIR)/man8
 	$(INSTALL) -c -m 644 pcilib.7 $(DESTDIR)$(MANDIR)/man7
 	$(INSTALL) -c -m 644 pci.ids.5 $(DESTDIR)$(MANDIR)/man5
 ifeq ($(SHARED),yes)
@@ -209,7 +212,7 @@ ifneq ($(IDSDIR),)
 else
 	rm -f $(DESTDIR)$(SBINDIR)/$(PCI_IDS)
 endif
-	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8
+	rm -f $(DESTDIR)$(MANDIR)/man8/lspci.8 $(DESTDIR)$(MANDIR)/man8/setpci.8 $(DESTDIR)$(MANDIR)/man8/update-pciids.8 $(DESTDIR)$(MANDIR)/man8/dwc_debugpci.8
 	rm -f $(DESTDIR)$(MANDIR)/man7/pcilib.7
 	rm -f $(DESTDIR)$(MANDIR)/man5/pci.ids.5
 ifeq ($(SHARED)_$(LIBEXT),yes_dll)
