@@ -680,7 +680,8 @@ struct mmap_cache
   int w;
 };
 
-struct ecam_aux
+// Back-end data linked to struct pci_access
+struct ecam_access
 {
   struct acpi_mcfg *mcfg;
   struct mmap_cache *cache;
@@ -689,22 +690,22 @@ struct ecam_aux
 static void
 munmap_reg(struct pci_access *a)
 {
-  struct ecam_aux *aux = a->aux;
-  struct mmap_cache *cache = aux->cache;
+  struct ecam_access *eacc = a->backend_data;
+  struct mmap_cache *cache = eacc->cache;
 
   if (!cache)
     return;
 
   munmap(cache->map, cache->length + (cache->addr & (pagesize-1)));
   pci_mfree(cache);
-  aux->cache = NULL;
+  eacc->cache = NULL;
 }
 
 static int
 mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int pos, volatile void **reg)
 {
-  struct ecam_aux *aux = a->aux;
-  struct mmap_cache *cache = aux->cache;
+  struct ecam_access *eacc = a->backend_data;
+  struct mmap_cache *cache = eacc->cache;
   const char *addrs;
   void *map;
   off_t addr;
@@ -720,7 +721,7 @@ mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int p
   else
     {
       addrs = pci_get_param(a, "ecam.addrs");
-      if (!get_bus_addr(aux->mcfg, addrs, domain, bus, &addr, &length))
+      if (!get_bus_addr(eacc->mcfg, addrs, domain, bus, &addr, &length))
         return 0;
 
       map = mmap(NULL, length + (addr & (pagesize-1)), w ? PROT_WRITE : PROT_READ, MAP_SHARED, a->fd, addr & ~(pagesize-1));
@@ -730,7 +731,7 @@ mmap_reg(struct pci_access *a, int w, int domain, u8 bus, u8 dev, u8 func, int p
       if (cache)
         munmap(cache->map, cache->length + (cache->addr & (pagesize-1)));
       else
-        cache = aux->cache = pci_malloc(a, sizeof(*cache));
+        cache = eacc->cache = pci_malloc(a, sizeof(*cache));
 
       cache->map = map;
       cache->addr = addr;
@@ -915,7 +916,7 @@ ecam_init(struct pci_access *a)
 #endif
   const char *addrs = pci_get_param(a, "ecam.addrs");
   struct acpi_mcfg *mcfg = NULL;
-  struct ecam_aux *aux = NULL;
+  struct ecam_access *eacc = NULL;
   int use_bsd = 0;
   int use_x86bios = 0;
   int test_domain = 0;
@@ -948,10 +949,10 @@ ecam_init(struct pci_access *a)
         a->error("Option ecam.addrs was not specified and ACPI MCFG table cannot be found.");
     }
 
-  aux = pci_malloc(a, sizeof(*aux));
-  aux->mcfg = mcfg;
-  aux->cache = NULL;
-  a->aux = aux;
+  eacc = pci_malloc(a, sizeof(*eacc));
+  eacc->mcfg = mcfg;
+  eacc->cache = NULL;
+  a->backend_data = eacc;
 
   if (mcfg)
     get_mcfg_allocation(mcfg, 0, &test_domain, &test_bus, NULL, NULL, NULL);
@@ -966,14 +967,15 @@ ecam_init(struct pci_access *a)
 static void
 ecam_cleanup(struct pci_access *a)
 {
-  struct ecam_aux *aux = a->aux;
+  struct ecam_access *eacc = a->backend_data;
 
   if (a->fd < 0)
     return;
 
   munmap_reg(a);
-  pci_mfree(aux->mcfg);
-  pci_mfree(aux);
+  pci_mfree(eacc->mcfg);
+  pci_mfree(eacc);
+  a->backend_data = NULL;
 
   close(a->fd);
   a->fd = -1;
@@ -983,7 +985,7 @@ static void
 ecam_scan(struct pci_access *a)
 {
   const char *addrs = pci_get_param(a, "ecam.addrs");
-  struct ecam_aux *aux = a->aux;
+  struct ecam_access *eacc = a->backend_data;
   u32 *segments;
   int i, j, count;
   int domain;
@@ -991,11 +993,11 @@ ecam_scan(struct pci_access *a)
   segments = pci_malloc(a, 0xFFFF/8);
   memset(segments, 0, 0xFFFF/8);
 
-  if (aux->mcfg)
+  if (eacc->mcfg)
     {
-      count = get_mcfg_allocations_count(aux->mcfg);
+      count = get_mcfg_allocations_count(eacc->mcfg);
       for (i = 0; i < count; i++)
-        segments[aux->mcfg->allocations[i].pci_segment / 32] |= 1 << (aux->mcfg->allocations[i].pci_segment % 32);
+        segments[eacc->mcfg->allocations[i].pci_segment / 32] |= 1 << (eacc->mcfg->allocations[i].pci_segment % 32);
     }
   else
     {

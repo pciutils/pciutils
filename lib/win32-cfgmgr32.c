@@ -833,7 +833,7 @@ get_device_driver_path(struct pci_dev *d, SC_HANDLE manager, BOOL manager_suppor
   LPWSTR service_name = NULL;
   ULONG devinst_id_len = 0;
   char *driver_path = NULL;
-  DEVINST devinst = (DEVINST)d->aux;
+  DEVINST devinst = (DEVINST)d->backend_data;
   ULONG problem = 0;
   ULONG status = 0;
   HKEY key = NULL;
@@ -1565,9 +1565,9 @@ scan_devinst_id(struct pci_access *a, DEVINSTID_A devinst_id)
 
   d = pci_get_dev(a, domain, bus, dev, func);
   pci_link_dev(a, d);
-  if (!d->access->aux)
+  if (!d->access->backend_data)
     d->no_config_access = 1;
-  d->aux = (void *)devinst;
+  d->backend_data = (void *)devinst;
 
   /* Parse device id part of devinst id and fill details into pci_dev. */
   if (!a->buscentric)
@@ -1581,7 +1581,7 @@ scan_devinst_id(struct pci_access *a, DEVINSTID_A devinst_id)
     fill_resources(d, devinst, devinst_id);
 
   /*
-   * Set parent field to cfgmgr32 parent devinst handle and aux field to current
+   * Set parent field to cfgmgr32 parent devinst handle and backend_data field to current
    * devinst handle. At later stage in win32_cfgmgr32_scan() when all pci_dev
    * devices are linked, change every devinst handle by pci_dev.
    */
@@ -1653,7 +1653,7 @@ win32_cfgmgr32_scan(struct pci_access *a)
       for (d1 = a->devices; d1; d1 = d1->next)
         {
           for (d2 = a->devices; d2; d2 = d2->next)
-            if ((DEVINST)d1->parent == (DEVINST)d2->aux)
+            if ((DEVINST)d1->parent == (DEVINST)d2->backend_data)
               break;
           d1->parent = d2;
           if (d1->parent)
@@ -1661,9 +1661,9 @@ win32_cfgmgr32_scan(struct pci_access *a)
         }
     }
 
-  /* devinst stored in ->aux is not needed anymore, clear it. */
+  /* devinst stored in ->backend_data is not needed anymore, clear it. */
   for (d = a->devices; d; d = d->next)
-    d->aux = NULL;
+    d->backend_data = NULL;
 
   pci_mfree(devinst_id_list);
 }
@@ -1713,7 +1713,7 @@ win32_cfgmgr32_fill_info(struct pci_dev *d, unsigned int flags)
    * All available flags were filled by win32_cfgmgr32_scan().
    * Filling more flags is possible only from config space.
    */
-  if (!d->access->aux)
+  if (!d->access->backend_data)
     return;
 
   pci_generic_fill_info(d, flags);
@@ -1723,14 +1723,14 @@ static int
 win32_cfgmgr32_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   struct pci_access *a = d->access;
-  struct pci_access *acfg = a->aux;
-  struct pci_dev *dcfg = d->aux;
+  struct pci_access *acfg = a->backend_data;
+  struct pci_dev *dcfg = d->backend_data;
 
   if (!acfg)
     return pci_emulated_read(d, pos, buf, len);
 
   if (!dcfg)
-    d->aux = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
+    d->backend_data = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
 
   return pci_read_block(dcfg, pos, buf, len);
 }
@@ -1739,14 +1739,14 @@ static int
 win32_cfgmgr32_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
   struct pci_access *a = d->access;
-  struct pci_access *acfg = a->aux;
-  struct pci_dev *dcfg = d->aux;
+  struct pci_access *acfg = a->backend_data;
+  struct pci_dev *dcfg = d->backend_data;
 
   if (!acfg)
     return 0;
 
   if (!dcfg)
-    d->aux = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
+    d->backend_data = dcfg = pci_get_dev(acfg, d->domain, d->bus, d->dev, d->func);
 
   return pci_write_block(dcfg, pos, buf, len);
 }
@@ -1754,7 +1754,7 @@ win32_cfgmgr32_write(struct pci_dev *d, int pos, byte *buf, int len)
 static void
 win32_cfgmgr32_cleanup_dev(struct pci_dev *d)
 {
-  struct pci_dev *dcfg = d->aux;
+  struct pci_dev *dcfg = d->backend_data;
 
   if (dcfg)
     pci_free_dev(dcfg);
@@ -1798,13 +1798,13 @@ win32_cfgmgr32_init(struct pci_access *a)
       return;
     }
 
-  a->aux = acfg;
+  a->backend_data = acfg;
 }
 
 static void
 win32_cfgmgr32_cleanup(struct pci_access *a)
 {
-  struct pci_access *acfg = a->aux;
+  struct pci_access *acfg = a->backend_data;
 
   if (acfg)
     pci_cleanup(acfg);

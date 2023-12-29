@@ -89,7 +89,7 @@ struct pci_access {
   int fd_rw;				/* proc/sys: fd opened read-write */
   int fd_vpd;				/* sys: fd for VPD */
   struct pci_dev *cached_dev;		/* proc/sys: device the fds are for */
-  void *aux;				/* Auxiliary data for use by the back-end */
+  void *backend_data;			/* Private data of the back end */
 };
 
 /* Initialize PCI access */
@@ -164,7 +164,7 @@ struct pci_dev {
   u8 *cache;				/* Cached config registers */
   int cache_len;
   int hdrtype;				/* Cached low 7 bits of header type, -1 if unknown */
-  void *aux;				/* Auxiliary data for use by the back-end */
+  void *backend_data;			/* Private data for of the back end */
   struct pci_property *properties;	/* A linked list of extra properties */
   struct pci_cap *last_cap;		/* Last capability in the list */
 };

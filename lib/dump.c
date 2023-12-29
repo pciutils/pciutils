@@ -40,7 +40,7 @@ dump_alloc_data(struct pci_dev *dev, int len)
   dd->allocated = len;
   dd->len = 0;
   memset(dd->data, 0xff, len);
-  dev->aux = dd;
+  dev->backend_data = dd;
 }
 
 static int
@@ -97,7 +97,7 @@ dump_init(struct pci_access *a)
 		dump_validate(buf, "#######: ") || dump_validate(buf, "########: ")) &&
 	       sscanf(buf, "%x: ", &i) == 1)
 	{
-	  struct dump_data *dd = dev->aux;
+	  struct dump_data *dd = dev->backend_data;
 	  z = strchr(buf, ' ') + 1;
 	  while (isxdigit(z[0]) && isxdigit(z[1]) && (!z[2] || z[2] == ' ') &&
 		 sscanf(z, "%x", &j) == 1 && j < 256)
@@ -110,9 +110,9 @@ dump_init(struct pci_access *a)
 	      if (i >= dd->allocated)	/* Need to re-allocate the buffer */
 		{
 		  dump_alloc_data(dev, 4096);
-		  memcpy(((struct dump_data *) dev->aux)->data, dd->data, 256);
+		  memcpy(((struct dump_data *) dev->backend_data)->data, dd->data, 256);
 		  pci_mfree(dd);
-		  dd = dev->aux;
+		  dd = dev->backend_data;
 		}
 	      dd->data[i++] = j;
 	      if (i > dd->len)
@@ -145,14 +145,14 @@ static int
 dump_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
   struct dump_data *dd;
-  if (!(dd = d->aux))
+  if (!(dd = d->backend_data))
     {
       struct pci_dev *e = d->access->devices;
       while (e && (e->domain != d->domain || e->bus != d->bus || e->dev != d->dev || e->func != d->func))
 	e = e->next;
       if (!e)
 	return 0;
-      dd = e->aux;
+      dd = e->backend_data;
     }
   if (pos + len > dd->len)
     return 0;
@@ -170,10 +170,10 @@ dump_write(struct pci_dev *d UNUSED, int pos UNUSED, byte *buf UNUSED, int len U
 static void
 dump_cleanup_dev(struct pci_dev *d)
 {
-  if (d->aux)
+  if (d->backend_data)
     {
-      pci_mfree(d->aux);
-      d->aux = NULL;
+      pci_mfree(d->backend_data);
+      d->backend_data = NULL;
     }
 }
 

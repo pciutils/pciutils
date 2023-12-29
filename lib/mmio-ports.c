@@ -45,7 +45,7 @@ static long pagesize;
 static void
 munmap_regs(struct pci_access *a)
 {
-  struct mmio_cache *cache = a->aux;
+  struct mmio_cache *cache = a->backend_data;
 
   if (!cache)
     return;
@@ -54,14 +54,14 @@ munmap_regs(struct pci_access *a)
   if (cache->addr_page != cache->data_page)
     munmap(cache->data_map, pagesize);
 
-  pci_mfree(a->aux);
-  a->aux = NULL;
+  pci_mfree(a->backend_data);
+  a->backend_data = NULL;
 }
 
 static int
 mmap_regs(struct pci_access *a, off_t addr_reg, off_t data_reg, int data_off, volatile void **addr, volatile void **data)
 {
-  struct mmio_cache *cache = a->aux;
+  struct mmio_cache *cache = a->backend_data;
   off_t addr_page = addr_reg & ~(pagesize-1);
   off_t data_page = data_reg & ~(pagesize-1);
   void *addr_map = MAP_FAILED;
@@ -101,7 +101,7 @@ mmap_regs(struct pci_access *a, off_t addr_reg, off_t data_reg, int data_off, vo
     munmap(cache->data_map, pagesize);
 
   if (!cache)
-    cache = a->aux = pci_malloc(a, sizeof(*cache));
+    cache = a->backend_data = pci_malloc(a, sizeof(*cache));
 
   cache->addr_page = addr_page;
   cache->data_page = data_page;
