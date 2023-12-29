@@ -1,7 +1,7 @@
 /*
  *	The PCI Library -- Configuration Access via /proc/bus/pci
  *
- *	Copyright (c) 1997--2003 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2023 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -19,7 +19,6 @@
 #include <sys/types.h>
 
 #include "internal.h"
-#include "pread.h"
 
 static void
 proc_config(struct pci_access *a)
@@ -162,7 +161,6 @@ proc_setup(struct pci_dev *d, int rw)
       if (a->fd < 0)
 	a->warning("Cannot open %s", buf);
       a->cached_dev = d;
-      a->fd_pos = 0;
     }
   return a->fd;
 }
@@ -175,7 +173,7 @@ proc_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = do_read(d, fd, buf, len, pos);
+  res = pread(fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("proc_read: read failed: %s", strerror(errno));
@@ -194,7 +192,7 @@ proc_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = do_write(d, fd, buf, len, pos);
+  res = pwrite(fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("proc_write: write failed: %s", strerror(errno));

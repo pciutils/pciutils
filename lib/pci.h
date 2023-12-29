@@ -87,7 +87,6 @@ struct pci_access {
   struct udev_hwdb *id_udev_hwdb;
   int fd;				/* proc/sys: fd for config space */
   int fd_rw;				/* proc/sys: fd opened read-write */
-  int fd_pos;				/* proc/sys: current position */
   int fd_vpd;				/* sys: fd for VPD */
   struct pci_dev *cached_dev;		/* proc/sys: device the fds are for */
   void *aux;				/* Auxiliary data for use by the back-end */

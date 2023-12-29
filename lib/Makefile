@@ -125,8 +125,8 @@ params.o: params.c $(INCL)
 i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
 mmio-ports.o: mmio-ports.c $(INCL)
 ecam.o: ecam.c $(INCL)
-proc.o: proc.c $(INCL) pread.h
-sysfs.o: sysfs.c $(INCL) pread.h
+proc.o: proc.c $(INCL)
+sysfs.o: sysfs.c $(INCL)
 generic.o: generic.c $(INCL)
 emulated.o: emulated.c $(INCL)
 syscalls.o: syscalls.c $(INCL)

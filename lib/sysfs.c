@@ -2,7 +2,7 @@
  *	The PCI Library -- Configuration Access via /sys/bus/pci
  *
  *	Copyright (c) 2003 Matthew Wilcox <matthew@wil.cx>
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2023 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -22,7 +22,6 @@
 #include <sys/types.h>
 
 #include "internal.h"
-#include "pread.h"
 
 static void
 sysfs_config(struct pci_access *a)
@@ -524,7 +523,6 @@ sysfs_setup(struct pci_dev *d, int intent)
       a->fd = open(namebuf, a->fd_rw ? O_RDWR : O_RDONLY);
       if (a->fd < 0)
 	a->warning("Cannot open %s", namebuf);
-      a->fd_pos = 0;
     }
   return a->fd;
 }
@@ -536,7 +534,7 @@ static int sysfs_read(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = do_read(d, fd, buf, len, pos);
+  res = pread(fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("sysfs_read: read failed: %s", strerror(errno));
@@ -554,7 +552,7 @@ static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
 
   if (fd < 0)
     return 0;
-  res = do_write(d, fd, buf, len, pos);
+  res = pwrite(fd, buf, len, pos);
   if (res < 0)
     {
       d->access->warning("sysfs_write: write failed: %s", strerror(errno));
@@ -567,17 +565,6 @@ static int sysfs_write(struct pci_dev *d, int pos, byte *buf, int len)
     }
   return 1;
 }
-
-#ifdef PCI_HAVE_DO_READ
-
-/* pread() is not available and do_read() only works for a single fd, so we
- * cannot implement read_vpd properly. */
-static int sysfs_read_vpd(struct pci_dev *d UNUSED, int pos UNUSED, byte *buf UNUSED, int len UNUSED)
-{
-  return 0;
-}
-
-#else /* !PCI_HAVE_DO_READ */
 
 static int sysfs_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
 {
@@ -596,8 +583,6 @@ static int sysfs_read_vpd(struct pci_dev *d, int pos, byte *buf, int len)
     return 0;
   return 1;
 }
-
-#endif /* PCI_HAVE_DO_READ */
 
 static void sysfs_cleanup_dev(struct pci_dev *d)
 {
