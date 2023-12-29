@@ -718,14 +718,11 @@ dvsec_cxl_device(struct device *d, int rev, int where, int len)
   u64 range_base, range_size;
   u16 w;
 
-  if (len < 0x38)
-    return;
-
   /* Legacy 1.1 revs aren't handled */
   if (rev == 0)
     return;
 
-  if (rev >= 1)
+  if (rev >= 1 && len >= PCI_CXL_DEV_LEN)
     {
       w = get_conf_word(d, where + PCI_CXL_DEV_CAP);
       printf("\t\tCXLCap:\tCache%c IO%c Mem%c MemHWInit%c HDMCount %d Viral%c\n",
@@ -788,7 +785,7 @@ dvsec_cxl_device(struct device *d, int rev, int where, int len)
       cxl_range(range_base, range_size, 2);
     }
 
-  if (rev >= 2)
+  if (rev >= 2 && len >= PCI_CXL_DEV_LEN_REV2)
     {
       w = get_conf_word(d, where + PCI_CXL_DEV_CAP3);
       printf("\t\tCXLCap3:\tDefaultVolatile HDM State After:\tColdReset%c WarmReset%c HotReset%c HotResetConfigurability%c\n",
@@ -799,7 +796,7 @@ dvsec_cxl_device(struct device *d, int rev, int where, int len)
     }
 
   // Unparsed data
-  if (len > PCI_CXL_DEV_LEN)
+  if (len > PCI_CXL_DEV_LEN_REV2)
     printf("\t\t<?>\n");
 }
 
