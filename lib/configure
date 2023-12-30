@@ -121,6 +121,12 @@ case $sys in
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/mem"'
 		echo >>$c '#define PCI_PATH_ACPI_MCFG "/var/db/acpi/MCFG.*"'
 		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
+		case $cpu in
+				i386|amd64)	echo_n " i386-ports"
+						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
+						echo >>$m 'WITH_LIBS+=-l'$cpu
+						;;
+		esac
 		LIBRESOLV=
 		;;
 

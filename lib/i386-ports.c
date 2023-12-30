@@ -30,6 +30,8 @@
 #include "i386-io-beos.h"
 #elif defined(PCI_OS_DJGPP)
 #include "i386-io-djgpp.h"
+#elif defined(PCI_OS_OPENBSD)
+#include "i386-io-openbsd.h"
 #else
 #error Do not know how to access I/O ports on this OS.
 #endif

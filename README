@@ -20,7 +20,7 @@ In runs on the following systems:
 	Linux		(via /sys/bus/pci, /proc/bus/pci or i386 ports)
 	FreeBSD		(via /dev/pci)
 	NetBSD		(via libpci)
-	OpenBSD		(via /dev/pci)
+	OpenBSD		(via /dev/pci or i386 ports)
 	GNU/kFreeBSD	(via /dev/pci)
 	Solaris/i386	(direct port access)
 	Aix		(via /dev/pci and odmget)
