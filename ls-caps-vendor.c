@@ -19,6 +19,10 @@ show_vendor_caps_virtio(struct device *d, int where, int cap)
   int length = BITS(cap, 0, 8);
   int type = BITS(cap, 8, 8);
   char *tname;
+  u32 offset;
+  u32 size;
+  u32 offset_hi;
+  u32 size_hi;
 
   if (length < 16)
     return 0;
@@ -39,6 +43,9 @@ show_vendor_caps_virtio(struct device *d, int where, int cap)
     case 4:
       tname = "DeviceCfg";
       break;
+    case 8:
+      tname = "SharedMemory";
+      break;
     default:
       tname = "<unknown>";
       break;
@@ -49,10 +56,20 @@ show_vendor_caps_virtio(struct device *d, int where, int cap)
   if (verbose < 2)
     return 1;
 
-  printf("\t\tBAR=%d offset=%08x size=%08x",
-	 get_conf_byte(d, where +  4),
-	 get_conf_long(d, where +  8),
-	 get_conf_long(d, where + 12));
+  offset = get_conf_long(d, where + 8);
+  size = get_conf_long(d, where + 12);
+  if (type != 8)
+    printf("\t\tBAR=%d offset=%08x size=%08x",
+          get_conf_byte(d, where +  4), offset, size);
+  else {
+    offset_hi = get_conf_long(d, where + 16);
+    size_hi = get_conf_long(d, where + 20);
+    printf("\t\tBAR=%d offset=%016lx size=%016lx id=%d",
+          get_conf_byte(d, where +  4),
+          (u64) offset | (u64) offset_hi << 32,
+          (u64) size | (u64) size_hi << 32,
+          get_conf_byte(d, where + 5));
+  }
 
   if (type == 2 && length >= 20)
     printf(" multiplier=%08x", get_conf_long(d, where+16));
