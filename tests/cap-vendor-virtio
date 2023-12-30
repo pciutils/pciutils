@@ -39,3 +39,39 @@ d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
+00:04.0 Mass storage controller: Red Hat, Inc. Virtio file system (rev 01)
+	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0
+	Region 0: Memory at a0008000 (32-bit, non-prefetchable) [size=16K]
+	Region 2: Memory at 200000000 (64-bit, prefetchable) [size=1G]
+	Capabilities: [40] MSI-X: Enable+ Count=3 Masked-
+		Vector table: BAR=0 offset=00000000
+		PBA: BAR=0 offset=00002000
+	Capabilities: [4c] Vendor Specific Information: VirtIO: CommonCfg
+		BAR=0 offset=00003000 size=0000003c
+	Capabilities: [5c] Vendor Specific Information: VirtIO: ISR
+		BAR=0 offset=0000303c size=00000004
+	Capabilities: [6c] Vendor Specific Information: VirtIO: Notify
+		BAR=0 offset=00003040 size=00000008 multiplier=00000004
+	Capabilities: [80] Vendor Specific Information: VirtIO: DeviceCfg
+		BAR=0 offset=00003048 size=0000002c
+	Capabilities: [90] Vendor Specific Information: VirtIO: SharedMemory
+		BAR=2 offset=0000000000000000 size=0000000040000000 id=0
+	Kernel driver in use: virtio-pci
+00: f4 1a 5a 10 06 04 10 00 01 00 80 01 00 00 00 00
+10: 00 80 00 a0 00 00 00 00 0c 00 00 00 02 00 00 00
+20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5a 10
+30: 00 00 00 00 40 00 00 00 00 00 00 00 00 00 00 00
+40: 11 4c 02 80 00 00 00 00 00 20 00 00 09 5c 10 01
+50: 00 00 00 00 00 30 00 00 3c 00 00 00 09 6c 10 03
+60: 00 00 00 00 3c 30 00 00 04 00 00 00 09 80 14 02
+70: 00 00 00 00 40 30 00 00 08 00 00 00 04 00 00 00
+80: 09 90 10 04 00 00 00 00 48 30 00 00 2c 00 00 00
+90: 09 00 18 08 02 00 00 00 00 00 00 00 00 00 00 40
+a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
