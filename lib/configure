@@ -204,6 +204,13 @@ case $sys in
 		IDSDIR="/etc/pci"
 		LIBRESOLV=
 		;;
+	amigaos)
+		echo_n " aos-expansion"
+		echo >>$c '#define PCI_HAVE_STDINT_H'
+		echo >>$c '#define PCI_HAVE_PM_AOS_EXPANSION'
+		IDSDIR="DEVS:"
+		echo >>$m 'CC=gcc'
+		;;
 	*)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
 		exit 1
