@@ -400,30 +400,24 @@ retry:
           pci_set_name_list_path(a, path, 1);
         }
     }
+
 #elif defined PCI_OS_AMIGAOS
 
 static void
 pci_init_name_list_path(struct pci_access *a)
 {
-	char last_char;
-	int len = strlen(PCI_PATH_IDS_DIR);
+  int len = strlen(PCI_PATH_IDS_DIR);
 
-	if(0 == len) // empty path
-	{
-	  pci_set_name_list_path(a, PCI_IDS, 0);
-	}
-	else
-	{
-		last_char = (PCI_PATH_IDS_DIR)[len - 1];
-		if((':' == last_char) || ('/' == last_char)) // root or parent char
-		{
-			pci_set_name_list_path(a, PCI_PATH_IDS_DIR PCI_IDS, 0);
-		}
-		else
-		{
-			pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
-		}
-	}
+  if (!len)
+    pci_set_name_list_path(a, PCI_IDS, 0);
+  else
+    {
+      char last_char = PCI_PATH_IDS_DIR[len - 1];
+      if (last_char == ':' || last_char == '/')  // root or parent char
+	pci_set_name_list_path(a, PCI_PATH_IDS_DIR PCI_IDS, 0);
+      else
+	pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
+    }
 }
 
 #else

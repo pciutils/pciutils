@@ -39,8 +39,7 @@
 #define VERSTAG "\0$VER: lspci 3.10 (02.01.2024) AmigaOS4 port"
 
 
-// Debug macros
-/////////////////////////////////////////////////////////////////////////
+/*** Debug macros ***/
 
 #define __PRIV_log(lvl, fmt, ...) fprintf(stderr, "[" lvl "] (%s:%d: errno: %s) " fmt "\n", __FILE__, __LINE__, clean_errno(), __VA_ARGS__)
 
@@ -70,30 +69,25 @@
 #define check_debug(A, ...) if(!(A)) { debug(__VA_ARGS__); errno=0; goto on_error; }
 
 
-// AmigaOS access support
-/////////////////////////////////////////////////////////////////////////
+/*** AmigaOS access support ***/
 
 #define PCIACCESS_TAG 0xc0ffeeee
+
 typedef struct _PCIAccess {
-	ULONG tag; // 0xc0ffeeee
+	ULONG tag;	// PCIACCESS_TAG
 	struct ExpansionBase *expansion;
 	struct PCIIFace *ipci;
 } PCIAccess;
-
 
 static void aos_close_pci_interface(struct pci_access *a)
 {
 	PCIAccess *pci;
 
-	if(NULL != a)
-	{
+	if (a) {
 		pci = (PCIAccess *)a->backend_data;
-		if(NULL != pci)
-		{
-			if(NULL != pci->expansion)
-			{
-				if(NULL != pci->ipci)
-				{
+		if (pci) {
+			if (pci->expansion) {
+				if (pci->ipci) {
 					IExec->DropInterface((struct Interface *)pci->ipci);
 					pci->ipci = NULL;
 				}
@@ -106,38 +100,32 @@ static void aos_close_pci_interface(struct pci_access *a)
 	}
 }
 
-
 static BOOL aos_open_pci_interface(struct pci_access *a)
 {
 	PCIAccess *pci;
 
-	check(NULL != a, "Null pci_access");
+	check(a, "Null pci_access");
 
-	if(NULL != a->backend_data)
-	{   
+	if (a->backend_data) {
 		pci = (PCIAccess *)(a->backend_data);
 		check(PCIACCESS_TAG == pci->tag, "pci_access.backend_data already used by alien code");
-	}
-	else
-	{
-		pci	= pci_malloc(a, sizeof(PCIAccess));
+	} else {
+		pci = pci_malloc(a, sizeof(PCIAccess));
 		a->backend_data = pci;
 		pci->tag = PCIACCESS_TAG;
 		pci->expansion = (struct ExpansionBase *)IExec->OpenLibrary("expansion.library", 0);
-		check(NULL != pci->expansion, "Unable to open expansion.library");
+		check(pci->expansion, "Unable to open expansion.library");
 
 		pci->ipci = (struct PCIIFace *)IExec->GetInterface((struct Library *)pci->expansion, "pci", 1, TAG_DONE);
-		check(NULL != pci->ipci, "Unable to obtain pci interface");
+		check(pci->ipci, "Unable to obtain pci interface");
 	}
 
 	return TRUE;
-
 
 on_error:
 	aos_close_pci_interface(a);
 	return FALSE;
 }
-
 
 static int aos_expansion_detect(struct pci_access *a)
 {
@@ -149,10 +137,10 @@ static int aos_expansion_detect(struct pci_access *a)
 
 	// Try to read PCI first device
 	device = pci->ipci->FindDeviceTags(FDT_Index, 0);
-	check(NULL != device, "AmigaOS Expansion PCI interface cannot find any device");
-	
+	check(device, "AmigaOS Expansion PCI interface cannot find any device");
+
 	pci->ipci->FreeDevice(device);
-	
+
 	return TRUE;
 
 on_error:
@@ -160,30 +148,21 @@ on_error:
 	return FALSE;
 }
 
-
 static void aos_expansion_init(struct pci_access *a)
 {
 	// to avoid flushing of version tag
 	static STRPTR USED ver = (STRPTR)VERSTAG;
 
-	if (!aos_open_pci_interface(a))
-	{
+	if (!aos_open_pci_interface(a)) {
 		a->debug("\n");
 		a->error("AmigaOS Expansion PCI interface cannot be accessed.");
 	}
 }
 
-
 static void aos_expansion_cleanup(struct pci_access *a)
 {
 	aos_close_pci_interface(a);
 }
-
-/*
-#define BYTE_LEN 1
-#define WORD_LEN 2
-#define LONG_LEN 4
-*/
 
 static void aos_expansion_scan(struct pci_access *a)
 {
@@ -201,8 +180,7 @@ static void aos_expansion_scan(struct pci_access *a)
 
 	// X1000 has a bug which left shifts secondary bus by one bit, so we don't scan but get all devices identified by the system
 	device = pci->ipci->FindDeviceTags(FDT_Index, found_devs);
-	while(NULL != device)
-	{
+	while (device) {
 		d = pci_alloc_dev(a);
 		check_mem(d);
 		d->domain = 0; // only one domain for AmigaOS
@@ -213,9 +191,9 @@ static void aos_expansion_scan(struct pci_access *a)
 		d->backend_data = device;
 		d->vendor_id = device->ReadConfigWord(PCI_VENDOR_ID);
 		d->device_id = device->ReadConfigWord(PCI_DEVICE_ID);
-	    d->known_fields = PCI_FILL_IDENT;
+		d->known_fields = PCI_FILL_IDENT;
 		d->hdrtype = device->ReadConfigByte(PCI_HEADER_TYPE) & ~PCI_HEADER_TYPE_MULTIFUNCTION;
-	    pci_link_dev(a, d);
+		pci_link_dev(a, d);
 		a->debug("  Found device %02x:%02x.%d %04x:%04x\n", d->bus, d->dev, d->func, d->vendor_id, d->device_id);
 
 		found_devs++;
@@ -223,27 +201,17 @@ static void aos_expansion_scan(struct pci_access *a)
 	}
 
 on_error:
-	if((NULL != device) && (NULL != pci))
-	{
+	if (device && pci)
 		pci->ipci->FreeDevice(device);
-	}
-
-	return;
 }
-
 
 static int aos_expansion_read(struct pci_dev *d, int pos, byte *buf, int len)
 {
-	byte *ptr = buf;
-	int i;
-
-	check(NULL != d, "Null pci_dev");
-	if(NULL != d->backend_data)
-	{
- 		for(i = 0; i < len; i++)
-		{
+	check(d, "Null pci_dev");
+	if (d->backend_data) {
+		for (int i = 0; i < len; i++) {
 			// byte by byte to avoid endianness troubles
-			*ptr = ((struct PCIDevice *)(d->backend_data))->ReadConfigByte(pos + i);
+			byte *ptr = ((struct PCIDevice *)(d->backend_data))->ReadConfigByte(pos + i);
 			ptr++;
 		}
 	}
@@ -254,17 +222,13 @@ on_error:
 	return FALSE;
 }
 
-
 static int aos_expansion_write(struct pci_dev *d, int pos, byte *buf, int len)
 {
 	byte *ptr = buf;
-	int i;
 
-	check(NULL != d, "Null pci_dev");
-	if(NULL != d->backend_data)
-	{
- 		for(i = 0; i < len; i++)
-		{
+	check(d, "Null pci_dev");
+	if (d->backend_data) {
+		for (int i = 0; i < len; i++) {
 			// byte by byte to avoid endianness troubles
 			((struct PCIDevice *)(d->backend_data))->WriteConfigByte(pos + i, *ptr);
 			ptr++;
@@ -277,40 +241,35 @@ on_error:
 	return FALSE;
 }
 
-
 static void aos_expansion_init_dev(struct pci_dev *d)
 {
-	if(NULL != d)
-	{
+	if (d)
 		d->backend_data = NULL; // struct PCIDevice * to be obtained
-	}
 }
 
 static void aos_expansion_cleanup_dev(struct pci_dev *d)
 {
 	PCIAccess *pci;
 
-	if((NULL != d) && (NULL != d->backend_data) && (NULL != d->access) && (NULL != d->access->backend_data))
-	{
+	if (d && d->backend_data && d->access && d->access->backend_data) {
 		pci = d->access->backend_data;
 		pci->ipci->FreeDevice((struct PCIDevice *)d->backend_data);
 		d->backend_data = NULL;
 	}
 }
 
-
 struct pci_methods pm_aos_expansion = {
-  "aos-expansion",
-  "The Expansion.library on AmigaOS 4.x",
-  NULL, // config, called after allocation of pci_access, if assigned
-  aos_expansion_detect,  // detect, mandatory because called without check
-  aos_expansion_init,    // init, called once access chosen, eventually after detect
-  aos_expansion_cleanup, // cleanup, called at the end
-  aos_expansion_scan, // scan,
-  pci_generic_fill_info, // fill_info,
-  aos_expansion_read, // read,
-  aos_expansion_write, // write,
-  NULL, // read_vpd,
-  aos_expansion_init_dev, // init_dev,
-  aos_expansion_cleanup_dev	 // cleanup_dev,
+	"aos-expansion",
+	"The Expansion.library on AmigaOS 4.x",
+	NULL,			// config, called after allocation of pci_access, if assigned
+	aos_expansion_detect,	// detect, mandatory because called without check
+	aos_expansion_init,	// init, called once access chosen, eventually after detect
+	aos_expansion_cleanup,	// cleanup, called at the end
+	aos_expansion_scan,
+	pci_generic_fill_info,
+	aos_expansion_read,
+	aos_expansion_write,
+	NULL,			// read_vpd
+	aos_expansion_init_dev,
+	aos_expansion_cleanup_dev,
 };
