@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #ifndef OFF_MAX
-#define OFF_MAX (off_t)((1ULL << (sizeof(off_t) * CHAR_BIT - 1)) - 1)
+#define OFF_MAX ((((off_t)1 << (sizeof(off_t) * CHAR_BIT - 2)) - 1) * 2 + 1)
 #endif
 
 struct physmem {
