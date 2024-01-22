@@ -158,6 +158,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+#if defined(PCI_HAVE_PM_AOS_EXPANSION)
+  &pm_aos_expansion,
+#else
+  NULL,
+#endif
 };
 
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
@@ -175,6 +180,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_WIN32_CFGMGR32,
   PCI_ACCESS_WIN32_KLDBG,
   PCI_ACCESS_WIN32_SYSDBG,
+  PCI_ACCESS_AOS_EXPANSION,
   // Low-level methods poking the hardware directly
   PCI_ACCESS_ECAM,
   PCI_ACCESS_I386_TYPE1,
@@ -393,6 +399,24 @@ retry:
           memcpy(sep+1, PCI_IDS, sizeof(PCI_IDS));
           pci_set_name_list_path(a, path, 1);
         }
+    }
+
+#elif defined PCI_OS_AMIGAOS
+
+static void
+pci_init_name_list_path(struct pci_access *a)
+{
+  int len = strlen(PCI_PATH_IDS_DIR);
+
+  if (!len)
+    pci_set_name_list_path(a, PCI_IDS, 0);
+  else
+    {
+      char last_char = PCI_PATH_IDS_DIR[len - 1];
+      if (last_char == ':' || last_char == '/')  // root or parent char
+	pci_set_name_list_path(a, PCI_PATH_IDS_DIR PCI_IDS, 0);
+      else
+	pci_set_name_list_path(a, PCI_PATH_IDS_DIR "/" PCI_IDS, 0);
     }
 }
 

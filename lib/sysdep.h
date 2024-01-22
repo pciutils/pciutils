@@ -86,6 +86,10 @@ typedef u16 word;
   #define BYTE_ORDER LITTLE_ENDIAN
 #endif
 
+#ifdef PCI_OS_AMIGAOS
+  #include <machine/endian.h>
+#endif
+
 #if !defined(BYTE_ORDER)
 #error "BYTE_ORDER not defined for your platform"
 #endif

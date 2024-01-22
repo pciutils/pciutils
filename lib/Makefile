@@ -75,6 +75,10 @@ ifdef PCI_HAVE_PM_WIN32_SYSDBG
 OBJS += win32-sysdbg
 endif
 
+ifdef PCI_HAVE_PM_AOS_EXPANSION
+OBJS += aos-expansion
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)

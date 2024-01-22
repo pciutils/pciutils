@@ -146,6 +146,9 @@ Archived download links of previous WinDbg versions:
 https://web.archive.org/web/20110221133326/https://www.microsoft.com/whdc/devtools/debugging/installx86.mspx
 .br
 https://web.archive.org/web/20110214012715/https://www.microsoft.com/whdc/devtools/debugging/install64bit.mspx
+.TP
+.B aos-expansion
+Access method used on PowerPC Amiga running OS4+. Access is made through Expansion.library. It offers read and write access to configuration space.
 
 .SH PARAMETERS
 
