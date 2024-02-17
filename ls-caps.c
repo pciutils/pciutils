@@ -1812,7 +1812,6 @@ show_caps(struct device *d, int where)
 	      break;
 	    case PCI_CAP_ID_EXP:
 	      type = cap_express(d, where, cap);
-        struct pci_cap* test = pci_find_cap(d->dev, PCI_CAP_ID_EXP, PCI_CAP_NORMAL);
 	      can_have_ext_caps = 1;
 	      break;
 	    case PCI_CAP_ID_MSIX:
