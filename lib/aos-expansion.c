@@ -45,9 +45,8 @@ typedef struct _PCIAccess {
 static void 
 aos_close_pci_interface(struct pci_access *a)
 {
-	PCIAccess *pci;
+	PCIAccess *pci = a->backend_data;
 
-	pci = (PCIAccess *)a->backend_data;
 	if (pci) {
 		if (pci->expansion) {
 			if (pci->ipci) {
