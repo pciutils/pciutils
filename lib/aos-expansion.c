@@ -32,7 +32,7 @@
 
 
 // custom Amiga x.y version tag
-#define VERSTAG "\0$VER: lspci 3.10 (02.01.2024) AmigaOS4 port"
+#define VERSTAG "\0$VER: pciutils " PCILIB_VERSION " (" PCILIB_DATE_AMIGAOS ") AmigaOS4 port"
 
 
 /*** AmigaOS access support ***/

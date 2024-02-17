@@ -349,4 +349,5 @@ else
 fi
 
 echo >>$c "#define PCILIB_VERSION \"$VERSION\""
+echo >>$c "#define PCILIB_DATE_AMIGAOS \"`echo $DATE | sed 's/\(....\)-\(..\)-\(..\)/\3.\2.\1/'`\""
 sed '/"/{s/^#define \([^ ]*\) "\(.*\)"$/\1=\2/;p;d;};s/^#define \(.*\)/\1=1/' <$c >>$m
