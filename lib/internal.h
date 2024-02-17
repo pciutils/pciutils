@@ -17,7 +17,7 @@
 // optimizations is happy to optimize them away, leading to linker failures.
 #define VERSIONED_ABI __attribute__((used)) PCI_ABI
 #ifdef __APPLE__
-#define STATIC_ALIAS(_decl, _for) _decl VERSIONED_ABI { return _for; }
+#define STATIC_ALIAS(_decl, _for) VERSIONED_ABI _decl { return _for; }
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
 #else
