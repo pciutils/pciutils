@@ -8,15 +8,9 @@
  *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#include <pc.h>
 #include <dos.h>
-#define outb(x,y) outportb(y, x)
-#define outw(x,y) outportw(y, x)
-#define outl(x,y) outportl(y, x)
 
-#define inb  inportb
-#define inw  inportw
-#define inl  inportl
+#include "i386-io-access.h"
 
 static int irq_enabled;
 

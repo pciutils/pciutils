@@ -24,37 +24,37 @@ intel_cleanup_io(struct pci_access *a UNUSED)
 }
 
 static inline u8
-inb (u16 port)
+intel_inb (u16 port)
 {
   return (u8)read_isa_io(0, (void *)(u32)port, sizeof(u8));
 }
 
 static inline u16
-inw (u16 port)
+intel_inw (u16 port)
 {
   return (u16)read_isa_io(0, (void *)(u32)port, sizeof(u16));
 }
 
 static inline u32
-inl (u16 port)
+intel_inl (u16 port)
 {
   return (u32)read_isa_io(0, (void *)(u32)port, sizeof(u32));
 }
 
 static inline void
-outb (u8 value, u16 port)
+intel_outb (u8 value, u16 port)
 {
   write_isa_io(0, (void *)(u32)port, sizeof(value), value);
 }
 
 static inline void
-outw (u16 value, u16 port)
+intel_outw (u16 value, u16 port)
 {
   write_isa_io(0, (void *)(u32)port, sizeof(value), value);
 }
 
 static inline void
-outl (u32 value, u16 port)
+intel_outl (u32 value, u16 port)
 {
   write_isa_io(0, (void *)(u32)port, sizeof(value), value);
 }

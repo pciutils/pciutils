@@ -66,6 +66,15 @@ static int poke_driver_fd;
 static int
 intel_setup_io(struct pci_access *a UNUSED)
 {
+  /*
+   * Opening poke device on systems with the linked change below
+   * automatically changes process IOPL to 3 and closing its file
+   * descriptor changes process IOPL back to 0, which give access
+   * to all x86 IO ports via x86 in/out instructions for this
+   * userspace process. To support also older systems without this
+   * change, access IO ports via ioctl() instead of x86 in/out.
+   * https://review.haiku-os.org/c/haiku/+/1077
+   */
   poke_driver_fd = open(POKE_DEVICE_FULLNAME, O_RDWR);
   return (poke_driver_fd < 0) ? 0 : 1;
 }
@@ -77,7 +86,7 @@ intel_cleanup_io(struct pci_access *a UNUSED)
 }
 
 static inline u8
-inb (u16 port)
+intel_inb (u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u8), 0 };
   if (ioctl(poke_driver_fd, POKE_PORT_READ, &args, sizeof(args)) < 0)
@@ -86,7 +95,7 @@ inb (u16 port)
 }
 
 static inline u16
-inw (u16 port)
+intel_inw (u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u16), 0 };
   if (ioctl(poke_driver_fd, POKE_PORT_READ, &args, sizeof(args)) < 0)
@@ -95,7 +104,7 @@ inw (u16 port)
 }
 
 static inline u32
-inl (u16 port)
+intel_inl (u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u32), 0 };
   if (ioctl(poke_driver_fd, POKE_PORT_READ, &args, sizeof(args)) < 0)
@@ -104,21 +113,21 @@ inl (u16 port)
 }
 
 static inline void
-outb (u8 value, u16 port)
+intel_outb (u8 value, u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u8), value };
   ioctl(poke_driver_fd, POKE_PORT_WRITE, &args, sizeof(args));
 }
 
 static inline void
-outw (u16 value, u16 port)
+intel_outw (u16 value, u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u16), value };
   ioctl(poke_driver_fd, POKE_PORT_WRITE, &args, sizeof(args));
 }
 
 static inline void
-outl (u32 value, u16 port)
+intel_outl (u32 value, u16 port)
 {
   port_io_args args = { POKE_SIGNATURE, port, sizeof(u32), value };
   ioctl(poke_driver_fd, POKE_PORT_WRITE, &args, sizeof(args));

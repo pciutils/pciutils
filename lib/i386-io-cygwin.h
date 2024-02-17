@@ -10,6 +10,8 @@
 
 #include <sys/io.h>
 
+#include "i386-io-access.h"
+
 static int
 intel_setup_io(struct pci_access *a UNUSED)
 {
