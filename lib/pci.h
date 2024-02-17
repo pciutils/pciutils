@@ -17,7 +17,6 @@
 
 #include "header.h"
 #include "types.h"
-#include "bitops.h"
 
 #define PCI_LIB_VERSION 0x030a00
 

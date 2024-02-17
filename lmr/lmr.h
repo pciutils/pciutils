@@ -14,6 +14,7 @@
 #include <stdbool.h>
 
 #include "pciutils.h"
+#include "lib/bitops.h"
 
 #define MARGIN_STEP_MS 1000
 

@@ -1,3 +1,9 @@
+2024-02-17  Martin Mares <mj@ucw.cz>
+
+	* Will be released as 3.11.0.
+
+	* All source files now have SPDX license identifiers.
+
 2023-05-01  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.10.0.

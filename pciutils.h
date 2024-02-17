@@ -10,6 +10,7 @@
 
 #include "lib/pci.h"
 #include "lib/sysdep.h"
+#include "lib/bitops.h"
 
 /*
  * gcc predefines macro __MINGW32__ for all MinGW targets.
