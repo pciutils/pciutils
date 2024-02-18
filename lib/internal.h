@@ -127,7 +127,7 @@ struct pci_property {
 char *pci_set_property(struct pci_dev *d, u32 key, char *value);
 
 /* params.c */
-void pci_define_param(struct pci_access *acc, char *param, char *val, char *help);
+struct pci_param *pci_define_param(struct pci_access *acc, char *param, char *val, char *help);
 int pci_set_param_internal(struct pci_access *acc, char *param, char *val, int copy);
 void pci_free_params(struct pci_access *acc);
 

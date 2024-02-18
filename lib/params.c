@@ -25,7 +25,7 @@ pci_get_param(struct pci_access *acc, char *param)
   return NULL;
 }
 
-void
+struct pci_param *
 pci_define_param(struct pci_access *acc, char *param, char *value, char *help)
 {
   struct pci_param *p, **pp;
@@ -37,7 +37,7 @@ pci_define_param(struct pci_access *acc, char *param, char *value, char *help)
 	{
 	  if (strcmp(p->value, value) || strcmp(p->help, help))
 	    acc->error("Parameter %s re-defined differently", param);
-	  return;
+	  return p;
 	}
       if (cmp > 0)
 	break;
@@ -50,6 +50,7 @@ pci_define_param(struct pci_access *acc, char *param, char *value, char *help)
   p->value = value;
   p->value_malloced = 0;
   p->help = help;
+  return p;
 }
 
 int
