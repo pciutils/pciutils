@@ -15,6 +15,7 @@
 #include <malloc.h>
 #endif
 #include <time.h>
+#include <stdlib.h>
 
 #include "lmr.h"
 
