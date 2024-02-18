@@ -22,7 +22,7 @@ typedef unsigned __int64 u64;
 #define PCI_U64_FMT_X "I64x"
 #define PCI_U64_FMT_U "I64u"
 
-#elif defined(PCI_HAVE_STDINT_H) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
+#else
 /* Use standard types in C99 and newer */
 #include <stdint.h>
 #include <inttypes.h>
@@ -32,25 +32,6 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 #define PCI_U64_FMT_X PRIx64
 #define PCI_U64_FMT_U PRIu64
-
-#else
-/* Hope for POSIX types from <sys/types.h> */
-typedef u_int8_t u8;
-typedef u_int16_t u16;
-typedef u_int32_t u32;
-
-/* u64 will be unsigned (long) long */
-#include <limits.h>
-#if ULONG_MAX > 0xffffffff
-typedef unsigned long u64;
-#define PCI_U64_FMT_X "lx"
-#define PCI_U64_FMT_U "lu"
-#else
-typedef unsigned long long u64;
-#define PCI_U64_FMT_X "llx"
-#define PCI_U64_FMT_U "llu"
-#endif
-
 #endif
 
 #endif	/* PCI_HAVE_Uxx_TYPES */

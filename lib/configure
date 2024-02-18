@@ -97,7 +97,6 @@ case $sys in
 						exit 1
 						;;
 		esac
-		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	freebsd*|kfreebsd*)
 		echo_n " fbsd-device mem-ports ecam"
@@ -201,7 +200,6 @@ case $sys in
 						echo >>$c '#define PCI_HAVE_PM_INTEL_CONF'
 						;;
 		esac
-		echo >>$c '#define PCI_HAVE_STDINT_H'
 		;;
 	sylixos)
 		echo >>$c '#define PCI_PATH_SYLIXOS_DEVICE "/proc/pci"'
