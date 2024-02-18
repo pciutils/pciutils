@@ -83,6 +83,7 @@ struct pci_access {
   struct id_bucket *current_id_bucket;
   int id_load_attempted;
   int id_cache_status;			/* 0=not read, 1=read, 2=dirty */
+  char *id_cache_name;
   struct udev *id_udev;			/* names-hwdb.c */
   struct udev_hwdb *id_udev_hwdb;
   int fd;				/* proc/sys: fd for config space */
