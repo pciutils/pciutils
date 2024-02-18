@@ -217,7 +217,7 @@ endif
 endif
 
 uninstall: all
-	rm -f $(DESTDIR)$(SBINDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/update-pciids
+	rm -f $(DESTDIR)$(LSPCIDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/update-pciids
 ifneq ($(IDSDIR),)
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 else
