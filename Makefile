@@ -62,12 +62,14 @@ LIBNAME=libpci
 
 -include lib/config.mk
 
-PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h lib/bitops.h
+PCIINC=lib/config.h lib/header.h lib/pci.h lib/types.h lib/sysdep.h
 PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
+
+UTILINC=pciutils.h bitops.h $(PCIINC)
 
 LMR=margin_hw.o margin.o margin_log.o margin_results.o
 LMROBJS=$(addprefix lmr/,$(LMR))
-LMRINC=lmr/lmr.h
+LMRINC=lmr/lmr.h $(UTILINC)
 
 export
 
@@ -90,7 +92,7 @@ endif
 lspci$(EXEEXT): lspci.o ls-vpd.o ls-caps.o ls-caps-vendor.o ls-ecaps.o ls-kernel.o ls-tree.o ls-map.o $(COMMON) lib/$(PCIIMPLIB)
 setpci$(EXEEXT): setpci.o $(COMMON) lib/$(PCIIMPLIB)
 
-LSPCIINC=lspci.h pciutils.h $(PCIINC)
+LSPCIINC=lspci.h $(UTILINC)
 lspci.o: lspci.c $(LSPCIINC)
 ls-vpd.o: ls-vpd.c $(LSPCIINC)
 ls-caps.o: ls-caps.c $(LSPCIINC)
@@ -99,8 +101,8 @@ ls-kernel.o: ls-kernel.c $(LSPCIINC)
 ls-tree.o: ls-tree.c $(LSPCIINC)
 ls-map.o: ls-map.c $(LSPCIINC)
 
-setpci.o: setpci.c pciutils.h $(PCIINC)
-common.o: common.c pciutils.h $(PCIINC)
+setpci.o: setpci.c $(UTILINC)
+common.o: common.c $(UTILINC)
 compat/getopt.o: compat/getopt.c
 
 lspci$(EXEEXT): LDLIBS+=$(LIBKMOD_LIBS)
@@ -115,10 +117,10 @@ example$(EXEEXT): example.o lib/$(PCIIMPLIB)
 example.o: example.c $(PCIINC)
 
 $(LMROBJS) pcilmr.o: override CFLAGS+=-I .
-$(LMROBJS): %.o: %.c $(LMRINC) $(PCIINC) pciutils.h
+$(LMROBJS): %.o: %.c $(LMRINC)
 
 pcilmr: pcilmr.o $(LMROBJS) $(COMMON) lib/$(PCIIMPLIB)
-pcilmr.o: pcilmr.c $(LMRINC) $(PCIINC) pciutils.h
+pcilmr.o: pcilmr.c $(LMRINC)
 
 %$(EXEEXT): %.o
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
