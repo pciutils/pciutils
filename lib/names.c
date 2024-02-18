@@ -143,7 +143,7 @@ pci_lookup_name(struct pci_access *a, char *buf, int size, int flags, ...)
   if (flags & PCI_LOOKUP_MIXED)
     flags &= ~PCI_LOOKUP_NUMERIC;
 
-  if (!a->id_hash && !(flags & (PCI_LOOKUP_NUMERIC | PCI_LOOKUP_SKIP_LOCAL)) && !a->id_load_failed)
+  if (!a->id_load_attempted && !(flags & (PCI_LOOKUP_NUMERIC | PCI_LOOKUP_SKIP_LOCAL)))
     pci_load_name_list(a);
 
   switch (flags & 0xffff)

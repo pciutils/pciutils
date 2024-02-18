@@ -81,7 +81,7 @@ struct pci_access {
   struct pci_param *params;
   struct id_entry **id_hash;		/* names.c */
   struct id_bucket *current_id_bucket;
-  int id_load_failed;
+  int id_load_attempted;
   int id_cache_status;			/* 0=not read, 1=read, 2=dirty */
   struct udev *id_udev;			/* names-hwdb.c */
   struct udev_hwdb *id_udev_hwdb;

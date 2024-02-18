@@ -223,7 +223,7 @@ pci_load_name_list(struct pci_access *a)
   const char *err;
 
   pci_free_name_list(a);
-  a->id_load_failed = 1;
+  a->id_load_attempted = 1;
   if (!(f = pci_open(a)))
     return 0;
   err = id_parse_list(a, f, &lino);
@@ -231,7 +231,6 @@ pci_load_name_list(struct pci_access *a)
   pci_close(f);
   if (err)
     a->error("%s at %s, line %d\n", err, a->id_file_name, lino);
-  a->id_load_failed = 0;
   return 1;
 }
 
@@ -241,7 +240,7 @@ pci_free_name_list(struct pci_access *a)
   pci_id_cache_flush(a);
   pci_id_hash_free(a);
   pci_id_hwdb_free(a);
-  a->id_load_failed = 0;
+  a->id_load_attempted = 0;
 }
 
 void
