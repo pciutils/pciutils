@@ -104,7 +104,7 @@ common.o: common.c pciutils.h $(PCIINC)
 compat/getopt.o: compat/getopt.c
 
 lspci$(EXEEXT): LDLIBS+=$(LIBKMOD_LIBS)
-ls-kernel.o: CFLAGS+=$(LIBKMOD_CFLAGS)
+ls-kernel.o: override CFLAGS+=$(LIBKMOD_CFLAGS)
 
 update-pciids: update-pciids.sh
 	sed <$< >$@ "s@^DEST=.*@DEST=$(if $(IDSDIR),$(IDSDIR)/,)$(PCI_IDS)@;s@^PCI_COMPRESSED_IDS=.*@PCI_COMPRESSED_IDS=$(PCI_COMPRESSED_IDS)@;s@VERSION=.*@VERSION=$(VERSION)@"
@@ -114,7 +114,7 @@ update-pciids: update-pciids.sh
 example$(EXEEXT): example.o lib/$(PCIIMPLIB)
 example.o: example.c $(PCIINC)
 
-$(LMROBJS) pcilmr.o: CFLAGS+=-I .
+$(LMROBJS) pcilmr.o: override CFLAGS+=-I .
 $(LMROBJS): %.o: %.c $(LMRINC) $(PCIINC) pciutils.h
 
 pcilmr: pcilmr.o $(LMROBJS) $(COMMON) lib/$(PCIIMPLIB)
