@@ -26,6 +26,13 @@
  * GCC version 4.9.0 and higher provides __builtin_ia32_readeflags_uXX()
  * builtin for XX-mode. This builtin is also available as __readeflags()
  * function indirectly via <x86intrin.h> header file.
+ *
+ * CAVEAT: Semicolon in MSVC __asm block means start of the comment, and not
+ * end of the __asm statement, like it is for all other C statements. Also
+ * function which uses MSVC inline assembly cannot be inlined to another function
+ * (compiler reports a warning about it, not a fatal error). So we add explicit
+ * curly brackets for __asm blocks, remove misleading semicolons and do not
+ * declare functions as inline.
  */
 #if defined(_MSC_VER) && (_MSC_VER >= 1500 || (_MSC_VER >= 1400 && defined(__BUILDMACHINE__)))
 #pragma intrinsic(__readeflags)
