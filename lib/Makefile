@@ -20,10 +20,12 @@ endif
 
 ifdef PCI_HAVE_PM_MMIO_CONF
 OBJS += mmio-ports
+PCI_USE_PHYSMEM = 1
 endif
 
 ifdef PCI_HAVE_PM_ECAM
 OBJS += ecam
+PCI_USE_PHYSMEM = 1
 endif
 
 ifdef PCI_HAVE_PM_DUMP
@@ -79,9 +81,11 @@ ifdef PCI_OS_WINDOWS
 OBJS += win32-helpers
 endif
 
+ifdef PCI_USE_PHYSMEM
 ifndef PCI_OS_WINDOWS
 ifndef PCI_OS_DJGPP
 OBJS += physmem-posix
+endif
 endif
 endif
 
@@ -133,8 +137,8 @@ init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 params.o: params.c $(INCL)
 i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
-mmio-ports.o: mmio-ports.c $(INCL)
-ecam.o: ecam.c $(INCL)
+mmio-ports.o: mmio-ports.c $(INCL) physmem.h physmem-access.h
+ecam.o: ecam.c $(INCL) physmem.h physmem-access.h
 proc.o: proc.c $(INCL)
 sysfs.o: sysfs.c $(INCL)
 generic.o: generic.c $(INCL)
