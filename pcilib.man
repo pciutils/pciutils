@@ -234,7 +234,9 @@ Configuration Manager.
 DNS domain containing the ID database.
 .TP
 .B net.cache_name
-Name of the file used for caching of resolved ID's.
+Name of the file used for caching of resolved ID's. An initial
+.B ~/
+is expanded to the user's home directory.
 
 .SS Parameters for resolving of ID's via UDEV's HWDB
 .TP
