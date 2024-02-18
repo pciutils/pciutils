@@ -179,7 +179,16 @@ Path to the procfs bus tree.
 Path to the sysfs device tree.
 .TP
 .B devmem.path
-Path to the /dev/mem device.
+Path to the /dev/mem device or path to the \\Device\\PhysicalMemory NT section
+or name of the platform specific physical address access method. Generally on
+POSIX systems it is path to memory device and on Windows systems it is path to
+memory NT section. Additionally on 32-bit Windows systems are recognized also
+platform methods: \fIvxdcall\fP, \fIw32skrnl\fP. On DOS/DJGPP systems are
+recognized only platform methods: \fIauto\fP, \fIdevmap\fP, \fIphysmap\fP.
+DJGPP's \fIdevmap\fP method uses DPMI 1.0 functions 0508H (Map Device in Memory
+Block) and 0509H (Map Conventional Memory in Memory Block). DJGPP's \fIphysmap\fP
+method uses DPMI 0.9 function 0800H (Physical Address Mapping). DJGPP's \fIauto\fP
+parameter automatically chooses one of the mentioned method supported by the system.
 .TP
 .B mmio-conf1.addrs
 Physical addresses of memory-mapped I/O ports for Intel configuration mechanism 1.
