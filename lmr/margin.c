@@ -9,7 +9,7 @@
  */
 
 #include <errno.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "lmr.h"
