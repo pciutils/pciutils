@@ -117,7 +117,7 @@ example.o: example.c $(PCIINC)
 $(LMROBJS) pcilmr.o: CFLAGS+=-I .
 $(LMROBJS): %.o: %.c $(LMRINC) $(PCIINC) pciutils.h
 
-pcilmr: pcilmr.o lib/$(PCIIMPLIB) $(LMROBJS) $(COMMON)
+pcilmr: pcilmr.o $(LMROBJS) $(COMMON) lib/$(PCIIMPLIB)
 pcilmr.o: pcilmr.c $(LMRINC) $(PCIINC) pciutils.h
 
 %$(EXEEXT): %.o
