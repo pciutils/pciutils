@@ -177,7 +177,7 @@ margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
 {
   char timestamp[64];
   time_t tim = time(NULL);
-  strftime(timestamp, sizeof(timestamp), "%FT%H.%M.%S", gmtime(&tim));
+  strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%S", gmtime(&tim));
 
   size_t pathlen = strlen(dir) + 128;
   char *path = xmalloc(pathlen);
