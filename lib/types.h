@@ -9,6 +9,7 @@
  */
 
 #include <sys/types.h>
+#include <stddef.h>
 
 #ifndef PCI_HAVE_Uxx_TYPES
 
