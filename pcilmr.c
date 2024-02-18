@@ -64,10 +64,8 @@ static struct pci_dev *
 dev_for_filter(struct pci_access *pacc, char *filter)
 {
   struct pci_filter pci_filter;
-  char dev[17] = { 0 };
-  strncpy(dev, filter, sizeof(dev) - 1);
   pci_filter_init(pacc, &pci_filter);
-  if (pci_filter_parse_slot(&pci_filter, dev))
+  if (pci_filter_parse_slot(&pci_filter, filter))
     die("Invalid device ID: %s\n", filter);
 
   if (pci_filter.bus == -1 || pci_filter.slot == -1 || pci_filter.func == -1)
