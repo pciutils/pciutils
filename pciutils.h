@@ -28,7 +28,7 @@
 #if defined(PCI_OS_WINDOWS) && !(defined(__MINGW32_MAJOR_VERSION) && __MINGW32_MAJOR_VERSION >= 3)
 #include "compat/getopt.h"
 #else
-#include <unistd.h>
+#include <getopt.h>
 #endif
 
 #define PCIUTILS_VERSION PCILIB_VERSION
