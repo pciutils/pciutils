@@ -8,3 +8,4 @@ setpci
 example
 update-pciids
 pci.ids.gz
+pcilmr
