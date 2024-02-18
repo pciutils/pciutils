@@ -1,8 +1,42 @@
-2024-02-17  Martin Mares <mj@ucw.cz>
+2024-02-18  Martin Mares <mj@ucw.cz>
 
 	* Will be released as 3.11.0.
 
+	* update-pciids now supports XZ compression. If libpci is configured
+	  with support for compression, all downloaded files are recompressed
+	  as gzip. Otherwise they are stored as plain text.
+
+	* update-pciids now sends itself as the User-Agent.
+
+	* Added a pcilmr utility for PCIe lane margining. Thanks to Nikita
+	  Proshkin for contributing it.
+
+	* Re-factored access to i386 ports on all relevant platforms.
+
+	* Added i386 port access on OpenBSD.
+
+	* Linux systems without pread/pwrite are no longer supported
+	  as they are hopefully long gone. This helps avoid the tricky check
+	  for presence of pread which was found to fail on musl libc.
+
+	* Improved decoding of PCIe control and status registers.
+
+	* Decoding of CXL capabilities now supports up to CXL 3.0.
+
+	* lspci now displays interrupt message numbers consistently across
+	  different capabilities.
+
+	* Cache of IDs resolved via DNS, which was located in ~/.pci-ids
+	  by default, is now stored according to the XDG base directory
+	  specification in $XDG_CACHE_HOME/pci-ids.
+
 	* All source files now have SPDX license identifiers.
+
+	* Internal: The "aux" fields of structs pci_access and pci_dev
+	  reserved for use by back-ends were renamed to backend_data to better
+	  reflect their meaning.
+
+	* As usually, various minor bug fixes and updated pci.ids.
 
 2023-05-01  Martin Mares <mj@ucw.cz>
 
