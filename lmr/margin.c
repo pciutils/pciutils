@@ -14,6 +14,10 @@
 
 #include "lmr.h"
 
+#ifdef PCI_OS_DJGPP
+#include <unistd.h>
+#endif
+
 /* Macro helpers for Margining command parsing */
 
 typedef u16 margin_cmd;
@@ -81,6 +85,16 @@ typedef u16 margin_cmd;
 static int
 msleep(long msec)
 {
+#if defined(PCI_OS_WINDOWS)
+  Sleep(msec);
+  return 0;
+#elif defined(PCI_OS_DJGPP)
+  if (msec * 1000 < 11264)
+    usleep(11264);
+  else
+    usleep(msec * 1000);
+  return 0;
+#else
   struct timespec ts;
   int res;
 
@@ -99,6 +113,7 @@ msleep(long msec)
   } while (res && errno == EINTR);
 
   return res;
+#endif
 }
 
 static margin_cmd
