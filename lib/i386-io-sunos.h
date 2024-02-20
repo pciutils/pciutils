@@ -23,7 +23,7 @@ intel_setup_io(struct pci_access *a UNUSED)
 static inline void
 intel_cleanup_io(struct pci_access *a UNUSED)
 {
-  /* FIXME: How to switch off I/O port access? */
+  sysi86(SI86V86, V86SC_IOPL, 0);
 }
 
 static inline void intel_io_lock(void)
