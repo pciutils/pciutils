@@ -140,7 +140,7 @@ $(PCILIBPC): libpci.pc.in
 init.o: init.c $(INCL)
 access.o: access.c $(INCL)
 params.o: params.c $(INCL)
-i386-ports.o: i386-ports.c $(INCL) i386-io-hurd.h i386-io-linux.h i386-io-sunos.h i386-io-windows.h i386-io-cygwin.h
+i386-ports.o: i386-ports.c $(INCL) i386-io-access.h i386-io-beos.h i386-io-cygwin.h i386-io-djgpp.h i386-io-haiku.h i386-io-hurd.h i386-io-linux.h i386-io-openbsd.h i386-io-sunos.h i386-io-windows.h
 mmio-ports.o: mmio-ports.c $(INCL) physmem.h physmem-access.h
 ecam.o: ecam.c $(INCL) physmem.h physmem-access.h
 proc.o: proc.c $(INCL)
