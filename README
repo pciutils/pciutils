@@ -32,6 +32,7 @@ In runs on the following systems:
 	Darwin		(via IOKit)
 	DOS/DJGPP	(via i386 ports)
 	SylixOS		(via /proc/pci)
+	AmigaOS on PPC	(via Expansion library)
 
 It should be very easy to add support for other systems as well (volunteers
 wanted; if you want to try that, I'll be very glad to see the patches and
