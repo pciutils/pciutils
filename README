@@ -1,6 +1,6 @@
 This package contains the PCI Utilities, version @VERSION@.
 
-Copyright (c) 1997--2023 Martin Mares <mj@ucw.cz>
+Copyright (c) 1997--2024 Martin Mares <mj@ucw.cz>
 
 All files in this package can be freely distributed and used according
 to the terms of the GNU General Public License, either version 2 or
@@ -48,6 +48,8 @@ The utilities include:  (See manual pages for more details)
     the manual page first!
 
   - update-pciids: download the current version of the pci.ids file.
+
+  - pcilmr: performs margining on PCIe links.
 
 
 2. Compiling and (un)installing
