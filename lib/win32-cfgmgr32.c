@@ -88,7 +88,10 @@
 /*
  * Unfortunately MinGW32 toolchain does not provide import library for these
  * cfgmgr32.dll functions. So resolve pointers to these functions at runtime.
+ * MinGW-w64 toolchain provides them also in 32-bit mode.
  */
+
+#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
 
 #ifdef CM_Get_DevNode_Registry_PropertyA
 #undef CM_Get_DevNode_Registry_PropertyA
@@ -128,6 +131,8 @@ resolve_cfgmgr32_functions(void)
 
   return TRUE;
 }
+
+#endif
 
 /*
  * cfgmgr32.dll uses custom non-Win32 error numbers which are unsupported by
@@ -1535,11 +1540,13 @@ win32_cfgmgr32_scan(struct pci_access *a)
   struct pci_dev *d;
   CONFIGRET cr;
 
+#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
   if (!resolve_cfgmgr32_functions())
     {
       a->warning("Required cfgmgr32.dll functions are unavailable.");
       return;
     }
+#endif
 
   /*
    * Explicitly initialize size to zero as wine cfgmgr32 implementation does not
@@ -1609,11 +1616,13 @@ win32_cfgmgr32_detect(struct pci_access *a)
   ULONG devinst_id_list_size;
   CONFIGRET cr;
 
+#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
   if (!resolve_cfgmgr32_functions())
     {
       a->debug("Required cfgmgr32.dll functions are unavailable.");
       return 0;
     }
+#endif
 
   /*
    * Explicitly initialize size to zero as wine cfgmgr32 implementation does not
