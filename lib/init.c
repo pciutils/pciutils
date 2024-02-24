@@ -400,6 +400,7 @@ retry:
           pci_set_name_list_path(a, path, 1);
         }
     }
+}
 
 #elif defined PCI_OS_AMIGAOS
 
