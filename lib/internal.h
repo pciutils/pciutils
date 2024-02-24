@@ -24,14 +24,15 @@
 #define DEFINE_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext)
 #else
-#define STATIC_ALIAS(_decl, _for)
 #define DEFINE_ALIAS(_decl, _for) extern _decl __attribute__((alias(#_for))) VERSIONED_ABI
 #ifdef _WIN32
+#define STATIC_ALIAS(_decl, _for) VERSIONED_ABI _decl { return _for; }
 /* GCC does not support asm .symver directive for Windows targets, so define new external global function symbol as alias to internal symbol */
 #define SYMBOL_VERSION(_int, _ext) asm(".globl\t" PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) "\n\t" \
                                        ".def\t"   PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) ";\t.scl\t2;\t.type\t32;\t.endef\n\t" \
                                        ".set\t"   PCI_STRINGIFY(__MINGW_USYMBOL(_ext)) "," PCI_STRINGIFY(__MINGW_USYMBOL(_int)))
 #else
+#define STATIC_ALIAS(_decl, _for)
 #define SYMBOL_VERSION(_int, _ext) asm(".symver " #_int "," #_ext)
 #endif
 #endif
