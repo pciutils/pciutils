@@ -63,6 +63,12 @@ typedef BOOL (WINAPI *SetSecurityDescriptorControlProt)(PSECURITY_DESCRIPTOR pSe
 typedef BOOL (WINAPI *SetThreadErrorModeProt)(DWORD dwNewMode, LPDWORD lpOldMode);
 
 
+static DWORD
+format_message_from_system(DWORD win32_error_id, DWORD lang_id, LPSTR buffer, DWORD size)
+{
+  return FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, win32_error_id, lang_id, buffer, size, NULL);
+}
+
 const char *
 win32_strerror(DWORD win32_error_id)
 {
@@ -73,7 +79,15 @@ win32_strerror(DWORD win32_error_id)
   static char buffer[4096];
   DWORD len;
 
-  len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, win32_error_id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buffer, sizeof(buffer), NULL);
+  /*
+   * If it is possible show error messages in US English language.
+   * International Windows editions do not have to provide error
+   * messages in English language, so fallback to the language
+   * which system provides (neutral).
+   */
+  len = format_message_from_system(win32_error_id, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), buffer, sizeof(buffer));
+  if (!len)
+    len = format_message_from_system(win32_error_id, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buffer, sizeof(buffer));
 
   /* FormatMessage() automatically appends ".\r\n" to the error message. */
   if (len && buffer[len-1] == '\n')
