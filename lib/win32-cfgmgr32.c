@@ -81,6 +81,10 @@
 #define fMD_MEMORY_BAR 0x0080
 #endif
 
+#ifndef mMD_Prefetchable
+#define mMD_Prefetchable fMD_Prefetchable
+#endif
+
 /*
  * Unfortunately MinGW32 toolchain does not provide import library for these
  * cfgmgr32.dll functions. So resolve pointers to these functions at runtime.
