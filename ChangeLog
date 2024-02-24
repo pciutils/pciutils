@@ -1,3 +1,13 @@
+2024-02-25  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.11.1.
+
+	* Fixed wrong API version in lib/pci.h.
+
+	* Updated README.Windows.
+
+	* Fix compilation on Windows.
+
 2024-02-24  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.11.0.

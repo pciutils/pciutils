@@ -4,8 +4,8 @@
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
 
-VERSION=3.11.0
-DATE=2024-02-24
+VERSION=3.11.1
+DATE=2024-02-25
 
 # Host OS and release (override if you are cross-compiling)
 HOST=
