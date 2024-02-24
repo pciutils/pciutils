@@ -1,6 +1,6 @@
-2024-02-18  Martin Mares <mj@ucw.cz>
+2024-02-24  Martin Mares <mj@ucw.cz>
 
-	* Will be released as 3.11.0.
+	* Released as 3.11.0.
 
 	* update-pciids now supports XZ compression. If libpci is configured
 	  with support for compression, all downloaded files are recompressed
@@ -14,6 +14,10 @@
 	* Re-factored access to i386 ports on all relevant platforms.
 
 	* Added i386 port access on OpenBSD.
+
+	* Back-ends for Windows received many bug fixes and improvements.
+
+	* ECAM back-end now scans ACPI and BIOS memory faster.
 
 	* Linux systems without pread/pwrite are no longer supported
 	  as they are hopefully long gone. This helps avoid the tricky check
