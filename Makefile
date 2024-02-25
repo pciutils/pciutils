@@ -123,7 +123,7 @@ pcilmr$(EXEEXT): pcilmr.o $(LMROBJS) $(COMMON) lib/$(PCIIMPLIB)
 pcilmr.o: pcilmr.c $(LMRINC)
 
 %$(EXEEXT): %.o
-	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
 ifdef PCI_OS_WINDOWS
 comma := ,
