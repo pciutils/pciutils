@@ -1488,6 +1488,195 @@ cap_doe(struct device *d, int where)
 	 FLAG(l, PCI_DOE_STS_OBJECT_READY));
 }
 
+static const char *offstr(char *buf, u32 off)
+{
+    if (verbose < 3)
+        return "";
+
+    sprintf(buf, "[%x]", off);
+    return buf;
+}
+
+static const char *ide_alg(char *buf, size_t len, u32 l)
+{
+    const char *algo[] = { "AES-GCM-256-96b" }; // AES-GCM 256 key size, 96b MAC
+
+    if (l == 0)
+        snprintf(buf, len, "%s", algo[l]);
+    else
+        snprintf(buf, len, "%s", "reserved");
+    return buf;
+}
+
+static void
+cap_ide(struct device *d, int where)
+{
+    const char *hdr_enc_mode[] = { "no", "17:2", "25:2", "33:2", "41:2" };
+    const char *stream_state[] = { "insecure", "secure" };
+    const char *aggr[] = { "-", "=2", "=4", "=8" };
+    u32 l, l2, linknum = 0, selnum = 0, addrnum, off, i, j;
+    char buf1[16], buf2[16], offs[16];
+
+    printf("Integrity & Data Encryption\n");
+
+    if (verbose < 2)
+        return;
+
+    if (!config_fetch(d, where + PCI_IDE_CAP, 8))
+      {
+        printf("\t\t<unreadable>\n");
+        return;
+      }
+
+    l = get_conf_long(d, where + PCI_IDE_CAP);
+    if (l & PCI_IDE_CAP_LINK_IDE_SUPP)
+        linknum = PCI_IDE_CAP_LINK_TC_NUM(l) + 1;
+    if (l & PCI_IDE_CAP_SELECTIVE_IDE_SUPP)
+        selnum = PCI_IDE_CAP_SELECTIVE_STREAMS_NUM(l) + 1;
+
+    printf("\t\tIDECap: Lnk=%d Sel=%d FlowThru%c PartHdr%c Aggr%c PCPC%c IDE_KM%c Alg='%s' TCs=%d TeeLim%c\n",
+      linknum,
+      selnum,
+      FLAG(l, PCI_IDE_CAP_FLOWTHROUGH_IDE_SUPP),
+      FLAG(l, PCI_IDE_CAP_PARTIAL_HEADER_ENC_SUPP),
+      FLAG(l, PCI_IDE_CAP_AGGREGATION_SUPP),
+      FLAG(l, PCI_IDE_CAP_PCRC_SUPP),
+      FLAG(l, PCI_IDE_CAP_IDE_KM_SUPP),
+      ide_alg(buf2, sizeof(buf2), PCI_IDE_CAP_ALG(l)),
+      PCI_IDE_CAP_LINK_TC_NUM(l) + 1,
+      FLAG(l, PCI_IDE_CAP_TEE_LIMITED_SUPP)
+      );
+
+    l = get_conf_long(d, where + PCI_IDE_CTL);
+    printf("\t\tIDECtl: FTEn%c\n",
+      FLAG(l, PCI_IDE_CTL_FLOWTHROUGH_IDE));
+
+    // The rest of the capability is variable length arrays
+    off = where + PCI_IDE_LINK_STREAM;
+
+    // Link IDE Register Block repeated 0 to 8 times
+    if (linknum)
+      {
+        if (!config_fetch(d, off, 8 * linknum))
+          {
+            printf("\t\t<unreadable>\n");
+            return;
+          }
+        for (i = 0; i < linknum; ++i)
+          {
+            // Link IDE Stream Control Register
+            l = get_conf_long(d, off);
+            printf("\t\t%sLinkIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c HdrEnc=%s Alg='%s' TC%d ID%d\n",
+              offstr(offs, off),
+              i,
+              FLAG(l, PCI_IDE_LINK_CTL_EN),
+              aggr[PCI_IDE_LINK_CTL_TX_AGGR_NPR(l)],
+              aggr[PCI_IDE_LINK_CTL_TX_AGGR_PR(l)],
+              aggr[PCI_IDE_LINK_CTL_TX_AGGR_CPL(l)],
+              FLAG(l, PCI_IDE_LINK_CTL_EN),
+              TABLE(hdr_enc_mode, PCI_IDE_LINK_CTL_PART_ENC(l), buf1),
+              ide_alg(buf2, sizeof(buf2), PCI_IDE_LINK_CTL_ALG(l)),
+              PCI_IDE_LINK_CTL_TC(l),
+              PCI_IDE_LINK_CTL_ID(l)
+              );
+            off += 4;
+
+            /* Link IDE Stream Status Register */
+            l = get_conf_long(d, off);
+            printf("\t\t%sLinkIDE#%d Sta: Status=%s RecvChkFail%c\n",
+              offstr(offs, off),
+              i,
+              TABLE(stream_state, PCI_IDE_LINK_STS_STATUS(l), buf1),
+              FLAG(l, PCI_IDE_LINK_STS_RECVD_INTEGRITY_CHECK));
+            off += 4;
+          }
+      }
+
+    for (i = 0; i < selnum; ++i)
+      {
+        // Fetching Selective IDE Stream Capability/Control/Status/RID1/RID2
+        if (!config_fetch(d, off, 20))
+          {
+            printf("\t\t<unreadable>\n");
+            return;
+          }
+
+        // Selective IDE Stream Capability Register
+        l = get_conf_long(d, off);
+        printf("\t\t%sSelectiveIDE#%d Cap: RID#=%d\n",
+          offstr(offs, off),
+          i,
+          PCI_IDE_SEL_CAP_BLOCKS_NUM(l));
+        off += 4;
+        addrnum = PCI_IDE_SEL_CAP_BLOCKS_NUM(l);
+
+        // Selective IDE Stream Control Register
+        l = get_conf_long(d, off);
+
+        printf("\t\t%sSelectiveIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c HdrEnc=%s Alg='%s' TC%d ID%d%s\n",
+          offstr(offs, off),
+          i,
+          FLAG(l, PCI_IDE_SEL_CTL_EN),
+          aggr[PCI_IDE_SEL_CTL_TX_AGGR_NPR(l)],
+          aggr[PCI_IDE_SEL_CTL_TX_AGGR_PR(l)],
+          aggr[PCI_IDE_SEL_CTL_TX_AGGR_CPL(l)],
+          FLAG(l, PCI_IDE_SEL_CTL_PCRC_EN),
+          TABLE(hdr_enc_mode, PCI_IDE_SEL_CTL_PART_ENC(l), buf1),
+          ide_alg(buf2, sizeof(buf2), PCI_IDE_SEL_CTL_ALG(l)),
+          PCI_IDE_SEL_CTL_TC(l),
+          PCI_IDE_SEL_CTL_ID(l),
+          (l & PCI_IDE_SEL_CTL_DEFAULT) ? " Default" : ""
+          );
+        off += 4;
+
+        // Selective IDE Stream Status Register
+        l = get_conf_long(d, off);
+        printf("\t\t%sSelectiveIDE#%d Sta: %s RecvChkFail%c\n",
+          offstr(offs, off),
+          i ,
+          TABLE(stream_state, PCI_IDE_SEL_STS_STATUS(l), buf1),
+          FLAG(l, PCI_IDE_SEL_STS_RECVD_INTEGRITY_CHECK));
+        off += 4;
+
+        // IDE RID Association Registers
+        l = get_conf_long(d, off);
+        l2 = get_conf_long(d, off + 4);
+
+        printf("\t\t%sSelectiveIDE#%d RID: Valid%c Base=%x Limit=%x SegBase=%x\n",
+          offstr(offs, off),
+          i,
+          FLAG(l2, PCI_IDE_SEL_RID_2_VALID),
+          PCI_IDE_SEL_RID_2_BASE(l2),
+          PCI_IDE_SEL_RID_1_LIMIT(l),
+          PCI_IDE_SEL_RID_2_SEG_BASE(l2));
+        off += 8;
+
+        if (!config_fetch(d, off, addrnum * 12))
+          {
+            printf("\t\t<unreadable>\n");
+            return;
+          }
+
+        // IDE Address Association Registers
+        for (j = 0; j < addrnum; ++j)
+          {
+            u64 limit, base;
+
+            l = get_conf_long(d, off);
+            limit = get_conf_long(d, off + 4);
+            base = get_conf_long(d, off + 8);
+            printf("\t\t%sSelectiveIDE#%d RID#%d: Valid%c Base=%lx Limit=%lx\n",
+              offstr(offs, off),
+              i,
+              j,
+              FLAG(l, PCI_IDE_SEL_ADDR_1_VALID),
+              (base << 32) | PCI_IDE_SEL_ADDR_1_BASE_LOW(l),
+              (limit << 32) | PCI_IDE_SEL_ADDR_1_LIMIT_LOW(l));
+            off += 12;
+          }
+      }
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -1640,6 +1829,9 @@ show_ext_caps(struct device *d, int type)
         break;
 	  case PCI_EXT_CAP_ID_DOE:
 	    cap_doe(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_IDE:
+	    cap_ide(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);
