@@ -717,6 +717,7 @@ static void cap_express_dev(struct device *d, int where, int type)
       printf(" SlotPowerLimit ");
       show_power_limit((t & PCI_EXP_DEVCAP_PWR_VAL) >> 18, (t & PCI_EXP_DEVCAP_PWR_SCL) >> 26);
     }
+  printf(" TEE-IO%c", FLAG(t, PCI_EXP_DEVCAP_TEE_IO));
   printf("\n");
 
   w = get_conf_word(d, where + PCI_EXP_DEVCTL);
