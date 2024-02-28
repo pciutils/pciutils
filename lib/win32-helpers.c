@@ -1227,6 +1227,7 @@ win32_call_func_with_tcb_privilege(BOOL (*function)(LPVOID), LPVOID argument)
   HANDLE lsass_process;
   HANDLE lsass_token;
 
+  DWORD error;
   BOOL ret;
 
   impersonate_privilege_enabled = FALSE;
@@ -1374,6 +1375,8 @@ err_privilege_not_held:
   goto ret;
 
 ret:
+  error = GetLastError();
+
   if (revert_to_old_token)
     win32_revert_to_token(old_token);
 
@@ -1382,6 +1385,8 @@ ret:
 
   if (lsass_token)
     CloseHandle(lsass_token);
+
+  SetLastError(error);
 
   return ret;
 }
