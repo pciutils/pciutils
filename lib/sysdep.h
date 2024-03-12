@@ -83,6 +83,10 @@ typedef u16 word;
 #endif
 #endif
 
+#ifdef PCI_OS_HAIKU
+#include <endian.h>
+#endif
+
 #ifdef PCI_OS_SYLIXOS
 #include <endian.h>
 #endif
