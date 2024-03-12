@@ -105,12 +105,13 @@ sysfs_get_string(struct pci_dev *d, char *object, char *buf, int mandatory)
       return 0;
     }
   n = read(fd, buf, OBJBUFSIZE);
+  int read_errno = errno;
   close(fd);
   if (n < 0)
     {
-      warn("Error reading %s: %s", namebuf, strerror(errno));
+      warn("Error reading %s: %s", namebuf, strerror(read_errno));
       return 0;
-     }
+    }
   if (n >= OBJBUFSIZE)
     {
       warn("Value in %s too long", namebuf);
