@@ -208,6 +208,9 @@ case $sys in
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "/dev/misc/mem"'
 		echo >>$c '#define PCI_PATH_ACPI_MCFG ""'
 		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
+		if [ "$sys" != "beos" ] ; then
+			LIBRESOLV=-lnetwork
+		fi
 		;;
 	sylixos)
 		echo >>$c '#define PCI_PATH_SYLIXOS_DEVICE "/proc/pci"'
