@@ -150,11 +150,12 @@ SetProcessUserModeIOPL(VOID)
   BOOL ret;
 
   /*
-   * Load ntdll.dll library with disabled critical-error-handler message box.
+   * Load ntdll.dll library with disabled critical-error-handler and
+   * file-not-found message box.
    * It means that NT kernel does not show unwanted GUI message box to user
    * when LoadLibrary() function fails.
    */
-  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS);
+  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
   ntdll = LoadLibrary(TEXT("ntdll.dll"));
   win32_change_error_mode(prev_error_mode);
   if (!ntdll)

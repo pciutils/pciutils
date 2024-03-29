@@ -948,7 +948,7 @@ win32_find_and_open_process_for_query(LPCSTR exe_file)
        * On older NT-based systems these functions are available in
        * psapi.dll library without K32 prefix.
        */
-      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS);
+      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
       psapi = LoadLibrary(TEXT("psapi.dll"));
       win32_change_error_mode(prev_error_mode);
 

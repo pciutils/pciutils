@@ -125,7 +125,7 @@ win32_sysdbg_setup(struct pci_access *a)
   if (win32_sysdbg_initialized)
     return 1;
 
-  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS);
+  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
   ntdll = LoadLibrary(TEXT("ntdll.dll"));
   win32_change_error_mode(prev_error_mode);
   if (!ntdll)
