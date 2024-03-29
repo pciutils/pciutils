@@ -295,33 +295,25 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_intel_conf1 = {
-  "intel-conf1",
-  "Raw I/O port access using Intel conf1 interface",
-  NULL,					/* config */
-  conf1_detect,
-  conf12_init,
-  conf12_cleanup,
-  pci_generic_scan,
-  pci_generic_fill_info,
-  conf1_read,
-  conf1_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "intel-conf1",
+  .help = "Raw I/O port access using Intel conf1 interface",
+  .detect = conf1_detect,
+  .init = conf12_init,
+  .cleanup = conf12_cleanup,
+  .scan = pci_generic_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = conf1_read,
+  .write = conf1_write,
 };
 
 struct pci_methods pm_intel_conf2 = {
-  "intel-conf2",
-  "Raw I/O port access using Intel conf2 interface",
-  NULL,					/* config */
-  conf2_detect,
-  conf12_init,
-  conf12_cleanup,
-  pci_generic_scan,
-  pci_generic_fill_info,
-  conf2_read,
-  conf2_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "intel-conf2",
+  .help = "Raw I/O port access using Intel conf2 interface",
+  .detect = conf2_detect,
+  .init = conf12_init,
+  .cleanup = conf12_cleanup,
+  .scan = pci_generic_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = conf2_read,
+  .write = conf2_write,
 };

@@ -214,17 +214,15 @@ proc_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_linux_proc = {
-  "linux-proc",
-  "The proc file system on Linux",
-  proc_config,
-  proc_detect,
-  proc_init,
-  proc_cleanup,
-  proc_scan,
-  pci_generic_fill_info,
-  proc_read,
-  proc_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  proc_cleanup_dev
+  .name = "linux-proc",
+  .help = "The proc file system on Linux",
+  .config = proc_config,
+  .detect = proc_detect,
+  .init = proc_init,
+  .cleanup = proc_cleanup,
+  .scan = proc_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = proc_read,
+  .write = proc_write,
+  .cleanup_dev = proc_cleanup_dev,
 };

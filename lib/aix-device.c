@@ -260,17 +260,13 @@ aix_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_aix_device = {
-  "aix-device",
-  "AIX /dev/pci[0-n]",
-  NULL,
-  aix_detect,
-  aix_init,
-  aix_cleanup,
-  aix_scan,
-  pci_generic_fill_info,
-  aix_read,
-  aix_write,
-  NULL,                                 /* read_vpd */
-  NULL,                                 /* dev_init */
-  NULL                                  /* dev_cleanup */
+  .name = "aix-device",
+  .help = "AIX /dev/pci[0-n]",
+  .detect = aix_detect,
+  .init = aix_init,
+  .cleanup = aix_cleanup,
+  .scan = aix_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = aix_read,
+  .write = aix_write,
 };

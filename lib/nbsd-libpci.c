@@ -143,17 +143,14 @@ nbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_nbsd_libpci = {
-  "nbsd-libpci",
-  "NetBSD libpci",
-  nbsd_config,
-  nbsd_detect,
-  nbsd_init,
-  nbsd_cleanup,
-  pci_generic_scan,
-  pci_generic_fill_info,
-  nbsd_read,
-  nbsd_write,
-  NULL,                                 /* read_vpd */
-  NULL,                                 /* dev_init */
-  NULL                                  /* dev_cleanup */
+  .name = "nbsd-libpci",
+  .help = "NetBSD libpci",
+  .config = nbsd_config,
+  .detect = nbsd_detect,
+  .init = nbsd_init,
+  .cleanup = nbsd_cleanup,
+  .scan = pci_generic_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = nbsd_read,
+  .write = nbsd_write,
 };

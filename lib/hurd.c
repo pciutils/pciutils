@@ -356,17 +356,15 @@ hurd_fill_info(struct pci_dev *d, unsigned int flags)
 }
 
 struct pci_methods pm_hurd = {
-  "hurd",
-  "Hurd access using RPCs",
-  NULL,				/* config */
-  hurd_detect,
-  hurd_init,
-  hurd_cleanup,
-  hurd_scan,
-  hurd_fill_info,
-  hurd_read,
-  hurd_write,
-  NULL,				/* read_vpd */
-  hurd_init_dev,
-  hurd_cleanup_dev
+  .name = "hurd",
+  .help = "Hurd access using RPCs",
+  .detect = hurd_detect,
+  .init = hurd_init,
+  .cleanup = hurd_cleanup,
+  .scan = hurd_scan,
+  .fill_info = hurd_fill_info,
+  .read = hurd_read,
+  .write = hurd_write,
+  .init_dev = hurd_init_dev,
+  .cleanup_dev = hurd_cleanup_dev
 };

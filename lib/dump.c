@@ -178,17 +178,15 @@ dump_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_dump = {
-  "dump",
-  "Reading of register dumps (set the `dump.name' parameter)",
-  dump_config,
-  dump_detect,
-  dump_init,
-  dump_cleanup,
-  dump_scan,
-  pci_generic_fill_info,
-  dump_read,
-  dump_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  dump_cleanup_dev
+  .name = "dump",
+  .help = "Reading of register dumps (set the `dump.name' parameter)",
+  .config = dump_config,
+  .detect = dump_detect,
+  .init = dump_init,
+  .cleanup = dump_cleanup,
+  .scan = dump_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = dump_read,
+  .write = dump_write,
+  .cleanup_dev = dump_cleanup_dev,
 };

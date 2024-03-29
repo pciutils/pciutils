@@ -144,17 +144,14 @@ sylixos_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_sylixos_device = {
-  "sylixos-device",
-  "SylixOS /proc/pci device",
-  sylixos_config,
-  sylixos_detect,
-  sylixos_init,
-  sylixos_cleanup,
-  sylixos_scan,
-  pci_generic_fill_info,
-  sylixos_read,
-  sylixos_write,
-  NULL,			// no read_vpd
-  NULL,			// no init_dev
-  NULL,			// no cleanup_dev
+  .name = "sylixos-device",
+  .help = "SylixOS /proc/pci device",
+  .config = sylixos_config,
+  .detect = sylixos_detect,
+  .init = sylixos_init,
+  .cleanup = sylixos_cleanup,
+  .scan = sylixos_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = sylixos_read,
+  .write = sylixos_write,
 };

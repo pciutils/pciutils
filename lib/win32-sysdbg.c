@@ -290,17 +290,13 @@ win32_sysdbg_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_win32_sysdbg = {
-  "win32-sysdbg",
-  "Win32 PCI config space access using NT SysDbg Bus Data interface",
-  NULL,					/* config */
-  win32_sysdbg_detect,
-  win32_sysdbg_init,
-  win32_sysdbg_cleanup,
-  pci_generic_scan,
-  pci_generic_fill_info,
-  win32_sysdbg_read,
-  win32_sysdbg_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "win32-sysdbg",
+  .help = "Win32 PCI config space access using NT SysDbg Bus Data interface",
+  .detect = win32_sysdbg_detect,
+  .init = win32_sysdbg_init,
+  .cleanup = win32_sysdbg_cleanup,
+  .scan = pci_generic_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = win32_sysdbg_read,
+  .write = win32_sysdbg_write,
 };

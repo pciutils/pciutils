@@ -1749,17 +1749,15 @@ win32_cfgmgr32_cleanup(struct pci_access *a)
 }
 
 struct pci_methods pm_win32_cfgmgr32 = {
-  "win32-cfgmgr32",
-  "Win32 device listing via Configuration Manager",
-  win32_cfgmgr32_config,
-  win32_cfgmgr32_detect,
-  win32_cfgmgr32_init,
-  win32_cfgmgr32_cleanup,
-  win32_cfgmgr32_scan,
-  win32_cfgmgr32_fill_info,
-  win32_cfgmgr32_read,
-  win32_cfgmgr32_write,
-  NULL,                                 /* read_vpd */
-  NULL,                                 /* init_dev */
-  win32_cfgmgr32_cleanup_dev,
+  .name = "win32-cfgmgr32",
+  .help = "Win32 device listing via Configuration Manager",
+  .config = win32_cfgmgr32_config,
+  .detect = win32_cfgmgr32_detect,
+  .init = win32_cfgmgr32_init,
+  .cleanup = win32_cfgmgr32_cleanup,
+  .scan = win32_cfgmgr32_scan,
+  .fill_info = win32_cfgmgr32_fill_info,
+  .read = win32_cfgmgr32_read,
+  .write = win32_cfgmgr32_write,
+  .cleanup_dev = win32_cfgmgr32_cleanup_dev,
 };

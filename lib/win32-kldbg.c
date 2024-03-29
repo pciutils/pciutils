@@ -715,17 +715,13 @@ win32_kldbg_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_win32_kldbg = {
-  "win32-kldbg",
-  "Win32 PCI config space access using Kernel Local Debugging Driver",
-  NULL,					/* config */
-  win32_kldbg_detect,
-  win32_kldbg_init,
-  win32_kldbg_cleanup,
-  win32_kldbg_scan,
-  pci_generic_fill_info,
-  win32_kldbg_read,
-  win32_kldbg_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "win32-kldbg",
+  .help = "Win32 PCI config space access using Kernel Local Debugging Driver",
+  .detect = win32_kldbg_detect,
+  .init = win32_kldbg_init,
+  .cleanup = win32_kldbg_cleanup,
+  .scan = win32_kldbg_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = win32_kldbg_read,
+  .write = win32_kldbg_write,
 };

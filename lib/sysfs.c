@@ -594,17 +594,16 @@ static void sysfs_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_linux_sysfs = {
-  "linux-sysfs",
-  "The sys filesystem on Linux",
-  sysfs_config,
-  sysfs_detect,
-  sysfs_init,
-  sysfs_cleanup,
-  sysfs_scan,
-  sysfs_fill_info,
-  sysfs_read,
-  sysfs_write,
-  sysfs_read_vpd,
-  NULL,					/* init_dev */
-  sysfs_cleanup_dev
+  .name = "linux-sysfs",
+  .help = "The sys filesystem on Linux",
+  .config = sysfs_config,
+  .detect = sysfs_detect,
+  .init = sysfs_init,
+  .cleanup = sysfs_cleanup,
+  .scan = sysfs_scan,
+  .fill_info = sysfs_fill_info,
+  .read = sysfs_read,
+  .write = sysfs_write,
+  .read_vpd = sysfs_read_vpd,
+  .cleanup_dev = sysfs_cleanup_dev,
 };

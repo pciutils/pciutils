@@ -197,17 +197,14 @@ darwin_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_darwin = {
-    "darwin",
-    "Darwin",
-    darwin_config,
-    darwin_detect,
-    darwin_init,
-    darwin_cleanup,
-    pci_generic_scan,
-    pci_generic_fill_info,
-    darwin_read,
-    darwin_write,
-    NULL,                                 /* read_vpd */
-    NULL,                                 /* dev_init */
-    NULL                                  /* dev_cleanup */
+    .name = "darwin",
+    .help = "Darwin",
+    .config = darwin_config,
+    .detect = darwin_detect,
+    .init = darwin_init,
+    .cleanup = darwin_cleanup,
+    .scan = pci_generic_scan,
+    .fill_info = pci_generic_fill_info,
+    .read = darwin_read,
+    .write = darwin_write,
 };

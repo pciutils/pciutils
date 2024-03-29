@@ -221,17 +221,15 @@ aos_expansion_cleanup_dev(struct pci_dev *d)
 }
 
 struct pci_methods pm_aos_expansion = {
-	"aos-expansion",
-	"The Expansion.library on AmigaOS 4.x",
-	NULL,			// config, called after allocation of pci_access, if assigned
-	aos_expansion_detect,	// detect, mandatory because called without check
-	aos_expansion_init,	// init, called once access chosen, eventually after detect
-	aos_expansion_cleanup,	// cleanup, called at the end
-	aos_expansion_scan,
-	pci_generic_fill_info,
-	aos_expansion_read,
-	aos_expansion_write,
-	NULL,			// read_vpd
-	aos_expansion_init_dev,
-	aos_expansion_cleanup_dev,
+	.name = "aos-expansion",
+	.help = "The Expansion.library on AmigaOS 4.x",
+	.detect = aos_expansion_detect,		// detect, mandatory because called without check
+	.init = aos_expansion_init,		// init, called once access chosen, eventually after detect
+	.cleanup = aos_expansion_cleanup,	// cleanup, called at the end
+	.scan = aos_expansion_scan,
+	.fill_info = pci_generic_fill_info,
+	.read = aos_expansion_read,
+	.write = aos_expansion_write,
+	.init_dev = aos_expansion_init_dev,
+	.cleanup_dev = aos_expansion_cleanup_dev,
 };

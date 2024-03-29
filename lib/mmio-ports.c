@@ -400,33 +400,27 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_mmio_conf1 = {
-  "mmio-conf1",
-  "Raw memory mapped I/O port access using Intel conf1 interface",
-  conf1_config,
-  conf1_detect,
-  conf1_init,
-  conf1_cleanup,
-  conf1_scan,
-  pci_generic_fill_info,
-  conf1_read,
-  conf1_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "mmio-conf1",
+  .help = "Raw memory mapped I/O port access using Intel conf1 interface",
+  .config = conf1_config,
+  .detect = conf1_detect,
+  .init = conf1_init,
+  .cleanup = conf1_cleanup,
+  .scan = conf1_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = conf1_read,
+  .write = conf1_write,
 };
 
 struct pci_methods pm_mmio_conf1_ext = {
-  "mmio-conf1-ext",
-  "Raw memory mapped I/O port access using Intel conf1 extended interface",
-  conf1_ext_config,
-  conf1_ext_detect,
-  conf1_init,
-  conf1_cleanup,
-  conf1_scan,
-  pci_generic_fill_info,
-  conf1_ext_read,
-  conf1_ext_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "mmio-conf1-ext",
+  .help = "Raw memory mapped I/O port access using Intel conf1 extended interface",
+  .config = conf1_ext_config,
+  .detect = conf1_ext_detect,
+  .init = conf1_init,
+  .cleanup = conf1_cleanup,
+  .scan = conf1_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = conf1_ext_read,
+  .write = conf1_ext_write,
 };

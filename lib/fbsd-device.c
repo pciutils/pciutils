@@ -350,17 +350,14 @@ fbsd_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_fbsd_device = {
-  "fbsd-device",
-  "FreeBSD /dev/pci device",
-  fbsd_config,
-  fbsd_detect,
-  fbsd_init,
-  fbsd_cleanup,
-  fbsd_scan,
-  fbsd_fill_info,
-  fbsd_read,
-  fbsd_write,
-  NULL,                                 /* read_vpd */
-  NULL,                                 /* dev_init */
-  NULL                                  /* dev_cleanup */
+  .name = "fbsd-device",
+  .help = "FreeBSD /dev/pci device",
+  .config = fbsd_config,
+  .detect = fbsd_detect,
+  .init = fbsd_init,
+  .cleanup = fbsd_cleanup,
+  .scan = fbsd_scan,
+  .fill_info = fbsd_fill_info,
+  .read = fbsd_read,
+  .write = fbsd_write,
 };

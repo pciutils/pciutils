@@ -1088,17 +1088,14 @@ ecam_write(struct pci_dev *d, int pos, byte *buf, int len)
 }
 
 struct pci_methods pm_ecam = {
-  "ecam",
-  "Raw memory mapped access using PCIe ECAM interface",
-  ecam_config,
-  ecam_detect,
-  ecam_init,
-  ecam_cleanup,
-  ecam_scan,
-  pci_generic_fill_info,
-  ecam_read,
-  ecam_write,
-  NULL,					/* read_vpd */
-  NULL,					/* init_dev */
-  NULL					/* cleanup_dev */
+  .name = "ecam",
+  .help = "Raw memory mapped access using PCIe ECAM interface",
+  .config = ecam_config,
+  .detect = ecam_detect,
+  .init = ecam_init,
+  .cleanup = ecam_cleanup,
+  .scan = ecam_scan,
+  .fill_info = pci_generic_fill_info,
+  .read = ecam_read,
+  .write = ecam_write,
 };
