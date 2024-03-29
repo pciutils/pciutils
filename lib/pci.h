@@ -210,23 +210,23 @@ int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 int pci_fill_info(struct pci_dev *, int flags) PCI_ABI;
 char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 
-#define PCI_FILL_IDENT		0x0001
+#define PCI_FILL_IDENT		0x0001		/* vendor and device ID */
 #define PCI_FILL_IRQ		0x0002
 #define PCI_FILL_BASES		0x0004
 #define PCI_FILL_ROM_BASE	0x0008
 #define PCI_FILL_SIZES		0x0010
 #define PCI_FILL_CLASS		0x0020
-#define PCI_FILL_CAPS		0x0040
-#define PCI_FILL_EXT_CAPS	0x0080
-#define PCI_FILL_PHYS_SLOT	0x0100
-#define PCI_FILL_MODULE_ALIAS	0x0200
-#define PCI_FILL_LABEL		0x0400
+#define PCI_FILL_CAPS		0x0040		/* capabilities */
+#define PCI_FILL_EXT_CAPS	0x0080		/* extended capabilities */
+#define PCI_FILL_PHYS_SLOT	0x0100		/* physical slot (string property) */
+#define PCI_FILL_MODULE_ALIAS	0x0200		/* Linux kernel module alias (string property) */
+#define PCI_FILL_LABEL		0x0400		/* (string property) */
 #define PCI_FILL_NUMA_NODE	0x0800
 #define PCI_FILL_IO_FLAGS	0x1000
-#define PCI_FILL_DT_NODE	0x2000		/* Device tree node */
-#define PCI_FILL_IOMMU_GROUP	0x4000
+#define PCI_FILL_DT_NODE	0x2000		/* Device tree node (string property) */
+#define PCI_FILL_IOMMU_GROUP	0x4000		/* (string property) */
 #define PCI_FILL_BRIDGE_BASES	0x8000
-#define PCI_FILL_RESCAN		0x00010000
+#define PCI_FILL_RESCAN		0x00010000	/* force re-scan of cached properties */
 #define PCI_FILL_CLASS_EXT	0x00020000      /* prog_if and rev_id */
 #define PCI_FILL_SUBSYS		0x00040000      /* subsys_vendor_id and subsys_id */
 #define PCI_FILL_PARENT		0x00080000
