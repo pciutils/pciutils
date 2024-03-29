@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
-git push --tags public
-git push --tags github
+git push --tags public master
+git push --tags github master
