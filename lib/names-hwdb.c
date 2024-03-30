@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 char *
-pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4)
+pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int id4 UNUSED)
 {
   char modalias[64];
   const char *key = NULL;
@@ -41,13 +41,16 @@ pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int
       key = "ID_MODEL_FROM_DATABASE";
       break;
     case ID_SUBSYSTEM:
-      sprintf(modalias, "pci:v%08Xd%08Xsv%08Xsd%08X*", id1, id2, id3, id4);
-      key = "ID_MODEL_FROM_DATABASE";
-      break;
+      /*
+       * There is no udev hwdb key which returns subsystem. Also note that query
+       * modalias "pci:v%08Xd%08Xsv%08Xsd%08X*" matches also hwdb device with
+       * modalias "pci:v%08Xd%08Xsv*sd*" (which is the default modalias), so
+       * there is no way to get information specific for the subsystem.
+       */
+      return NULL;
     case ID_GEN_SUBSYSTEM:
-      sprintf(modalias, "pci:v*d*sv%08Xsd%08X*", id1, id2);
-      key = "ID_MODEL_FROM_DATABASE";
-      break;
+      /* There is no udev hwdb key which returns generic subsystem. */
+      return NULL;
     case ID_CLASS:
       sprintf(modalias, "pci:v*d*sv*sd*bc%02X*", id1);
       key = "ID_PCI_CLASS_FROM_DATABASE";
