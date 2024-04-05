@@ -20,7 +20,7 @@ one of the above config access access method to provide as much as possible
 information to application. More details about particular access method and
 caveats are described in the pcilib(8) manual page.
 
-The default access method for config is is win32-kldbg. It uses Microsoft's
+The default access method for config space is win32-kldbg. It uses Microsoft's
 Kernel Local Debugging Driver kldbgdrv.sys. This driver is not part of the
 Windows system but is part of the Microsoft WinDbg tool. It is required to
 have kldbgdrv.sys driver installed in the system32 directory or to have
