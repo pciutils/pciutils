@@ -9,10 +9,9 @@ Check version numbers in Makefile and lib/pci.h.
 ssh-add ~/.ssh/id_korg
 
 maint/tag-release vX.Y.Z
-git push --tags
-
-maint/release
 
 maint/push-to-public
+
+maint/release
 
 Update progs/pciutils at Jabberwock.
