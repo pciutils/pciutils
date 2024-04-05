@@ -1,3 +1,26 @@
+2024-04-05  Martin Mares <mj@ucw.cz>
+
+	* lspci decodes the IDE (Integrity & Data Encryption) and TEE-IO
+	  extended capabilities.
+
+	* Several bugs in back-ends for Windows were fixed and the
+	  README.Windows updated.
+
+	* Fixed building on Haiku.
+
+	* We now use more C99 features.
+
+	* Optimization flags used for compiling individual object files
+	  should be the same as optimization flags for linking the final
+	  executable to make link-time optimization possible.
+
+	* We no longer look up subsystems in the HWDB, because there is
+	  no API for querying only the subsystem. The lookup we used
+	  previously returned a device name if there was no entry for
+	  the particular subsystem.
+
+	* Updated pci.ids.
+
 2024-02-25  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.11.1.
