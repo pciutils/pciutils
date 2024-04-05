@@ -147,6 +147,11 @@ resolve_cfgmgr32_functions(void)
  * acledit.dll, netui0.dll or netui2.dll) but due to static linking it is
  * not possible to access these error strings easily at runtime.
  *
+ * Not all error strings are in cmapi.rc file. Some other strings are defined
+ * in CfgMgr32+CONFIGRET.cs file which is part of the Microsoft dotnet pinvoke
+ * project. Others are described in the US patent 5748980 and in Microsoft's
+ * PNP.DOC and [MS-PNPR].PDF documents.
+ *
  * So define own function for translating CR_* errors directly to strings.
  */
 static const char *
@@ -155,51 +160,51 @@ cr_strerror(CONFIGRET cr_error_id)
   static char unknown_error[sizeof("Unknown CR error XXXXXXXXXX")];
   static const char *cr_errors[] = {
     "The operation completed successfully",
-    "CR_DEFAULT",
+    "The operation is not implemented for this request", /* Error code returned from the default switch case. */
     "Not enough memory is available to process this command",
     "A required pointer parameter is invalid",
     "The ulFlags parameter specified is invalid for this operation",
     "The device instance handle parameter is not valid",
     "The supplied resource descriptor parameter is invalid",
     "The supplied logical configuration parameter is invalid",
-    "CR_INVALID_ARBITRATOR",
-    "CR_INVALID_NODELIST",
-    "CR_DEVNODE_HAS_REQS/CR_DEVINST_HAS_REQS",
+    "The arbitrator's registration identifier is invalid or there is already such a global arbitrator",
+    "The nodelist header is invalid",
+    "The device instance already has requirements",
     "The RESOURCEID parameter does not contain a valid RESOURCEID",
-    "CR_DLVXD_NOT_FOUND",
+    "Dynamically loadable VxD was not found",
     "The specified device instance handle does not correspond to a present device",
     "There are no more logical configurations available",
     "There are no more resource descriptions available",
     "This device instance already exists",
     "The supplied range list parameter is invalid",
-    "CR_INVALID_RANGE",
+    "The supplied range parameter is invalid",
     "A general internal error occurred",
-    "CR_NO_SUCH_LOGICAL_DEV",
+    "The logical device was not found in ISAPNP conversion",
     "The device is disabled for this configuration",
-    "CR_NOT_SYSTEM_VM",
+    "This routine must be called from the system VM",
     "A service or application refused to allow removal of this device",
-    "CR_APM_VETOED",
-    "CR_INVALID_LOAD_TYPE",
+    "The APM request has been vetoed",
+    "The load type is invalid",
     "An output parameter was too small to hold all the data available",
-    "CR_NO_ARBITRATOR",
-    "CR_NO_REGISTRY_HANDLE",
+    "The resource has no arbitrator",
+    "The operation does not produce registry entry",
     "A required entry in the registry is missing or an attempt to write to the registry failed",
     "The specified Device ID is not a valid Device ID",
     "One or more parameters were invalid",
-    "CR_INVALID_API",
-    "CR_DEVLOADER_NOT_READY",
-    "CR_NEED_RESTART",
+    "This routine cannot be called from ring 3",
+    "The device loader is not ready",
+    "The system must be restarted for the operation to be completed",
     "There are no more hardware profiles available",
-    "CR_DEVICE_NOT_THERE",
+    "The driver could not find the device",
     "The specified value does not exist in the registry",
-    "CR_WRONG_TYPE",
+    "The registry value has wrong type",
     "The specified priority is invalid for this operation",
     "This device cannot be disabled",
-    "CR_FREE_RESOURCES",
-    "CR_QUERY_VETOED",
-    "CR_CANT_SHARE_IRQ",
-    "CR_NO_DEPENDENT",
-    "CR_SAME_RESOURCES",
+    "The resources have been freed",
+    "A service or application refused to query this device",
+    "The IRQ cannot be shared",
+    "This routine is not implemented in this version of the operating system", /* Older cfgmgr32.dll has NUM_CR_RESULTS=0x2C and uses it for unimplemented routine. New cfgmgr32.dll has CR_NO_DEPENDENT=0x2C but does not use it at all. */
+    "The two resources represent the same resource",
     "The specified key does not exist in the registry",
     "The specified machine name does not meet the UNC naming conventions",
     "A general remote communication error occurred",
@@ -215,7 +220,7 @@ cr_strerror(CONFIGRET cr_error_id)
     "Invalid index",
     "Invalid structure size"
   };
-  if (cr_error_id <= 0 || cr_error_id >= sizeof(cr_errors)/sizeof(*cr_errors))
+  if (cr_error_id >= sizeof(cr_errors)/sizeof(*cr_errors))
     {
       sprintf(unknown_error, "Unknown CR error %lu", cr_error_id);
       return unknown_error;
