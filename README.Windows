@@ -20,6 +20,19 @@ one of the above config access access method to provide as much as possible
 information to application. More details about particular access method and
 caveats are described in the pcilib(8) manual page.
 
+The default access method for config is is win32-kldbg. It uses Microsoft's
+Kernel Local Debugging Driver kldbgdrv.sys. This driver is not part of the
+Windows system but is part of the Microsoft WinDbg tool. It is required to
+have kldbgdrv.sys driver installed in the system32 directory or to have
+windbg.exe or kd.exe binary in PATH. kldbgdrv.sys driver has some restrictions.
+Process needs to have Debug privilege and Windows system has to be booted with
+Debugging option. Debugging option can be enabled by calling (takes effect
+after next boot): bcdedit /debug on
+
+Download links for WinDbg 6.12.2.633 standalone installer from Microsoft:
+https://download.microsoft.com/download/A/6/A/A6AC035D-DA3F-4F0C-ADA4-37C8E5D34E3D/setup/WinSDKDebuggingTools_amd64/dbg_amd64.msi
+https://download.microsoft.com/download/A/6/A/A6AC035D-DA3F-4F0C-ADA4-37C8E5D34E3D/setup/WinSDKDebuggingTools/dbg_x86.msi
+
 To access config space via intel-conf1 access method on NT-based systems via
 NT ProcessUserModeIOPL system call, it is required to have SeTcbPrivilege
 (Act as part of the operating system privilege), which can be enabled in User
