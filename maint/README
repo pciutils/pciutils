@@ -14,4 +14,4 @@ maint/push-to-public
 
 maint/release
 
-Update progs/pciutils at Jabberwock.
+ssh jw 'cd web && bin/release-prog pciutils X.Y.Z'
