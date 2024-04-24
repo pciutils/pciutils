@@ -1512,7 +1512,7 @@ static void
 cap_ide(struct device *d, int where)
 {
     const char *hdr_enc_mode[] = { "no", "17:2", "25:2", "33:2", "41:2" };
-    const char *stream_state[] = { "insecure", "secure" };
+    const char *stream_state[] = { "insecure", "reserved", "secure" };
     const char *aggr[] = { "-", "=2", "=4", "=8" };
     u32 l, l2, linknum = 0, selnum = 0, addrnum, off, i, j;
     char buf1[16], buf2[16], offs[16];
@@ -1613,7 +1613,7 @@ cap_ide(struct device *d, int where)
         // Selective IDE Stream Control Register
         l = get_conf_long(d, off);
 
-        printf("\t\t%sSelectiveIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c HdrEnc=%s Alg='%s' TC%d ID%d%s\n",
+        printf("\t\t%sSelectiveIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c CFG%c HdrEnc=%s Alg='%s' TC%d ID%d%s\n",
           offstr(offs, off),
           i,
           FLAG(l, PCI_IDE_SEL_CTL_EN),
@@ -1621,6 +1621,7 @@ cap_ide(struct device *d, int where)
           aggr[PCI_IDE_SEL_CTL_TX_AGGR_PR(l)],
           aggr[PCI_IDE_SEL_CTL_TX_AGGR_CPL(l)],
           FLAG(l, PCI_IDE_SEL_CTL_PCRC_EN),
+          FLAG(l, PCI_IDE_SEL_CTL_CFG_EN),
           TABLE(hdr_enc_mode, PCI_IDE_SEL_CTL_PART_ENC(l), buf1),
           ide_alg(buf2, sizeof(buf2), PCI_IDE_SEL_CTL_ALG(l)),
           PCI_IDE_SEL_CTL_TC(l),
@@ -1664,14 +1665,18 @@ cap_ide(struct device *d, int where)
 
             l = get_conf_long(d, off);
             limit = get_conf_long(d, off + 4);
+            limit <<= 32;
+            limit |= (PCI_IDE_SEL_ADDR_1_LIMIT_LOW(l) << 20) | 0xFFFFF;
             base = get_conf_long(d, off + 8);
+            base <<= 32;
+            base |= PCI_IDE_SEL_ADDR_1_BASE_LOW(l) << 20;
             printf("\t\t%sSelectiveIDE#%d RID#%d: Valid%c Base=%lx Limit=%lx\n",
               offstr(offs, off),
               i,
               j,
               FLAG(l, PCI_IDE_SEL_ADDR_1_VALID),
-              (base << 32) | PCI_IDE_SEL_ADDR_1_BASE_LOW(l),
-              (limit << 32) | PCI_IDE_SEL_ADDR_1_LIMIT_LOW(l));
+              base,
+              limit);
             off += 12;
           }
       }

@@ -79,10 +79,10 @@ e1:00.0 Class 0800: Device aaaa:bbbb
 		IDECap: Lnk=0 Sel=1 FlowThru- PartHdr- Aggr- PCPC- IDE_KM+ Alg='AES-GCM-256-96b' TCs=8 TeeLim+
 		IDECtl: FTEn-
 		SelectiveIDE#0 Cap: RID#=1
-		SelectiveIDE#0 Ctl: En- NPR- PR- CPL- PCRC- HdrEnc=no Alg='AES-GCM-256-96b' TC0 ID0
-		SelectiveIDE#0 Sta: insecure RecvChkFail-
-		SelectiveIDE#0 RID: Valid- Base=0 Limit=0 SegBase=0
-		SelectiveIDE#0 RID#0: Valid- Base=0 Limit=0
+		SelectiveIDE#0 Ctl: En+ NPR- PR- CPL- PCRC- CFG- HdrEnc=no Alg='AES-GCM-256-96b' TC0 ID0 Default
+		SelectiveIDE#0 Sta: secure RecvChkFail-
+		SelectiveIDE#0 RID: Valid+ Base=0 Limit=ffff SegBase=0
+		SelectiveIDE#0 RID#0: Valid+ Base=0 Limit=ffffffffffffffff
 	Capabilities: [e00 v2] Data Object Exchange
 		DOECap: IntSup-
 		DOECtl: IntEn-
@@ -219,8 +219,8 @@ f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 810: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 820: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 830: 30 00 01 e0 42 e0 00 01 00 00 00 00 01 00 00 00
-840: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-850: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+840: 01 00 40 00 02 00 00 00 00 ff ff 00 01 00 00 00
+850: 01 00 f0 ff ff ff ff ff 00 00 00 00 00 00 00 00
 860: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 870: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
