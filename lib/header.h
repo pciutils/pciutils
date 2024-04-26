@@ -993,6 +993,16 @@
 #define  PCI_ERR_UNC_ECRC	0x00080000	/* ECRC Error Status */
 #define  PCI_ERR_UNC_UNSUP	0x00100000	/* Unsupported Request */
 #define  PCI_ERR_UNC_ACS_VIOL	0x00200000	/* ACS Violation */
+#define  PCI_ERR_UNC_INTERNAL					0x00400000	/* Uncorrectable Internal Error */
+#define  PCI_ERR_UNC_MC_BLOCKED_TLP				0x00800000	/* MC Blocked TLP */
+#define  PCI_ERR_UNC_ATOMICOP_EGRESS_BLOCKED	0x01000000	/* AtomicOp Egress Blocked */
+#define  PCI_ERR_UNC_TLP_PREFIX_BLOCKED			0x02000000	/* TLP Prefix Blocked Error */
+#define  PCI_ERR_UNC_POISONED_TLP_EGRESS		0x04000000	/* Poisoned TLP Egress Blocked */
+#define  PCI_ERR_UNC_DMWR_REQ_EGRESS_BLOCKED	0x08000000	/* DMWr Request Egress Blocked */
+#define  PCI_ERR_UNC_IDE_CHECK					0x10000000	/* IDE Check Failed */
+#define  PCI_ERR_UNC_MISR_IDE_TLP				0x20000000	/* Misrouted IDE TLP */
+#define  PCI_ERR_UNC_PCRC_CHECK					0x40000000	/* PCRC Check Failed */
+#define  PCI_ERR_UNC_TLP_XLAT_EGRESS_BLOCKED	0x80000000	/* TLP Translation Egress Blocked */
 #define PCI_ERR_UNCOR_MASK	8	/* Uncorrectable Error Mask */
 	/* Same bits as above */
 #define PCI_ERR_UNCOR_SEVER	12	/* Uncorrectable Error Severity */
@@ -1004,6 +1014,8 @@
 #define  PCI_ERR_COR_REP_ROLL	0x00000100	/* REPLAY_NUM Rollover */
 #define  PCI_ERR_COR_REP_TIMER	0x00001000	/* Replay Timer Timeout */
 #define  PCI_ERR_COR_REP_ANFE	0x00002000	/* Advisory Non-Fatal Error */
+#define  PCI_ERR_COR_INTERNAL	0x00004000	/* Corrected Internal Error */
+#define  PCI_ERR_COR_HDRLOG_OVER	0x00008000	/* Header Log Overflow */
 #define PCI_ERR_COR_MASK	20	/* Correctable Error Mask */
 	/* Same bits as above */
 #define PCI_ERR_CAP		24	/* Advanced Error Capabilities */
