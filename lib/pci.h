@@ -159,6 +159,9 @@ struct pci_dev {
   u16 subsys_vendor_id, subsys_id;	/* Subsystem vendor id and subsystem id */
   struct pci_dev *parent;		/* Parent device, does not have to be always accessible */
   int no_config_access;			/* No access to config space for this device */
+  u32 rcd_link_cap;
+  u16 rcd_link_status;
+  u16 rcd_link_ctrl;
 
   /* Fields used internally */
   struct pci_access *access;
@@ -187,6 +190,8 @@ int pci_write_long(struct pci_dev *, int pos, u32 data) PCI_ABI;
 /* Configuration space as a sequence of bytes (little-endian) */
 int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
+
+int get_rcd_sysfs_obj_file(struct pci_dev *d, char *object, char *result) PCI_ABI;
 
 /*
  * Most device properties take some effort to obtain, so libpci does not
@@ -231,6 +236,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_SUBSYS		0x00040000      /* subsys_vendor_id and subsys_id */
 #define PCI_FILL_PARENT		0x00080000
 #define PCI_FILL_DRIVER		0x00100000      /* OS driver currently in use (string property) */
+#define PCI_FILL_RCD_LNK	0x00200000      /* CXL RCD Link status properties */
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
 

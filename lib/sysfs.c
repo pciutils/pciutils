@@ -483,6 +483,17 @@ sysfs_fill_info(struct pci_dev *d, unsigned int flags)
         clear_fill(d, PCI_FILL_DRIVER);
     }
 
+  if (want_fill(d, flags, PCI_FILL_RCD_LNK))
+    {
+      char buf[OBJBUFSIZE];
+      if (sysfs_get_string(d, "rcd_link_cap", buf, 0))
+        d->rcd_link_cap = strtoul(buf, NULL, 16);
+      if (sysfs_get_string(d, "rcd_link_ctrl", buf, 0))
+        d->rcd_link_ctrl = strtoul(buf, NULL, 16);
+      if (sysfs_get_string(d, "rcd_link_status", buf, 0))
+        d->rcd_link_status = strtoul(buf, NULL, 16);
+    }
+
   pci_generic_fill_info(d, flags);
 }
 
