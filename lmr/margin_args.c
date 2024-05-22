@@ -14,7 +14,7 @@
 
 #include "lmr.h"
 
-const char* usage
+const char *usage
   = "! Utility requires preliminary preparation of the system. Refer to the pcilmr man page !\n\n"
     "Usage:\n"
     "pcilmr [--margin] [<margining options>] <downstream component> ...\n"
@@ -130,7 +130,7 @@ parse_dev_args(int argc, char **argv, struct margin_link_args *args, u8 link_spe
   if (argc == optind)
     return;
   int c;
-  while ((c = getopt(argc, argv, "+r:l:p:t:v:VT")) != -1)
+  while ((c = getopt(argc, argv, "+r:l:p:t:v:VTg:")) != -1)
     {
       switch (c)
         {
@@ -155,6 +155,60 @@ parse_dev_args(int argc, char **argv, struct margin_link_args *args, u8 link_spe
           case 'r':
             args->recvs_n = parse_csv_arg(optarg, args->recvs);
             break;
+            case 'g': {
+              char recv[2] = { 0 };
+              char dir[2] = { 0 };
+              char unit[4] = { 0 };
+              float criteria = 0.0;
+              char eye[2] = { 0 };
+              int cons[3] = { 0 };
+
+              int ret = sscanf(optarg, "%1[1-6]%1[tv]=%f%n%3[%,ps]%n%1[f]%n", recv, dir, &criteria,
+                               &cons[0], unit, &cons[1], eye, &cons[2]);
+              if (ret < 3)
+                {
+                  ret = sscanf(optarg, "%1[1-6]%1[tv]=%1[f]%n,%f%n%2[ps%]%n", recv, dir, eye,
+                               &cons[0], &criteria, &cons[1], unit, &cons[2]);
+                  if (ret < 3)
+                    die("Invalid arguments\n\n%s", usage);
+                }
+
+              int consumed = 0;
+              for (int i = 0; i < 3; i++)
+                if (cons[i] > consumed)
+                  consumed = cons[i];
+              if ((size_t)consumed != strlen(optarg))
+                die("Invalid arguments\n\n%s", usage);
+              if (criteria < 0)
+                die("Invalid arguments\n\n%s", usage);
+              if (strstr(unit, ",") && eye[0] == 0)
+                die("Invalid arguments\n\n%s", usage);
+
+              u8 recv_n = recv[0] - '0' - 1;
+              if (dir[0] == 'v')
+                {
+                  if (unit[0] != ',' && unit[0] != 0)
+                    die("Invalid arguments\n\n%s", usage);
+                  args->recv_args[recv_n].v.valid = true;
+                  args->recv_args[recv_n].v.criteria = criteria;
+                  if (eye[0] != 0)
+                    args->recv_args[recv_n].v.one_side_is_whole = true;
+                }
+              else
+                {
+                  if (unit[0] == '%')
+                    criteria = criteria / 100.0 * margin_ui[link_speed];
+                  else if (unit[0] != 0 && (unit[0] != 'p' || unit[1] != 's'))
+                    die("Invalid arguments\n\n%s", usage);
+                  else if (unit[0] == 0 && criteria != 0)
+                    die("Invalid arguments\n\n%s", usage);
+                  args->recv_args[recv_n].t.valid = true;
+                  args->recv_args[recv_n].t.criteria = criteria;
+                  if (eye[0] != 0)
+                    args->recv_args[recv_n].t.one_side_is_whole = true;
+                }
+              break;
+            }
           case '?':
             die("Invalid arguments\n\n%s", usage);
             break;
@@ -236,7 +290,7 @@ margin_parse_util_args(struct pci_access *pacc, int argc, char **argv, enum marg
           struct pci_dev *down;
           struct pci_dev *up;
           if (!margin_find_pair(pacc, dev, &down, &up))
-            die("Cannot find pair for the specified device: %s\n", argv[optind]);
+            die("Cannot find pair for the specified device: %s\n", argv[optind - 1]);
           struct pci_cap *cap = pci_find_cap(down, PCI_CAP_ID_EXP, PCI_CAP_NORMAL);
           if (!cap)
             die("Looks like you don't have enough privileges to access "

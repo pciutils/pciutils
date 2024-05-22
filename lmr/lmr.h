@@ -17,11 +17,10 @@
 
 #define MARGIN_STEP_MS 1000
 
-#define MARGIN_TIM_MIN       20
-#define MARGIN_TIM_RECOMMEND 30
-#define MARGIN_VOLT_MIN      50
-
 enum margin_hw { MARGIN_HW_DEFAULT, MARGIN_ICE_LAKE_RC };
+
+// in ps
+static const double margin_ui[] = { 62.5, 31.25 };
 
 /* PCI Device wrapper for margining functions */
 struct margin_dev {
@@ -122,6 +121,15 @@ struct margin_com_args {
   char *dir_for_csv;
 };
 
+struct margin_recv_args {
+  // Grading options
+  struct {
+    bool valid;
+    double criteria; // in ps/mV
+    bool one_side_is_whole;
+  } t, v;
+};
+
 struct margin_link_args {
   struct margin_com_args *common;
   u8 steps_t;        // 0 == use NumTimingSteps
@@ -129,8 +137,9 @@ struct margin_link_args {
   u8 parallel_lanes; // [1; MaxLanes + 1]
   u8 recvs[6];       // Receivers Numbers
   u8 recvs_n;        // 0 == margin all available receivers
-  u8 lanes[32];      // Lanes to Margin
-  u8 lanes_n;        // 0 == margin all available lanes
+  struct margin_recv_args recv_args[6];
+  u8 lanes[32]; // Lanes to Margin
+  u8 lanes_n;   // 0 == margin all available lanes
 };
 
 struct margin_link {
@@ -243,7 +252,19 @@ void margin_log_hw_quirks(struct margin_recv *recv);
 
 /* margin_results */
 
-void margin_results_print_brief(struct margin_results *results, u8 recvs_n);
+// Min values are taken from PCIe Base Spec Rev. 5.0 Section 8.4.2.
+// Rec values are based on PCIe Arch PHY Test Spec Rev 5.0
+// (Transmitter Electrical Compliance)
+
+// values in ps
+static const double margin_ew_min[] = { 18.75, 9.375 };
+static const double margin_ew_rec[] = { 23.75, 10.1565 };
+
+static const double margin_eh_min[] = { 15, 15 };
+static const double margin_eh_rec[] = { 21, 19.75 };
+
+void margin_results_print_brief(struct margin_results *results, u8 recvs_n,
+                                struct margin_link_args *args);
 
 void margin_results_save_csv(struct margin_results *results, u8 recvs_n, struct margin_link *link);
 

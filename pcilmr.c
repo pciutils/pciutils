@@ -189,10 +189,6 @@ main(int argc, char **argv)
   if (com_args->run_margin)
     {
       printf("Results:\n");
-      printf("\nPass/fail criteria:\nTiming:\n");
-      printf("Minimum Offset (spec): %d %% UI\nRecommended Offset: %d %% UI\n", MARGIN_TIM_MIN,
-             MARGIN_TIM_RECOMMEND);
-      printf("\nVoltage:\nMinimum Offset (spec): %d mV\n\n", MARGIN_VOLT_MIN);
       printf(
         "Margining statuses:\nLIM -\tErrorCount exceeded Error Count Limit (found device limit)\n");
       printf("NAK -\tDevice didn't execute last command, \n\tso result may be less reliable\n");
@@ -204,7 +200,7 @@ main(int argc, char **argv)
           printf("Link ");
           margin_log_bdfs(links[i].down_port.dev, links[i].up_port.dev);
           printf(":\n\n");
-          margin_results_print_brief(results[i], results_n[i]);
+          margin_results_print_brief(results[i], results_n[i], &links[i].args);
           if (com_args->save_csv)
             margin_results_save_csv(results[i], results_n[i], &links[i]);
           printf("\n");
