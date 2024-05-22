@@ -229,9 +229,10 @@ margin_parse_util_args(struct pci_access *pacc, int argc, char **argv, enum marg
   com_args->steps_utility = 0;
   com_args->dir_for_csv = NULL;
   com_args->save_csv = false;
+  com_args->dwell_time = 1;
 
   int c;
-  while ((c = getopt(argc, argv, "+e:co:")) != -1)
+  while ((c = getopt(argc, argv, "+e:co:d:")) != -1)
     {
       switch (c)
         {
@@ -244,6 +245,9 @@ margin_parse_util_args(struct pci_access *pacc, int argc, char **argv, enum marg
           case 'o':
             com_args->dir_for_csv = optarg;
             com_args->save_csv = true;
+            break;
+          case 'd':
+            com_args->dwell_time = atoi(optarg);
             break;
           default:
             die("Invalid arguments\n\n%s", usage);

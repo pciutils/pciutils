@@ -260,7 +260,7 @@ margin_test_lanes(struct margin_lanes_data arg)
               pci_write_word(arg.recv->dev->dev, ctrl_addr, step_cmd);
             }
         }
-      msleep(MARGIN_STEP_MS);
+      msleep(arg.recv->dwell_time * 1000);
 
       for (int i = 0; i < arg.lanes_n; i++)
         {
@@ -312,7 +312,8 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_link_args *
                               .lane_reversal = false,
                               .params = &params,
                               .parallel_lanes = args->parallel_lanes ? args->parallel_lanes : 1,
-                              .error_limit = args->common->error_limit };
+                              .error_limit = args->common->error_limit,
+                              .dwell_time = args->common->dwell_time };
 
   results->recvn = recvn;
   results->lanes_n = lanes_n;

@@ -15,8 +15,6 @@
 
 #include "pciutils.h"
 
-#define MARGIN_STEP_MS 1000
-
 enum margin_hw { MARGIN_HW_DEFAULT, MARGIN_ICE_LAKE_RC };
 
 // in ps
@@ -119,6 +117,7 @@ struct margin_com_args {
   u64 steps_utility; // For ETA logging
   bool save_csv;
   char *dir_for_csv;
+  u8 dwell_time;
 };
 
 struct margin_recv_args {
@@ -157,6 +156,7 @@ struct margin_recv {
 
   u8 parallel_lanes;
   u8 error_limit;
+  u8 dwell_time;
 };
 
 struct margin_lanes_data {

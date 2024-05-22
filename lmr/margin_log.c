@@ -88,7 +88,8 @@ void
 margin_log_receiver(struct margin_recv *recv)
 {
   margin_log("\nError Count Limit = %d\n", recv->error_limit);
-  margin_log("Parallel Lanes: %d\n\n", recv->parallel_lanes);
+  margin_log("Parallel Lanes: %d\n", recv->parallel_lanes);
+  margin_log("Margining dwell time: %d s\n\n", recv->dwell_time);
 
   margin_log_params(recv->params);
 
@@ -143,8 +144,8 @@ margin_log_margining(struct margin_lanes_data arg)
         }
       margin_log("]");
 
-      u64 lane_eta_s = (arg.steps_lane_total - arg.steps_lane_done) * MARGIN_STEP_MS / 1000;
-      u64 total_eta_s = *arg.steps_utility * MARGIN_STEP_MS / 1000 + lane_eta_s;
+      u64 lane_eta_s = (arg.steps_lane_total - arg.steps_lane_done) * arg.recv->dwell_time;
+      u64 total_eta_s = *arg.steps_utility * arg.recv->dwell_time + lane_eta_s;
       margin_log(" - ETA: %3ds Steps: %3d Total ETA: %3dm %2ds", lane_eta_s, arg.steps_lane_done,
                  total_eta_s / 60, total_eta_s % 60);
 
