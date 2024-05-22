@@ -8,6 +8,8 @@
  *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
+#include <memory.h>
+
 #include "lmr.h"
 
 static u16 special_hw[][4] =
@@ -125,6 +127,7 @@ fill_dev_wrapper(struct pci_dev *dev)
 bool
 margin_fill_link(struct pci_dev *down_port, struct pci_dev *up_port, struct margin_link *wrappers)
 {
+  memset(wrappers, 0, sizeof(*wrappers));
   if (!margin_verify_link(down_port, up_port))
     return false;
   wrappers->down_port = fill_dev_wrapper(down_port);

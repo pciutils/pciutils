@@ -67,7 +67,7 @@ PCIINC_INS=lib/config.h lib/header.h lib/pci.h lib/types.h
 
 UTILINC=pciutils.h bitops.h $(PCIINC)
 
-LMR=margin_hw.o margin.o margin_log.o margin_results.o
+LMR=margin_hw.o margin.o margin_log.o margin_results.o margin_args.o
 LMROBJS=$(addprefix lmr/,$(LMR))
 LMRINC=lmr/lmr.h $(UTILINC)
 

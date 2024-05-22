@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Display/save margining results
  *
- *	Copyright (c) 2023 KNS Group LLC (YADRO)
+ *	Copyright (c) 2023-2024 KNS Group LLC (YADRO)
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -172,13 +172,13 @@ margin_results_print_brief(struct margin_results *results, u8 recvs_n)
 }
 
 void
-margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
-                        struct pci_dev *up_port)
+margin_results_save_csv(struct margin_results *results, u8 recvs_n, struct margin_link *link)
 {
   char timestamp[64];
   time_t tim = time(NULL);
   strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%S", gmtime(&tim));
 
+  char *dir = link->args.common->dir_for_csv;
   size_t pathlen = strlen(dir) + 128;
   char *path = xmalloc(pathlen);
   FILE *csv;
@@ -190,6 +190,8 @@ margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
   enum lane_rating lane_rating;
   u8 link_speed;
 
+  struct pci_dev *port;
+
   for (int i = 0; i < recvs_n; i++)
     {
       res = &(results[i]);
@@ -198,9 +200,11 @@ margin_results_save_csv(struct margin_results *results, u8 recvs_n, char *dir,
 
       if (res->test_status != MARGIN_TEST_OK)
         continue;
+
+      port = res->recvn == 6 ? link->up_port.dev : link->down_port.dev;
       snprintf(path, pathlen, "%s/lmr_%0*x.%02x.%02x.%x_Rx%X_%s.csv", dir,
-               up_port->domain_16 == 0xffff ? 8 : 4, up_port->domain, up_port->bus, up_port->dev,
-               up_port->func, 10 + res->recvn - 1, timestamp);
+               port->domain_16 == 0xffff ? 8 : 4, port->domain, port->bus, port->dev,
+               port->func, 10 + res->recvn - 1, timestamp);
       csv = fopen(path, "w");
       if (!csv)
         die("Error while saving %s\n", path);

@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Log margining process
  *
- *	Copyright (c) 2023 KNS Group LLC (YADRO)
+ *	Copyright (c) 2023-2024 KNS Group LLC (YADRO)
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -35,6 +35,17 @@ margin_log_bdfs(struct pci_dev *down, struct pci_dev *up)
   else
     margin_log("%x:%x.%x -> %x:%x.%x", down->bus, down->dev, down->func, up->bus, up->dev,
                up->func);
+}
+
+void
+margin_gen_bdfs(struct pci_dev *down, struct pci_dev *up, char *dest, size_t maxlen)
+{
+  if (margin_print_domain)
+    snprintf(dest, maxlen, "%x:%x:%x.%x -> %x:%x:%x.%x", down->domain, down->bus, down->dev,
+             down->func, up->domain, up->bus, up->dev, up->func);
+  else
+    snprintf(dest, maxlen, "%x:%x.%x -> %x:%x.%x", down->bus, down->dev, down->func, up->bus,
+             up->dev, up->func);
 }
 
 void
