@@ -143,13 +143,17 @@ margin_report_cmd(struct margin_dev *dev, u8 lane, margin_cmd cmd, margin_cmd *r
 }
 
 static void
-margin_apply_hw_quirks(struct margin_recv *recv)
+margin_apply_hw_quirks(struct margin_recv *recv, struct margin_link_args *args)
 {
   switch (recv->dev->hw)
     {
       case MARGIN_ICE_LAKE_RC:
         if (recv->recvn == 1)
-          recv->params->volt_offset = 12;
+          {
+            recv->params->volt_offset = 12;
+            args->recv_args[recv->recvn - 1].t.one_side_is_whole = true;
+            args->recv_args[recv->recvn - 1].t.valid = true;
+          }
         break;
       default:
         break;
@@ -341,7 +345,7 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_link_args *
 
   if (recv.parallel_lanes > params.max_lanes + 1)
     recv.parallel_lanes = params.max_lanes + 1;
-  margin_apply_hw_quirks(&recv);
+  margin_apply_hw_quirks(&recv, args);
   margin_log_hw_quirks(&recv);
 
   results->tim_off_reported = params.timing_offset != 0;

@@ -162,7 +162,8 @@ margin_log_hw_quirks(struct margin_recv *recv)
         if (recv->recvn == 1)
           margin_log("\nRx(A) is Intel Ice Lake RC port.\n"
                      "Applying next quirks for margining process:\n"
-                     "  - Set MaxVoltageOffset to 12 (120 mV).\n");
+                     "  - Set MaxVoltageOffset to 12 (120 mV);\n"
+                     "  - Force the use of 'one side is the whole' grading mode.\n");
         break;
       default:
         break;
