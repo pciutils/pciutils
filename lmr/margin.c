@@ -426,13 +426,8 @@ margin_read_params(struct pci_access *pacc, struct pci_dev *dev, u8 recvn,
   struct pci_cap *cap = pci_find_cap(dev, PCI_CAP_ID_EXP, PCI_CAP_NORMAL);
   if (!cap)
     return false;
-  u8 dev_dir = GET_REG_MASK(pci_read_word(dev, cap->addr + PCI_EXP_FLAGS), PCI_EXP_FLAGS_TYPE);
 
-  bool dev_down;
-  if (dev_dir == PCI_EXP_TYPE_ROOT_PORT || dev_dir == PCI_EXP_TYPE_DOWNSTREAM)
-    dev_down = true;
-  else
-    dev_down = false;
+  bool dev_down = margin_port_is_down(dev);
 
   if (recvn == 0)
     {
@@ -453,25 +448,7 @@ margin_read_params(struct pci_access *pacc, struct pci_dev *dev, u8 recvn,
   struct pci_dev *up = NULL;
   struct margin_link link;
 
-  for (struct pci_dev *p = pacc->devices; p; p = p->next)
-    {
-      if (dev_down && pci_read_byte(dev, PCI_SECONDARY_BUS) == p->bus && dev->domain == p->domain
-          && p->func == 0)
-        {
-          down = dev;
-          up = p;
-          break;
-        }
-      else if (!dev_down && pci_read_byte(p, PCI_SECONDARY_BUS) == dev->bus
-               && dev->domain == p->domain)
-        {
-          down = p;
-          up = dev;
-          break;
-        }
-    }
-
-  if (!down)
+  if (!margin_find_pair(pacc, dev, &down, &up))
     return false;
 
   if (!margin_fill_link(down, up, &link))

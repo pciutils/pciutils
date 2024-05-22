@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Margining utility main header
  *
- *	Copyright (c) 2023 KNS Group LLC (YADRO)
+ *	Copyright (c) 2023-2024 KNS Group LLC (YADRO)
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -95,7 +95,7 @@ enum margin_test_status {
 
 /* All lanes Receiver results */
 struct margin_results {
-  u8 recvn; // Receiver Number
+  u8 recvn; // Receiver Number; from 1 to 6
   struct margin_params params;
   bool lane_reversal;
   u8 link_speed;
@@ -104,7 +104,7 @@ struct margin_results {
 
   /* Used to convert steps to physical quantity.
      Calculated from MaxOffset and NumSteps     */
-  double tim_coef;
+  double tim_coef; // from steps to % UI
   double volt_coef;
 
   bool tim_off_reported;
@@ -134,7 +134,7 @@ struct margin_args {
 /* Receiver structure */
 struct margin_recv {
   struct margin_dev *dev;
-  u8 recvn; // Receiver Number
+  u8 recvn; // Receiver Number; from 1 to 6
   bool lane_reversal;
   struct margin_params *params;
 
@@ -160,6 +160,12 @@ struct margin_lanes_data {
 };
 
 /* margin_hw */
+
+bool margin_port_is_down(struct pci_dev *dev);
+
+/* Results through down/up ports */
+bool margin_find_pair(struct pci_access *pacc, struct pci_dev *dev, struct pci_dev **down_port,
+                      struct pci_dev **up_port);
 
 /* Verify that devices form the link with 16 GT/s or 32 GT/s data rate */
 bool margin_verify_link(struct pci_dev *down_port, struct pci_dev *up_port);

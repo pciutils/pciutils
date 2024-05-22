@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Margining utility main function
  *
- *	Copyright (c) 2023 KNS Group LLC (YADRO)
+ *	Copyright (c) 2023-2024 KNS Group LLC (YADRO)
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -83,21 +83,6 @@ dev_for_filter(struct pci_access *pacc, char *filter)
   die("No such PCI device: %s or you don't have enough privileges.\n", filter);
 }
 
-static struct pci_dev *
-find_down_port_for_up(struct pci_access *pacc, struct pci_dev *up)
-{
-  struct pci_dev *down = NULL;
-  for (struct pci_dev *p = pacc->devices; p; p = p->next)
-    {
-      if (pci_read_byte(p, PCI_SECONDARY_BUS) == up->bus && up->domain == p->domain)
-        {
-          down = p;
-          break;
-        }
-    }
-  return down;
-}
-
 static u8
 parse_csv_arg(char *arg, u8 *vals)
 {
@@ -120,11 +105,13 @@ scan_links(struct pci_access *pacc, bool only_ready)
   else
     printf("Links with Lane Margining at the Receiver capabilities:\n");
   bool flag = true;
-  for (struct pci_dev *up = pacc->devices; up; up = up->next)
+  for (struct pci_dev *p = pacc->devices; p; p = p->next)
     {
-      if (pci_find_cap(up, PCI_EXT_CAP_ID_LMR, PCI_CAP_EXTENDED))
+      if (pci_find_cap(p, PCI_EXT_CAP_ID_LMR, PCI_CAP_EXTENDED) && margin_port_is_down(p))
         {
-          struct pci_dev *down = find_down_port_for_up(pacc, up);
+          struct pci_dev *down = NULL;
+          struct pci_dev *up = NULL;
+          margin_find_pair(pacc, p, &down, &up);
 
           if (down && margin_verify_link(down, up))
             {
@@ -147,11 +134,13 @@ find_ready_links(struct pci_access *pacc, struct pci_dev **down_ports, struct pc
                  bool cnt_only)
 {
   u8 cnt = 0;
-  for (struct pci_dev *up = pacc->devices; up; up = up->next)
+  for (struct pci_dev *p = pacc->devices; p; p = p->next)
     {
-      if (pci_find_cap(up, PCI_EXT_CAP_ID_LMR, PCI_CAP_EXTENDED))
+      if (pci_find_cap(p, PCI_EXT_CAP_ID_LMR, PCI_CAP_EXTENDED) && margin_port_is_down(p))
         {
-          struct pci_dev *down = find_down_port_for_up(pacc, up);
+          struct pci_dev *down = NULL;
+          struct pci_dev *up = NULL;
+          margin_find_pair(pacc, p, &down, &up);
 
           if (down && margin_verify_link(down, up)
               && (margin_check_ready_bit(down) || margin_check_ready_bit(up)))
@@ -328,10 +317,9 @@ main(int argc, char **argv)
       u8 cnt = 0;
       while (optind != argc)
         {
-          up_ports[cnt] = dev_for_filter(pacc, argv[optind]);
-          down_ports[cnt] = find_down_port_for_up(pacc, up_ports[cnt]);
-          if (!down_ports[cnt])
-            die("Cannot find Upstream Component for the specified device: %s\n", argv[optind]);
+          struct pci_dev *dev = dev_for_filter(pacc, argv[optind]);
+          if (!margin_find_pair(pacc, dev, &(down_ports[cnt]), &(up_ports[cnt])))
+            die("Cannot find pair for the specified device: %s\n", argv[optind]);
           cnt++;
           optind++;
         }
