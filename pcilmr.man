@@ -4,10 +4,10 @@ pcilmr \- margin PCIe Links
 .SH SYNOPSIS
 .B pcilmr
 .RB [ "--margin" ]
-.RI [ "<margining options>" ] " <downstream component> ..."
+.RI [ "<common options>" ] " <link port> " [ "<link options>" "] [" "<link port> " [ "<link options>" ] " ..." ]
 .br
 .B pcilmr --full
-.RI [ "<margining options>" ]
+.RI [ "<common options>" ]
 .br
 .B pcilmr --scan
 .SH CONFIGURATION
@@ -64,26 +64,81 @@ Utility allows to get an approximation of the eye margin diagram in the form of 
 links without a hardware debugger and without the need to stop the target system. Utility
 can be useful to debug link issues due to receiver margins.
 
-However, the utility results may be not particularly accurate and, as it was found out during
-testing, specific devices provide rather dubious capability support and the reliability of
-the information they provide is questionable. The PCIe specification provides reference values
-for the eye diagram, which are also used by the
-.B pcilmr
-to evaluate the results, but it seems that it makes sense to contact the
-manufacturer of a particular device for references.
-
-The PCIe Base Specification Revision 5.0 sets allowed range for Timing Margin from 20%\~UI to 50%\~UI and
-for Voltage Margin from 50\~mV to 500\~mV. Utility uses 30%\~UI as the recommended
-value for Timing - taken from NVIDIA presentation ("PCIe 4.0 Mass Electrical Margins Data
-Collection").
-
 .B pcilmr
 requires root privileges (to access Extended Configuration Space), but during our testing
 there were no problems with the devices and they successfully returned to their normal initial
 state after the end of testing.
 
+.SH RESULTS GRADING
+The PCIe specification provides reference values for the eye diagram, which are also used by the
+.B pcilmr
+to evaluate the results, but it seems that it makes sense to contact the
+manufacturer of a particular device for references.
+
+The utility uses values set in PCIe Base Spec Rev. 5.0 Section 8.4.2 as the default eye width and height
+minimum references. Recommended values were taken from 
+the PCIe Architecture PHY Test Spec Rev 5.0 (Transmitter Electrical Compliance).
+
+Reference grading values currently used by the utility are presented in the table below:
+
+.TS
+box tab(:);
+C | Cb S | Cb S
+C | Cb | Cb | Cb | Cb
+Lb | C | C | C | C.
+\&:16 GT/s (Gen 4):32 GT/s (Gen 5)
+\&:EW:EH:EW:EH
+_
+Min:T{
+18.75 ps
+.br
+30% UI
+T}:15 mV:T{
+9.375 ps
+.br
+30% UI
+T}:15 mV
+_
+Rec:T{
+23.75 ps
+.br
+38% UI
+T}:21 mV:T{
+10.157 ps
+.br
+33% UI
+T}:19.75 mV
+.TE
+
+.B pcilmr
+uses full eye width and height values to grade lanes. However, it is possible that
+device supports only one side margining. In such cases by default utility will
+calculate EW or EH as a double one side result.
+
+If info for specific device is available, you can configure grading criteria
+and tweak utility behavior in one-side only cases for your device using 
+.I -g
+link specific option (see below).
+
+.SH HARDWARE QUIRKS SUPPORT
+
+Thanks to testing or directly from the manufacturer's documentation, we know that
+some devices require special treatment during the margining. 
+Utility detects such devices based on their Vendor ID - Device ID pair.
+Right now the list of special devices is hardcoded in
+.I margin_hw
+file. For such devices utility can automatically adjust port margining parameters
+or grading options.
+
+For example, for Ice Lake CPUs RC ports
+.B pcilmr
+will change device MaxVoltageOffset value and will force the use of
+.RI ' "one side is the whole" "' grading mode."
+
 .SH OPTIONS
 .SS Device Specifier
+.B "You can specify Downstream or Upstream Port of the Link."
+.TP
 .B "<device/component>" \t
 .RI [ "<domain>" :] <bus> : <dev> . <func>
 (see
@@ -102,24 +157,35 @@ option) Links in the system (one by one).
 Scan for Links with negotiated speed 16 GT/s or higher. Mark "Ready" those of them
 in which at least one of the Link sides have Margining Ready bit set meaning that
 these Links are ready for testing and you can run utility on them.
-.SS Margining Test options
-.TP
+.SS Margining Common (for all specified links) options
 .B -c
 Print Device Lane Margining Capabilities only. Do not run margining.
 .TP
+.BI -e " <errors>"
+Specify Error Count Limit for margining.
+.br
+Default: 4.
+.TP
+.BI -o " <directory>"
+Save margining results in csv form into the specified directory. Utility
+will generate file with the name in form of
+.RI "\[dq]lmr_" "<port>" "_Rx" # _ <timestamp> ".csv\[dq]"
+for each successfully tested receiver.
+.TP
+.BI -d " <time>"
+Specify dwell time in seconds for the margining step. 
+.br
+Default: 1 s
+.SS Margining Link specific options
+.TP
 \fB\-l\fI <lane>\fP[\fI,<lane>...\fP]
-Specify lanes for margining.
+.R Specify lanes for margining.
 .br
 Remember that Device may use Lane Reversal for Lane numbering. However, utility
 uses logical lane numbers in arguments and for logging. Utility will automatically
 determine Lane Reversal and tune its calls.
 .br
 Default: all link lanes.
-.TP
-.BI -e " <errors>"
-Specify Error Count Limit for margining.
-.br
-Default: 4.
 .TP
 \fB-r\fI <recvn>\fP[\fI,<recvn>...\fP]
 Specify Receivers to select margining targets.
@@ -157,18 +223,34 @@ option, but for Voltage.
 .TP
 .BI -v " <steps>"
 Specify maximum number of steps for Voltage Margining.
-.SS Margining Log options
 .TP
-.BI -o " <directory>"
-Save margining results in csv form into the specified directory. Utility
-will generate file with the name in form of
-.RI "\[dq]lmr_" "<downstream component>" "_Rx" # _ <timestamp> ".csv\[dq]"
-for each successfully tested receiver.
+\fB-g\fI <recvn>\fPt=\fI<criteria>\fP{%|ps}[,f]
+.TP
+.IB "   <recvn>" t=f[, "<criteria>" "{%|ps}]"
+.TP
+.IB "   <recvn>" v= "<criteria>" "[,f]"
+.TP
+.IB "   <recvn>" v=f[, "<criteria>" ]
+Specify pass/fail grading criteria for eye width (timing - t) or height
+(voltage - v) for one of the link receivers. For EW you must choose one of the
+units (% UI or ps), for EH mV is used.
+.br
+Additional flag
+.I f
+is for situations when port doesn't support two side independent
+margining. In such cases by default utility will calculate EW or EH as a
+double one side result. You can add 
+.I f
+flag for
+.I -g
+option to tell the utility that the result in one direction is actually the
+measurement of the full eye and it does not need to be multiplied. This is so called
+.RI ' "one side is the whole" "' grading mode."
 
 .SH EXAMPLES
 Utility syntax example:
 .RS
-.BI "pcilmr -l" " 0,1 " "-r" " 1,6 " "-TV" " ab:0.0 52:0.0"
+.BI "pcilmr -o " "csv ab:0.0 " "-r " "1,6 " "-g " "1t=20% " "-g " "1v=f,30 52:0.0 " "-l " "0,1,2 " "-TV"
 .RE
 
 .UR https://gist.github.com/bombanya/f2b15263712757ffba1a11eea011c419
