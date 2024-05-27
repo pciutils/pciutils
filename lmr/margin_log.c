@@ -53,7 +53,7 @@ margin_log_link(struct margin_link *link)
 {
   margin_log("Link ");
   margin_log_bdfs(link->down_port.dev, link->up_port.dev);
-  margin_log("\nNegotiated Link Width: %d\n", link->down_port.width);
+  margin_log("\nNegotiated Link Width: %d\n", link->down_port.neg_width);
   margin_log("Link Speed: %d.0 GT/s = Gen %d\n", (link->down_port.link_speed - 3) * 16,
              link->down_port.link_speed);
   margin_log("Available receivers: ");

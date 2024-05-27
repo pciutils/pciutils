@@ -24,7 +24,8 @@ static const double margin_ui[] = { 62.5, 31.25 };
 struct margin_dev {
   struct pci_dev *dev;
   int lmr_cap_addr;
-  u8 width;
+  u8 neg_width;
+  u8 max_width;
   u8 retimers_n;
   u8 link_speed;
 
@@ -234,7 +235,7 @@ void margin_log(char *format, ...);
 void margin_log_bdfs(struct pci_dev *down_port, struct pci_dev *up_port);
 void margin_gen_bdfs(struct pci_dev *down_port, struct pci_dev *up_port, char *dest, size_t maxlen);
 
-/* Print Link header (bdfs, width, speed) */
+/* Print Link header (bdfs, neg_width, speed) */
 void margin_log_link(struct margin_link *link);
 
 void margin_log_params(struct margin_params *params);

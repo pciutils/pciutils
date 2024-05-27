@@ -165,7 +165,7 @@ read_params_internal(struct margin_dev *dev, u8 recvn, bool lane_reversal,
                      struct margin_params *params)
 {
   margin_cmd resp;
-  u8 lane = lane_reversal ? dev->width - 1 : 0;
+  u8 lane = lane_reversal ? dev->max_width - 1 : 0;
   margin_set_cmd(dev, lane, NO_COMMAND);
   bool status = margin_report_cmd(dev, lane, REPORT_CAPS(recvn), &resp);
   if (status)
@@ -366,7 +366,7 @@ margin_test_receiver(struct margin_dev *dev, u8 recvn, struct margin_link_args *
   for (int i = 0; i < lanes_n; i++)
     {
       results->lanes[i].lane
-        = recv.lane_reversal ? dev->width - lanes_to_margin[i] - 1 : lanes_to_margin[i];
+        = recv.lane_reversal ? dev->max_width - lanes_to_margin[i] - 1 : lanes_to_margin[i];
     }
 
   if (args->common->run_margin)
@@ -510,7 +510,7 @@ margin_process_args(struct margin_link *link)
 
   if (!args->lanes_n)
     {
-      args->lanes_n = dev->width;
+      args->lanes_n = dev->neg_width;
       for (int i = 0; i < args->lanes_n; i++)
         args->lanes[i] = i;
     }
@@ -518,7 +518,7 @@ margin_process_args(struct margin_link *link)
     {
       for (int i = 0; i < args->lanes_n; i++)
         {
-          if (args->lanes[i] >= dev->width)
+          if (args->lanes[i] >= dev->neg_width)
             {
               return MARGIN_TEST_ARGS_LANES;
             }
