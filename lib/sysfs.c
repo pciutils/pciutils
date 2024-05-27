@@ -2,7 +2,7 @@
  *	The PCI Library -- Configuration Access via /sys/bus/pci
  *
  *	Copyright (c) 2003 Matthew Wilcox <matthew@wil.cx>
- *	Copyright (c) 1997--2023 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2024 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <sys/types.h>
 
 #include "internal.h"
