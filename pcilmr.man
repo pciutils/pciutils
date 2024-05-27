@@ -76,7 +76,7 @@ to evaluate the results, but it seems that it makes sense to contact the
 manufacturer of a particular device for references.
 
 The utility uses values set in PCIe Base Spec Rev. 5.0 Section 8.4.2 as the default eye width and height
-minimum references. Recommended values were taken from 
+minimum references. Recommended values were taken from
 the PCIe Architecture PHY Test Spec Rev 5.0 (Transmitter Electrical Compliance).
 
 Reference grading values currently used by the utility are presented in the table below:
@@ -116,14 +116,14 @@ device supports only one side margining. In such cases by default utility will
 calculate EW or EH as a double one side result.
 
 If info for specific device is available, you can configure grading criteria
-and tweak utility behavior in one-side only cases for your device using 
+and tweak utility behavior in one-side only cases for your device using
 .I -g
 link specific option (see below).
 
 .SH HARDWARE QUIRKS SUPPORT
 
 Thanks to testing or directly from the manufacturer's documentation, we know that
-some devices require special treatment during the margining. 
+some devices require special treatment during the margining.
 Utility detects such devices based on their Vendor ID - Device ID pair.
 Right now the list of special devices is hardcoded in
 .I margin_hw
@@ -173,7 +173,7 @@ will generate file with the name in form of
 for each successfully tested receiver.
 .TP
 .BI -d " <time>"
-Specify dwell time in seconds for the margining step. 
+Specify dwell time in seconds for the margining step.
 .br
 Default: 1 s
 .SS Margining Link specific options
@@ -239,7 +239,7 @@ Additional flag
 .I f
 is for situations when port doesn't support two side independent
 margining. In such cases by default utility will calculate EW or EH as a
-double one side result. You can add 
+double one side result. You can add
 .I f
 flag for
 .I -g
