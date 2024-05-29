@@ -146,7 +146,7 @@ scan_device(struct pci_dev *p)
 	d->config_cached += 64;
     }
   pci_setup_cache(p, d->config, d->config_cached);
-  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS | PCI_FILL_RCD_LNK | (need_topology ? PCI_FILL_PARENT : 0));
+  pci_fill_info(p, PCI_FILL_IDENT | PCI_FILL_CLASS | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS | (need_topology ? PCI_FILL_PARENT : 0));
   return d;
 }
 
@@ -805,7 +805,7 @@ show_verbose(struct device *d)
 
   pci_fill_info(p, PCI_FILL_IRQ | PCI_FILL_BASES | PCI_FILL_ROM_BASE | PCI_FILL_SIZES |
     PCI_FILL_PHYS_SLOT | PCI_FILL_NUMA_NODE | PCI_FILL_DT_NODE | PCI_FILL_IOMMU_GROUP |
-    PCI_FILL_BRIDGE_BASES | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS);
+    PCI_FILL_BRIDGE_BASES | PCI_FILL_CLASS_EXT | PCI_FILL_SUBSYS | PCI_FILL_RCD_LNK);
 
   switch (htype)
     {

@@ -159,9 +159,9 @@ struct pci_dev {
   u16 subsys_vendor_id, subsys_id;	/* Subsystem vendor id and subsystem id */
   struct pci_dev *parent;		/* Parent device, does not have to be always accessible */
   int no_config_access;			/* No access to config space for this device */
-  u32 rcd_link_cap;
-  u16 rcd_link_status;
-  u16 rcd_link_ctrl;
+  u32 rcd_link_cap;     /* Link Capabilities register for RCD */
+  u16 rcd_link_status;  /* Link Status register for RCD */
+  u16 rcd_link_ctrl;    /* Link Control register for RCD */
 
   /* Fields used internally */
   struct pci_access *access;
@@ -190,8 +190,6 @@ int pci_write_long(struct pci_dev *, int pos, u32 data) PCI_ABI;
 /* Configuration space as a sequence of bytes (little-endian) */
 int pci_read_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
 int pci_write_block(struct pci_dev *, int pos, u8 *buf, int len) PCI_ABI;
-
-int get_rcd_sysfs_obj_file(struct pci_dev *d, char *object, char *result) PCI_ABI;
 
 /*
  * Most device properties take some effort to obtain, so libpci does not
