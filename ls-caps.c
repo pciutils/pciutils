@@ -1399,58 +1399,58 @@ static void cap_express_link_rcd(struct device *d)
 
   if (!pdev->rcd_link_cap)
     return;
+
   t = pdev->rcd_link_cap;
   aspm = (t & PCI_EXP_LNKCAP_ASPM) >> 10;
   cap_speed = t & PCI_EXP_LNKCAP_SPEED;
   cap_width = (t & PCI_EXP_LNKCAP_WIDTH) >> 4;
   printf("\t\tLnkCap:\tPort #%d, Speed %s, Width x%d, ASPM %s",
-   t >> 24,
-   link_speed(cap_speed), cap_width,
-   aspm_support(aspm));
-  if (aspm) {
+    t >> 24,
+    link_speed(cap_speed), cap_width,
+    aspm_support(aspm));
+  if (aspm)
+    {
       printf(", Exit Latency ");
       if (aspm & 1)
         printf("L0s %s", latency_l0s((t & PCI_EXP_LNKCAP_L0S) >> 12));
       if (aspm & 2)
         printf("%sL1 %s", (aspm & 1) ? ", " : "",
       latency_l1((t & PCI_EXP_LNKCAP_L1) >> 15));
-  }
+    }
   printf("\n");
   printf("\t\t\tClockPM%c Surprise%c LLActRep%c BwNot%c ASPMOptComp%c\n",
-   FLAG(t, PCI_EXP_LNKCAP_CLOCKPM),
-   FLAG(t, PCI_EXP_LNKCAP_SURPRISE),
-   FLAG(t, PCI_EXP_LNKCAP_DLLA),
-   FLAG(t, PCI_EXP_LNKCAP_LBNC),
-   FLAG(t, PCI_EXP_LNKCAP_AOC));
+    FLAG(t, PCI_EXP_LNKCAP_CLOCKPM),
+    FLAG(t, PCI_EXP_LNKCAP_SURPRISE),
+    FLAG(t, PCI_EXP_LNKCAP_DLLA),
+    FLAG(t, PCI_EXP_LNKCAP_LBNC),
+    FLAG(t, PCI_EXP_LNKCAP_AOC));
 
   w = pdev->rcd_link_ctrl;
   printf("\t\tLnkCtl:\tASPM %s;", aspm_enabled(w & PCI_EXP_LNKCTL_ASPM));
   printf(" Disabled%c CommClk%c\n\t\t\tExtSynch%c ClockPM%c AutWidDis%c BWInt%c AutBWInt%c\n",
-   FLAG(w, PCI_EXP_LNKCTL_DISABLE),
-   FLAG(w, PCI_EXP_LNKCTL_CLOCK),
-   FLAG(w, PCI_EXP_LNKCTL_XSYNCH),
-   FLAG(w, PCI_EXP_LNKCTL_CLOCKPM),
-   FLAG(w, PCI_EXP_LNKCTL_HWAUTWD),
-   FLAG(w, PCI_EXP_LNKCTL_BWMIE),
-   FLAG(w, PCI_EXP_LNKCTL_AUTBWIE));
+    FLAG(w, PCI_EXP_LNKCTL_DISABLE),
+    FLAG(w, PCI_EXP_LNKCTL_CLOCK),
+    FLAG(w, PCI_EXP_LNKCTL_XSYNCH),
+    FLAG(w, PCI_EXP_LNKCTL_CLOCKPM),
+    FLAG(w, PCI_EXP_LNKCTL_HWAUTWD),
+    FLAG(w, PCI_EXP_LNKCTL_BWMIE),
+    FLAG(w, PCI_EXP_LNKCTL_AUTBWIE));
 
   w = pdev->rcd_link_status;
   sta_speed = w & PCI_EXP_LNKSTA_SPEED;
   sta_width = (w & PCI_EXP_LNKSTA_WIDTH) >> 4;
   printf("\t\tLnkSta:\tSpeed %s%s, Width x%d%s\n",
-   link_speed(sta_speed),
-   link_compare(PCI_EXP_TYPE_ROOT_INT_EP, sta_speed, cap_speed),
-   sta_width,
-   link_compare(PCI_EXP_TYPE_ROOT_INT_EP, sta_width, cap_width));
+    link_speed(sta_speed),
+    link_compare(PCI_EXP_TYPE_ROOT_INT_EP, sta_speed, cap_speed),
+    sta_width,
+    link_compare(PCI_EXP_TYPE_ROOT_INT_EP, sta_width, cap_width));
   printf("\t\t\tTrErr%c Train%c SlotClk%c DLActive%c BWMgmt%c ABWMgmt%c\n",
-   FLAG(w, PCI_EXP_LNKSTA_TR_ERR),
-   FLAG(w, PCI_EXP_LNKSTA_TRAIN),
-   FLAG(w, PCI_EXP_LNKSTA_SL_CLK),
-   FLAG(w, PCI_EXP_LNKSTA_DL_ACT),
-   FLAG(w, PCI_EXP_LNKSTA_BWMGMT),
-   FLAG(w, PCI_EXP_LNKSTA_AUTBW));
-
-  return;
+    FLAG(w, PCI_EXP_LNKSTA_TR_ERR),
+    FLAG(w, PCI_EXP_LNKSTA_TRAIN),
+    FLAG(w, PCI_EXP_LNKSTA_SL_CLK),
+    FLAG(w, PCI_EXP_LNKSTA_DL_ACT),
+    FLAG(w, PCI_EXP_LNKSTA_BWMGMT),
+    FLAG(w, PCI_EXP_LNKSTA_AUTBW));
 }
 
 static int

@@ -159,9 +159,9 @@ struct pci_dev {
   u16 subsys_vendor_id, subsys_id;	/* Subsystem vendor id and subsystem id */
   struct pci_dev *parent;		/* Parent device, does not have to be always accessible */
   int no_config_access;			/* No access to config space for this device */
-  u32 rcd_link_cap;     /* Link Capabilities register for RCD */
-  u16 rcd_link_status;  /* Link Status register for RCD */
-  u16 rcd_link_ctrl;    /* Link Control register for RCD */
+  u32 rcd_link_cap;     		/* Link Capabilities register for Restricted CXL Devices */
+  u16 rcd_link_status;  		/* Link Status register for RCD */
+  u16 rcd_link_ctrl;    		/* Link Control register for RCD */
 
   /* Fields used internally */
   struct pci_access *access;
@@ -234,7 +234,7 @@ char *pci_get_string_property(struct pci_dev *d, u32 prop) PCI_ABI;
 #define PCI_FILL_SUBSYS		0x00040000      /* subsys_vendor_id and subsys_id */
 #define PCI_FILL_PARENT		0x00080000
 #define PCI_FILL_DRIVER		0x00100000      /* OS driver currently in use (string property) */
-#define PCI_FILL_RCD_LNK	0x00200000      /* CXL RCD Link status properties */
+#define PCI_FILL_RCD_LNK	0x00200000      /* CXL RCD Link status properties (rcd_*) */
 
 void pci_setup_cache(struct pci_dev *, u8 *cache, int len) PCI_ABI;
 
