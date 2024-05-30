@@ -1,5 +1,7 @@
 2024-04-05  Martin Mares <mj@ucw.cz>
 
+	* Released as 3.12.0.
+
 	* lspci decodes the IDE (Integrity & Data Encryption) and TEE-IO
 	  extended capabilities.
 
