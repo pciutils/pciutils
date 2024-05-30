@@ -1,3 +1,23 @@
+2024-05-30  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.13.0.
+
+	* lspci decodes CXL 1.1 device link status information.
+	  This requires a recent kernel which exports rcd_* atributes via
+	  sysfs.
+
+	* Further development of the pcilmr (the link margining utility)
+
+	* Dump parsing supports 6-digit domain numbers.
+
+	* Bug fixes in PCIe link state reporting.
+
+	* Decode more fields in PCIe AER capability.
+
+	* Fixed build on Linux systems with musl libc.
+
+	* Updated pci.ids.
+
 2024-04-05  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.12.0.
