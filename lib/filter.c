@@ -204,20 +204,20 @@ pci_filter_match_v38(struct pci_filter *f, struct pci_dev *d)
     return 0;
   if (f->device >= 0 || f->vendor >= 0)
     {
-      pci_fill_info_v38(d, PCI_FILL_IDENT);
+      pci_fill_info_v313(d, PCI_FILL_IDENT);
       if ((f->device >= 0 && f->device != d->device_id) ||
 	  (f->vendor >= 0 && f->vendor != d->vendor_id))
 	return 0;
     }
   if (f->device_class >= 0)
     {
-      pci_fill_info_v38(d, PCI_FILL_CLASS);
+      pci_fill_info_v313(d, PCI_FILL_CLASS);
       if ((f->device_class ^ d->device_class) & f->device_class_mask)
 	return 0;
     }
   if (f->prog_if >= 0)
     {
-      pci_fill_info_v38(d, PCI_FILL_CLASS_EXT);
+      pci_fill_info_v313(d, PCI_FILL_CLASS_EXT);
       if (f->prog_if != d->prog_if)
 	return 0;
     }

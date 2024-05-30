@@ -104,6 +104,7 @@ int pci_fill_info_v33(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v34(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v35(struct pci_dev *, int flags) VERSIONED_ABI;
 int pci_fill_info_v38(struct pci_dev *, int flags) VERSIONED_ABI;
+int pci_fill_info_v313(struct pci_dev *, int flags) VERSIONED_ABI;
 
 static inline int want_fill(struct pci_dev *d, unsigned want_fields, unsigned int try_fields)
 {
