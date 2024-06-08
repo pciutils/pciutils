@@ -56,3 +56,11 @@ if ($r->{"do_upload"}) {
 	print "<confirm> "; <STDIN>;
 	system '/home/mj/tree/kup/kup', 'put', "$dd/$pkg.tar", "$dd/$pkg.tar.sig", "/pub/software/utils/pciutils/$pkg.tar.gz"; die if $?;
 }
+
+# GitHub releases
+print "Creating a GitHub release\n";
+my $ghrel = "v$ver";
+`gh release create $ghrel --verify-tag --latest --notes "Automatically generated. Please see the ChangeLog for details."`;
+die if $?;
+`gh release upload $ghrel $dd/$pkg.tar.gz $dd/pkg.tar.gz.sign";
+die if $?
