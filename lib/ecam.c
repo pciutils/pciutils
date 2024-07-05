@@ -504,6 +504,7 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
                       fclose(mcfg_file);
                       return mcfg;
                     }
+                  pci_mfree(mcfg);
                 }
               fclose(mcfg_file);
             }
