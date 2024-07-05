@@ -464,7 +464,7 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
 #ifdef PCI_OS_WINDOWS
       if (strcmp(acpimcfg, "GetSystemFirmwareTable()") == 0)
         {
-          a->debug("reading acpi mcfg via GetSystemFirmwareTable()...");
+          a->debug("reading ACPI mcfg via GetSystemFirmwareTable()...");
           mcfg = get_system_firmware_table_acpi_mcfg(a);
           if (mcfg)
             return mcfg;
@@ -481,7 +481,7 @@ find_mcfg(struct pci_access *a, const char *acpimcfg, const char *efisystab, int
         {
           path = mcfg_glob.gl_pathv[0];
 #endif
-          a->debug("reading acpi mcfg file: %s...", path);
+          a->debug("reading ACPI mcfg file: %s...", path);
           mcfg_file = fopen(path, "rb");
 #ifndef PCI_OS_WINDOWS
           globfree(&mcfg_glob);
