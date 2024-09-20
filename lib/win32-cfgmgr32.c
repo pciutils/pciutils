@@ -461,10 +461,13 @@ retry_service_config:
       wcscpy(service_image_path, L"\\\\");
       wcscpy(service_image_path + sizeof("\\\\")-1, service_config->lpBinaryPathName + driver_path_len);
     }
-  else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\", sizeof("\\??\\")-1) == 0)
+  else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\", sizeof("\\??\\")-1) == 0 &&
+           ((service_config->lpBinaryPathName[4] >= L'A' && service_config->lpBinaryPathName[4] <= L'Z') ||
+            (service_config->lpBinaryPathName[4] >= L'a' && service_config->lpBinaryPathName[4] <= L'z')) &&
+           service_config->lpBinaryPathName[5] == L'\\')
     {
-      /* ImagePath is in NT Global?? namespace, root of the Win32 file namespace, so just remove "\\??\\" prefix to get Win32 path. */
-      service_image_path = pci_malloc(a, sizeof(WCHAR) * (wcslen(service_config->lpBinaryPathName) - (sizeof("\\??\\")-1)));
+      /* ImagePath is in NT GLOBAL?? namespace with drive letter, so just remove "\\??\\" prefix to get Win32 path. */
+      service_image_path = pci_malloc(a, sizeof(WCHAR) * (wcslen(service_config->lpBinaryPathName) - (sizeof("\\??\\")-1) + 1));
       /* Namespace separator may be single or double backslash. */
       driver_path_len = sizeof("\\??\\")-1;
       if (service_config->lpBinaryPathName[driver_path_len] == L'\\')
@@ -485,9 +488,10 @@ retry_service_config:
     }
   else
     {
-      /* ImagePath is in some unhandled NT namespace, copy it as is. It cannot be used in Win32 API but libpci user can be still interested in it. */
-      service_image_path = pci_malloc(a, sizeof(WCHAR) * wcslen(service_config->lpBinaryPathName));
-      wcscpy(service_image_path, service_config->lpBinaryPathName);
+      /* ImagePath is NT absolute but is not any NT namespace which is special for Win32, so convert it to Win32 path via NT GLOBALROOT symlink (which points to the NT root) available in NT GLOBAL?? namespace (which has Win32 path "\\\\?\\"). */
+      service_image_path = pci_malloc(a, sizeof(WCHAR) * (sizeof("\\\\?\\GLOBALROOT") + wcslen(service_config->lpBinaryPathName)));
+      wcscpy(service_image_path, L"\\\\?\\GLOBALROOT");
+      wcscpy(service_image_path + sizeof("\\\\?\\GLOBALROOT")-1, service_config->lpBinaryPathName);
     }
 
   /* Calculate len of buffer needed for conversion from LPWSTR to char*. */
