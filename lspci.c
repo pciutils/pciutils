@@ -800,6 +800,7 @@ show_verbose(struct device *d)
   byte bist;
   byte max_lat, min_gnt;
   char *dt_node, *iommu_group;
+  word status = 0;
 
   show_terse(d);
 
@@ -845,7 +846,7 @@ show_verbose(struct device *d)
   if (!unknown_config_data && verbose > 1)
     {
       word cmd = get_conf_word(d, PCI_COMMAND);
-      word status = get_conf_word(d, PCI_STATUS);
+      status = get_conf_word(d, PCI_STATUS);
       printf("\tControl: I/O%c Mem%c BusMaster%c SpecCycle%c MemWINV%c VGASnoop%c ParErr%c Stepping%c SERR%c FastB2B%c DisINTx%c\n",
 	     FLAG(cmd, PCI_COMMAND_IO),
 	     FLAG(cmd, PCI_COMMAND_MEMORY),
@@ -898,7 +899,7 @@ show_verbose(struct device *d)
   if (verbose > 1)
     {
       byte int_pin = unknown_config_data ? 0 : get_conf_byte(d, PCI_INTERRUPT_PIN);
-      if (int_pin || p->irq)
+      if ((int_pin || p->irq)&&(status & PCI_STATUS_INTx))
 	printf("\tInterrupt: pin %c routed to IRQ " PCIIRQ_FMT "\n",
 	       (int_pin ? 'A' + int_pin - 1 : '?'), p->irq);
       if (p->numa_node != -1)
