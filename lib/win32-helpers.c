@@ -177,7 +177,7 @@ win32_change_error_mode(UINT new_mode)
    */
   kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
   if (kernel32)
-    MySetThreadErrorMode = (SetThreadErrorModeProt)(LPVOID)GetProcAddress(kernel32, "SetThreadErrorMode");
+    MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "SetThreadErrorMode");
 
   if (MySetThreadErrorMode &&
       MySetThreadErrorMode(new_mode, &old_mode))
@@ -597,7 +597,7 @@ prepare_security_descriptor_for_set_operation(PSECURITY_DESCRIPTOR security_desc
   if (!advapi32)
     return FALSE;
 
-  MySetSecurityDescriptorControl = (SetSecurityDescriptorControlProt)(LPVOID)GetProcAddress(advapi32, "SetSecurityDescriptorControl");
+  MySetSecurityDescriptorControl = (SetSecurityDescriptorControlProt)(void(*)(void))GetProcAddress(advapi32, "SetSecurityDescriptorControl");
   if (!MySetSecurityDescriptorControl)
     return FALSE;
 
@@ -940,8 +940,8 @@ win32_find_and_open_process_for_query(LPCSTR exe_file)
    * kernel32.dll library with K32 prefix.
    */
   MyGetModuleFileNameExW = NULL;
-  MyGetProcessImageFileNameW = (GetProcessImageFileNameWProt)(LPVOID)GetProcAddress(kernel32, "K32GetProcessImageFileNameW");
-  MyEnumProcesses = (EnumProcessesProt)(LPVOID)GetProcAddress(kernel32, "K32EnumProcesses");
+  MyGetProcessImageFileNameW = (GetProcessImageFileNameWProt)(void(*)(void))GetProcAddress(kernel32, "K32GetProcessImageFileNameW");
+  MyEnumProcesses = (EnumProcessesProt)(void(*)(void))GetProcAddress(kernel32, "K32EnumProcesses");
   if (!MyGetProcessImageFileNameW || !MyEnumProcesses)
     {
       /*
@@ -960,9 +960,9 @@ win32_find_and_open_process_for_query(LPCSTR exe_file)
        * Windows XP and higher systems. On older versions is
        * available function GetModuleFileNameExW().
        */
-      MyGetProcessImageFileNameW = (GetProcessImageFileNameWProt)(LPVOID)GetProcAddress(psapi, "GetProcessImageFileNameW");
-      MyGetModuleFileNameExW = (GetModuleFileNameExWProt)(LPVOID)GetProcAddress(psapi, "GetModuleFileNameExW");
-      MyEnumProcesses = (EnumProcessesProt)(LPVOID)GetProcAddress(psapi, "EnumProcesses");
+      MyGetProcessImageFileNameW = (GetProcessImageFileNameWProt)(void(*)(void))GetProcAddress(psapi, "GetProcessImageFileNameW");
+      MyGetModuleFileNameExW = (GetModuleFileNameExWProt)(void(*)(void))GetProcAddress(psapi, "GetModuleFileNameExW");
+      MyEnumProcesses = (EnumProcessesProt)(void(*)(void))GetProcAddress(psapi, "EnumProcesses");
       if ((!MyGetProcessImageFileNameW && !MyGetModuleFileNameExW) || !MyEnumProcesses)
         {
           FreeLibrary(psapi);
