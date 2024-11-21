@@ -38,6 +38,24 @@
 #define SE_SACL_AUTO_INHERITED 0x0800
 #endif
 
+/* Older SDK versions do not provide NtCurrentTeb symbol for X86, header files have only function declaration. */
+#if defined(_MSC_VER) && defined(_M_IX86) && !defined(PcTeb)
+#define PcTeb 0x18
+#if _MSC_VER >= 1400
+#pragma intrinsic(__readfsdword)
+__inline struct _TEB *NtCurrentTeb(void) { return (struct _TEB *)__readfsdword(PcTeb); }
+#else
+__inline struct _TEB *NtCurrentTeb(void) { __asm mov eax, fs:[PcTeb] }
+#endif
+#endif
+
+/* Offset to ULONG HardErrorMode field in TEB structure, it is architecture specific. */
+#if defined(_M_IX86) || defined(__i386__)
+#define TEB_HARD_ERROR_MODE_OFFSET 0x0F28
+#elif defined(_M_AMD64) || defined(__x86_64__)
+#define TEB_HARD_ERROR_MODE_OFFSET 0x16B0
+#endif
+
 /*
  * These psapi functions are available in kernel32.dll library with K32 prefix
  * on Windows 7 and higher systems. On older Windows systems these functions are
@@ -168,7 +186,9 @@ UINT
 win32_change_error_mode(UINT new_mode)
 {
   SetThreadErrorModeProt MySetThreadErrorMode = NULL;
+  OSVERSIONINFOA version;
   HMODULE kernel32;
+  HMODULE ntdll;
   DWORD old_mode;
 
   /*
@@ -179,9 +199,37 @@ win32_change_error_mode(UINT new_mode)
   if (kernel32)
     MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "SetThreadErrorMode");
 
+  /*
+   * Function RtlSetThreadErrorMode() was introduced in Windows XP x64
+   * and Windows Server 2003. Use GetProcAddress() as it is in ntdll.dll.
+   */
+  if (!MySetThreadErrorMode)
+    {
+      ntdll = GetModuleHandle(TEXT("ntdll.dll"));
+      if (ntdll)
+        MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(ntdll, "RtlSetThreadErrorMode");
+    }
+
   if (MySetThreadErrorMode &&
       MySetThreadErrorMode(new_mode, &old_mode))
     return old_mode;
+
+#ifdef TEB_HARD_ERROR_MODE_OFFSET
+  /*
+   * On Windows NT 4.0+ systems fallback to thread HardErrorMode API.
+   * It depends on architecture specific offset for HardErrorMode field in TEB.
+   */
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (GetVersionExA(&version) &&
+      version.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+      version.dwMajorVersion >= 4)
+    {
+      ULONG *hard_error_mode_ptr = (ULONG *)((BYTE *)NtCurrentTeb() + TEB_HARD_ERROR_MODE_OFFSET);
+      old_mode = *hard_error_mode_ptr;
+      *hard_error_mode_ptr = new_mode;
+      return old_mode;
+    }
+#endif
 
   /*
    * Fallback to function SetErrorMode() which modifies error mode of the
