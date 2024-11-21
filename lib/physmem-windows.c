@@ -145,7 +145,6 @@ typedef struct _OBJECT_ATTRIBUTES {
 #define DPMI_PHYSICAL_ADDRESS_MAPPING 0x0800
 
 struct physmem {
-  HMODULE ntdll;
   HANDLE section_handle;
   NTSTATUS (NTAPI *NtOpenSection)(PHANDLE SectionHandle, ACCESS_MASK DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes);
   NTSTATUS (NTAPI *NtMapViewOfSection)(HANDLE SectionHandle, HANDLE ProcessHandle, PVOID *BaseAddress, ULONG_PTR ZeroBits, SIZE_T CommitSize, PLARGE_INTEGER SectionOffset, PSIZE_T ViewSize, SECTION_INHERIT InheritDisposition, ULONG AllocationType, ULONG Win32Protect);
@@ -667,49 +666,41 @@ init_physmem_ntdll(struct physmem *physmem, struct pci_access *a, const char *fi
   wchar_t *wide_filename;
   UNICODE_STRING unicode_filename;
   OBJECT_ATTRIBUTES attributes;
-  UINT prev_error_mode;
   NTSTATUS status;
+  HMODULE ntdll;
   int len;
 
   a->debug("resolving section functions from ntdll.dll...");
-  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-  physmem->ntdll = LoadLibrary(TEXT("ntdll.dll"));
-  win32_change_error_mode(prev_error_mode);
-  if (!physmem->ntdll)
+  ntdll = GetModuleHandle(TEXT("ntdll.dll"));
+  if (!ntdll)
     {
-      a->debug("failed: cannot open ntdll.dll library: %s.", win32_strerror(GetLastError()));
+      a->debug("failed: library ntdll.dll is not present.");
       errno = ENOENT;
       return 0;
     }
 
-  physmem->RtlNtStatusToDosError = (LPVOID)GetProcAddress(physmem->ntdll, "RtlNtStatusToDosError");
+  physmem->RtlNtStatusToDosError = (LPVOID)GetProcAddress(ntdll, "RtlNtStatusToDosError");
 
-  physmem->NtOpenSection = (LPVOID)GetProcAddress(physmem->ntdll, "NtOpenSection");
+  physmem->NtOpenSection = (LPVOID)GetProcAddress(ntdll, "NtOpenSection");
   if (!physmem->NtOpenSection)
     {
       a->debug("failed: function NtOpenSection() not found.");
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       errno = ENOENT;
       return 0;
     }
 
-  physmem->NtMapViewOfSection = (LPVOID)GetProcAddress(physmem->ntdll, "NtMapViewOfSection");
+  physmem->NtMapViewOfSection = (LPVOID)GetProcAddress(ntdll, "NtMapViewOfSection");
   if (!physmem->NtMapViewOfSection)
     {
       a->debug("failed: function NtMapViewOfSection() not found.");
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       errno = ENOENT;
       return 0;
     }
 
-  physmem->NtUnmapViewOfSection = (LPVOID)GetProcAddress(physmem->ntdll, "NtUnmapViewOfSection");
+  physmem->NtUnmapViewOfSection = (LPVOID)GetProcAddress(ntdll, "NtUnmapViewOfSection");
   if (!physmem->NtUnmapViewOfSection)
     {
       a->debug("failed: function NtUnmapViewOfSection() not found.");
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       errno = ENOENT;
       return 0;
     }
@@ -733,8 +724,6 @@ init_physmem_ntdll(struct physmem *physmem, struct pci_access *a, const char *fi
   if (len <= 0)
     {
       a->debug("Option devmem.path '%s' is invalid multibyte string.", filename);
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       errno = EINVAL;
       return 0;
     }
@@ -745,8 +734,6 @@ init_physmem_ntdll(struct physmem *physmem, struct pci_access *a, const char *fi
     {
       a->debug("Option devmem.path '%s' is invalid multibyte string.", filename);
       pci_mfree(wide_filename);
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       errno = EINVAL;
       return 0;
     }
@@ -762,8 +749,6 @@ init_physmem_ntdll(struct physmem *physmem, struct pci_access *a, const char *fi
 
   if (status < 0 || physmem->section_handle == INVALID_HANDLE_VALUE)
     {
-      FreeLibrary(physmem->ntdll);
-      physmem->ntdll = NULL;
       physmem->section_handle = INVALID_HANDLE_VALUE;
       if (status == 0)
         a->debug("failed.");
@@ -853,8 +838,6 @@ physmem_close(struct physmem *physmem)
 {
   if (physmem->section_handle != INVALID_HANDLE_VALUE)
     CloseHandle(physmem->section_handle);
-  if (physmem->ntdll)
-    FreeLibrary(physmem->ntdll);
   pci_mfree(physmem);
 }
 

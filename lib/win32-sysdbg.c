@@ -85,7 +85,6 @@ static BOOL debug_privilege_enabled;
 static LUID luid_debug_privilege;
 static BOOL revert_only_privilege;
 static HANDLE revert_token;
-static HMODULE ntdll;
 
 static int win32_sysdbg_initialized;
 
@@ -117,20 +116,18 @@ win32_sysdbg_pci_bus_data(BOOL WriteBusData, BYTE BusNumber, BYTE DeviceNumber, 
 static int
 win32_sysdbg_setup(struct pci_access *a)
 {
-  UINT prev_error_mode;
   NTSTATUS status;
+  HMODULE ntdll;
   ULONG ret_len;
   DWORD id;
 
   if (win32_sysdbg_initialized)
     return 1;
 
-  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-  ntdll = LoadLibrary(TEXT("ntdll.dll"));
-  win32_change_error_mode(prev_error_mode);
+  ntdll = GetModuleHandle(TEXT("ntdll.dll"));
   if (!ntdll)
     {
-      a->debug("Cannot open ntdll.dll library.");
+      a->debug("Library ntdll.dll is not present.");
       return 0;
     }
 
@@ -138,8 +135,6 @@ win32_sysdbg_setup(struct pci_access *a)
   if (!NtSystemDebugControl)
     {
       a->debug("Function NtSystemDebugControl() is not supported.");
-      FreeLibrary(ntdll);
-      ntdll = NULL;
       return 0;
     }
 
@@ -162,8 +157,6 @@ win32_sysdbg_setup(struct pci_access *a)
         a->debug("NT SysDbg is disabled.");
       else
         a->debug("NT SysDbg returned error 0x%lx.", status);
-      FreeLibrary(ntdll);
-      ntdll = NULL;
       NtSystemDebugControl = NULL;
       return 0;
     }
@@ -173,8 +166,6 @@ win32_sysdbg_setup(struct pci_access *a)
   if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &luid_debug_privilege))
     {
       a->debug("Debug privilege is not supported.");
-      FreeLibrary(ntdll);
-      ntdll = NULL;
       NtSystemDebugControl = NULL;
       return 0;
     }
@@ -182,8 +173,6 @@ win32_sysdbg_setup(struct pci_access *a)
   if (!win32_enable_privilege(luid_debug_privilege, &revert_token, &revert_only_privilege))
     {
       a->debug("Cannot enable Debug privilege.");
-      FreeLibrary(ntdll);
-      ntdll = NULL;
       NtSystemDebugControl = NULL;
       return 0;
     }
@@ -201,8 +190,6 @@ win32_sysdbg_setup(struct pci_access *a)
   revert_token = NULL;
   revert_only_privilege = FALSE;
 
-  FreeLibrary(ntdll);
-  ntdll = NULL;
   NtSystemDebugControl = NULL;
 
   if (status == STATUS_NOT_IMPLEMENTED || status == STATUS_INVALID_INFO_CLASS)
@@ -250,8 +237,6 @@ win32_sysdbg_cleanup(struct pci_access *a UNUSED)
       debug_privilege_enabled = FALSE;
     }
 
-  FreeLibrary(ntdll);
-  ntdll = NULL;
   NtSystemDebugControl = NULL;
 
   win32_sysdbg_initialized = 0;

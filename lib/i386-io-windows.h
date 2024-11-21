@@ -145,19 +145,11 @@ static BOOL
 SetProcessUserModeIOPL(VOID)
 {
   LPVOID Arg[2];
-  UINT prev_error_mode;
   HMODULE ntdll;
   BOOL ret;
 
-  /*
-   * Load ntdll.dll library with disabled critical-error-handler and
-   * file-not-found message box.
-   * It means that NT kernel does not show unwanted GUI message box to user
-   * when LoadLibrary() function fails.
-   */
-  prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-  ntdll = LoadLibrary(TEXT("ntdll.dll"));
-  win32_change_error_mode(prev_error_mode);
+  /* Ntdll.dll is loaded into every process on all NT systems. */
+  ntdll = GetModuleHandle(TEXT("ntdll.dll"));
   if (!ntdll)
     {
       SetLastError(ERROR_INVALID_FUNCTION);
@@ -168,7 +160,6 @@ SetProcessUserModeIOPL(VOID)
   Arg[0] = (LPVOID)GetProcAddress(ntdll, "NtSetInformationProcess");
   if (!Arg[0])
     {
-      FreeLibrary(ntdll);
       SetLastError(ERROR_INVALID_FUNCTION);
       return FALSE;
     }
@@ -178,8 +169,6 @@ SetProcessUserModeIOPL(VOID)
 
   /* Call ProcessUserModeIOPL with Tcb privilege. */
   ret = win32_call_func_with_tcb_privilege(SetProcessUserModeIOPLFunc, (LPVOID)&Arg);
-
-  FreeLibrary(ntdll);
 
   if (!ret)
     return FALSE;
