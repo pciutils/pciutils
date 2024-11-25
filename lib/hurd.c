@@ -216,7 +216,7 @@ static int
 hurd_read(struct pci_dev *d, int pos, byte * buf, int len)
 {
   int err;
-  size_t nread;
+  mach_msg_type_number_t nread;
   char *data;
   mach_port_t device_port = device_port_lookup(d);
 
@@ -250,7 +250,7 @@ static int
 hurd_write(struct pci_dev *d, int pos, byte * buf, int len)
 {
   int err;
-  size_t nwrote;
+  vm_size_t nwrote;
   mach_port_t device_port = device_port_lookup(d);
 
   if (len > 4)
@@ -269,7 +269,7 @@ hurd_fill_regions(struct pci_dev *d)
   mach_port_t device_port = device_port_lookup(d);
   struct pci_bar regions[6];
   char *buf = (char *) &regions;
-  size_t size = sizeof(regions);
+  mach_msg_type_number_t size = sizeof(regions);
 
   int err = pci_get_dev_regions(device_port, &buf, &size);
   if (err)
@@ -310,7 +310,7 @@ hurd_fill_rom(struct pci_dev *d)
   struct pci_xrom_bar rom;
   mach_port_t device_port = device_port_lookup(d);
   char *buf = (char *) &rom;
-  size_t size = sizeof(rom);
+  mach_msg_type_number_t size = sizeof(rom);
 
   int err = pci_get_dev_rom(device_port, &buf, &size);
   if (err)
