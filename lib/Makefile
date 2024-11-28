@@ -95,6 +95,10 @@ ifdef PCI_HAVE_PM_AOS_EXPANSION
 OBJS += aos-expansion
 endif
 
+ifdef PCI_HAVE_PM_RT_THREAD_SMART_DM
+OBJS += rt-thread-smart-dm
+endif
+
 all: $(PCILIB) $(PCILIBPC)
 
 ifeq ($(SHARED),no)
