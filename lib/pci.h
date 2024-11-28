@@ -56,6 +56,7 @@ enum pci_access_type {
   PCI_ACCESS_MMIO_TYPE1_EXT,		/* MMIO ports, type 1 extended */
   PCI_ACCESS_ECAM,			/* PCIe ECAM via /dev/mem */
   PCI_ACCESS_AOS_EXPANSION,		/* AmigaOS Expansion library */
+  PCI_ACCESS_RT_THREAD_SMART_DM,	/* RT-Thread Smart pci */
   PCI_ACCESS_MAX
 };
 

@@ -235,6 +235,13 @@ case $sys in
 		IDSDIR="DEVS:"
 		echo >>$m 'CC=gcc'
 		;;
+	rt_thread_smart)
+		echo >>$c '#define PCI_PATH_RT_THREAD_SMART_DM "/proc/pci"'
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
+		echo >>$c '#define PCI_HAVE_PM_RT_THREAD_SMART_DM'
+		IDSDIR="/etc/pci"
+		LIBRESOLV=
+		;;
 	*)
 		echo " Unfortunately, your OS is not supported by the PCI Library"
 		exit 1
