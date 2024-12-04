@@ -155,6 +155,10 @@ win32_check_driver(BYTE *driver_data)
     return FALSE;
 #endif
 
+  /* IMAGE_OPTIONAL_HEADER is alias for the structure used on the target compiler architecture. */
+  if (nt_headers->FileHeader.SizeOfOptionalHeader < offsetof(IMAGE_OPTIONAL_HEADER, DataDirectory))
+    return FALSE;
+
   /* IMAGE_NT_OPTIONAL_HDR_MAGIC is alias for the header magic used on the target compiler architecture. */
   if (nt_headers->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC)
     return FALSE;

@@ -428,6 +428,9 @@ win32_get_proc_address_by_ordinal(HMODULE module, DWORD ordinal, BOOL must_be_wi
   if (nt_header->Signature != IMAGE_NT_SIGNATURE)
     return NULL;
 
+  if (nt_header->FileHeader.SizeOfOptionalHeader < offsetof(IMAGE_OPTIONAL_HEADER, DataDirectory))
+    return NULL;
+
   if (nt_header->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC)
     return NULL;
 
