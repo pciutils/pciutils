@@ -121,7 +121,11 @@ SetProcessUserModeIOPLFunc(LPVOID Arg)
    * If we have optional RtlNtStatusToDosError() function then use it for
    * translating NT status to Win32 error. If we do not have it then translate
    * two important status codes which we use later STATUS_NOT_IMPLEMENTED and
-   * STATUS_PRIVILEGE_NOT_HELD.
+   * STATUS_PRIVILEGE_NOT_HELD. Note that RtlNtStatusToDosError() not only
+   * returns the translated Win32 error code from the passed NT status, but it
+   * also changes the current thread status value to the passed NT status.
+   * We are not using the thread status value at all, so it does not matter
+   * that this side effect happens.
    */
   if (RtlNtStatusToDosErrorPtr)
     SetLastError(RtlNtStatusToDosErrorPtr(nt_status));
