@@ -93,7 +93,7 @@ directio_setup_io(struct pci_access *a)
     return lib_used;
 
   /* remove current directory from DLL search path */
-  fnSetDllDirectory = GetProcAddress(GetModuleHandle("kernel32"), "SetDllDirectoryA");
+  fnSetDllDirectory = (SETDLLDIRECTORY)GetProcAddress(GetModuleHandle("kernel32"), "SetDllDirectoryA");
   if (fnSetDllDirectory)
     fnSetDllDirectory("");
 
