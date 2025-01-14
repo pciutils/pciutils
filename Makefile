@@ -44,6 +44,7 @@ PKGCFDIR=$(LIBDIR)/pkgconfig
 
 # Commands
 INSTALL=install
+COPY=cp
 DIRINSTALL=install -d
 STRIP=-s
 ifdef CROSS_COMPILE
@@ -166,6 +167,8 @@ install: all
 	$(INSTALL) -c -m 755 $(STRIP) lspci$(EXEEXT) $(DESTDIR)$(LSPCIDIR)
 	$(INSTALL) -c -m 755 $(STRIP) setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 $(STRIP) pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)
+	$(COPY) DirectIOLib32.dll $(DESTDIR)$(SBINDIR)
+	$(COPY) DirectIOLibx64.dll $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 ifneq ($(IDSDIR),)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
@@ -218,7 +221,7 @@ endif
 endif
 
 uninstall: all
-	rm -f $(DESTDIR)$(LSPCIDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/update-pciids
+	rm -f $(DESTDIR)$(LSPCIDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/DirectIOLib32.dll $(DESTDIR)$(SBINDIR)/DirectIOLibx64.dll $(DESTDIR)$(SBINDIR)/update-pciids
 ifneq ($(IDSDIR),)
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 else
