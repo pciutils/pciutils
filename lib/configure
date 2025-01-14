@@ -186,6 +186,7 @@ case $sys in
 		echo >>$c '#define PCI_PATH_DEVMEM_DEVICE "\\\\Device\\\\PhysicalMemory"'
 		echo >>$c '#define PCI_PATH_ACPI_MCFG "GetSystemFirmwareTable()"'
 		echo >>$c '#define PCI_PATH_EFI_SYSTAB ""'
+		echo >>$c '#define PCI_HAVE_PM_WIN32_DIRECTIO'
 		# Warning: MinGW-w64 (incorrectly) provides cfgmgr32 functions
 		# also in other import libraries, not only in libcfgmgr32.a.
 		# So always set -lcfgmgr32 as a first library parameter which
