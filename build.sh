@@ -17,3 +17,5 @@ $MAKE_TOOL \
     IDSDIR="" \
     COMPAT_GETOPT=yes \
     $@
+wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLibx64.dll
+wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLib32.dll

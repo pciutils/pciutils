@@ -167,8 +167,6 @@ install: all
 	$(INSTALL) -c -m 755 $(STRIP) lspci$(EXEEXT) $(DESTDIR)$(LSPCIDIR)
 	$(INSTALL) -c -m 755 $(STRIP) setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 $(STRIP) pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)
-	$(COPY) DirectIOLib32.dll $(DESTDIR)$(SBINDIR)
-	$(COPY) DirectIOLibx64.dll $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 update-pciids $(DESTDIR)$(SBINDIR)
 ifneq ($(IDSDIR),)
 	$(INSTALL) -c -m 644 $(PCI_IDS) $(DESTDIR)$(IDSDIR)
