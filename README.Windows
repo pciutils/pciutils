@@ -66,6 +66,8 @@ If you don't use build.sh, but want to use DirectIO for config space you need to
 
   wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLibx64.dll
   wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLib32.dll
+  wget -P . https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLibx64.dll
+  wget -P . https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLib32.dll
 
 DirectIO config space requires elevated command prompt. Open terminal as administrator to load the library. If you don't open terminal as administrator you will get:
 "Trying method win32-directio...pcilib: i386-io-windows: IO library initialization failed. Try running from an elevated command prompt."
