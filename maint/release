@@ -62,5 +62,5 @@ print "Creating a GitHub release\n";
 my $ghrel = "v$ver";
 `gh release create $ghrel --verify-tag --latest --notes "Automatically generated. Please see the ChangeLog for details."`;
 die if $?;
-`gh release upload $ghrel $dd/$pkg.tar.gz $dd/pkg.tar.gz.sign";
+`gh release upload $ghrel $dd/$pkg.tar.gz $dd/pkg.tar.gz.sign`;
 die if $?
