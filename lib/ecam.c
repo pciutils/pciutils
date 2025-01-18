@@ -384,7 +384,7 @@ find_rsdp_address(struct pci_access *a, const char *efisystab, int use_bsd UNUSE
 static struct acpi_mcfg *
 get_system_firmware_table_acpi_mcfg(struct pci_access *a)
 {
-  UINT (*WINAPI MyGetSystemFirmwareTable)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
+  UINT (WINAPI *MyGetSystemFirmwareTable)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
   struct acpi_mcfg *mcfg;
   HMODULE kernel32;
   DWORD error;

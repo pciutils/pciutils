@@ -586,7 +586,7 @@ win32_kldbg_scan(struct pci_access *a)
    * ECAM definitions, so all PCI segment numbers.
    */
 
-  UINT (*WINAPI MyGetSystemFirmwareTable)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
+  UINT (WINAPI *MyGetSystemFirmwareTable)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
   int i, allocations_count;
   struct acpi_mcfg *mcfg;
   HMODULE kernel32;
