@@ -49,6 +49,16 @@
 #define SysDbgWriteBusData (SYSDBG_COMMAND)19
 #endif
 
+#ifndef _WIN64
+typedef struct _SYSDBG_BUS_DATA64 {
+  ULONG Address;
+  u64 Buffer64; /* 32-bit process has to pass 64-bit wide pointer on 64-bit systems */
+  ULONG Request;
+  BUS_DATA_TYPE BusDataType;
+  ULONG BusNumber;
+  ULONG SlotNumber;
+} SYSDBG_BUS_DATA64, *PSYSDBG_BUS_DATA64;
+#endif
 #ifndef SYSDBG_BUS_DATA
 typedef struct _SYSDBG_BUS_DATA {
   ULONG Address;
@@ -89,6 +99,13 @@ typedef struct _PCI_SLOT_NUMBER {
 #define PCI_SLOT_NUMBER PCI_SLOT_NUMBER
 #endif
 
+#ifndef _WIN64
+typedef struct _KLDBG64 {
+  SYSDBG_COMMAND Command;
+  u64 Buffer64; /* 32-bit process has to pass 64-bit wide pointer on 64-bit systems */
+  DWORD BufferLength;
+} KLDBG64, *PKLDBG64;
+#endif
 #ifndef KLDBG
 typedef struct _KLDBG {
   SYSDBG_COMMAND Command;
@@ -656,32 +673,79 @@ win32_kldbg_scan(struct pci_access *a)
 static BOOL
 win32_kldbg_pci_bus_data(BOOL WriteBusData, USHORT SegmentNumber, BYTE BusNumber, BYTE DeviceNumber, BYTE FunctionNumber, USHORT Address, PVOID Buffer, ULONG BufferSize, LPDWORD Length)
 {
-  KLDBG kldbg_cmd;
-  SYSDBG_BUS_DATA sysdbg_cmd;
+  union {
+    KLDBG native;
+#ifndef _WIN64
+    KLDBG64 ext64;
+#endif
+  } kldbg_cmd;
+  union {
+    SYSDBG_BUS_DATA native;
+#ifndef _WIN64
+    SYSDBG_BUS_DATA64 ext64;
+#endif
+  } sysdbg_cmd;
   PCI_SLOT_NUMBER pci_slot;
   PCI_SEGMENT_BUS_NUMBER pci_seg_bus;
+  DWORD kldbg_cmd_size;
+  DWORD sysdbg_cmd_size;
+#ifndef _WIN64
+  BOOL is_32bit_on_64bit_system = win32_is_32bit_on_64bit_system();
+#endif
 
   memset(&pci_slot, 0, sizeof(pci_slot));
+  memset(&kldbg_cmd, 0, sizeof(kldbg_cmd));
   memset(&sysdbg_cmd, 0, sizeof(sysdbg_cmd));
   memset(&pci_seg_bus, 0, sizeof(pci_seg_bus));
 
-  sysdbg_cmd.Address = Address;
-  sysdbg_cmd.Buffer = Buffer;
-  sysdbg_cmd.Request = BufferSize;
-  sysdbg_cmd.BusDataType = PCIConfiguration;
   pci_seg_bus.u.bits.BusNumber = BusNumber;
   pci_seg_bus.u.bits.SegmentNumber = SegmentNumber;
-  sysdbg_cmd.BusNumber = pci_seg_bus.u.AsULONG;
+
   pci_slot.u.bits.DeviceNumber = DeviceNumber;
   pci_slot.u.bits.FunctionNumber = FunctionNumber;
-  sysdbg_cmd.SlotNumber = pci_slot.u.AsULONG;
 
-  kldbg_cmd.Command = WriteBusData ? SysDbgWriteBusData : SysDbgReadBusData;
-  kldbg_cmd.Buffer = &sysdbg_cmd;
-  kldbg_cmd.BufferLength = sizeof(sysdbg_cmd);
+#ifndef _WIN64
+  if (is_32bit_on_64bit_system)
+    {
+      sysdbg_cmd.ext64.Address = Address;
+      sysdbg_cmd.ext64.Buffer64 = (u64)(ULONG)Buffer; /* extend 32-bit pointer to 64-bit */
+      sysdbg_cmd.ext64.Request = BufferSize;
+      sysdbg_cmd.ext64.BusDataType = PCIConfiguration;
+      sysdbg_cmd.ext64.BusNumber = pci_seg_bus.u.AsULONG;
+      sysdbg_cmd.ext64.SlotNumber = pci_slot.u.AsULONG;
+      sysdbg_cmd_size = sizeof(sysdbg_cmd.ext64);
+    }
+  else
+#endif
+    {
+      sysdbg_cmd.native.Address = Address;
+      sysdbg_cmd.native.Buffer = Buffer;
+      sysdbg_cmd.native.Request = BufferSize;
+      sysdbg_cmd.native.BusDataType = PCIConfiguration;
+      sysdbg_cmd.native.BusNumber = pci_seg_bus.u.AsULONG;
+      sysdbg_cmd.native.SlotNumber = pci_slot.u.AsULONG;
+      sysdbg_cmd_size = sizeof(sysdbg_cmd.native);
+    }
+
+#ifndef _WIN64
+  if (is_32bit_on_64bit_system)
+    {
+      kldbg_cmd.ext64.Command = WriteBusData ? SysDbgWriteBusData : SysDbgReadBusData;
+      kldbg_cmd.ext64.Buffer64 = (u64)(ULONG)&sysdbg_cmd; /* extend 32-bit pointer to 64-bit */
+      kldbg_cmd.ext64.BufferLength = sysdbg_cmd_size;
+      kldbg_cmd_size = sizeof(kldbg_cmd.ext64);
+    }
+  else
+#endif
+    {
+      kldbg_cmd.native.Command = WriteBusData ? SysDbgWriteBusData : SysDbgReadBusData;
+      kldbg_cmd.native.Buffer = &sysdbg_cmd;
+      kldbg_cmd.native.BufferLength = sysdbg_cmd_size;
+      kldbg_cmd_size = sizeof(kldbg_cmd.native);
+    }
 
   *Length = 0;
-  return DeviceIoControl(kldbg_dev, IOCTL_KLDBG, &kldbg_cmd, sizeof(kldbg_cmd), &sysdbg_cmd, sizeof(sysdbg_cmd), Length, NULL);
+  return DeviceIoControl(kldbg_dev, IOCTL_KLDBG, &kldbg_cmd, kldbg_cmd_size, &sysdbg_cmd, sysdbg_cmd_size, Length, NULL);
 }
 
 static int
