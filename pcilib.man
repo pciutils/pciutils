@@ -127,6 +127,16 @@ Access to the PCI configuration space via Kernel Local Debugging Driver
 kldbgdrv.sys. This driver is not part of the Windows system but is part of
 the Microsoft WinDbg tool. It is required to have kldbgdrv.sys driver installed
 in the system32 directory or to have windbg.exe or kd.exe binary in PATH.
+windbg.exe or kd.exe binary contains embedded kldbgdrv.sys driver which libpci
+can automatically unpack and register. Because of embedded driver usage, it is
+required that architecture of windbg.exe or kd.exe binary matches the system
+architecture, and not the libpci application architecture. Therefore for running
+i386 libpci application on AMD64 system, it is required to have AMD64 version of
+kldbgdrv.sys driver in the native system32 directory or AMD64 version of
+windbg.exe or kd.exe binary in the PATH. i386 versions of these binaries would
+not work. win32-kldbg access method compiled for 32-bit applications supports
+both 32-bit and also 64-bit OS host systems, therefore i386 libpci application
+with win32-kldbg method can access PCI config space also on AMD64 host system.
 kldbgdrv.sys driver has some restrictions. Process needs to have Debug privilege
 and Windows system has to be booted with Debugging option. Debugging option can
 be enabled by calling (takes effect after next boot):
