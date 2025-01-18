@@ -1,7 +1,9 @@
 const char *win32_strerror(DWORD win32_error_id);
+USHORT win32_get_process_machine(void);
 BOOL win32_is_non_nt_system(void);
 BOOL win32_is_32bit_on_64bit_system(void);
 BOOL win32_is_32bit_on_win8_64bit_system(void);
+BOOL win32_is_not_native_process(USHORT *native_machine);
 UINT win32_change_error_mode(UINT new_mode);
 BOOL win32_have_privilege(LUID luid_privilege);
 BOOL win32_enable_privilege(LUID luid_privilege, HANDLE *revert_token, BOOL *revert_only_privilege);

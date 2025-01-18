@@ -125,32 +125,13 @@ static HANDLE kldbg_dev = INVALID_HANDLE_VALUE;
 static BOOL
 win32_kldbg_pci_bus_data(BOOL WriteBusData, USHORT SegmentNumber, BYTE BusNumber, BYTE DeviceNumber, BYTE FunctionNumber, USHORT Address, PVOID Buffer, ULONG BufferSize, LPDWORD Length);
 
-static WORD
-win32_get_current_process_machine(void)
-{
-  IMAGE_DOS_HEADER *dos_header;
-  IMAGE_NT_HEADERS *nt_header;
-
-  dos_header = (IMAGE_DOS_HEADER *)GetModuleHandle(NULL);
-  if (dos_header->e_magic != IMAGE_DOS_SIGNATURE)
-    return IMAGE_FILE_MACHINE_UNKNOWN;
-
-  nt_header = (IMAGE_NT_HEADERS *)((BYTE *)dos_header + dos_header->e_lfanew);
-  if (nt_header->Signature != IMAGE_NT_SIGNATURE)
-    return IMAGE_FILE_MACHINE_UNKNOWN;
-
-  return nt_header->FileHeader.Machine;
-}
-
 static BOOL
-win32_check_driver(BYTE *driver_data)
+win32_check_driver(BYTE *driver_data, USHORT native_machine, USHORT *driver_machine_ptr)
 {
   IMAGE_DOS_HEADER *dos_header;
   IMAGE_NT_HEADERS *nt_headers;
-  WORD current_machine;
 
-  current_machine = win32_get_current_process_machine();
-  if (current_machine == IMAGE_FILE_MACHINE_UNKNOWN)
+  if (native_machine == IMAGE_FILE_MACHINE_UNKNOWN)
     return FALSE;
 
   dos_header = (IMAGE_DOS_HEADER *)driver_data;
@@ -161,33 +142,21 @@ win32_check_driver(BYTE *driver_data)
   if (nt_headers->Signature != IMAGE_NT_SIGNATURE)
     return FALSE;
 
-  if (nt_headers->FileHeader.Machine != current_machine)
-    return FALSE;
-
   if (!(nt_headers->FileHeader.Characteristics & IMAGE_FILE_EXECUTABLE_IMAGE))
-    return FALSE;
-
-#ifndef _WIN64
-  if (!(nt_headers->FileHeader.Characteristics & IMAGE_FILE_32BIT_MACHINE))
-    return FALSE;
-#endif
-
-  /* IMAGE_OPTIONAL_HEADER is alias for the structure used on the target compiler architecture. */
-  if (nt_headers->FileHeader.SizeOfOptionalHeader < offsetof(IMAGE_OPTIONAL_HEADER, DataDirectory))
-    return FALSE;
-
-  /* IMAGE_NT_OPTIONAL_HDR_MAGIC is alias for the header magic used on the target compiler architecture. */
-  if (nt_headers->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR_MAGIC)
     return FALSE;
 
   if (nt_headers->OptionalHeader.Subsystem != IMAGE_SUBSYSTEM_NATIVE)
     return FALSE;
 
+  *driver_machine_ptr = nt_headers->FileHeader.Machine;
+  if (*driver_machine_ptr != native_machine)
+    return FALSE;
+
   return TRUE;
 }
 
-static int
-win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
+static BOOL
+win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path, USHORT native_machine)
 {
   BOOL use_kd_exe = FALSE;
   HMODULE exe_with_driver = NULL;
@@ -196,9 +165,10 @@ win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
   BYTE *driver_data = NULL;
   DWORD driver_size = 0;
   HANDLE driver_handle = INVALID_HANDLE_VALUE;
+  USHORT driver_machine = IMAGE_FILE_MACHINE_UNKNOWN;
   DWORD written = 0;
   DWORD error = 0;
-  int ret = 0;
+  BOOL ret = FALSE;
 
   /* Try to find and open windbg.exe or kd.exe file in PATH. */
   exe_with_driver = LoadLibraryEx(TEXT("windbg.exe"), NULL, LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
@@ -212,7 +182,7 @@ win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
       error = GetLastError();
       if (error == ERROR_FILE_NOT_FOUND ||
           error == ERROR_MOD_NOT_FOUND)
-        a->debug("Cannot find windbg.exe or kd.exe file in PATH");
+        a->debug("Cannot find windbg.exe or kd.exe file in PATH.");
       else
         a->debug("Cannot load %s file: %s.", use_kd_exe ? "kd.exe" : "windbg.exe", win32_strerror(error));
       goto out;
@@ -247,9 +217,14 @@ win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
       goto out;
     }
 
-  if (!win32_check_driver(driver_data))
+  if (!win32_check_driver(driver_data, native_machine, &driver_machine))
     {
-      a->debug("Cannot use kldbgdrv.sys driver from %s file: Driver is from different architecture.", use_kd_exe ? "kd.exe" : "windbg.exe");
+      if (native_machine == IMAGE_FILE_MACHINE_UNKNOWN)
+        a->debug("Cannot use kldbgdrv.sys driver from %s file: Cannot determinate native machine architecture.", use_kd_exe ? "kd.exe" : "windbg.exe");
+      else if (driver_machine == IMAGE_FILE_MACHINE_UNKNOWN)
+        a->debug("Cannot use kldbgdrv.sys driver from %s file: Attached resource is not valid kernel driver.", use_kd_exe ? "kd.exe" : "windbg.exe");
+      else
+        a->debug("Cannot use kldbgdrv.sys driver from %s file: Driver machine architecture 0x%04x differs from native machine architecture 0x%04x.", use_kd_exe ? "kd.exe" : "windbg.exe", (unsigned)driver_machine, (unsigned)native_machine);
       goto out;
     }
 
@@ -263,7 +238,7 @@ win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
           goto out;
         }
       /* If driver file in system32 directory already exists then treat it as successfull unpack. */
-      ret = 1;
+      ret = TRUE;
       goto out;
     }
 
@@ -279,7 +254,7 @@ win32_kldbg_unpack_driver(struct pci_access *a, LPTSTR driver_path)
     }
 
   a->debug("Driver kldbgdrv.sys was successfully unpacked from %s and stored in system32 directory...", use_kd_exe ? "kd.exe" : "windbg.exe");
-  ret = 1;
+  ret = TRUE;
 
 out:
   if (driver_handle != INVALID_HANDLE_VALUE)
@@ -300,6 +275,13 @@ win32_kldbg_register_driver(struct pci_access *a, SC_HANDLE manager, SC_HANDLE *
   UINT system32_len;
   LPTSTR driver_path;
   HANDLE driver_handle;
+  BOOL has_driver;
+  HMODULE kernel32;
+  USHORT native_machine = IMAGE_FILE_MACHINE_UNKNOWN;
+  BOOL fs_revert_needed = FALSE;
+  PVOID fs_revert_value = NULL;
+  BOOL (WINAPI *MyWow64DisableWow64FsRedirection)(PVOID *) = NULL;
+  BOOL (WINAPI *MyWow64RevertWow64FsRedirection)(PVOID) = NULL;
 
   /*
    * COM library dbgeng.dll unpacks kldbg driver to file "\\system32\\kldbgdrv.sys"
@@ -326,17 +308,80 @@ win32_kldbg_register_driver(struct pci_access *a, SC_HANDLE manager, SC_HANDLE *
 
   memcpy(driver_path + system32_len, TEXT("kldbgdrv.sys"), sizeof(TEXT("kldbgdrv.sys")));
 
-  driver_handle = CreateFile(driver_path, 0, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (driver_handle != INVALID_HANDLE_VALUE)
-    CloseHandle(driver_handle);
-  else if (GetLastError() == ERROR_FILE_NOT_FOUND)
+  /*
+   * For non-native processes to access System32 directory, it is required to
+   * disable FsRedirection. FsRedirection is by default enabled and automatically
+   * redirects all access to System32 directory from non-native processes to
+   * different directory (e.g. to SysWOW64 directory).
+   *
+   * FsRedirection can be temporary disabled for he current thread by
+   * Wow64DisableWow64FsRedirection() function and then reverted to the
+   * previous state by Wow64RevertWow64FsRedirection() function. These
+   * functions properly handle repeated calls.
+   */
+
+  if (win32_is_not_native_process(&native_machine))
     {
-      a->debug("Driver kldbgdrv.sys is missing, trying to unpack it from windbg.exe or kd.exe...");
-      if (!win32_kldbg_unpack_driver(a, driver_path))
+      if (native_machine == IMAGE_FILE_MACHINE_UNKNOWN)
         {
+          a->debug("Cannot register new driver: Unable to detect native machine architecture from non-native process.");
           pci_mfree(driver_path);
           return 0;
         }
+      kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+      if (kernel32)
+        {
+          MyWow64DisableWow64FsRedirection = (void *)GetProcAddress(kernel32, "Wow64DisableWow64FsRedirection");
+          MyWow64RevertWow64FsRedirection = (void *)GetProcAddress(kernel32, "Wow64RevertWow64FsRedirection");
+        }
+      if (!MyWow64DisableWow64FsRedirection || !MyWow64RevertWow64FsRedirection)
+        {
+          a->debug("Cannot register new driver: Unable to locate FsRedirection functions in kernel32.dll library.");
+          pci_mfree(driver_path);
+          return 0;
+        }
+      if (!MyWow64DisableWow64FsRedirection(&fs_revert_value))
+        {
+          a->debug("Cannot register new driver: Disabling FsRedirection for the current thread failed: %s.", win32_strerror(GetLastError()));
+          pci_mfree(driver_path);
+          return 0;
+        }
+      fs_revert_needed = TRUE;
+    }
+  else
+    {
+      native_machine = win32_get_process_machine();
+    }
+
+  has_driver = FALSE;
+  driver_handle = CreateFile(driver_path, 0, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (driver_handle != INVALID_HANDLE_VALUE)
+    CloseHandle(driver_handle);
+
+  if (driver_handle == INVALID_HANDLE_VALUE && GetLastError() == ERROR_FILE_NOT_FOUND)
+    {
+      a->debug("Driver kldbgdrv.sys is missing, trying to unpack it from windbg.exe or kd.exe...");
+      has_driver = win32_kldbg_unpack_driver(a, driver_path, native_machine);
+    }
+  else
+    {
+      /*
+       * driver_path was either successfully opened or it cannot be opened for
+       * any other reason than ERROR_FILE_NOT_FOUND. So expects that it exists.
+       */
+      has_driver = TRUE;
+    }
+
+  if (fs_revert_needed)
+    {
+      if (!MyWow64RevertWow64FsRedirection(fs_revert_value))
+        a->warning("Reverting of FsRedirection for the current thread failed: %s.", win32_strerror(GetLastError()));
+    }
+
+  if (!has_driver)
+    {
+      pci_mfree(driver_path);
+      return 0;
     }
 
   *service = CreateService(manager, TEXT("kldbgdrv"), TEXT("kldbgdrv"), SERVICE_START, SERVICE_KERNEL_DRIVER, SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL, driver_path, NULL, NULL, NULL, NULL, NULL);
@@ -391,13 +436,6 @@ win32_kldbg_start_driver(struct pci_access *a)
         }
 
       a->debug("Kernel Local Debugging Driver (kldbgdrv.sys) is not registered, trying to register it...");
-
-      if (win32_is_32bit_on_64bit_system())
-        {
-          /* TODO */
-          a->debug("Registering driver from 32-bit process on 64-bit system is not implemented yet.");
-          goto out;
-        }
 
       if (!win32_kldbg_register_driver(a, manager, &service))
         goto out;
