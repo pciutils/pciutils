@@ -257,6 +257,7 @@
 #define PCI_EXT_CAP_ID_32GT	0x2a	/* Physical Layer 32.0 GT/s */
 #define PCI_EXT_CAP_ID_DOE	0x2e	/* Data Object Exchange */
 #define PCI_EXT_CAP_ID_IDE	0x30	/* Integrity and Data Encryption */
+#define PCI_EXT_CAP_ID_64GT	0x31	/* Physical Layer 64.0 GT/s */
 
 /*** Definitions of capabilities ***/
 
@@ -1406,6 +1407,19 @@
 #define PCI_32GT_RXMODTS2	0x14	/* Received Modified TS Data 2 Register */
 #define PCI_32GT_TXMODTS1	0x18	/* Transmitted Modified TS Data 1 Register */
 #define PCI_32GT_TXMODTS2	0x1C	/* Transmitted Modified TS Data 2 Register */
+
+/* Physical Layer 64 GT/s Extended Capability */
+#define PCI_64GT_CAP		0x04	/* 64 GT/s Capabilities Register */
+#define PCI_64GT_CTL		0x08	/* 64 GT/s Control Register */
+#define PCI_64GT_STATUS		0x0C	/* 64 GT/s Status Register */
+#define  PCI_64GT_STATUS_EQU_COMP	0x0001	/* Equalization 64 GT/s Complete */
+#define  PCI_64GT_STATUS_EQU_PHASE1	0x0002	/* Equalization 64 GT/s Phase 1 Successful */
+#define  PCI_64GT_STATUS_EQU_PHASE2	0x0004	/* Equalization 64 GT/s Phase 2 Successful */
+#define  PCI_64GT_STATUS_EQU_PHASE3	0x0008	/* Equalization 64 GT/s Phase 3 Successful */
+#define  PCI_64GT_STATUS_EQU_REQ	0x0010	/* Link Equalization Request 64 GT/s */
+#define  PCI_64GT_STATUS_TX_PRE_ON	0x0020	/* Transmitter Precoding On */
+#define  PCI_64GT_STATUS_TX_PRE_REQ	0x0040	/* Transmitter Precoding Request */
+#define  PCI_64GT_STATUS_NO_EQU 	0x0080	/* No Equalization Needed Received */
 
 /* Process Address Space ID */
 #define PCI_PASID_CAP		0x04	/* PASID feature register */
