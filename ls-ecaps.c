@@ -734,6 +734,88 @@ cap_lmr(struct device *d, int where)
 }
 
 static void
+cap_phy_16gt(struct device *d, int where)
+{
+  printf("Physical Layer 16.0 GT/s\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_16GT_CAP, 0x18)) {
+    printf("\t\t<unreadable>\n");
+    return;
+  }
+
+  u32 status = get_conf_long(d, where + PCI_16GT_STATUS);
+
+  printf("\t\tPhy16Sta: EquComplete%c EquPhase1%c EquPhase2%c EquPhase3%c LinkEquRequest%c\n",
+         FLAG(status, PCI_16GT_STATUS_EQU_COMP),
+         FLAG(status, PCI_16GT_STATUS_EQU_PHASE1),
+         FLAG(status, PCI_16GT_STATUS_EQU_PHASE2),
+         FLAG(status, PCI_16GT_STATUS_EQU_PHASE3),
+         FLAG(status, PCI_16GT_STATUS_EQU_REQ));
+}
+
+static void
+cap_phy_32gt(struct device *d, int where)
+{
+  static const char * const mod_ts_modes[] = {
+    "PCI Express",
+    "Training Set Messages",
+    "Alternate Protocol Negotiation"
+  };
+  static const char * const enh_link_ctl[] = {
+    "Full Equalization required",
+    "Equalization bypass to highest rate support",
+    "No Equalization Needed",
+    "Modified TS1/TS2 Ordered Sets supported"
+  };
+  char buf[48];
+
+  printf("Physical Layer 32.0 GT/s\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_32GT_CAP, 0x1C)) {
+    printf("\t\t<unreadable>\n");
+    return;
+  }
+
+  u32 cap = get_conf_long(d, where + PCI_32GT_CAP);
+  u32 ctl = get_conf_long(d, where + PCI_32GT_CTL);
+  u32 status = get_conf_long(d, where + PCI_32GT_STATUS);
+
+  printf("\t\tPhy32Cap: EqualizationBypass%c NoEqualizationNeeded%c\n"
+         "\t\t\t  ModTsMode0%c ModTsMode1%c ModTsMode2%c\n",
+         FLAG(cap, PCI_32GT_CAP_EQU_BYPASS),
+         FLAG(cap, PCI_32GT_CAP_NO_EQU_NEEDED),
+         FLAG(cap, PCI_32GT_CAP_MOD_TS_MODE_0),
+         FLAG(cap, PCI_32GT_CAP_MOD_TS_MODE_1),
+         FLAG(cap, PCI_32GT_CAP_MOD_TS_MODE_2));
+
+  printf("\t\tPhy32Ctl: EqualizationBypassDis%c NoEqualizationNeededDis%c\n"
+         "\t\t\t  Modified TS Usage Mode: %s\n",
+         FLAG(ctl, PCI_32GT_CTL_EQU_BYPASS_DIS),
+         FLAG(ctl, PCI_32GT_CTL_NO_EQU_NEEDED_DIS),
+         TABLE(mod_ts_modes, PCI_32GT_CTL_MOD_TS_MODE(ctl), buf));
+
+  printf("\t\tPhy32Sta: EquComplete%c EquPhase1%c EquPhase2%c EquPhase3%c LinkEquRequest%c\n"
+         "\t\t\t  Received Enhanced Link Behavior Control: %s\n"
+         "\t\t\t  ModTsRecv%c TxPrecodeOn%c TxPrecodeReq%c NoEqualizationNeededRecv%c\n",
+         FLAG(status, PCI_32GT_STATUS_EQU_COMP),
+         FLAG(status, PCI_32GT_STATUS_EQU_PHASE1),
+         FLAG(status, PCI_32GT_STATUS_EQU_PHASE2),
+         FLAG(status, PCI_32GT_STATUS_EQU_PHASE3),
+         FLAG(status, PCI_32GT_STATUS_EQU_REQ),
+         TABLE(enh_link_ctl, PCI_32GT_STATUS_RCV_ENH_LINK(status), buf),
+         FLAG(status, PCI_32GT_STATUS_MOD_TS),
+         FLAG(status, PCI_32GT_STATUS_TX_PRE_ON),
+         FLAG(status, PCI_32GT_STATUS_TX_PRE_REQ),
+         FLAG(status, PCI_32GT_STATUS_NO_EQU));
+}
+
+static void
 cxl_range(u64 base, u64 size, int n)
 {
   u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
@@ -1840,7 +1922,7 @@ show_ext_caps(struct device *d, int type)
 	    printf("Data Link Feature <?>\n");
 	    break;
 	  case PCI_EXT_CAP_ID_16GT:
-	    printf("Physical Layer 16.0 GT/s <?>\n");
+	    cap_phy_16gt(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_LMR:
 	    cap_lmr(d, where);
@@ -1851,9 +1933,9 @@ show_ext_caps(struct device *d, int type)
 	  case PCI_EXT_CAP_ID_NPEM:
 	    printf("Native PCIe Enclosure Management <?>\n");
 	    break;
-      case PCI_EXT_CAP_ID_32GT:
-	    printf("Physical Layer 32.0 GT/s <?>\n");
-        break;
+	  case PCI_EXT_CAP_ID_32GT:
+	    cap_phy_32gt(d, where);
+	    break;
 	  case PCI_EXT_CAP_ID_DOE:
 	    cap_doe(d, where);
 	    break;
