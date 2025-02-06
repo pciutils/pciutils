@@ -1367,6 +1367,46 @@
 #define PCI_SEC_LANE_ERR	8	/* Lane Error status register */
 #define PCI_SEC_LANE_EQU_CTRL	12	/* Lane Equalization control register */
 
+/* Physical Layer 16 GT/s Extended Capability */
+#define PCI_16GT_CAP		0x04	/* 16 GT/s Capabilities Register */
+#define PCI_16GT_CTL		0x08	/* 16 GT/s Control Register */
+#define PCI_16GT_STATUS		0x0C	/* 16 GT/s Status Register */
+#define  PCI_16GT_STATUS_EQU_COMP	0x0001	/* Equalization 16 GT/s Complete */
+#define  PCI_16GT_STATUS_EQU_PHASE1	0x0002	/* Equalization 16 GT/s Phase 1 Successful */
+#define  PCI_16GT_STATUS_EQU_PHASE2	0x0004	/* Equalization 16 GT/s Phase 2 Successful */
+#define  PCI_16GT_STATUS_EQU_PHASE3	0x0008	/* Equalization 16 GT/s Phase 3 Successful */
+#define  PCI_16GT_STATUS_EQU_REQ	0x0010	/* Link Equalization Request 16 GT/s */
+#define PCI_16GT_LDPM		0x10	/* 16 GT/s Local Data Parity Mismatch Status Register */
+#define PCI_16GT_FRDPM		0x14	/* 16 GT/s First Retimer Data Parity Mismatch Status Register */
+#define PCI_16GT_SRDPM		0x18	/* 16 GT/s Second Retimer Data Parity Mismatch Status Register */
+
+/* Physical Layer 32 GT/s Extended Capability */
+#define PCI_32GT_CAP		0x04	/* 32 GT/s Capabilities Register */
+#define  PCI_32GT_CAP_EQU_BYPASS	0x0001	/* Equalization bypass to highest rate Supported */
+#define  PCI_32GT_CAP_NO_EQU_NEEDED	0x0002	/* No Equalization Needed Supported */
+#define  PCI_32GT_CAP_MOD_TS_MODE_0	0x0100	/* Modified TS Usage Mode 0 Supported - PCI Express */
+#define  PCI_32GT_CAP_MOD_TS_MODE_1	0x0200	/* Modified TS Usage Mode 1 Supported - Training Set Message */
+#define  PCI_32GT_CAP_MOD_TS_MODE_2	0x0400	/* Modified TS Usage Mode 2 Supported - Alternate Protocol */
+#define PCI_32GT_CTL		0x08	/* 32 GT/s Control Register */
+#define  PCI_32GT_CTL_EQU_BYPASS_DIS	0x1	/* Equalization bypass to highest rate Disable */
+#define  PCI_32GT_CTL_NO_EQU_NEEDED_DIS	0x2	/* No Equalization Needed Disable */
+#define  PCI_32GT_CTL_MOD_TS_MODE(x) (((x) >> 8) & 0x7)	/* Modified TS Usage Mode Selected */
+#define PCI_32GT_STATUS		0x0C	/* 32 GT/s Status Register */
+#define  PCI_32GT_STATUS_EQU_COMP	0x0001	/* Equalization 32 GT/s Complete */
+#define  PCI_32GT_STATUS_EQU_PHASE1	0x0002	/* Equalization 32 GT/s Phase 1 Successful */
+#define  PCI_32GT_STATUS_EQU_PHASE2	0x0004	/* Equalization 32 GT/s Phase 2 Successful */
+#define  PCI_32GT_STATUS_EQU_PHASE3	0x0008	/* Equalization 32 GT/s Phase 3 Successful */
+#define  PCI_32GT_STATUS_EQU_REQ	0x0010	/* Link Equalization Request 32 GT/s */
+#define  PCI_32GT_STATUS_MOD_TS		0x0020	/* Modified TS Received */
+#define  PCI_32GT_STATUS_RCV_ENH_LINK(x) (((x) >> 6) & 0x3)	/* Received Enhanced Link Behavior Control */
+#define  PCI_32GT_STATUS_TX_PRE_ON	0x0100	/* Transmitter Precoding On */
+#define  PCI_32GT_STATUS_TX_PRE_REQ	0x0200	/* Transmitter Precoding Request */
+#define  PCI_32GT_STATUS_NO_EQU 	0x0400	/* No Equalization Needed Received */
+#define PCI_32GT_RXMODTS1	0x10	/* Received Modified TS Data 1 Register */
+#define PCI_32GT_RXMODTS2	0x14	/* Received Modified TS Data 2 Register */
+#define PCI_32GT_TXMODTS1	0x18	/* Transmitted Modified TS Data 1 Register */
+#define PCI_32GT_TXMODTS2	0x1C	/* Transmitted Modified TS Data 2 Register */
+
 /* Process Address Space ID */
 #define PCI_PASID_CAP		0x04	/* PASID feature register */
 #define  PCI_PASID_CAP_EXEC	0x02	/* Exec permissions Supported */
