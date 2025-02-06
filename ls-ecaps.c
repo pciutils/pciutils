@@ -816,6 +816,33 @@ cap_phy_32gt(struct device *d, int where)
 }
 
 static void
+cap_phy_64gt(struct device *d, int where)
+{
+  printf("Physical Layer 64.0 GT/s\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_64GT_CAP, 0x0C)) {
+    printf("\t\t<unreadable>\n");
+    return;
+  }
+
+  u32 status = get_conf_long(d, where + PCI_64GT_STATUS);
+
+  printf("\t\tPhy64Sta: EquComplete%c EquPhase1%c EquPhase2%c EquPhase3%c LinkEquRequest%c\n"
+         "\t\t\t  TxPrecodeOn%c TxPrecodeReq%c NoEqualizationNeededRecv%c\n",
+         FLAG(status, PCI_64GT_STATUS_EQU_COMP),
+         FLAG(status, PCI_64GT_STATUS_EQU_PHASE1),
+         FLAG(status, PCI_64GT_STATUS_EQU_PHASE2),
+         FLAG(status, PCI_64GT_STATUS_EQU_PHASE3),
+         FLAG(status, PCI_64GT_STATUS_EQU_REQ),
+         FLAG(status, PCI_64GT_STATUS_TX_PRE_ON),
+         FLAG(status, PCI_64GT_STATUS_TX_PRE_REQ),
+         FLAG(status, PCI_64GT_STATUS_NO_EQU));
+}
+
+static void
 cxl_range(u64 base, u64 size, int n)
 {
   u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
@@ -1941,6 +1968,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_IDE:
 	    cap_ide(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_64GT:
+	    cap_phy_64gt(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);

@@ -398,6 +398,7 @@ static const struct reg_name pci_reg_names[] = {
   { 0x20029,	0, 0, 0x0, "ECAP_NPEM" },
   { 0x2002a,	0, 0, 0x0, "ECAP_32GT" },
   { 0x20030,	0, 0, 0x0, "ECAP_IDE" },
+  { 0x20031,	0, 0, 0x0, "ECAP_64GT" },
   {       0,    0, 0, 0x0, NULL }
 };
 
