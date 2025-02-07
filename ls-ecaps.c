@@ -943,7 +943,7 @@ dvsec_cxl_gpf_device(struct device *d, int where)
   printf("\t\tGPF Phase 2 Duration: %u%s\n", duration,
       (time_scale < PCI_CXL_GPF_DEV_1MS) ? "us":
       (time_scale < PCI_CXL_GPF_DEV_1S) ? "ms" :
-      (time_scale == PCI_CXL_GPF_DEV_1S) ? "s" : "<?>");
+      (time_scale <= PCI_CXL_GPF_DEV_10S) ? "s" : "<?>");
 
   l = get_conf_long(d, where + PCI_CXL_GPF_DEV_PHASE2_POW);
   printf("\t\tGPF Phase 2 Power: %umW\n", (unsigned int)l);
@@ -984,7 +984,7 @@ dvsec_cxl_gpf_port(struct device *d, int where)
   printf("\t\tGPF Phase 1 Timeout: %d%s\n", timeout,
       (time_scale < PCI_CXL_GPF_PORT_1MS) ? "us":
       (time_scale < PCI_CXL_GPF_PORT_1S) ? "ms" :
-      (time_scale == PCI_CXL_GPF_PORT_1S) ? "s" : "<?>");
+      (time_scale <= PCI_CXL_GPF_PORT_10S) ? "s" : "<?>");
 
   w = get_conf_word(d, where + PCI_CXL_GPF_PORT_PHASE2_CTRL);
   time_base = BITS(w, 0, 4);
@@ -1015,7 +1015,7 @@ dvsec_cxl_gpf_port(struct device *d, int where)
   printf("\t\tGPF Phase 2 Timeout: %d%s\n", timeout,
       (time_scale < PCI_CXL_GPF_PORT_1MS) ? "us":
       (time_scale < PCI_CXL_GPF_PORT_1S) ? "ms" :
-      (time_scale == PCI_CXL_GPF_PORT_1S) ? "s" : "<?>");
+      (time_scale <= PCI_CXL_GPF_PORT_10S) ? "s" : "<?>");
 }
 
 static void
