@@ -18,6 +18,10 @@
 #include "header.h"
 #include "types.h"
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #define PCI_LIB_VERSION 0x030d00
 
 #ifndef PCI_ABI
@@ -312,5 +316,9 @@ enum pci_lookup_mode {
   PCI_LOOKUP_REFRESH_CACHE = 0x400000,	/* Forget all previously cached entries, but still allow updating the cache */
   PCI_LOOKUP_NO_HWDB = 0x800000,	/* Do not ask udev's hwdb */
 };
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif
