@@ -1813,6 +1813,103 @@ cap_ide(struct device *d, int where)
       }
 }
 
+static const char *l0p_exit_latency(int value)
+{
+  static const char *latencies[] = {
+    "Less than 1us",
+    "1us to less than 2us",
+    "2us to less than 4us",
+    "4us to less than 8us",
+    "8us to less than 16us",
+    "16us to less than 32us",
+    "32us-64us",
+    "More than 64us"
+  };
+  
+  if (value >= 0 && value <= 7)
+    return latencies[value];
+  return "Unknown";
+}
+
+static const char *link_width_str(char *buf, size_t buflen, int width)
+{
+  switch (width)
+    {
+      case 0:
+        return "x1";
+      case 1:
+        return "x2";
+      case 2:
+        return "x4";
+      case 3:
+        return "x8";
+      case 4:
+        return "x16";
+      case 7:
+        return "Dynamic";
+      default:
+        snprintf(buf, buflen, "Unknown (%d)", width);
+        return buf;
+    }
+}
+
+static void
+cap_dev3(struct device *d, int where)
+{
+  u32 devcap3;
+  u16 devctl3, devsta3;
+  char buf[16];
+  
+  printf("Device 3\n");
+  
+  if (verbose < 2)
+    return;
+    
+  if (!config_fetch(d, where + PCI_DEV3_DEVCAP3, 4))
+    return;
+  devcap3 = get_conf_long(d, where + PCI_DEV3_DEVCAP3);
+  
+  printf("\t\tDevCap3: DMWr Request Routing%c, 14-Bit Tag Completer%c, 14-Bit Tag Requester%c\n"
+         "\t\t\t L0p%c",
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_DMWR_REQ),
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_14BIT_TAG_COMP),
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_14BIT_TAG_REQ),
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_L0P_SUPP));
+  
+  if (devcap3 & PCI_DEV3_DEVCAP3_L0P_SUPP)
+    printf(", Port L0p Exit Latency: %s, Retimer L0p Exit Latency: %s",
+           l0p_exit_latency(PCI_DEV3_DEVCAP3_PORT_L0P_EXIT(devcap3)),
+           l0p_exit_latency(PCI_DEV3_DEVCAP3_RETIMER_L0P_EXIT(devcap3)));
+  
+  printf("\n\t\t\t UIO Mem RdWr Completer%c, UIO Mem RdWr Requester%c\n",
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_COMP),
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ));
+  
+  if (!config_fetch(d, where + PCI_DEV3_DEVCTL3, 2))
+    return;
+  devctl3 = get_conf_word(d, where + PCI_DEV3_DEVCTL3);
+  
+  printf("\t\tDevCtl3: DMWr Requester%c, DMWr Egress Blocking%c, 14-Bit Tag Requester%c\n"
+         "\t\t\t L0p%c, Target Link Width: %s\n"
+         "\t\t\t UIO Mem RdWr Requester%c, UIO Request 256B Boundary%c\n",
+         FLAG(devctl3, PCI_DEV3_DEVCTL3_DMWR_REQ_EN),
+         FLAG(devctl3, PCI_DEV3_DEVCTL3_DMWR_EGRESS_BLK),
+         FLAG(devctl3, PCI_DEV3_DEVCTL3_14BIT_TAG_REQ_EN),
+         FLAG(devctl3, PCI_DEV3_DEVCTL3_L0P_EN),
+         link_width_str(buf, sizeof(buf), PCI_DEV3_DEVCTL3_TARGET_LINK_WIDTH(devctl3)),
+         FLAG(devctl3, PCI_DEV3_DEVCTL3_UIO_MEM_RDWR_REQ_EN),
+         FLAG(~devctl3, PCI_DEV3_DEVCTL3_UIO_REQ_256B_DIS));
+  
+  if (!config_fetch(d, where + PCI_DEV3_DEVSTA3, 2))
+    return;
+  devsta3 = get_conf_word(d, where + PCI_DEV3_DEVSTA3);
+  
+  printf("\t\tDevSta3: Initial Link Width: %s, Segment Captured%c, Remote L0p%c\n",
+         link_width_str(buf, sizeof(buf), PCI_DEV3_DEVSTA3_INIT_LINK_WIDTH(devsta3)),
+         FLAG(devsta3, PCI_DEV3_DEVSTA3_SEGMENT_CAPTURED),
+         FLAG(devsta3, PCI_DEV3_DEVSTA3_REMOTE_L0P_SUPP));
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -1971,6 +2068,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_64GT:
 	    cap_phy_64gt(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_DEV3:
+	    cap_dev3(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);

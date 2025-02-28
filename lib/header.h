@@ -259,6 +259,7 @@
 #define PCI_EXT_CAP_ID_ALT_PROT	0x2b	/* Alternate Protocol */
 #define PCI_EXT_CAP_ID_SFI	0x2c	/* System Firmware Intermediary */
 #define PCI_EXT_CAP_ID_DOE	0x2e	/* Data Object Exchange */
+#define PCI_EXT_CAP_ID_DEV3	0x2f	/* Device 3 */
 #define PCI_EXT_CAP_ID_IDE	0x30	/* Integrity and Data Encryption */
 #define PCI_EXT_CAP_ID_64GT	0x31	/* Physical Layer 64.0 GT/s */
 #define PCI_EXT_CAP_ID_FLIT_LOG	0x32	/* Flit Logging */
@@ -777,6 +778,7 @@
 #define  PCI_EXP_TYPE_ROOT_EC 0xa	/* Root Complex Event Collector */
 #define PCI_EXP_FLAGS_SLOT	0x0100	/* Slot implemented */
 #define PCI_EXP_FLAGS_IRQ	0x3e00	/* Interrupt message number */
+#define PCI_EXP_FLAGS_FLIT_MODE  0x8000  /* FLIT mode supported */
 #define PCI_EXP_DEVCAP		0x4	/* Device capabilities */
 #define  PCI_EXP_DEVCAP_PAYLOAD	0x07	/* Max_Payload_Size */
 #define  PCI_EXP_DEVCAP_PHANTOM	0x18	/* Phantom functions */
@@ -835,6 +837,7 @@
 #define  PCI_EXP_LNKCTL_HWAUTWD	0x0200	/* Hardware Autonomous Width Disable */
 #define  PCI_EXP_LNKCTL_BWMIE	0x0400	/* Bandwidth Mgmt Interrupt Enable */
 #define  PCI_EXP_LNKCTL_AUTBWIE	0x0800	/* Autonomous Bandwidth Mgmt Interrupt Enable */
+#define  PCI_EXP_LNKCTL_FLIT_MODE_DIS  0x2000      /* FLIT mode disable */
 #define PCI_EXP_LNKSTA		0x12	/* Link Status */
 #define  PCI_EXP_LNKSTA_SPEED	0x000f	/* Negotiated Link Speed */
 #define  PCI_EXP_LNKSTA_WIDTH	0x03f0	/* Negotiated Link Width */
@@ -953,6 +956,7 @@
 #define  PCI_EXP_LINKSTA2_CROSSLINK(x)	(((x) >> 8) & 0x3) /* Crosslink Res */
 #define  PCI_EXP_LINKSTA2_COMPONENT(x)	(((x) >> 12) & 0x7) /* Presence */
 #define  PCI_EXP_LINKSTA2_DRS_RCVD	0x8000	/* DRS Msg Received */
+#define  PCI_EXP_LINKSTA2_FLIT_MODE 0x0400  /* FLIT mode active */
 #define PCI_EXP_SLTCAP2			0x34	/* Slot Capabilities */
 #define PCI_EXP_SLTCTL2			0x38	/* Slot Control */
 #define PCI_EXP_SLTSTA2			0x3a	/* Slot Status */
@@ -1501,6 +1505,31 @@
 #define PCI_LMR_PORT_STS		0x6 /* Margining Port Status Register */
 #define PCI_LMR_PORT_STS_READY		0x1 /* Margining Ready */
 #define PCI_LMR_PORT_STS_SOFT_READY	0x2 /* Margining Software Ready */
+
+/* Device 3 Extended Capability */
+#define PCI_DEV3_DEVCAP3		0x04	/* Device Capabilities 3 */
+#define  PCI_DEV3_DEVCAP3_DMWR_REQ	0x0001	/* DMWr Request Routing Supported */
+#define  PCI_DEV3_DEVCAP3_14BIT_TAG_COMP	0x0002	/* 14-Bit Tag Completer Supported */
+#define  PCI_DEV3_DEVCAP3_14BIT_TAG_REQ	0x0004	/* 14-Bit Tag Requester Supported */
+#define  PCI_DEV3_DEVCAP3_L0P_SUPP	0x0008	/* L0p Supported */
+#define  PCI_DEV3_DEVCAP3_PORT_L0P_EXIT(x)	(((x) >> 4) & 0x7) /* Port L0p Exit Latency */
+#define  PCI_DEV3_DEVCAP3_RETIMER_L0P_EXIT(x)	(((x) >> 7) & 0x7) /* Retimer L0p Exit Latency */
+#define  PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_COMP	0x0400	/* UIO Mem RdWr Completer Supported */
+#define  PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ	0x0800	/* UIO Mem RdWr Requester Supported */
+
+#define PCI_DEV3_DEVCTL3		0x08	/* Device Control 3 */
+#define  PCI_DEV3_DEVCTL3_DMWR_REQ_EN	0x0001	/* DMWr Requester Enable */
+#define  PCI_DEV3_DEVCTL3_DMWR_EGRESS_BLK	0x0002	/* DMWr Egress Blocking */
+#define  PCI_DEV3_DEVCTL3_14BIT_TAG_REQ_EN	0x0004	/* 14-Bit Tag Requester Enable */
+#define  PCI_DEV3_DEVCTL3_L0P_EN	0x0008	/* L0p Enable */
+#define  PCI_DEV3_DEVCTL3_TARGET_LINK_WIDTH(x)	(((x) >> 4) & 0x7) /* Target Link Width */
+#define  PCI_DEV3_DEVCTL3_UIO_MEM_RDWR_REQ_EN	0x0080	/* UIO Mem RdWr Requester Enable */
+#define  PCI_DEV3_DEVCTL3_UIO_REQ_256B_DIS	0x0100	/* UIO Request 256B Boundary Disable */
+
+#define PCI_DEV3_DEVSTA3		0x0C	/* Device Status 3 */
+#define  PCI_DEV3_DEVSTA3_INIT_LINK_WIDTH(x)	((x) & 0x7) /* Initial Link Width */
+#define  PCI_DEV3_DEVSTA3_SEGMENT_CAPTURED	0x0008	/* Segment Captured */
+#define  PCI_DEV3_DEVSTA3_REMOTE_L0P_SUPP	0x0010	/* Remote L0p Supported */
 
 /* Integrity and Data Encryption Extended Capability */
 #define PCI_IDE_CAP		0x4
