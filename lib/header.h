@@ -208,6 +208,7 @@
 #define  PCI_CAP_ID_SATA	0x12	/* Serial-ATA HBA */
 #define  PCI_CAP_ID_AF		0x13	/* Advanced features of PCI devices integrated in PCIe root cplx */
 #define  PCI_CAP_ID_EA		0x14	/* Enhanced Allocation */
+#define  PCI_CAP_ID_FPB		0x15	/* Flattening Portal Bridge */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
