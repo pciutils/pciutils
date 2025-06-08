@@ -1,7 +1,7 @@
 /*
  *	The PCI Library
  *
- *	Copyright (c) 1997--2024 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2025 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+
  *
@@ -10,6 +10,10 @@
 
 #ifndef _PCI_LIB_H
 #define _PCI_LIB_H
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 #ifndef PCI_CONFIG_H
 #include "config.h"
@@ -312,5 +316,9 @@ enum pci_lookup_mode {
   PCI_LOOKUP_REFRESH_CACHE = 0x400000,	/* Forget all previously cached entries, but still allow updating the cache */
   PCI_LOOKUP_NO_HWDB = 0x800000,	/* Do not ask udev's hwdb */
 };
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif
