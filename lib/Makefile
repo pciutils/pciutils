@@ -77,6 +77,10 @@ ifdef PCI_HAVE_PM_WIN32_SYSDBG
 OBJS += win32-sysdbg
 endif
 
+ifdef PCI_HAVE_PM_WIN32_DIRECTIO
+OBJS += win32-directio
+endif
+
 ifdef PCI_OS_WINDOWS
 OBJS += win32-helpers
 endif
@@ -167,6 +171,7 @@ win32-helpers.o: win32-helpers.c $(INCL) win32-helpers.h
 win32-cfgmgr32.o: win32-cfgmgr32.c $(INCL) win32-helpers.h
 win32-kldbg.o: win32-kldbg.c $(INCL) win32-helpers.h
 win32-sysdbg.o: win32-sysdbg.c $(INCL) win32-helpers.h
+win32-directio.o: win32-directio.c $(INCL) win32-helpers.h
 i386-io-windows.h: win32-helpers.h
 
 # MinGW32 toolchain has some required Win32 header files in /ddk subdirectory.

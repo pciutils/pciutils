@@ -44,6 +44,7 @@ PKGCFDIR=$(LIBDIR)/pkgconfig
 
 # Commands
 INSTALL=install
+COPY=cp
 DIRINSTALL=install -d
 STRIP=-s
 ifdef CROSS_COMPILE
@@ -129,6 +130,7 @@ ifdef PCI_OS_WINDOWS
 comma := ,
 %-rsrc.rc: lib/winrsrc.rc.in
 	sed <$< >$@ -e 's,@PCILIB_VERSION@,$(PCILIB_VERSION),' \
+		-e 's,@PCI_HAVE_PM_WIN32_DIRECTIO@,$(if $(PCI_HAVE_PM_WIN32_DIRECTIO),1,0),' \
 		-e 's,@PCILIB_VERSION_WINRC@,$(subst .,\$(comma),$(PCILIB_VERSION).0),' \
 		-e 's,@FILENAME@,$(subst -rsrc.rc,$(EXEEXT),$@),' \
 		-e 's,@DESCRIPTION@,$(subst -rsrc.rc,,$@),' \
@@ -217,7 +219,7 @@ endif
 endif
 
 uninstall: all
-	rm -f $(DESTDIR)$(LSPCIDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/update-pciids
+	rm -f $(DESTDIR)$(LSPCIDIR)/lspci$(EXEEXT) $(DESTDIR)$(SBINDIR)/setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)/pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)/DirectIOLib32.dll $(DESTDIR)$(SBINDIR)/DirectIOLibx64.dll $(DESTDIR)$(SBINDIR)/update-pciids
 ifneq ($(IDSDIR),)
 	rm -f $(DESTDIR)$(IDSDIR)/$(PCI_IDS)
 else

@@ -14,6 +14,7 @@ For config space access there are different windows specific access methods:
 - win32-kldbg - Kernel Local Debugging Driver kldbgdrv.sys
 - win32-sysdbg - NT SysDbg interface
 - intel-conf1 - Direct hardware access via Intel configuration mechanism 1
+- directIO - Direct hardware access to I/O ports via DirectIO drivers
 
 The default access method is win32-cfgmgr32 and by default it tries to use
 one of the above config access access method to provide as much as possible
@@ -51,6 +52,27 @@ To compile this port, run following command:
 To build 64-bit version, run:
 
   make CROSS_COMPILE=x86_64-w64-mingw32- HOST=x86_64-windows ZLIB=no IDSDIR=""
+
+Or you can use the build.sh script, which also downloads the DirectIO libraries to the /usr/local/sbin. 
+After building the binaries install them to /usr/local/sbin with the command:
+
+  make install
+
+If you wish to uninstall use the command:
+
+  make uninstall
+
+If you don't use build.sh, but want to use DirectIO for config space you need to download the libraries manualy:
+
+  wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLibx64.dll
+  wget -P /usr/local/sbin/ https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLib32.dll
+  wget -P . https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLibx64.dll
+  wget -P . https://raw.githubusercontent.com/allenyllee/directio/refs/heads/master/bin/DirectIOLib32.dll
+
+DirectIO config space requires elevated command prompt. Open terminal as administrator to load the library. If you don't open terminal as administrator you will get:
+"Trying method win32-directio...pcilib: i386-io-windows: IO library initialization failed. Try running from an elevated command prompt."
+
+You might need to add C:\msys64\usr\local\sbin to the Windows environmental variable PATH to access pciutils from terminal.
 
 Sometimes compilation may fail due to broken or missing getopt implementation.
 In this case try to compile with additional make option: COMPAT_GETOPT=yes
