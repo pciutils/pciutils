@@ -1792,6 +1792,321 @@ static void cap_ea(struct device *d, int where, int cap)
   }
 }
 
+static void cap_fpb(struct device *d, int where, int type)
+{
+  if (type != PCI_EXP_TYPE_DOWNSTREAM && type != PCI_EXP_TYPE_UPSTREAM)
+    return;
+  if (!config_fetch(d, where + 4, 28))
+    return;
+  u32 cap_register = get_conf_long(d, where + 4);
+  u32 rid_vec_control_1_reg = get_conf_long(d, where + 8);
+  u32 rid_vec_control_2_reg = get_conf_long(d, where + 12);
+  u32 mem_low_control_reg = get_conf_long(d, where + 16);
+  u32 mem_high_control_1_reg = get_conf_long(d, where + 20);
+  u32 mem_high_control_2_reg = get_conf_long(d, where + 24);
+  u32 vec_access_control_reg = get_conf_long(d, where + 28);
+  
+  int rid_decode_supported = cap_register & 1;
+  int mem_low_decode_supported = cap_register & 2;
+  int mem_high_decode_supported = cap_register & 4;
+  int rid_vector_size_supported = BITS(cap_register, 8, 3);
+  int mem_low_vector_size_supported = BITS(cap_register, 16, 3);
+  int mem_high_vector_size_supported = BITS(cap_register, 24, 3);
+  puts("Flattening Portal Bridge");
+  if (type == PCI_EXP_TYPE_UPSTREAM) {
+    int num_sec_devices = BITS(cap_register, 3, 5);
+    printf("\t\tNum Sec Dev: %d\n", num_sec_devices + 1);
+  }
+  const char *vector_access_offset;
+  switch(BITS(vec_access_control_reg, 0, 8)) {
+  case 0:
+    vector_access_offset = "2:0 (7:3 unused)";
+    break;
+  case 1:
+    vector_access_offset = "3:0 (7:4 unused)";
+    break;
+  case 2:
+    vector_access_offset = "4:0 (7:5 unused)";
+    break;
+  case 3:
+    vector_access_offset = "5:0 (7:6 unused)";
+    break;
+  case 4:
+    vector_access_offset = "6:0 (7 unused)";
+    break;
+  case 5:
+    vector_access_offset = "7:0";
+    break;
+  default:
+    vector_access_offset = "<reserved>";
+  }
+  const char *vector_access_select;
+  switch(BITS(vec_access_control_reg, 14, 2)) {
+  case 0:
+    vector_access_select = "RID";
+    break;
+  case 1:
+    vector_access_select = "MEM Low";
+    break;
+  case 2:
+    vector_access_select = "MEM High";
+    break;
+  default:
+    vector_access_select = "<reserved>";
+  }
+  printf("\t\tVector Access Offset=%s, Vector Select=%s\n",
+         vector_access_offset, vector_access_select);
+  printf("\t\tRID Decode: ");
+  if (rid_decode_supported) {
+    const char *vector_size;
+    const char *allowed_granularities;
+    switch(rid_vector_size_supported) {
+    case 2:
+      vector_size = "1K bits";
+      allowed_granularities = "8,64";
+      break;
+    case 5:
+      vector_size = "8K bits";
+      allowed_granularities = "8";
+      break;
+    case 0:
+      vector_size = "256 bits";
+      allowed_granularities = "8,64,256";
+      break;
+    default:
+      vector_size = "<reserved>";
+      allowed_granularities = "<reserved>";
+    }
+    printf("Supported, Vector Size: %s, Allowed Granularities: %s RIDs\n",
+           vector_size, allowed_granularities);
+    int rid_enabled = rid_vec_control_1_reg & 1;
+    if (rid_enabled) {
+      const char *rid_granularity;
+      switch(BITS(rid_vec_control_1_reg, 4, 4)) {
+      case 3:
+        rid_granularity = "64 RIDs";
+        break;
+      case 5:
+        rid_granularity = "256 RIDs";
+        break;
+      case 0:
+        rid_granularity = "8 RIDs";
+        break;
+      default:
+        rid_granularity = "<reserved>";
+      }
+      const char *rid_vector_start;
+      switch(BITS(rid_vec_control_1_reg, 19, 13)) {
+      case 0:
+        rid_vector_start = "<no constraint>";
+        break;
+      case 3:
+        rid_vector_start = "8";
+        break;
+      case 5:
+        rid_vector_start = "32";
+        break;
+      default:
+        rid_vector_start = "<reserved>";
+      }
+      //TODO(Downstream Port): make a check or assert
+      int rid_secondary_start = BITS(rid_vec_control_2_reg, 3, 13);
+      printf("\t\tEnabled, Granularity: %s, Vector Start: %s, Secondary Vector Start: %d\n",
+             rid_granularity, rid_vector_start, rid_secondary_start);
+    } else {
+      puts("\t\tDisabled");
+    }
+  } else {
+    puts("Not Supported");
+  }
+  printf("\t\tMEM Low Decode: ");
+  if (mem_low_decode_supported) {
+    const char *vector_size;
+    const char *allowed_granularities;
+    if (mem_low_vector_size_supported == 1) {
+      vector_size = "512 bits";
+      allowed_granularities = "1,2,4,8";
+    } else if (mem_low_vector_size_supported == 2) {
+      vector_size = "1K bits";
+      allowed_granularities = "1,2,4";
+    } else if (mem_low_vector_size_supported == 3) {
+      vector_size = "2K bits";
+      allowed_granularities = "1,2";
+    } else if (mem_low_vector_size_supported == 4) {
+      vector_size = "4K bits";
+      allowed_granularities = "1";
+    } else {
+      vector_size = "256 bits";
+      allowed_granularities = "1,2,4,8,16";
+    }
+    printf("Supported, Vector Size: %s, Allowed Granularities: %s MBs\n",
+           vector_size, allowed_granularities);
+    int mem_low_enabled = mem_low_control_reg & 1;
+    if (mem_low_enabled) {
+      const char *mem_low_vector_granularity;
+      switch(BITS(mem_low_control_reg, 4, 4)) {
+      case 0:
+        mem_low_vector_granularity = "1 MB";
+        break;
+      case 1:
+        mem_low_vector_granularity = "2 MB";
+        break;
+      case 2:
+        mem_low_vector_granularity = "4 MB";
+        break;
+      case 3:
+        mem_low_vector_granularity = "8 MB";
+        break;
+      case 4:
+        mem_low_vector_granularity = "16 MB";
+        break;
+      default:
+        mem_low_vector_granularity = "<reserved>";
+      }
+      const char *mem_low_vector_start;
+      switch(BITS(mem_low_control_reg, 20, 12)) {
+      case 0:
+        mem_low_vector_start = "<no constraint>";
+        break;
+      case 1:
+        mem_low_vector_start = "2";
+        break;
+      case 2:
+        mem_low_vector_start = "4";
+        break;
+      case 3:
+        mem_low_vector_start = "8";
+        break;
+      case 4:
+        mem_low_vector_start = "16";
+        break;
+      default:
+        mem_low_vector_start = "<reserved>";
+      }
+      printf("\t\tEnabled, Granularity: %s, Vector Start: %s\n",
+      mem_low_vector_granularity, mem_low_vector_start);
+    } else {
+      puts("\t\tDisabled");
+    }
+  } else {
+    puts("Not Supported");
+  }
+  printf("\t\tMEM High Decode: ");
+  if (mem_high_decode_supported) {
+    const char *vector_size;
+    switch(mem_high_vector_size_supported) {
+    case 1:
+      vector_size = "512 bits";
+      break;
+    case 2:
+      vector_size = "1K bits";
+      break;
+    case 3: 
+      vector_size = "2K bits";
+      break;
+    case 4: 
+      vector_size = "4K bits";
+      break;
+    case 5: 
+      vector_size = "8K bits";
+      break;
+    case 0:
+      vector_size = "256 bits";
+      break;
+    default:
+      vector_size = "<reserved>";
+    }
+    printf("Supported, Vector Size: %s\n", vector_size);
+    int mem_high_enabled = mem_high_control_1_reg & 1;
+    if (mem_high_enabled) {
+      const char *mem_high_granularity;
+      switch(BITS(mem_high_control_1_reg, 4, 4)) {
+      case 0:
+        mem_high_granularity = "256 MB";
+        break;
+      case 1:
+        mem_high_granularity = "512 MB";
+        break;
+      case 2:
+        mem_high_granularity = "1 GB";
+        break;
+      case 3:
+        mem_high_granularity = "2 GB";
+        break;
+      case 4:
+        mem_high_granularity = "4 GB";
+        break;
+      case 5:
+        mem_high_granularity = "8 GB";
+        break;
+      case 6:
+        mem_high_granularity = "16 GB";
+        break;
+      case 7:
+        mem_high_granularity = "32 GB";
+        break;
+      default:
+        mem_high_granularity = "<reserved>";
+      }
+      const char *mem_high_vector_start_lower;
+      switch(BITS(mem_high_control_1_reg, 28, 4)) {
+      case 0:
+        mem_high_vector_start_lower = "<no constraint>";
+        break;
+      case 1:
+        mem_high_vector_start_lower = "2";
+        break;
+      case 2:
+        mem_high_vector_start_lower = "4";
+        break;
+      case 3:
+        mem_high_vector_start_lower = "8";
+        break;
+      case 4:
+        mem_high_vector_start_lower = "16";
+        break;
+      case 5:
+        mem_high_vector_start_lower = "32";
+        break;
+      case 6:
+        mem_high_vector_start_lower = "64";
+        break;
+      case 7:
+        mem_high_vector_start_lower = "128";
+        break;
+      default:
+        mem_high_vector_start_lower = "<reserved>";
+      }
+      const char *mem_high_vector_start_upper;
+      switch(mem_high_control_2_reg) {
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        mem_high_vector_start_upper = "<no constraint>";
+        break;
+      case 5:
+        mem_high_vector_start_upper = "2";
+        break;
+      case 6:
+        mem_high_vector_start_upper = "4";
+        break;
+      case 7:
+        mem_high_vector_start_upper = "8";
+        break;
+      }
+      printf("\t\tEnabled, Granularity: %s, Vector Start Lower: %s, Vector Start Upper: %s\n",
+             mem_high_granularity, mem_high_vector_start_lower,
+             mem_high_vector_start_upper);
+    } else {
+      puts("\t\tDisabled");
+    }
+  } else {
+    puts("Not Supported");
+  }
+}
+
 void
 show_caps(struct device *d, int where)
 {
@@ -1892,6 +2207,9 @@ show_caps(struct device *d, int where)
 	      break;
 	    case PCI_CAP_ID_EA:
 	      cap_ea(d, where, cap);
+	      break;
+	    case PCI_CAP_ID_FPB:
+	      cap_fpb(d, where, type);
 	      break;
 	    default:
 	      printf("Capability ID %#02x [%04x]\n", id, cap);
