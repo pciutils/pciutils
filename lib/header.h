@@ -208,6 +208,7 @@
 #define  PCI_CAP_ID_SATA	0x12	/* Serial-ATA HBA */
 #define  PCI_CAP_ID_AF		0x13	/* Advanced features of PCI devices integrated in PCIe root cplx */
 #define  PCI_CAP_ID_EA		0x14	/* Enhanced Allocation */
+#define  PCI_CAP_ID_FPB		0x15	/* Flattening Portal Bridge */
 #define PCI_CAP_LIST_NEXT	1	/* Next capability in the list */
 #define PCI_CAP_FLAGS		2	/* Capability defined flags (16 bits) */
 #define PCI_CAP_SIZEOF		4
@@ -255,9 +256,20 @@
 #define PCI_EXT_CAP_ID_HIER_ID	0x28	/* Hierarchy ID */
 #define PCI_EXT_CAP_ID_NPEM	0x29	/* Native PCIe Enclosure Management */
 #define PCI_EXT_CAP_ID_32GT	0x2a	/* Physical Layer 32.0 GT/s */
+#define PCI_EXT_CAP_ID_ALT_PROT	0x2b	/* Alternate Protocol */
+#define PCI_EXT_CAP_ID_SFI	0x2c	/* System Firmware Intermediary */
 #define PCI_EXT_CAP_ID_DOE	0x2e	/* Data Object Exchange */
 #define PCI_EXT_CAP_ID_IDE	0x30	/* Integrity and Data Encryption */
 #define PCI_EXT_CAP_ID_64GT	0x31	/* Physical Layer 64.0 GT/s */
+#define PCI_EXT_CAP_ID_FLIT_LOG	0x32	/* Flit Logging */
+#define PCI_EXT_CAP_ID_FLIT_PM	0x33	/* Flit Performance Measurement */
+#define PCI_EXT_CAP_ID_FLIT_EI	0x34	/* Flit Error Injection*/
+#define PCI_EXT_CAP_ID_SVC	0x35	/* Streamlined Virtual Channel */
+#define PCI_EXT_CAP_ID_MMIO_RBL	0x36	/* MMIO Register Block Locator */
+#define PCI_EXT_CAP_ID_NOP_FLIT	0x37	/* NOP Flit Extended Capability */
+#define PCI_EXT_CAP_ID_SIOV	0x38	/* Scalable I/O Virtualization */
+#define PCI_EXT_CAP_ID_128GT	0x39	/* Physical Layer 128.0 GT/s */
+#define PCI_EXT_CAP_ID_CAPT_D	0x3a	/* Captured Data */
 
 /*** Definitions of capabilities ***/
 
@@ -1624,6 +1636,7 @@
 #define  PCI_CLASS_BRIDGE_RACEWAY	0x0608
 #define  PCI_CLASS_BRIDGE_PCI_SEMI	0x0609
 #define  PCI_CLASS_BRIDGE_IB_TO_PCI	0x060a
+#define  PCI_CLASS_BRIDGE_ADV_SWITCHING	0x060b
 #define  PCI_CLASS_BRIDGE_OTHER		0x0680
 
 #define PCI_BASE_CLASS_COMMUNICATION	0x07
@@ -1643,8 +1656,10 @@
 #define PCI_CLASS_SYSTEM_PCI_HOTPLUG	0x0804
 #define PCI_CLASS_SYSTEM_SD_HOST	0x0805
 #define PCI_CLASS_SYSTEM_IOMMU		0x0806
+#define PCI_CLASS_SYSTEM_ROOT_EVENT_COLL	0x0807
+#define PCI_CLASS_SYSTEM_TIME_CARD	0x0808
 #define PCI_CLASS_SYSTEM_OTHER		0x0880
-#define PCI_CLASS_SYSTEM_TIMING_CARD	0x0899
+#define PCI_CLASS_SYSTEM_TIMING_CARD	0x0899	// Experimental use before official PCI SIG allocation
 
 #define PCI_BASE_CLASS_INPUT		0x09
 #define PCI_CLASS_INPUT_KEYBOARD	0x0900
@@ -1666,6 +1681,7 @@
 #define PCI_CLASS_PROCESSOR_POWERPC	0x0b20
 #define PCI_CLASS_PROCESSOR_MIPS	0x0b30
 #define PCI_CLASS_PROCESSOR_CO		0x0b40
+#define PCI_CLASS_PROCESSOR_OTHER	0x0b80
 
 #define PCI_BASE_CLASS_SERIAL		0x0c
 #define PCI_CLASS_SERIAL_FIREWIRE	0x0c00
@@ -1678,6 +1694,9 @@
 #define PCI_CLASS_SERIAL_IPMI		0x0c07
 #define PCI_CLASS_SERIAL_SERCOS		0x0c08
 #define PCI_CLASS_SERIAL_CANBUS		0x0c09
+#define PCI_CLASS_SERIAL_MIPS_I3C	0x0c0a
+#define PCI_CLASS_SERIAL_CXL_FMHI	0x0c0b
+#define PCI_CLASS_SERIAL_MMBI		0x0c0c
 #define PCI_CLASS_SERIAL_OTHER		0x0c80
 
 #define PCI_BASE_CLASS_WIRELESS		0x0d
@@ -1688,6 +1707,8 @@
 #define PCI_CLASS_WIRELESS_BROADBAND	0x0d12
 #define PCI_CLASS_WIRELESS_80211a	0x0d20
 #define PCI_CLASS_WIRELESS_80211b	0x0d21
+#define PCI_CLASS_WIRELESS_CELLULAR	0x0d40
+#define PCI_CLASS_WIRELESS_CELLULAR_PLUS_80211	0x0d41
 #define PCI_CLASS_WIRELESS_OTHER	0x0d80
 
 #define PCI_BASE_CLASS_INTELLIGENT	0x0e
@@ -1698,10 +1719,12 @@
 #define PCI_CLASS_SATELLITE_AUDIO	0x0f01
 #define PCI_CLASS_SATELLITE_VOICE	0x0f03
 #define PCI_CLASS_SATELLITE_DATA	0x0f04
+#define PCI_CLASS_SATELLITE_OTHER	0x0f80
 
 #define PCI_BASE_CLASS_CRYPT		0x10
 #define PCI_CLASS_CRYPT_NETWORK		0x1000
 #define PCI_CLASS_CRYPT_ENTERTAINMENT	0x1010
+#define PCI_CLASS_CRYPT_TPM		0x1020
 #define PCI_CLASS_CRYPT_OTHER		0x1080
 
 #define PCI_BASE_CLASS_SIGNAL		0x11
@@ -1710,6 +1733,13 @@
 #define PCI_CLASS_SIGNAL_SYNCHRONIZER	0x1110
 #define PCI_CLASS_SIGNAL_MANAGEMENT	0x1120
 #define PCI_CLASS_SIGNAL_OTHER		0x1180
+
+#define PCI_BASE_CLASS_ACCEL		0x12
+#define PCI_CLASS_ACCEL_PROCESSING	0x1200
+#define PCI_CLASS_ACCEL_SDXI		0x1201
+
+#define PCI_BASE_CLASS_INSTRUM		0x13
+#define PCI_CLASS_INSTRUM_NON_ESS	0x1300
 
 #define PCI_CLASS_OTHERS		0xff
 
