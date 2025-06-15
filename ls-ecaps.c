@@ -846,8 +846,8 @@ static void
 cxl_range(u64 base, u64 size, int n)
 {
   u32 interleave[] = { 0, 256, 4096, 512, 1024, 2048, 8192, 16384 };
-  const char *type[] = { "Volatile", "Non-volatile", "CDAT" };
-  const char *class[] = { "DRAM", "Storage", "CDAT" };
+  const char * const type[] = { "Volatile", "Non-volatile", "CDAT" };
+  const char * const class[] = { "DRAM", "Storage", "CDAT" };
   u16 w;
 
   w = (u16) size;
@@ -1642,9 +1642,9 @@ static const char *ide_alg(char *buf, size_t len, u32 l)
 static void
 cap_ide(struct device *d, int where)
 {
-    const char *hdr_enc_mode[] = { "no", "17:2", "25:2", "33:2", "41:2" };
-    const char *stream_state[] = { "insecure", "reserved", "secure" };
-    const char *aggr[] = { "-", "=2", "=4", "=8" };
+    const char * const hdr_enc_mode[] = { "no", "17:2", "25:2", "33:2", "41:2" };
+    const char * const stream_state[] = { "insecure", "reserved", "secure" };
+    const char * const aggr[] = { "-", "=2", "=4", "=8" };
     u32 l, l2, linknum = 0, selnum = 0, addrnum, off, i, j;
     char buf1[16], buf2[16], offs[16];
 
@@ -1815,7 +1815,7 @@ cap_ide(struct device *d, int where)
 
 static const char *l0p_exit_latency(int value)
 {
-  static const char *latencies[] = {
+  static const char * const latencies[] = {
     "Less than 1us",
     "1us to less than 2us",
     "2us to less than 4us",

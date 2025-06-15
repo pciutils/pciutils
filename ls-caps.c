@@ -677,13 +677,13 @@ static void show_power_limit(int value, int scale)
 
 static const char *latency_l0s(int value)
 {
-  static const char *latencies[] = { "<64ns", "<128ns", "<256ns", "<512ns", "<1us", "<2us", "<4us", "unlimited" };
+  static const char * const latencies[] = { "<64ns", "<128ns", "<256ns", "<512ns", "<1us", "<2us", "<4us", "unlimited" };
   return latencies[value];
 }
 
 static const char *latency_l1(int value)
 {
-  static const char *latencies[] = { "<1us", "<2us", "<4us", "<8us", "<16us", "<32us", "<64us", "unlimited" };
+  static const char * const latencies[] = { "<1us", "<2us", "<4us", "<8us", "<16us", "<32us", "<64us", "unlimited" };
   return latencies[value];
 }
 
@@ -804,7 +804,7 @@ static char *aspm_support(int code)
 
 static const char *aspm_enabled(int code)
 {
-  static const char *desc[] = { "Disabled", "L0s Enabled", "L1 Enabled", "L0s L1 Enabled" };
+  static const char * const desc[] = { "Disabled", "L0s Enabled", "L1 Enabled", "L0s L1 Enabled" };
   return desc[code];
 }
 
@@ -872,7 +872,7 @@ static void cap_express_link(struct device *d, int where, int type)
 
 static const char *indicator(int code)
 {
-  static const char *names[] = { "Unknown", "On", "Blink", "Off" };
+  static const char * const names[] = { "Unknown", "On", "Blink", "Off" };
   return names[code];
 }
 
