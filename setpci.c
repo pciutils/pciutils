@@ -118,7 +118,7 @@ exec_op(struct op *op, struct pci_dev *dev)
   int width = op->width;
   char slot[16];
 
-  sprintf(slot, "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
+  snprintf(slot, sizeof(slot), "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
   trace("%s ", slot);
   if (op->cap_type)
     {

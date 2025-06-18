@@ -34,6 +34,6 @@
   (((reg) & ~(mask)) | (((val) * ((mask) & ~((mask) << 1))) & (mask)))
 
 #define TABLE(tab, x, buf)                                                                         \
-  ((x) < sizeof(tab) / sizeof((tab)[0]) ? (tab)[x] : (sprintf((buf), "??%d", (x)), (buf)))
+  ((x) < sizeof(tab) / sizeof((tab)[0]) ? (tab)[x] : (snprintf((buf), sizeof(buf), "??%d", (x)), (buf)))
 
 #endif
