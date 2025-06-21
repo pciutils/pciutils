@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2025.06.08
-#	Date:    2025-06-08 18:04:12
+#	Version: 2025.06.21
+#	Date:    2025-06-21 17:54:14
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at https://pci-ids.ucw.cz/.
@@ -653,7 +653,7 @@
 		1bd4 000e  6G SAS2008IR
 		1bd4 000f  6G SAS2008IT SA5248
 		1bd4 0010  6G SAS2008IR SA5248
-		4c52 96c8  LRSA96C8 8-Port SATA3(6Gb/s)Exchange Adapter (with Raid)
+		4c52 96c8  LRSA96C8 8-Port SATA3 (6Gb/s) Exchange Adapter (with RAID)
 		8086 350f  RMS2LL040 RAID Controller
 		8086 3700  SSD 910 Series
 	0073  MegaRAID SAS 2008 [Falcon]
@@ -1326,8 +1326,9 @@
 	1681  Rembrandt [Radeon 680M]
 	1714  BeaverCreek HDMI Audio [Radeon HD 6500D and 6400G-6600G series]
 		103c 168b  ProBook 4535s
-	1900  Phoenix3
-	1901  Phoenix4
+	1900  HawkPoint1
+	1901  HawkPoint2
+	1902  Krackan2
 	3150  RV380/M24 [Mobility Radeon X600]
 		103c 0934  nx8220
 	3151  RV380 GL [FireMV 2400]
@@ -4117,6 +4118,7 @@
 	7489  Navi 33 [Radeon Pro W7500]
 	748b  Navi 33 [Radeon Graphics]
 	7499  Navi 33 [Radeon RX 7400/7300/Pro W7400]
+	749f  Navi 33 [Radeon RX 7500]
 	74a0  Aqua Vanjaram [Instinct MI300A]
 	74a1  Aqua Vanjaram [Instinct MI300X]
 	74a2  Aqua Vanjaram [Instinct MI308X]
@@ -4125,10 +4127,11 @@
 	74b5  Aqua Vanjaram [Instinct MI300X VF]
 	74b9  Aqua Vanjaram [Instinct MI325X VF]
 	74bd  Aqua Vanjaram [Instinct MI300X HF]
-	7550  Navi 48 [RX 9070/9070 XT]
+	7550  Navi 48 [Radeon RX 9070/9070 XT/9070 GRE]
 		148c 2435  Reaper Radeon RX 9070 XT 16GB GDDR6 (RX9070XT 16G-A)
 		1da2 e490  Navi 48 XTX [Sapphire Pulse Radeon RX 9070 XT]
-	7590  Navi 44 [RX 9060 XT]
+	7551  Navi 48 [Radeon AI PRO R9700]
+	7590  Navi 44 [Radeon RX 9060 XT]
 	7833  RS350 Host Bridge
 	7834  RS350 [Radeon 9100 PRO/XT IGP]
 	7835  RS350M [Mobility Radeon 9000 IGP]
@@ -22621,6 +22624,7 @@
 # NIC-ETH540F-3S-2P OCP3.0 2x10G Card
 		193d 1084  NIC-ETH540F-3S-2P
 		1e81 0c10  25GbE dual-port SFP28, PCIe3.0 x8 [3SC10]
+		1f3f 0c10  25GbE dual-port SFP28, PCIe3.0 x8, 3SC10
 	1016  MT27710 Family [ConnectX-4 Lx Virtual Function]
 	1017  MT27800 Family [ConnectX-5]
 		117c 00b1  FastFrame N311 Single-port 10Gb Ethernet Adapter
@@ -22647,6 +22651,7 @@
 		193d 1035  NIC-ETH641F-LP-2P SFP28 2x25GbE PCIe Network Adapter
 		1bd4 00ac  O252MCX6Lx
 		1bd4 00ae  S252MCX6Lx
+		1f3f 0c11  25GbE dual-port SFP28, PCIe4.0 x8, 3SC1125GbE dual-port SFP28, PCIe4.0 x8, 3SC11
 		1ff9 00ad  ENFM6251-SP2
 		1ff9 00af  ENPM6251-SP2
 	1020  MT28860
@@ -25232,7 +25237,11 @@
 	1112  AR9285 Wireless Network Adapter (PCI-Express)
 1a3e  Micro-Research Finland Oy
 	132c  MTCA Event Receiver 300
+	152c  CompactPCI Event Receiver 300
+	172c  PCI Express Event Receiver 300
+	192c  CompactPCI Event Receiver TG 300
 	232c  MTCA Event Master 300
+	252c  CompactPCI Event Generator 300
 1a41  Tilera Corp.
 	0001  TILE64 processor
 	0002  TILEPro processor
@@ -25530,7 +25539,7 @@
 	1069  Virtio 1.0 GPIO
 		1af4 1100  QEMU
 	1110  QEMU Inter-VM shared memory device
-		1af4 1100  QEMU Virtual Machine
+		1af4 1100  QEMU
 1af5  Netezza Corp.
 1afa  J & W Electronics Co., Ltd.
 1b00  Montage Technology Co., Ltd.
@@ -28733,6 +28742,7 @@
 		1fe4 0075  Enterprise NVMe SSD U.2 3.84TB(HP610)
 		1fe4 0076  Enterprise NVMe SSD U.2 7.68TB(HP610)
 		1fe4 0078  Enterprise NVMe SSD U.2 3.20TB(HP630)
+		1fe4 0079  Enterprise NVMe SSD U.2 6.40TB (HP630)
 1fe9  MemryX
 	0100  MX3
 # Linkdata Technology (Tianjin) Co., LTD
@@ -28781,6 +28791,7 @@
 203b  XTX Markets Technologies Ltd.
 2046  GXMICRO Technology (Shanghai) Co., Ltd.
 2048  Beijing SpaceControl Technology Co.Ltd
+2058  Lime Microsystems Ltd.
 205c  Zhejiang VMing Semiconductor Co., Ltd.
 	1514  EP9410 U.2 1.92TB NVME SSD
 	1515  EP9410 U.2 3.84TB NVME SSD
@@ -28859,6 +28870,8 @@
 		20bc 1082  Ethernet Network Adapter XS-N1082-2X for 10GbE SFP+ Dual-port
 		20bc 2083  Ethernet Network Adapter XS-N2083-2X for 25GbE SFP28 SFP+ Dual-port ROCEv2
 	2001  Solid State Storage
+20d0  Telin Semiconductor (Wuhan) Co., Ltd.
+	1001  Pacific-S1 X2-07T6U2
 20f4  TRENDnet
 2116  ZyDAS Technology Corp.
 21b4  Hunan Goke Microelectronics Co., Ltd
@@ -28899,7 +28912,7 @@
 	501c  NV2 NVMe SSD [E19T] (DRAM-less)
 	501d  NV2 NVMe SSD [TC2200] (DRAM-less)
 	501e  OM3PGP4 NVMe SSD (DRAM-less)
-	501f  FURY Renegade NVMe SSD + Heatsink [E18]
+	501f  FURY Renegade NVMe SSD [E18] (Heatsink)
 	5021  OM8SEP4 Design-In PCIe 4 NVMe SSD (QLC) (DRAM-less)
 	5022  OM8PGP4 Design-In PCIe 4 NVMe SSD (QLC) (DRAM-less)
 	5023  NV2 NVMe SSD [SM2269XT] (DRAM-less)
@@ -37553,6 +37566,7 @@
 	7af8  Alder Lake-S Integrated Sensor Hub
 	7afc  Alder Lake-S PCH Serial IO I2C Controller #4
 	7afd  Alder Lake-S PCH Serial IO I2C Controller #5
+	7d01  Meteor Lake-H 6p+8e cores Host Bridge/DRAM Controller
 	7d03  Meteor Lake-P Dynamic Tuning Technology
 	7d0b  Volume Management Device NVMe RAID Controller Intel Corporation
 	7d0d  Meteor Lake-P Platform Monitoring Technology
@@ -37568,6 +37582,7 @@
 	7dd1  Arrow Lake-P [Intel Graphics]
 	7dd5  Meteor Lake-P [Intel Graphics]
 	7e01  Meteor Lake-P LPC/eSPI Controller
+	7e02  Meteor Lake-H eSPI Controller
 	7e22  Meteor Lake-P SMBus Controller
 	7e23  Meteor Lake-P SPI Controller
 	7e24  Meteor Lake-P Trace Hub
@@ -37576,12 +37591,14 @@
 	7e27  Meteor Lake-P Serial IO SPI Controller #0
 	7e28  Meteor Lake-P HD Audio Controller
 	7e30  Meteor Lake-P Serial IO SPI Controller #1
+	7e3f  Meteor Lake-H/U PCIe Root Port #8
 	7e40  Meteor Lake PCH CNVi WiFi
 		8086 0094  Wi-Fi 6E AX211 160MHz
 # Refer from Intel Meteor Lake EDS (doc#640228) under its "Device IDs" section.
 	7e45  Meteor Lake-P Integrated Sensor Hub
 	7e46  Meteor Lake-P Serial IO SPI Controller #2
 	7e4c  Meteor Lake-P Gaussian & Neural-Network Accelerator
+	7e4d  Meteor Lake-H/U PCIe Root Port #9
 	7e50  Meteor Lake-P Serial IO I2C Controller #4
 	7e51  Meteor Lake-P Serial IO I2C Controller #5
 	7e52  Meteor Lake-P Serial IO UART Controller #2
@@ -37593,6 +37610,7 @@
 	7e7b  Meteor Lake-P Serial IO I2C Controller #3
 	7e7d  Meteor Lake-P USB 3.2 Gen 2x1 xHCI Host Controller
 	7e7e  Meteor Lake-P USB Device Controller
+	7e7f  Meteor Lake-H/U Shared SRAM
 	7ec0  Meteor Lake-P Thunderbolt 4 USB Controller
 	7ec2  Meteor Lake-P Thunderbolt 4 NHI #0
 	7ec3  Meteor Lake-P Thunderbolt 4 NHI #1
@@ -37600,6 +37618,8 @@
 	7ec5  Meteor Lake-P Thunderbolt 4 PCI Express Root Port #1
 	7ec6  Meteor Lake-P Thunderbolt 4 PCI Express Root Port #2
 	7ec7  Meteor Lake-P Thunderbolt 4 PCI Express Root Port #3
+	7eca  Meteor Lake-H/U PCIe Root Port #10
+	7ecc  Meteor Lake-H PCIe Root Port #12
 	7f70  Arrow Lake-S PCH CNVi WiFi
 		8086 0094  WiFi 6E AX211 160MHz
 	8002  Trusted Execution Technology Registers
@@ -38522,7 +38542,7 @@
 	a1ea  C620 Series Chipset Family PCI Express Root Port #20
 	a1ec  C620 Series Chipset Family MROM 0
 	a1ed  C620 Series Chipset Family MROM 1
-	a1f0  Lewisburg MROM 0
+	a1f0  C62x HD Audio Controller
 	a1f8  Lewisburg IE: HECI #1
 	a1f9  Lewisburg IE: HECI #2
 	a1fa  Lewisburg IE: IDE-r
@@ -38845,10 +38865,10 @@
 	e212  Battlemage G21 [Intel Graphics]
 	e215  Battlemage G21 [Intel Graphics]
 	e216  Battlemage G21 [Intel Graphics]
-	e220  Battlemage G21 [Intel Graphics]
-	e221  Battlemage G21 [Intel Graphics]
-	e222  Battlemage G21 [Intel Graphics]
-	e223  Battlemage G21 [Intel Graphics]
+	e220  Battlemage G31 [Intel Graphics]
+	e221  Battlemage G31 [Intel Graphics]
+	e222  Battlemage G31 [Intel Graphics]
+	e223  Battlemage G31 [Intel Graphics]
 	f1a5  SSD 600P Series
 		8086 390a  SSDPEKKW256G7 256GB
 	f1a6  SSD DC P4101/Pro 7600p/760p/E 6100p Series
@@ -38857,6 +38877,8 @@
 	f1a8  SSD 660P Series
 	f1aa  SSD 670p Series [Keystone Harbor]
 	faf0  SSD 665p Series [Neptune Harbor Refresh]
+	fd80  Wildcat Lake [Intel Graphics]
+	fd81  Wildcat Lake [Intel Graphics]
 8088  Beijing Wangxun Technology Co., Ltd.
 	0100  WX1860AL-W Gigabit Ethernet Controller
 	0101  WX1860A2 Gigabit Ethernet Controller
@@ -39781,6 +39803,8 @@ d20c  Chengdu BeiZhongWangXin Technology Co., Ltd.
 		d20c e421  N6S Series 2-port 40GbE Network Adapter
 		d20c ea21  N6S Series 2-port 100GbE Network Adapter
 d405  LeapIO
+	8200  LeapSAS
+	8201  LeapRAID
 d4d4  Dy4 Systems Inc
 	0601  PCI Mezzanine Card
 d531  I+ME ACTIA GmbH
