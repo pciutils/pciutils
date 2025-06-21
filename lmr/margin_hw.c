@@ -9,6 +9,7 @@
  */
 
 #include <memory.h>
+#include <string.h>
 
 #include "lmr.h"
 
