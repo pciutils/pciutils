@@ -221,7 +221,7 @@ SYMBOL_VERSION(pci_fill_info_v33, pci_fill_info@LIBPCI_3.3);
 SYMBOL_VERSION(pci_fill_info_v34, pci_fill_info@LIBPCI_3.4);
 SYMBOL_VERSION(pci_fill_info_v35, pci_fill_info@LIBPCI_3.5);
 SYMBOL_VERSION(pci_fill_info_v38, pci_fill_info@LIBPCI_3.8);
-SYMBOL_VERSION(pci_fill_info_v313, pci_fill_info@@LIBPCI_3.13);
+SYMBOL_VERSION(pci_fill_info_v313, pci_fill_info@@@LIBPCI_3.13);
 
 void
 pci_setup_cache(struct pci_dev *d, byte *cache, int len)
