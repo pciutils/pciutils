@@ -1,3 +1,23 @@
+2025-06-21  Martin Mares <mj@ucw.cz>
+
+	* Released as 3.14.0.
+
+	* New capabilities are decoded: VirtIO SharedMemory, Physical Layer
+	  16 to 64 GT/s, Flit Mode, Device 3, Intel vendor-specific.
+
+	* ECAM now works on Windows and DJGPP.
+
+	* The GNU/Hurd back-end works on 64-bit systems.
+
+	* Added a new back-end for RT-Thread Smart OS.
+
+	* <lib/header.h> got definitions of new classes and capabilities
+	  from PCI Code and ID Assignment rev 1.18.
+
+	* <lib/pci.h> can be included from C++ programs.
+
+	* Updated pci.ids.
+
 2024-05-30  Martin Mares <mj@ucw.cz>
 
 	* Released as 3.13.0.

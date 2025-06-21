@@ -22,7 +22,7 @@ extern "C" {
 #include "header.h"
 #include "types.h"
 
-#define PCI_LIB_VERSION 0x030d00
+#define PCI_LIB_VERSION 0x030e00
 
 #ifndef PCI_ABI
 #define PCI_ABI
