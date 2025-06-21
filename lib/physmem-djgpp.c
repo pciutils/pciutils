@@ -163,6 +163,7 @@ set_and_get_page_attributes(__dpmi_meminfo *mi, short *attributes)
       free(attributes);
       switch (error)
         {
+        case 0x0000: /* Unsupported function (returned by Windows NTVDM, error number is cleared) */
         case 0x0507: /* Unsupported function (returned by DPMI 0.9 host, error number is same as DPMI function number) */
         case 0x8001: /* Unsupported function (returned by DPMI 1.0 host) */
           errno = ENOSYS;
@@ -196,6 +197,7 @@ set_and_get_page_attributes(__dpmi_meminfo *mi, short *attributes)
       free(attributes);
       switch (error)
         {
+        case 0x0000: /* Unsupported function (returned by Windows NTVDM, error number is cleared) */
         case 0x0506: /* Unsupported function (returned by DPMI 0.9 host, error number is same as DPMI function number) */
         case 0x8001: /* Unsupported function (returned by DPMI 1.0 host) */
           errno = ENOSYS;
@@ -540,6 +542,7 @@ physmem_map(struct physmem *physmem, u64 addr, size_t length, int w)
                         aligned_free(ptr);
                       switch (error)
                         {
+                        case 0x0000: /* Unsupported function (returned by Windows NTVDM, error number is cleared) */
                         case 0x0509: /* Unsupported function (returned by DPMI 0.9 host, error number is same as DPMI function number) */
                         case 0x8001: /* Unsupported function (returned by DPMI 1.0 host) */
                           /*
@@ -583,6 +586,7 @@ physmem_map(struct physmem *physmem, u64 addr, size_t length, int w)
                     aligned_free(ptr);
                   switch (error)
                     {
+                    case 0x0000: /* Unsupported function (returned by Windows NTVDM, error number is cleared) */
                     case 0x0508: /* Unsupported function (returned by DPMI 0.9 host, error number is same as DPMI function number) */
                     case 0x8001: /* Unsupported function (returned by DPMI 1.0 host) */
                       errno = ENOSYS;
@@ -909,6 +913,7 @@ retry_via_indirect_change:
             {
               switch (__dpmi_error)
                 {
+                case 0x0000: /* Unsupported function (returned by Windows NTVDM, error number is cleared) */
                 case 0x0801: /* Unsupported function (returned by DPMI 0.9 host, error number is same as DPMI function number) */
                 case 0x8001: /* Unsupported function (returned by DPMI 1.0 host) */
                   errno = ENOSYS;
