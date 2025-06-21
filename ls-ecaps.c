@@ -1801,7 +1801,7 @@ cap_ide(struct device *d, int where)
             base = get_conf_long(d, off + 8);
             base <<= 32;
             base |= PCI_IDE_SEL_ADDR_1_BASE_LOW(l) << 20;
-            printf("\t\t%sSelectiveIDE#%d RID#%d: Valid%c Base=%lx Limit=%lx\n",
+            printf("\t\t%sSelectiveIDE#%d RID#%d: Valid%c Base=%" PCI_U64_FMT_X " Limit=%" PCI_U64_FMT_X "\n",
               offstr(offs, off),
               i,
               j,

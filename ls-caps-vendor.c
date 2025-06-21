@@ -64,7 +64,7 @@ show_vendor_caps_virtio(struct device *d, int where, int cap)
   else {
     offset_hi = get_conf_long(d, where + 16);
     size_hi = get_conf_long(d, where + 20);
-    printf("\t\tBAR=%d offset=%016lx size=%016lx id=%d",
+    printf("\t\tBAR=%d offset=%016" PCI_U64_FMT_X " size=%016" PCI_U64_FMT_X " id=%d",
           get_conf_byte(d, where +  4),
           (u64) offset | (u64) offset_hi << 32,
           (u64) size | (u64) size_hi << 32,
