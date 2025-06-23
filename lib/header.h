@@ -129,7 +129,7 @@
 #define PCI_IO_BASE_UPPER16	0x30	/* Upper half of I/O addresses */
 #define PCI_IO_LIMIT_UPPER16	0x32
 /* 0x34 same as for htype 0 */
-/* 0x35-0x3b is reserved */
+/* 0x35-0x37 is reserved */
 #define PCI_ROM_ADDRESS1	0x38	/* Same as PCI_ROM_ADDRESS, but for htype 1 */
 /* 0x3c-0x3d are same as for htype 0 */
 #define PCI_BRIDGE_CONTROL	0x3e
