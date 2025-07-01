@@ -768,6 +768,8 @@ static char *link_speed(int speed)
         return "32GT/s";
       case 6:
         return "64GT/s";
+      case 8:
+        return "128GT/s";
       default:
 	return "unknown";
     }
@@ -1195,7 +1197,7 @@ static const char *cap_express_link2_speed_cap(int vector)
    * highest supported rate.
    */
   if (vector & 0x40)
-    return "RsvdP";
+    return "2.5-128GT/s";
   if (vector & 0x20)
     return "2.5-64GT/s";
   if (vector & 0x10)
@@ -1229,6 +1231,8 @@ static const char *cap_express_link2_speed(int type)
         return "32GT/s";
       case 6:
         return "64GT/s";
+      case 8:
+        return "128GT/s";
       default:
 	return "Unknown";
     }
