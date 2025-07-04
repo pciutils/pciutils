@@ -1910,6 +1910,68 @@ cap_dev3(struct device *d, int where)
          FLAG(devsta3, PCI_DEV3_DEVSTA3_REMOTE_L0P_SUPP));
 }
 
+static const char *mmio_rbl_bid(char *buf, size_t buflen, u8 bid)
+{
+  switch (bid)
+    {
+      case 0x00:
+        return "Empty";
+      case 0x01:
+        return "MCAP";
+      case 0xFF:
+        return "MDVS";
+      default:
+        snprintf(buf, buflen, "Reserved (%u)", bid);
+        return buf;
+    }
+}
+
+static void
+cap_mmio_rbl(struct device *d, int where)
+{
+  char buf[16];
+
+  printf("MMIO Register Block Locator\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_MRBL_CAP, 0x0C)) {
+    printf("\t\t<unreadable>\n");
+    return;
+  }
+
+  u32 cap = get_conf_long(d, where + PCI_MRBL_CAP);
+
+  u32 mrbllen = PCI_MRBL_CAP_STRUCT_LEN(cap);
+
+  if (!config_fetch(d, where + PCI_MRBL_REG, mrbllen)) {
+    printf("\t\t<unreadable>\n");
+    return;
+  }
+
+  u32 num_mrbl = (mrbllen / 8) - 1;
+
+  for (u32 i = 0; i < num_mrbl; i++) {
+    unsigned int pos = where + PCI_MRBL_REG + i * PCI_MRBL_REG_SIZE;
+    if (!config_fetch(d, pos, PCI_MRBL_REG_SIZE)) {
+      printf("\t\t<unreadable>\n");
+      return;
+    }
+
+    u32 lo = get_conf_long(d, pos);
+    u32 hi = get_conf_long(d, pos + 0x04);
+
+    u64 offs = ((u64) hi << 32) | PCI_MRBL_LOC_OFF_LOW(lo);
+
+    printf("\t\tLocator%u: BIR: BAR%u, ID: %s, offset: %016" PCI_U64_FMT_X "\n",
+          i,
+          PCI_MRBL_LOC_BIR(lo),
+          mmio_rbl_bid(buf, sizeof(buf), PCI_MRBL_LOC_BID(lo)),
+          offs);
+  }
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -2071,6 +2133,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_DEV3:
 	    cap_dev3(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_MMIO_RBL:
+	    cap_mmio_rbl(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);

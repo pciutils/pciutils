@@ -1593,6 +1593,15 @@
 /* IDE Address Association Register 2 is "Memory Limit Upper" */
 /* IDE Address Association Register 3 is "Memory Base Upper" */
 
+/* MMIO Register Block Locator Capability */
+#define PCI_MRBL_CAP		0x04	/* MRBL Capabilities Register */
+#define PCI_MRBL_REG		0x08	/* MRBL Locator Register base */
+#define PCI_MRBL_REG_SIZE	0x08	/* MRBL Locator Register size */
+#define  PCI_MRBL_CAP_STRUCT_LEN(x)	((x) & 0xFFF) /* MRBL Structure Length in bytes */
+#define  PCI_MRBL_LOC_BIR(x)		((x) & 0x7) /* MRBL Locator BIR */
+#define  PCI_MRBL_LOC_BID(x)		(((x) >> 8) & 0xff) /* MRBL Locator Block ID */
+#define  PCI_MRBL_LOC_OFF_LOW(x)	((x) & 0xffff0000) /* MRBL Locator Offset Low */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
