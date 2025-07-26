@@ -139,7 +139,7 @@ typedef struct _OBJECT_ATTRIBUTES {
 }
 #endif
 
-#define VWIN32_DEVICE_ID 0x0002A /* from vmm.h */
+#define VWIN32_DEVICE_ID 0x002A /* from vmm.h */
 #define WIN32_SERVICE_ID(device, function) (((device) << 16) | (function))
 #define VWIN32_Int31Dispatch WIN32_SERVICE_ID(VWIN32_DEVICE_ID, 0x29)
 #define DPMI_PHYSICAL_ADDRESS_MAPPING 0x0800
