@@ -177,10 +177,88 @@ win32_get_process_machine(void)
 BOOL
 win32_is_non_nt_system(void)
 {
-  OSVERSIONINFOA version;
-  version.dwOSVersionInfoSize = sizeof(version);
-  return GetVersionExA(&version) && version.dwPlatformId < VER_PLATFORM_WIN32_NT;
+#if defined(_M_IX86) || defined(__i386__)
+  /* Highest bit set indicates the non-NT system. */
+  return GetVersion() >> 31;
+#else
+  /* Non-i386 systems are not pre-NT compatible. */
+  return FALSE;
+#endif
 }
+
+static BOOL
+win32_is_nt40_system(void)
+{
+#if defined(_M_IX86) || defined(__i386__)
+  /* Check for Windows NT 4.0. Highest two bits are zero for NT and in lowest 8 bits is major os version. */
+  DWORD raw_version = GetVersion();
+  return (raw_version >> 30) == 0 && (raw_version & 0xff) >= 4;
+#else
+  /* Modern non-i386 systems have at least version 5.2 (XP x64). */
+  return TRUE;
+#endif
+}
+
+static BOOL
+win32_is_win2k_system(void)
+{
+#if defined(_M_IX86) || defined(__i386__)
+  /* Check for Windows 2000 (NT 5.0). Highest two bits are zero for NT and in lowest 8 bits is major os version. */
+  DWORD raw_version = GetVersion();
+  return (raw_version >> 30) == 0 && (raw_version & 0xff) >= 5;
+#else
+  /* Modern non-i386 systems have at least version 5.2 (XP x64). */
+  return TRUE;
+#endif
+}
+
+BOOL
+win32_is_vista_system(void)
+{
+#if defined(_M_IX86) || defined(__i386__)
+  /* Check for Windows Vista (NT 6.0). Highest two bits are zero for NT and in lowest 8 bits is major os version. */
+  DWORD raw_version = GetVersion();
+  return (raw_version >> 30) == 0 && (raw_version & 0xff) >= 6;
+#else
+  /* Check for Windows Vista (NT 6.0). */
+  OSVERSIONINFO version;
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (!GetVersionEx(&version) ||
+      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
+      version.dwMajorVersion >= 6)
+    return FALSE;
+  else
+    return TRUE;
+#endif
+}
+
+#ifndef _WIN64
+static BOOL
+win32_is_win8_system(void)
+{
+#if defined(_M_IX86) || defined(__i386__)
+  /* Check for Windows 8 (NT 6.2). Highest two bits are zero for NT and in lowest 16 bits are minor<<8 + major os version. */
+  DWORD raw_version = GetVersion();
+  if ((raw_version >> 30) != 0 ||
+      (raw_version & 0xff) < 6 ||
+      ((raw_version & 0xff) == 6 && ((raw_version >> 8) & 0xff) < 2))
+    return FALSE;
+  else
+    return TRUE;
+#else
+  /* Check for Windows 8 (NT 6.2). */
+  OSVERSIONINFO version;
+  version.dwOSVersionInfoSize = sizeof(version);
+  if (!GetVersionEx(&version) ||
+      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
+      version.dwMajorVersion < 6 ||
+      (version.dwMajorVersion == 6 && version.dwMinorVersion < 2))
+    return FALSE;
+  else
+    return TRUE;
+#endif
+}
+#endif
 
 BOOL
 win32_is_32bit_on_64bit_system(void)
@@ -223,17 +301,7 @@ win32_is_32bit_on_win8_64bit_system(void)
 #ifdef _WIN64
   return FALSE;
 #else
-  OSVERSIONINFOA version;
-
-  /* Check for Windows 8 (NT 6.2). */
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (!GetVersionExA(&version) ||
-      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
-      version.dwMajorVersion < 6 ||
-      (version.dwMajorVersion == 6 && version.dwMinorVersion < 2))
-    return FALSE;
-
-  return win32_is_32bit_on_64bit_system();
+  return win32_is_win8_system() && win32_is_32bit_on_64bit_system();
 #endif
 }
 
@@ -350,7 +418,6 @@ UINT
 win32_change_error_mode(UINT new_mode)
 {
   SetThreadErrorModeProt MySetThreadErrorMode = NULL;
-  OSVERSIONINFOA version;
   HMODULE kernel32;
   HMODULE ntdll;
   DWORD old_mode;
@@ -383,10 +450,7 @@ win32_change_error_mode(UINT new_mode)
    * On Windows NT 4.0+ systems fallback to thread HardErrorMode API.
    * It depends on architecture specific offset for HardErrorMode field in TEB.
    */
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (GetVersionExA(&version) &&
-      version.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-      version.dwMajorVersion >= 4)
+  if (win32_is_nt40_system())
     {
       ULONG *hard_error_mode_ptr = (ULONG *)((BYTE *)NtCurrentTeb() + TEB_HARD_ERROR_MODE_OFFSET);
       old_mode = *hard_error_mode_ptr;
@@ -748,7 +812,6 @@ prepare_security_descriptor_for_set_operation(PSECURITY_DESCRIPTOR security_desc
   SECURITY_DESCRIPTOR_CONTROL bits_mask;
   SECURITY_DESCRIPTOR_CONTROL bits_set;
   SECURITY_DESCRIPTOR_CONTROL control;
-  OSVERSIONINFO version;
   HMODULE advapi32;
   DWORD revision;
 
@@ -778,10 +841,7 @@ prepare_security_descriptor_for_set_operation(PSECURITY_DESCRIPTOR security_desc
    * older versions of advapi32.dll library, so resolve it at runtime.
    */
 
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (!GetVersionEx(&version) ||
-      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
-      version.dwMajorVersion < 5)
+  if (!win32_is_win2k_system())
     return TRUE;
 
   if (!GetSecurityDescriptorControl(security_descriptor, &control, &revision))
@@ -1024,7 +1084,6 @@ open_process_for_query(DWORD pid, BOOL with_vm_read)
 {
   BOOL revert_only_privilege;
   LUID luid_debug_privilege;
-  OSVERSIONINFO version;
   DWORD process_right;
   HANDLE revert_token;
   HANDLE process;
@@ -1044,10 +1103,7 @@ open_process_for_query(DWORD pid, BOOL with_vm_read)
    * PROCESS_QUERY_LIMITED_INFORMATION right on older systems than
    * Windows Vista (NT 6.0).
    */
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (GetVersionEx(&version) &&
-      version.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-      version.dwMajorVersion >= 6)
+  if (win32_is_vista_system())
     process_right = PROCESS_QUERY_LIMITED_INFORMATION;
   else
     process_right = PROCESS_QUERY_INFORMATION;

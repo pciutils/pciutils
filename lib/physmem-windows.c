@@ -524,8 +524,10 @@ init_physmem_w32skrnl(struct physmem *physmem, struct pci_access *a)
 {
   HMODULE w32skrnl;
   LPVOID (WINAPI *GetThunkBuff)(VOID);
-  OSVERSIONINFOA version;
   LPVOID buf_ptr;
+  DWORD raw_version;
+  USHORT build_num;
+  BOOL build_num_valid;
 
   a->debug("resolving DPMI function via GetThunkBuff() function from w32skrnl.dll...");
   w32skrnl = GetModuleHandleA("w32skrnl.dll");
@@ -544,16 +546,12 @@ init_physmem_w32skrnl(struct physmem *physmem, struct pci_access *a)
       return 0;
     }
 
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (!GetVersionExA(&version))
-    {
-      a->debug("failed: cannot detect version.");
-      errno = EINVAL;
-      return 0;
-    }
+  raw_version = GetVersion();
+  build_num = (raw_version >> 16) & 0x3FFF;
+  build_num_valid = ((raw_version & 0xC0000000) == 0x80000000 && (raw_version & 0xff) < 4);
 
-  /* Versions before 1.1 (1.1.88) are not supported. */
-  if (version.dwMajorVersion < 1 || (version.dwMajorVersion == 1 && version.dwMinorVersion < 1))
+  /* Builds older than 88 (match version 1.1) are not supported. */
+  if (build_num_valid && build_num < 88)
     {
       a->debug("failed: found old incompatible version.");
       errno = ENOENT;
@@ -576,15 +574,11 @@ init_physmem_w32skrnl(struct physmem *physmem, struct pci_access *a)
     }
 
   /*
-   * Versions 1.1 (1.1.88) - 1.15 (1.15.103) have DPMI function at offset 0xa0.
-   * Versions 1.15a (1.15.111) - 1.30c (1.30.172) have DPMI function at offset 0xa4.
+   * Builds 88-103 (match versions 1.1-1.15) have DPMI function at offset 0xa0.
+   * Builds 111-172 (match versions 1.15a-1.30c) have DPMI function at offset 0xa4.
+   * If build number is unavailable then expects the latest version.
    */
-  if (version.dwMajorVersion > 1 ||
-      (version.dwMajorVersion == 1 && version.dwMinorVersion > 15) ||
-      (version.dwMajorVersion == 1 && version.dwMinorVersion == 15 && version.dwBuildNumber >= 111))
-    physmem->w32skrnl_dpmi_lcall_ptr = (LPVOID)((BYTE *)buf_ptr + 0xa4);
-  else
-    physmem->w32skrnl_dpmi_lcall_ptr = (LPVOID)((BYTE *)buf_ptr + 0xa0);
+  physmem->w32skrnl_dpmi_lcall_ptr = (LPVOID)((BYTE *)buf_ptr + ((build_num_valid && build_num < 111) ? 0xa0 : 0xa4));
 
   a->debug("success.");
   return 1;

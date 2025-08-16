@@ -467,7 +467,6 @@ out:
 static int
 win32_kldbg_setup(struct pci_access *a)
 {
-  OSVERSIONINFO version;
   DWORD ret_len;
   DWORD error;
   DWORD id;
@@ -475,11 +474,7 @@ win32_kldbg_setup(struct pci_access *a)
   if (kldbg_dev != INVALID_HANDLE_VALUE)
     return 1;
 
-  /* Check for Windows Vista (NT 6.0). */
-  version.dwOSVersionInfoSize = sizeof(version);
-  if (!GetVersionEx(&version) ||
-      version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
-      version.dwMajorVersion < 6)
+  if (!win32_is_vista_system())
     {
       a->debug("Accessing PCI config space via Kernel Local Debugging Driver requires Windows Vista or higher version.");
       return 0;
