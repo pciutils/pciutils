@@ -1665,7 +1665,7 @@ cap_ide(struct device *d, int where)
     if (l & PCI_IDE_CAP_SELECTIVE_IDE_SUPP)
         selnum = PCI_IDE_CAP_SELECTIVE_STREAMS_NUM(l) + 1;
 
-    printf("\t\tIDECap: Lnk=%d Sel=%d FlowThru%c PartHdr%c Aggr%c PCPC%c IDE_KM%c Alg='%s' TCs=%d TeeLim%c\n",
+    printf("\t\tIDECap: Lnk=%d Sel=%d FlowThru%c PartHdr%c Aggr%c PCPC%c IDE_KM%c SelCfg%c Alg='%s' TCs=%d TeeLim%c XT%c\n",
       linknum,
       selnum,
       FLAG(l, PCI_IDE_CAP_FLOWTHROUGH_IDE_SUPP),
@@ -1673,9 +1673,11 @@ cap_ide(struct device *d, int where)
       FLAG(l, PCI_IDE_CAP_AGGREGATION_SUPP),
       FLAG(l, PCI_IDE_CAP_PCRC_SUPP),
       FLAG(l, PCI_IDE_CAP_IDE_KM_SUPP),
+      FLAG(l, PCI_IDE_CAP_SEL_CFG_SUPP),
       ide_alg(buf2, sizeof(buf2), PCI_IDE_CAP_ALG(l)),
       PCI_IDE_CAP_LINK_TC_NUM(l) + 1,
-      FLAG(l, PCI_IDE_CAP_TEE_LIMITED_SUPP)
+      FLAG(l, PCI_IDE_CAP_TEE_LIMITED_SUPP),
+      FLAG(l, PCI_IDE_CAP_XT_SUPP)
       );
 
     l = get_conf_long(d, where + PCI_IDE_CTL);
@@ -1697,10 +1699,11 @@ cap_ide(struct device *d, int where)
           {
             // Link IDE Stream Control Register
             l = get_conf_long(d, off);
-            printf("\t\t%sLinkIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c HdrEnc=%s Alg='%s' TC%d ID%d\n",
+            printf("\t\t%sLinkIDE#%d Ctl: En%c XT%c NPR%s PR%s CPL%s PCRC%c HdrEnc=%s Alg='%s' TC%d ID%d\n",
               offstr(offs, off),
               i,
               FLAG(l, PCI_IDE_LINK_CTL_EN),
+              FLAG(l, PCI_IDE_LINK_CTL_XT),
               aggr[PCI_IDE_LINK_CTL_TX_AGGR_NPR(l)],
               aggr[PCI_IDE_LINK_CTL_TX_AGGR_PR(l)],
               aggr[PCI_IDE_LINK_CTL_TX_AGGR_CPL(l)],
@@ -1744,10 +1747,11 @@ cap_ide(struct device *d, int where)
         // Selective IDE Stream Control Register
         l = get_conf_long(d, off);
 
-        printf("\t\t%sSelectiveIDE#%d Ctl: En%c NPR%s PR%s CPL%s PCRC%c CFG%c HdrEnc=%s Alg='%s' TC%d ID%d%s\n",
+        printf("\t\t%sSelectiveIDE#%d Ctl: En%c XT%c NPR%s PR%s CPL%s PCRC%c CFG%c HdrEnc=%s Alg='%s' TC%d TeeLim%c ID%d%s\n",
           offstr(offs, off),
           i,
           FLAG(l, PCI_IDE_SEL_CTL_EN),
+          FLAG(l, PCI_IDE_SEL_CTL_XT),
           aggr[PCI_IDE_SEL_CTL_TX_AGGR_NPR(l)],
           aggr[PCI_IDE_SEL_CTL_TX_AGGR_PR(l)],
           aggr[PCI_IDE_SEL_CTL_TX_AGGR_CPL(l)],
@@ -1756,6 +1760,7 @@ cap_ide(struct device *d, int where)
           TABLE(hdr_enc_mode, PCI_IDE_SEL_CTL_PART_ENC(l), buf1),
           ide_alg(buf2, sizeof(buf2), PCI_IDE_SEL_CTL_ALG(l)),
           PCI_IDE_SEL_CTL_TC(l),
+          FLAG(l, PCI_IDE_SEL_CTL_TEE_LIMITED),
           PCI_IDE_SEL_CTL_ID(l),
           (l & PCI_IDE_SEL_CTL_DEFAULT) ? " Default" : ""
           );

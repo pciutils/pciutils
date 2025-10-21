@@ -76,10 +76,10 @@ e1:00.0 Class 0800: Device aaaa:bbbb
 		PASIDCap: Exec+ Priv+, Max PASID Width: 10
 		PASIDCtl: Enable+ Exec- Priv-
 	Capabilities: [830 v1] Integrity & Data Encryption
-		IDECap: Lnk=0 Sel=1 FlowThru- PartHdr- Aggr- PCPC- IDE_KM+ Alg='AES-GCM-256-96b' TCs=8 TeeLim+
+		IDECap: Lnk=0 Sel=1 FlowThru- PartHdr- Aggr- PCPC- IDE_KM+ SelCfg- Alg='AES-GCM-256-96b' TCs=8 TeeLim+ XT-
 		IDECtl: FTEn-
 		SelectiveIDE#0 Cap: RID#=1
-		SelectiveIDE#0 Ctl: En+ NPR- PR- CPL- PCRC- CFG- HdrEnc=no Alg='AES-GCM-256-96b' TC0 ID0 Default
+		SelectiveIDE#0 Ctl: En- XT- NPR- PR- CPL- PCRC- CFG- HdrEnc=no Alg='AES-GCM-256-96b' TC0 TeeLim- ID0
 		SelectiveIDE#0 Sta: secure RecvChkFail-
 		SelectiveIDE#0 RID: Valid+ Base=0 Limit=ffff SegBase=0
 		SelectiveIDE#0 RID#0: Valid+ Base=0 Limit=ffffffffffffffff
