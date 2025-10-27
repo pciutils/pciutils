@@ -485,9 +485,9 @@ win32_get_proc_address_by_ordinal(HMODULE module, DWORD ordinal, BOOL must_be_wi
       memcpy(module_name, func_ptr, module_name_len);
       module_name[module_name_len] = 0;
 
-      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX, TRUE);
       module = LoadLibraryA(module_name);
-      win32_change_error_mode(prev_error_mode);
+      win32_change_error_mode(prev_error_mode, FALSE);
       if (!module)
         {
           FreeLibrary(module);

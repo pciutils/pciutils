@@ -112,8 +112,15 @@ typedef BOOL (WINAPI *SetSecurityDescriptorControlProt)(PSECURITY_DESCRIPTOR pSe
 
 /*
  * This errhandlingapi function is available in kernel32.dll library on
+ * Win9x systems and then on Windows Vista and higher systems.
+ */
+typedef UINT (WINAPI *GetErrorModeProt)(VOID);
+
+/*
+ * These errhandlingapi functions are available in kernel32.dll library on
  * Windows 7 and higher systems.
  */
+typedef DWORD (WINAPI *GetThreadErrorModeProt)(VOID);
 typedef BOOL (WINAPI *SetThreadErrorModeProt)(DWORD dwNewMode, LPDWORD lpOldMode);
 
 
@@ -415,35 +422,47 @@ win32_is_not_native_process(USHORT *native_machine_ptr)
  * error mode of the whole process. Always returns previous error mode.
  */
 UINT
-win32_change_error_mode(UINT new_mode)
+win32_change_error_mode(UINT new_mode, BOOL append)
 {
+  GetThreadErrorModeProt MyGetThreadErrorMode = NULL;
   SetThreadErrorModeProt MySetThreadErrorMode = NULL;
+  GetErrorModeProt MyGetErrorMode = NULL;
   HMODULE kernel32;
   HMODULE ntdll;
   DWORD old_mode;
 
   /*
-   * Function SetThreadErrorMode() was introduced in Windows 7, so use
-   * GetProcAddress() for compatibility with older systems.
+   * Functions GetThreadErrorMode() and SetThreadErrorMode() were introduced
+   * in Windows 7, so use GetProcAddress() for compatibility with older systems.
    */
   kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
   if (kernel32)
-    MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "SetThreadErrorMode");
+    {
+      MyGetThreadErrorMode = (GetThreadErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "GetThreadErrorMode");
+      MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "SetThreadErrorMode");
+      MyGetErrorMode = (GetErrorModeProt)(void(*)(void))GetProcAddress(kernel32, "GetErrorMode");
+    }
 
   /*
-   * Function RtlSetThreadErrorMode() was introduced in Windows XP x64
-   * and Windows Server 2003. Use GetProcAddress() as it is in ntdll.dll.
+   * Functions RtlGetThreadErrorMode() and RtlSetThreadErrorMode() were introduced
+   * in Windows XP x64 and Windows Server 2003. Use GetProcAddress() as they are in ntdll.dll.
    */
-  if (!MySetThreadErrorMode)
+  if (!MyGetThreadErrorMode || !MySetThreadErrorMode)
     {
       ntdll = GetModuleHandle(TEXT("ntdll.dll"));
       if (ntdll)
-        MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(ntdll, "RtlSetThreadErrorMode");
+        {
+          MyGetThreadErrorMode = (GetThreadErrorModeProt)(void(*)(void))GetProcAddress(ntdll, "RtlGetThreadErrorMode");
+          MySetThreadErrorMode = (SetThreadErrorModeProt)(void(*)(void))GetProcAddress(ntdll, "RtlSetThreadErrorMode");
+        }
     }
 
-  if (MySetThreadErrorMode &&
-      MySetThreadErrorMode(new_mode, &old_mode))
-    return old_mode;
+  if (MyGetThreadErrorMode && MySetThreadErrorMode)
+    {
+      old_mode = MyGetThreadErrorMode();
+      MySetThreadErrorMode(new_mode | (append ? old_mode : 0), &old_mode);
+      return old_mode;
+    }
 
 #ifdef TEB_HARD_ERROR_MODE_OFFSET
   /*
@@ -454,16 +473,31 @@ win32_change_error_mode(UINT new_mode)
     {
       ULONG *hard_error_mode_ptr = (ULONG *)((BYTE *)NtCurrentTeb() + TEB_HARD_ERROR_MODE_OFFSET);
       old_mode = *hard_error_mode_ptr;
-      *hard_error_mode_ptr = new_mode;
+      *hard_error_mode_ptr = new_mode | (append ? old_mode : 0);
       return old_mode;
     }
 #endif
 
   /*
-   * Fallback to function SetErrorMode() which modifies error mode of the
-   * whole process and returns old mode.
+   * If GetErrorMode() is available and we were requested to just append
+   * new error bits then fallback to GetErrorMode()+SetErrorMode()
+   * functions which modifies error mode of the whole process just once.
    */
-  return SetErrorMode(new_mode);
+  if (MyGetErrorMode && append)
+    {
+      old_mode = MyGetErrorMode();
+      old_mode = SetErrorMode(new_mode | old_mode);
+      return old_mode;
+    }
+
+  /*
+   * Fallback to function SetErrorMode() which modifies error mode of the
+   * whole process in thread-unsafe way two times and returns old mode.
+   */
+  old_mode = SetErrorMode(new_mode);
+  if (append)
+    SetErrorMode(new_mode | old_mode);
+  return old_mode;
 }
 
 /*
@@ -1216,9 +1250,9 @@ win32_find_and_open_process_for_query(LPCSTR exe_file)
        * On older NT-based systems these functions are available in
        * psapi.dll library without K32 prefix.
        */
-      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+      prev_error_mode = win32_change_error_mode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX, TRUE);
       psapi = LoadLibrary(TEXT("psapi.dll"));
-      win32_change_error_mode(prev_error_mode);
+      win32_change_error_mode(prev_error_mode, FALSE);
 
       if (!psapi)
         return NULL;
