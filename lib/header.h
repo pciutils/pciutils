@@ -1593,6 +1593,63 @@
 /* IDE Address Association Register 2 is "Memory Limit Upper" */
 /* IDE Address Association Register 3 is "Memory Base Upper" */
 
+/* Flit Logging Extended Capability */
+#define PCI_FLIT_LOG_ERR1		0x04	/* Flit Error Log 1 Register */
+#define  PCI_FLIT_LOG_ERR1_VLD 0x00000001 /* Flit Error Log Valid */
+#define  PCI_FLIT_LOG_ERR1_WIDTH(x) (((x) >> 1) & 0x7) /* Flit Error Link Width */
+#define  PCI_FLIT_LOG_ERR1_OFFS(x) (((x) >> 4) & 0xf) /* Flit Offset from the Last Logged Flit in Error */
+#define  PCI_FLIT_LOG_ERR1_CONS(x) (((x) >> 8) & 0x1f) /* Consecutive Flit Error after the Last Flit Error */
+#define  PCI_FLIT_LOG_ERR1_MORE  0x00002000 /* More Entries for Flit Error Log Register are Valid */
+#define  PCI_FLIT_LOG_ERR1_UNREC 0x00004000 /* Unrecognized Flit */
+#define  PCI_FLIT_LOG_ERR1_UNCOR 0x00008000 /* FEC Uncorrectable Error in Flit */
+#define  PCI_FLIT_LOG_ERR1_PAR_GRP0(x) (((x) >> 16) & 0xff) /* Syndrome Parity for ECC Group 0 */
+#define  PCI_FLIT_LOG_ERR1_CHK_GRP0(x) (((x) >> 24) & 0xff) /* Syndrome Check for ECC Group 0 */
+#define PCI_FLIT_LOG_ERR2		0x08	/* Flit Error Log 2 Register */
+#define  PCI_FLIT_LOG_ERR2_PAR_GRP1(x) ((x) & 0xff) /* Syndrome Parity for ECC Group 1 */
+#define  PCI_FLIT_LOG_ERR2_CHK_GRP1(x) (((x) >> 8) & 0xff) /* Syndrome Check for ECC Group 1 */
+#define  PCI_FLIT_LOG_ERR2_PAR_GRP2(x) (((x) >> 16) & 0xff) /* Syndrome Parity for ECC Group 2 */
+#define  PCI_FLIT_LOG_ERR2_CHK_GRP2(x) (((x) >> 24) & 0xff) /* Syndrome Check for ECC Group 2 */
+#define PCI_FLIT_LOG_CNT_CTL	0x0C	/* Flit Error Counter Control Register */
+#define  PCI_FLIT_LOG_CNT_CTL_EN 0x00000001 /* Flit Error Counter Enable */
+#define  PCI_FLIT_LOG_CNT_CTL_INT 0x00000002 /* Flit Error Counter Interrupt Enable */
+#define  PCI_FLIT_LOG_CNT_CTL_EVNT(x) (((x) >> 2) & 0x3) /* Events to count */
+#define  PCI_FLIT_LOG_CNT_CTL_TRG(x) (((x) >> 4) & 0xff) /* Trigger Event on Error Count */
+#define PCI_FLIT_LOG_CNT_STS	0x0E	/* Flit Error Counter Status Register */
+#define  PCI_FLIT_LOG_CNT_STS_WIDTH(x) ((x) & 0x7) /* Link Width when Error Counter Started */
+#define  PCI_FLIT_LOG_CNT_STS_INT 0x00000004 /* Interrupt Generated based on Trigger Event Count */
+#define  PCI_FLIT_LOG_CNT_STS_CNT(x) (((x) >> 8) & 0xFF) /* Flit Error Counter */
+#define PCI_FLIT_LOG_MES_CTL	0x10	/* FBER Measurement Control Register */
+#define  PCI_FLIT_LOG_MES_CTL_EN	0x00000001 /* FBER Measurement Enable */
+#define  PCI_FLIT_LOG_MES_CTL_CLR	0x00000002 /* Clear FBER Counters */
+#define  PCI_FLIT_LOG_MES_CTL_GRAN(x) (((x) >> 2) & 0x3) /* Granularity of per-Lane Error reported */
+#define PCI_FLIT_LOG_MES_STS1	0x14	/* FBER Measurement Status 1 Register */
+#define PCI_FLIT_LOG_MES_STS2	0x18	/* FBER Measurement Status 2 Register */
+#define  PCI_FLIT_LOG_MES_STS2_INV(x) ((x) & 0xffff) /* Invalid Flit Counter */
+#define PCI_FLIT_LOG_MES_STS3	0x1C	/* FBER Measurement Status 3 Register */
+#define  PCI_FLIT_LOG_MES_STS3_LN0(x) ((x) & 0xffff) /* Lane #0 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS3_LN1(x) (((x) >> 16) & 0xffff) /* Lane #1 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS4	0x20	/* FBER Measurement Status 4 Register */
+#define  PCI_FLIT_LOG_MES_STS4_LN2(x) ((x) & 0xffff) /* Lane #2 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS4_LN3(x) (((x) >> 16) & 0xffff) /* Lane #3 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS5	0x24	/* FBER Measurement Status 5 Register */
+#define  PCI_FLIT_LOG_MES_STS5_LN4(x) ((x) & 0xffff) /* Lane #4 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS5_LN5(x) (((x) >> 16) & 0xffff) /* Lane #5 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS6	0x28	/* FBER Measurement Status 6 Register */
+#define  PCI_FLIT_LOG_MES_STS6_LN6(x) ((x) & 0xffff) /* Lane #6 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS6_LN7(x) (((x) >> 16) & 0xffff) /* Lane #7 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS7	0x2C	/* FBER Measurement Status 7 Register */
+#define  PCI_FLIT_LOG_MES_STS7_LN8(x) ((x) & 0xffff) /* Lane #8 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS7_LN9(x) (((x) >> 16) & 0xffff) /* Lane #9 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS8	0x30	/* FBER Measurement Status 8 Register */
+#define  PCI_FLIT_LOG_MES_STS8_LN10(x) ((x) & 0xffff) /* Lane #10 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS8_LN11(x) (((x) >> 16) & 0xffff) /* Lane #11 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS9	0x34	/* FBER Measurement Status 9 Register */
+#define  PCI_FLIT_LOG_MES_STS9_LN12(x) ((x) & 0xffff) /* Lane #12 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS9_LN13(x) (((x) >> 16) & 0xffff) /* Lane #13 Correctable Counter */
+#define PCI_FLIT_LOG_MES_STS10	0x38	/* FBER Measurement Status 10 Register */
+#define  PCI_FLIT_LOG_MES_STS10_LN14(x) ((x) & 0xffff) /* Lane #14 Correctable Counter */
+#define  PCI_FLIT_LOG_MES_STS10_LN15(x) (((x) >> 16) & 0xffff) /* Lane #15 Correctable Counter */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
