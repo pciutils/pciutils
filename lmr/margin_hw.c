@@ -68,8 +68,8 @@ margin_find_pair(struct pci_access *pacc, struct pci_dev *dev, struct pci_dev **
           *up_port = p;
           return true;
         }
-      else if (!given_down && pci_read_byte(p, PCI_SECONDARY_BUS) == dev->bus
-               && dev->domain == p->domain)
+      else if (!given_down && dev->domain == p->domain && margin_port_is_down(p)
+               && pci_read_byte(p, PCI_SECONDARY_BUS) == dev->bus)
         {
           *down_port = p;
           *up_port = dev;
