@@ -573,23 +573,41 @@ set_privilege(HANDLE token, LUID luid_privilege, BOOL enable)
 BOOL
 win32_change_token(HANDLE new_token, HANDLE *old_token)
 {
-  HANDLE token;
+  HANDLE current_token;
+  HANDLE impersonate_token;
 
-  if (!OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE, TRUE, &token))
+  if (!OpenThreadToken(GetCurrentThread(), TOKEN_IMPERSONATE, TRUE, &current_token))
     {
       if (GetLastError() != ERROR_NO_TOKEN)
         return FALSE;
-      token = NULL;
+      current_token = NULL;
     }
 
-  if (!ImpersonateLoggedOnUser(new_token))
+  /*
+   * SetThreadToken() can set only impersonation token, not the primary token
+   * (which caller passed as argument). Function DuplicateToken() can be used
+   * to create a new impersonation token as duplicate of the primary token.
+   */
+  if (!DuplicateToken(new_token, SecurityImpersonation, &impersonate_token))
     {
-      if (token)
-        CloseHandle(token);
+      if (current_token)
+        CloseHandle(current_token);
       return FALSE;
     }
 
-  *old_token = token;
+  /*
+   * NULL argument for SetThreadToken() specifies the current thread.
+   * If thread handle argument is value returned GetCurrentThread() then
+   * SetThreadToken() function crashes on older Windows versions.
+   */
+  if (!SetThreadToken(NULL, impersonate_token))
+    {
+      if (current_token)
+        CloseHandle(current_token);
+      return FALSE;
+    }
+
+  *old_token = current_token;
   return TRUE;
 }
 
