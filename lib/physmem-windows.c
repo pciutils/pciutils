@@ -948,6 +948,7 @@ physmem_unmap(struct physmem *physmem, void *ptr, size_t length)
   long pagesize = physmem_get_pagesize(physmem);
   MEMORY_BASIC_INFORMATION info;
   NTSTATUS status;
+  DWORD region_size;
 
   if (physmem->section_handle != INVALID_HANDLE_VALUE)
     {
@@ -957,17 +958,30 @@ physmem_unmap(struct physmem *physmem, void *ptr, size_t length)
        * point to the beginning of the mapped memory range.
        *
        * So verify that the ptr argument is the beginning of the mapped range
-       * and length argument is the length of mapped range.
+       * and length argument is the total length of mapped range.
+       *
+       * VirtualQuery() does not have to return whole mapped range, but just
+       * some region subset. So call VirtualQuery() multiple times for each
+       * region subset until we receive size of the whole mapped region range.
        */
 
-      if (VirtualQuery(ptr, &info, sizeof(info)) != sizeof(info))
+      for (region_size = 0; region_size < length; region_size += info.RegionSize)
         {
-          errno = EINVAL;
-          return -1;
+          if (VirtualQuery(ptr + region_size, &info, sizeof(info)) != sizeof(info))
+            {
+              errno = EINVAL;
+              return -1;
+            }
+
+          if (info.AllocationBase != ptr)
+            {
+              errno = EINVAL;
+              return -1;
+            }
         }
 
       /* RegionSize is already page aligned, but length does not have to be. */
-      if (info.AllocationBase != ptr || info.RegionSize != ((length + pagesize-1) & ~(pagesize-1)))
+      if (region_size != ((length + pagesize-1) & ~(pagesize-1)))
         {
           errno = EINVAL;
           return -1;
