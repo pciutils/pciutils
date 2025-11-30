@@ -525,7 +525,7 @@ win32_change_error_mode(UINT new_mode, BOOL append)
  * not have permission to open its own current active access token) is evaluated
  * as thread does not have that privilege.
  */
-BOOL
+static BOOL
 win32_have_privilege(LUID luid_privilege)
 {
   PRIVILEGE_SET priv;
@@ -589,7 +589,7 @@ set_privilege(HANDLE token, LUID luid_privilege, BOOL enable)
  * used for reverting to this access token. It is set to NULL if the current
  * thread previously used primary process access token.
  */
-BOOL
+static BOOL
 win32_change_token(HANDLE new_token, HANDLE *old_token)
 {
   HANDLE current_token;
@@ -654,7 +654,7 @@ change_token_to_primary(HANDLE *old_token)
  * token is specified as NULL then revert to the primary process access token.
  * Use to revert after win32_change_token() or change_token_to_primary() call.
  */
-VOID
+static VOID
 win32_revert_to_token(HANDLE token)
 {
   /*
@@ -1238,7 +1238,7 @@ check_process_name(LPCWSTR image_name, DWORD image_name_byte_length, LPCSTR exe_
 }
 
 /* Open process handle with the query right specified by process exe file. */
-HANDLE
+static HANDLE
 win32_find_and_open_process_for_query(LPCSTR exe_file)
 {
   HMODULE ntdll;
@@ -1354,7 +1354,7 @@ try_grant_permissions_and_open_process_token(HANDLE process, DWORD rights)
  * Open primary access token of particular process handle with specified rights.
  * If permissions for specified rights are missing then try to grant them.
  */
-HANDLE
+static HANDLE
 win32_open_process_token_with_rights(HANDLE process, DWORD rights)
 {
   HANDLE old_token;
