@@ -108,7 +108,7 @@ the fourth function of each device.
 .TP
 .B -d [<vendor>]:[<device>][:<class>[:<prog-if>]]
 Select devices with specified vendor, device, class ID, and programming interface.
-The ID's are given in hexadecimal and may be omitted or given as "*", both meaning
+The IDs are given in hexadecimal and may be omitted or given as "*", both meaning
 "any value". The class ID can contain "x" characters which stand for "any digit".
 .PP
 When
