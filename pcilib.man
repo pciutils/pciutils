@@ -262,17 +262,17 @@ or
 only builds a read-only virtual emulated config space with information from the
 Configuration Manager.
 
-.SS Parameters for resolving of ID's via DNS
+.SS Parameters for resolving of IDs via DNS
 .TP
 .B net.domain
 DNS domain containing the ID database.
 .TP
 .B net.cache_name
-Name of the file used for caching of resolved ID's. An initial
+Name of the file used for caching of resolved IDs. An initial
 .B ~/
 is expanded to the user's home directory.
 
-.SS Parameters for resolving of ID's via UDEV's HWDB
+.SS Parameters for resolving of IDs via UDEV's HWDB
 .TP
 .B hwdb.disable
 Disable use of HWDB if set to a non-zero value.

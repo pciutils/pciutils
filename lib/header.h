@@ -1920,7 +1920,7 @@
 
 #define PCI_CLASS_OTHERS		0xff
 
-/* Several ID's we need in the library */
+/* Several IDs we need in the library */
 
 #define PCI_VENDOR_ID_INTEL		0x8086
 #define PCI_VENDOR_ID_COMPAQ		0x0e11

@@ -442,7 +442,7 @@ pci_init_name_list_path(struct pci_access *a)
 static void
 pci_init_dns(struct pci_access *a)
 {
-  pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of ID's");
+  pci_define_param(a, "net.domain", PCI_ID_DOMAIN, "DNS domain used for resolving of IDs");
   a->id_lookup_mode = PCI_LOOKUP_CACHE;
 
   char *cache_dir = getenv("XDG_CACHE_HOME");

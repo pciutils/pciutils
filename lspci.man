@@ -103,7 +103,7 @@ Identify PCI devices by path through each bridge, instead of by bus number.
 Identify PCI devices by path through each bridge, showing the bus number as
 well as the device number.
 
-.SS Options to control resolving ID's to names
+.SS Options to control resolving IDs to names
 .TP
 .B -n
 Show PCI vendor and device codes as numbers instead of looking them up in the
@@ -144,7 +144,7 @@ the fourth function of each device.
 .TP
 .B -d [<vendor>]:[<device>][:<class>[:<prog-if>]]
 Show only devices with specified vendor, device, class ID, and programming interface.
-The ID's are given in hexadecimal and may be omitted or given as "*", both meaning
+The IDs are given in hexadecimal and may be omitted or given as "*", both meaning
 "any value". The class ID can contain "x" characters which stand for "any digit".
 
 .SS Other options
@@ -159,7 +159,7 @@ as the PCI ID list instead of @IDSDIR@/pci.ids.
 Use
 .B
 <file>
-as the map of PCI ID's handled by kernel modules. By default, lspci uses
+as the map of PCI IDs handled by kernel modules. By default, lspci uses
 .RI /lib/modules/ kernel_version /modules.pcimap.
 Applies only to Linux systems with recent enough module tools.
 .TP
@@ -221,7 +221,7 @@ described in this section. All other formats are likely to change
 between versions of lspci.
 
 .P
-All numbers are always printed in hexadecimal. If you want to process numeric ID's instead of
+All numbers are always printed in hexadecimal. If you want to process numeric IDs instead of
 names, please add the
 .B -n
 switch.
@@ -337,7 +337,7 @@ in a single record. Please avoid using this format in any new code.
 .SH FILES
 .TP
 .B @IDSDIR@/pci.ids
-A list of all known PCI ID's (vendors, devices, classes and subclasses). Maintained
+A list of all known PCI IDs (vendors, devices, classes and subclasses). Maintained
 at https://pci-ids.ucw.cz/, use the
 .B update-pciids
 utility to download the most recent version.
@@ -346,7 +346,7 @@ utility to download the most recent version.
 If lspci is compiled with support for compression, this file is tried before pci.ids.
 .TP
 .B $XDG_CACHE_HOME/pci-ids
-All ID's found in the DNS query mode are cached in this file.
+All IDs found in the DNS query mode are cached in this file.
 
 .SH BUGS
 

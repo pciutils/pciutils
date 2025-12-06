@@ -1,5 +1,5 @@
 /*
- *	The PCI Library -- Resolving ID's via DNS
+ *	The PCI Library -- Resolving IDs via DNS
  *
  *	Copyright (c) 2007--2008 Martin Mares <mj@ucw.cz>
  *

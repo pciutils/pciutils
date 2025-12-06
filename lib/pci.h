@@ -280,9 +280,9 @@ char *pci_filter_parse_id(struct pci_filter *, char *) PCI_ABI;
 int pci_filter_match(struct pci_filter *, struct pci_dev *) PCI_ABI;
 
 /*
- *	Conversion of PCI ID's to names (according to the pci.ids file)
+ *	Conversion of PCI IDs to names (according to the pci.ids file)
  *
- *	Call pci_lookup_name() to identify different types of ID's:
+ *	Call pci_lookup_name() to identify different types of IDs:
  *
  *	VENDOR				(vendorID) -> vendor
  *	DEVICE				(vendorID, deviceID) -> device
@@ -311,7 +311,7 @@ enum pci_lookup_mode {
   PCI_LOOKUP_NUMERIC = 0x10000,		/* Want only formatted numbers; default if access->numeric_ids is set */
   PCI_LOOKUP_NO_NUMBERS = 0x20000,	/* Return NULL if not found in the database; default is to print numerically */
   PCI_LOOKUP_MIXED = 0x40000,		/* Include both numbers and names */
-  PCI_LOOKUP_NETWORK = 0x80000,		/* Try to resolve unknown ID's by DNS */
+  PCI_LOOKUP_NETWORK = 0x80000,		/* Try to resolve unknown IDs by DNS */
   PCI_LOOKUP_SKIP_LOCAL = 0x100000,	/* Do not consult local database */
   PCI_LOOKUP_CACHE = 0x200000,		/* Consult the local cache before using DNS */
   PCI_LOOKUP_REFRESH_CACHE = 0x400000,	/* Forget all previously cached entries, but still allow updating the cache */

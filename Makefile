@@ -15,7 +15,7 @@ CROSS_COMPILE=
 # Support for compressed pci.ids (yes/no, default: detect)
 ZLIB=
 
-# Support for resolving ID's by DNS (yes/no, default: detect)
+# Support for resolving IDs by DNS (yes/no, default: detect)
 DNS=
 
 # Build libpci as a shared library (yes/no; or local for testing; requires GCC)
