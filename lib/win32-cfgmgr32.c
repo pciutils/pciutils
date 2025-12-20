@@ -464,7 +464,7 @@ retry_service_config:
   else if (wcsncmp(service_config->lpBinaryPathName, L"\\??\\", sizeof("\\??\\")-1) == 0 &&
            ((service_config->lpBinaryPathName[4] >= L'A' && service_config->lpBinaryPathName[4] <= L'Z') ||
             (service_config->lpBinaryPathName[4] >= L'a' && service_config->lpBinaryPathName[4] <= L'z')) &&
-           service_config->lpBinaryPathName[5] == L'\\')
+           service_config->lpBinaryPathName[5] == L':' && service_config->lpBinaryPathName[6] == L'\\')
     {
       /* ImagePath is in NT GLOBAL?? namespace with drive letter, so just remove "\\??\\" prefix to get Win32 path. */
       service_image_path = pci_malloc(a, sizeof(WCHAR) * (wcslen(service_config->lpBinaryPathName) - (sizeof("\\??\\")-1) + 1));
