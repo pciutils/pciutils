@@ -2172,6 +2172,116 @@ cap_flit_ei(struct device *d, int where)
          flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_EQ3(flit_ei_os_rx)));
 }
 
+static const char *flit_log_mes_ctl_gran(char *buf, size_t buflen, u8 sts)
+{
+  switch (sts)
+    {
+      case 0b00:
+        return "all";
+      case 0b001:
+        return "even";
+      case 0b010:
+        return "odd";
+      case 0b011:
+        return "mismatch";
+      default:
+        snprintf(buf, buflen, "Unknown (%u)", sts);
+        return buf;
+    }
+}
+
+static void
+cap_flit_log(struct device *d, int where)
+{
+  char buf[16];
+
+  printf("Flit Logging\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_FLIT_LOG_ERR1, 56))
+    return;
+
+  u32 err_log_1 = get_conf_long(d, where + PCI_FLIT_LOG_ERR1);
+  printf("\t\tLog1:      Valid%c, Link Width: %s\n"
+         "\t\t\t   More entries%c Unrecognized flit%c FEC uncorrectable%c\n"
+         "\t\t\t   SyndParityGrp0: %02x, SyndCheckGrp0: %02x\n",
+         FLAG(err_log_1, PCI_FLIT_LOG_ERR1_VLD),
+         link_width_str(buf, sizeof(buf), PCI_FLIT_LOG_ERR1_WIDTH(err_log_1)),
+         FLAG(err_log_1, PCI_FLIT_LOG_ERR1_MORE),
+         FLAG(err_log_1, PCI_FLIT_LOG_ERR1_UNREC),
+         FLAG(err_log_1, PCI_FLIT_LOG_ERR1_UNCOR),
+         PCI_FLIT_LOG_ERR1_PAR_GRP0(err_log_1),
+         PCI_FLIT_LOG_ERR1_CHK_GRP0(err_log_1));
+
+  u32 err_log_2 = get_conf_long(d, where + PCI_FLIT_LOG_ERR2);
+  printf("\t\tLog2:      SyndParityGrp1: %02x, SyndCheckGrp1: %02x\n"
+         "\t\t\t   SyndParityGrp2: %02x, SyndCheckGrp2: %02x\n",
+         PCI_FLIT_LOG_ERR2_PAR_GRP1(err_log_2),
+         PCI_FLIT_LOG_ERR2_CHK_GRP1(err_log_2),
+         PCI_FLIT_LOG_ERR2_PAR_GRP2(err_log_2),
+         PCI_FLIT_LOG_ERR2_CHK_GRP2(err_log_2));
+
+  u16 err_cnt_ctl = get_conf_word(d, where + PCI_FLIT_LOG_CNT_CTL);
+  printf("\t\tCntCtl:    Flit Error Counter En%c Flit Error Counter Interrupt En%c\n"
+         "\t\t\t   Events to count: %u, Trigger Event on Error Count: %02x\n",
+         FLAG(err_cnt_ctl, PCI_FLIT_LOG_CNT_CTL_EN),
+         FLAG(err_cnt_ctl, PCI_FLIT_LOG_CNT_CTL_INT),
+         PCI_FLIT_LOG_CNT_CTL_EVNT(err_cnt_ctl),
+         PCI_FLIT_LOG_CNT_CTL_TRG(err_cnt_ctl));
+
+  u16 err_cnt_sts = get_conf_word(d, where + PCI_FLIT_LOG_CNT_STS);
+  printf("\t\tCntSts:    Link Width when Error Counter Started %s\n"
+         "\t\t\t   Interrupt Generated based on Trigger Event Count%c, FlitErr: %u\n",
+         link_width_str(buf, sizeof(buf), PCI_FLIT_LOG_CNT_STS_WIDTH(err_cnt_sts)),
+         FLAG(err_cnt_sts, PCI_FLIT_LOG_CNT_STS_INT),
+         PCI_FLIT_LOG_CNT_STS_CNT(err_cnt_sts));
+
+  u32 mes_ctl = get_conf_long(d, where + PCI_FLIT_LOG_MES_CTL);
+  printf("\t\tMeasCtl:   En%c Granularity: %s\n",
+         FLAG(mes_ctl, PCI_FLIT_LOG_MES_CTL_EN),
+         flit_log_mes_ctl_gran(buf, sizeof(buf), PCI_FLIT_LOG_MES_CTL_GRAN(mes_ctl)));
+
+  u32 mes_sts1 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS1);
+  printf("\t\tMeasSts1:  Flit Counter: %u\n", mes_sts1);
+  u32 mes_sts2 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS2);
+  printf("\t\tMeasSts2:  Invalid Flit Counter: %u\n",
+         PCI_FLIT_LOG_MES_STS2_INV(mes_sts2));
+  u32 mes_sts3 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS3);
+  printf("\t\tMeasSts3:  Lane0:  %5u, Lane1:  %5u\n",
+         PCI_FLIT_LOG_MES_STS3_LN0(mes_sts3),
+         PCI_FLIT_LOG_MES_STS3_LN1(mes_sts3));
+  u32 mes_sts4 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS4);
+  printf("\t\tMeasSts4:  Lane2:  %5u, Lane3:  %5u\n",
+         PCI_FLIT_LOG_MES_STS4_LN2(mes_sts4),
+         PCI_FLIT_LOG_MES_STS4_LN3(mes_sts4));
+  u32 mes_sts5 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS5);
+  printf("\t\tMeasSts5:  Lane4:  %5u, Lane5:  %5u\n",
+         PCI_FLIT_LOG_MES_STS5_LN4(mes_sts5),
+         PCI_FLIT_LOG_MES_STS5_LN5(mes_sts5));
+  u32 mes_sts6 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS6);
+  printf("\t\tMeasSts6:  Lane6:  %5u, Lane7:  %5u\n",
+         PCI_FLIT_LOG_MES_STS6_LN6(mes_sts6),
+         PCI_FLIT_LOG_MES_STS6_LN7(mes_sts6));
+  u32 mes_sts7 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS7);
+  printf("\t\tMeasSts7:  Lane8:  %5u, Lane9:  %5u\n",
+         PCI_FLIT_LOG_MES_STS7_LN8(mes_sts7),
+         PCI_FLIT_LOG_MES_STS7_LN9(mes_sts7));
+  u32 mes_sts8 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS8);
+  printf("\t\tMeasSts8:  Lane10: %5u, Lane11: %5u\n",
+         PCI_FLIT_LOG_MES_STS8_LN10(mes_sts8),
+         PCI_FLIT_LOG_MES_STS8_LN11(mes_sts8));
+  u32 mes_sts9 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS9);
+  printf("\t\tMeasSts9:  Lane12: %5u, Lane13: %5u\n",
+         PCI_FLIT_LOG_MES_STS9_LN12(mes_sts9),
+         PCI_FLIT_LOG_MES_STS9_LN13(mes_sts9));
+  u32 mes_sts10 = get_conf_long(d, where + PCI_FLIT_LOG_MES_STS10);
+  printf("\t\tMeasSts10: Lane14: %5u, Lane15: %5u\n",
+         PCI_FLIT_LOG_MES_STS10_LN14(mes_sts10),
+         PCI_FLIT_LOG_MES_STS10_LN15(mes_sts10));
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -2339,6 +2449,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_FLIT_EI:
 	    cap_flit_ei(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_FLIT_LOG:
+	    cap_flit_log(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);
