@@ -1936,40 +1936,43 @@ cap_mmio_rbl(struct device *d, int where)
   if (verbose < 2)
     return;
 
-  if (!config_fetch(d, where + PCI_MRBL_CAP, 0x0C)) {
-    printf("\t\t<unreadable>\n");
-    return;
-  }
-
-  u32 cap = get_conf_long(d, where + PCI_MRBL_CAP);
-
-  u32 mrbllen = PCI_MRBL_CAP_STRUCT_LEN(cap);
-
-  if (!config_fetch(d, where + PCI_MRBL_REG, mrbllen)) {
-    printf("\t\t<unreadable>\n");
-    return;
-  }
-
-  u32 num_mrbl = (mrbllen / 8) - 1;
-
-  for (u32 i = 0; i < num_mrbl; i++) {
-    unsigned int pos = where + PCI_MRBL_REG + i * PCI_MRBL_REG_SIZE;
-    if (!config_fetch(d, pos, PCI_MRBL_REG_SIZE)) {
+  if (!config_fetch(d, where + PCI_MRBL_CAP, 0x0C))
+    {
       printf("\t\t<unreadable>\n");
       return;
     }
 
-    u32 lo = get_conf_long(d, pos);
-    u32 hi = get_conf_long(d, pos + 0x04);
+  u32 cap = get_conf_long(d, where + PCI_MRBL_CAP);
+  u32 mrbllen = PCI_MRBL_CAP_STRUCT_LEN(cap);
 
-    u64 offs = ((u64) hi << 32) | PCI_MRBL_LOC_OFF_LOW(lo);
+  if (!config_fetch(d, where + PCI_MRBL_REG, mrbllen))
+    {
+      printf("\t\t<unreadable>\n");
+      return;
+    }
 
-    printf("\t\tLocator%u: BIR: BAR%u, ID: %s, offset: %016" PCI_U64_FMT_X "\n",
-          i,
-          PCI_MRBL_LOC_BIR(lo),
-          mmio_rbl_bid(buf, sizeof(buf), PCI_MRBL_LOC_BID(lo)),
-          offs);
-  }
+  u32 num_mrbl = (mrbllen / 8) - 1;
+
+  for (u32 i = 0; i < num_mrbl; i++)
+    {
+      unsigned int pos = where + PCI_MRBL_REG + i * PCI_MRBL_REG_SIZE;
+      if (!config_fetch(d, pos, PCI_MRBL_REG_SIZE))
+	{
+	  printf("\t\t<unreadable>\n");
+	  return;
+	}
+
+      u32 lo = get_conf_long(d, pos);
+      u32 hi = get_conf_long(d, pos + 0x04);
+
+      u64 offs = ((u64) hi << 32) | PCI_MRBL_LOC_OFF_LOW(lo);
+
+      printf("\t\tLocator%u: BIR: BAR%u, ID: %s, offset: %016" PCI_U64_FMT_X "\n",
+	     i,
+	     PCI_MRBL_LOC_BIR(lo),
+	     mmio_rbl_bid(buf, sizeof(buf), PCI_MRBL_LOC_BID(lo)),
+	     offs);
+    }
 }
 
 void
