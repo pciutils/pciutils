@@ -1602,6 +1602,83 @@
 #define  PCI_MRBL_LOC_BID(x)		(((x) >> 8) & 0xff) /* MRBL Locator Block ID */
 #define  PCI_MRBL_LOC_OFF_LOW(x)	((x) & 0xffff0000) /* MRBL Locator Offset Low */
 
+/* Flit Error Injection Capability */
+#define PCI_FLIT_EI_CAP		0x04	/* Error Injection Capability Register */
+#define PCI_FLIT_EI_CTL1	0x08	/* Flit Error Injection Control 1 Register */
+#define  PCI_FLIT_EI_CTL1_EN	0x0001	/* Flit Error Injection Enable */
+#define  PCI_FLIT_EI_CTL1_TX	0x0002	/* Inject Errors on Transmitted Flits */
+#define  PCI_FLIT_EI_CTL1_RX	0x0004	/* Inject Errors on Received Flits */
+#define  PCI_FLIT_EI_CTL1_25GT	0x0040 /* Flit Error Injection Enable 2.5 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_50GT	0x0080 /* Flit Error Injection Enable 5.0 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_80GT	0x0100 /* Flit Error Injection Enable 8.0 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_16GT	0x0200 /* Flit Error Injection Enable 16.0 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_32GT	0x0400 /* Flit Error Injection Enable 32.0 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_64GT	0x0800 /* Flit Error Injection Enable 64.0 GT/s Data Rate */
+#define  PCI_FLIT_EI_CTL1_NUM_ERR(x) (((x) >> 16) & 0x1F) /* Number of Errors Injected */
+#define  PCI_FLIT_EI_CTL1_SPACING(x) (((x) >> 21) & 0xFF) /* Spacing Between Injected Errors */
+#define  PCI_FLIT_EI_CTL1_FLIT_TY(x) (((x) >> 29) & 0x3) /* Injection on Flit Type */
+#define PCI_FLIT_EI_CTL2	0x0C	/* Flit Error Injection Control 2 Register */
+#define  PCI_FLIT_EI_CTL2_CONSEC(x) ((x) & 0x7) /* Consecutive Error Injection */
+#define  PCI_FLIT_EI_CTL2_TYPE(x) (((x) >> 3) & 0x3) /* Error Type Being Injected */
+#define  PCI_FLIT_EI_CTL2_OFFS(x) (((x) >> 5) & 0x7F) /* Error Offset within Flit */
+#define  PCI_FLIT_EI_CTL2_MAG(x) (((x) >> 12) & 0xFF) /* Error Magnitude */
+#define PCI_FLIT_EI_STS		0x10	/* Flit Error Injection Status Register */
+#define  PCI_FLIT_EI_STS_TX(x) ((x) & 0x3) /* Flit Error Tx Injection Status */
+#define  PCI_FLIT_EI_STS_RX(x) (((x) >> 2) & 0x3) /* Flit Error Rx Injection Status */
+#define PCI_FLIT_EI_OS_CTL1	0x14	/* Ordered Set Error Injection Control 1 Register */
+#define  PCI_FLIT_EI_OS_CTL1_EN	0x00000001 /* Ordered Set Error Injection Enable */
+#define  PCI_FLIT_EI_OS_CTL1_TX	0x00000002 /* Inject Errors on Transmitted Ordered Sets */
+#define  PCI_FLIT_EI_OS_CTL1_RX	0x00000004 /* Inject Errors on Received Ordered Sets */
+#define  PCI_FLIT_EI_OS_CTL1_NUM(x) (((x) >> 3) & 0x1F) /* Number of Errors injected */
+#define  PCI_FLIT_EI_OS_CTL1_SPACING(x) (((x) >> 8) & 0xFF) /* Spacing Between Injected Errors */
+#define  PCI_FLIT_EI_OS_CTL1_TS0	0x00010000 /* Inject Error on TS0 OS */
+#define  PCI_FLIT_EI_OS_CTL1_TS1	0x00020000 /* Inject Error on TS1 OS */
+#define  PCI_FLIT_EI_OS_CTL1_TS2	0x00040000 /* Inject Error on TS2 OS */
+#define  PCI_FLIT_EI_OS_CTL1_SKP	0x00080000 /* Inject Error on SKP OS */
+#define  PCI_FLIT_EI_OS_CTL1_EIEOS	0x00100000 /* Inject Error on EIEOS OS */
+#define  PCI_FLIT_EI_OS_CTL1_EIOS	0x00200000 /* Inject Error on EIOS OS */
+#define  PCI_FLIT_EI_OS_CTL1_SDS	0x00400000 /* Inject Error on SDS OS */
+#define  PCI_FLIT_EI_OS_CTL1_POLL	0x00800000 /* Inject Error in Polling State */
+#define  PCI_FLIT_EI_OS_CTL1_CONF	0x01000000 /* Inject errors in the Configuration LTSSM state */
+#define  PCI_FLIT_EI_OS_CTL1_L0		0x02000000 /* Inject errors in the L0 LTSSM state */
+#define  PCI_FLIT_EI_OS_CTL1_NOEQ	0x04000000 /* Inject errors in the Recovery LTSSM states */
+#define  PCI_FLIT_EI_OS_CTL1_EQ01	0x08000000 /* Inject errors Recovery.Equalization Phase 0 and Phase 1 */
+#define  PCI_FLIT_EI_OS_CTL1_EQ2	0x10000000 /* Inject errors Recovery.Equalization Phase 2 */
+#define  PCI_FLIT_EI_OS_CTL1_EQ3	0x20000000 /* Inject errors Recovery.Equalization Phase 3 */
+#define PCI_FLIT_EI_OS_CTL2	0x18	/* Ordered Set Error Injection Control 2 Register */
+#define  PCI_FLIT_EI_OS_CTL2_BYTES(x) ((x) & 0xFFFF) /* Error Injection Bytes */
+#define  PCI_FLIT_EI_OS_CTL2_LANES(x) (((x) >> 16) & 0xFFFF) /* Lane Number for Error Injection */
+#define PCI_FLIT_EI_OS_TX	0x1C	/* Ordered Set Error Tx Injection Status Registe */
+#define  PCI_FLIT_EI_OS_TX_TS0(x) ((x) & 0x3) /* Tx Injection Status TS0 */
+#define  PCI_FLIT_EI_OS_TX_TS1(x) (((x) >> 2) & 0x3) /* Tx Injection Status TS1 */
+#define  PCI_FLIT_EI_OS_TX_TS2(x) (((x) >> 4) & 0x3) /* Tx Injection Status TS2 */
+#define  PCI_FLIT_EI_OS_TX_SKP(x) (((x) >> 6) & 0x3) /* Tx Injection Status SKP */
+#define  PCI_FLIT_EI_OS_TX_EIEOS(x) (((x) >> 8) & 0x3) /* Tx Injection Status EIEOS */
+#define  PCI_FLIT_EI_OS_TX_EIOS(x) (((x) >> 10) & 0x3) /* Tx Injection Status EIOS */
+#define  PCI_FLIT_EI_OS_TX_SDS(x) (((x) >> 12) & 0x3) /* Tx Injection Status SDS */
+#define  PCI_FLIT_EI_OS_TX_POLL(x) (((x) >> 14) & 0x3) /* Tx Injection Status Polling */
+#define  PCI_FLIT_EI_OS_TX_CONF(x) (((x) >> 16) & 0x3) /* Tx Injection Status Configuration */
+#define  PCI_FLIT_EI_OS_TX_L0(x) (((x) >> 18) & 0x3) /* Tx Injection Status L0 */
+#define  PCI_FLIT_EI_OS_TX_NOEQ(x) (((x) >> 20) & 0x3) /* Tx Injection Status non-EQ Recovery */
+#define  PCI_FLIT_EI_OS_TX_EQ01(x) (((x) >> 22) & 0x3) /* Tx Injection Status Recovery.Equalization Phase 0 and 1 */
+#define  PCI_FLIT_EI_OS_TX_EQ2(x) (((x) >> 24) & 0x3) /* Tx Injection Status Recovery.Equalization Phase 2 */
+#define  PCI_FLIT_EI_OS_TX_EQ3(x) (((x) >> 26) & 0x3) /* Tx Injection Status Recovery.Equalization Phase 3 */
+#define PCI_FLIT_EI_OS_RX	0x20	/* Ordered Set Error Rx Injection Status Register */
+#define  PCI_FLIT_EI_OS_RX_TS0(x) ((x) & 0x3) /* Rx Injection Status TS0 */
+#define  PCI_FLIT_EI_OS_RX_TS1(x) (((x) >> 2) & 0x3) /* Rx Injection Status TS1 */
+#define  PCI_FLIT_EI_OS_RX_TS2(x) (((x) >> 4) & 0x3) /* Rx Injection Status TS2 */
+#define  PCI_FLIT_EI_OS_RX_SKP(x) (((x) >> 6) & 0x3) /* Rx Injection Status SKP */
+#define  PCI_FLIT_EI_OS_RX_EIEOS(x) (((x) >> 8) & 0x3) /* Rx Injection Status EIEOS */
+#define  PCI_FLIT_EI_OS_RX_EIOS(x) (((x) >> 10) & 0x3) /* Rx Injection Status EIOS */
+#define  PCI_FLIT_EI_OS_RX_SDS(x) (((x) >> 12) & 0x3) /* Rx Injection Status SDS */
+#define  PCI_FLIT_EI_OS_RX_POLL(x) (((x) >> 14) & 0x3) /* Rx Injection Status Polling */
+#define  PCI_FLIT_EI_OS_RX_CONF(x) (((x) >> 16) & 0x3) /* Rx Injection Status Configuration */
+#define  PCI_FLIT_EI_OS_RX_L0(x) (((x) >> 18) & 0x3) /* Rx Injection Status L0 */
+#define  PCI_FLIT_EI_OS_RX_NOEQ(x) (((x) >> 20) & 0x3) /* Rx Injection Status non-EQ Recovery */
+#define  PCI_FLIT_EI_OS_RX_EQ01(x) (((x) >> 22) & 0x3) /* Rx Injection Status Recovery.Equalization Phase 0 and 1 */
+#define  PCI_FLIT_EI_OS_RX_EQ2(x) (((x) >> 24) & 0x3) /* Rx Injection Status Recovery.Equalization Phase 2 */
+#define  PCI_FLIT_EI_OS_RX_EQ3(x) (((x) >> 26) & 0x3) /* Rx Injection Status Recovery.Equalization Phase 3 */
+
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded

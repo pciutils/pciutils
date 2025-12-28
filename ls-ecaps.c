@@ -1975,6 +1975,198 @@ cap_mmio_rbl(struct device *d, int where)
     }
 }
 
+static const char *flit_ei_flit_type_str(char *buf, size_t buflen, u8 type)
+{
+  switch (type)
+    {
+      case 0b000:
+        return "any";
+      case 0b001:
+        return "any non-IDLE";
+      case 0b010:
+        return "only payload";
+      case 0b011:
+        return "only NOP";
+      case 0b100:
+        return "only IDLE";
+      case 0b101:
+        return "only payload+seq";
+      case 0b110:
+        return "only payload+1seq";
+      default:
+        snprintf(buf, buflen, "Unknown (%u)", type);
+        return buf;
+    }
+}
+
+static const char *flit_ei_consec_str(char *buf, size_t buflen, u8 consec)
+{
+  switch (consec)
+    {
+      case 0b000:
+        return "none";
+      case 0b001:
+      case 0b010:
+      case 0b011:
+      case 0b101:
+      case 0b110:
+        snprintf(buf, buflen, "%u", consec);
+        return buf;
+      case 0b111:
+        return "pseudo-random";
+      default:
+        snprintf(buf, buflen, "Unknown (%u)", consec);
+        return buf;
+    }
+}
+
+static const char *flit_ei_err_type_str(char *buf, size_t buflen, u8 type)
+{
+  switch (type)
+    {
+      case 0b00:
+        return "random";
+      case 0b01:
+        return "correctable single group";
+      case 0b10:
+        return "correctable three groups";
+      case 0b011:
+        return "uncorrectable";
+      default:
+        snprintf(buf, buflen, "Unknown (%u)", type);
+        return buf;
+    }
+}
+
+static const char *flit_ei_sts_str(char *buf, size_t buflen, u8 sts)
+{
+  switch (sts)
+    {
+      case 0b00:
+        return "not started";
+      case 0b001:
+        return "started";
+      case 0b010:
+        return "completed";
+      case 0b011:
+        return "error";
+      default:
+        snprintf(buf, buflen, "Unknown (%u)", sts);
+        return buf;
+    }
+}
+
+static void
+cap_flit_ei(struct device *d, int where)
+{
+  char buf0[16], buf1[16], buf2[16];
+
+  printf("Flit Error Injection\n");
+
+  if (verbose < 2)
+    return;
+
+  if (!config_fetch(d, where + PCI_FLIT_EI_CAP, 32))
+    return;
+
+  u32 flit_ei_ctl1 = get_conf_long(d, where + PCI_FLIT_EI_CTL1);
+
+  printf("\t\tFlitEiCtl1:   En%c Tx%c Rx%c 2.5GT/s%c 5.0GT/s%c 8.0GT/s%c 16.0GT/s%c 32.0GT/s%c 64.0GT/s%c\n"
+         "\t\t\t      Number of errors: %u, Spacing between errors: %u, Flit Type: %s\n",
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_EN),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_TX),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_RX),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_25GT),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_50GT),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_80GT),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_16GT),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_32GT),
+         FLAG(flit_ei_ctl1, PCI_FLIT_EI_CTL1_64GT),
+         PCI_FLIT_EI_CTL1_NUM_ERR(flit_ei_ctl1),
+         PCI_FLIT_EI_CTL1_SPACING(flit_ei_ctl1),
+         flit_ei_flit_type_str(buf0, sizeof(buf0), PCI_FLIT_EI_CTL1_FLIT_TY(flit_ei_ctl1)));
+
+  u32 flit_ei_ctl2 = get_conf_long(d, where + PCI_FLIT_EI_CTL2);
+  printf("\t\tFlitEiCtl2:   Consecutive: %s, Type: %s, Offset: %u, Magnitude: %u\n",
+         flit_ei_consec_str(buf0, sizeof(buf0), PCI_FLIT_EI_CTL2_CONSEC(flit_ei_ctl2)),
+         flit_ei_err_type_str(buf1, sizeof(buf1), PCI_FLIT_EI_CTL2_TYPE(flit_ei_ctl2)),
+         PCI_FLIT_EI_CTL2_OFFS(flit_ei_ctl2),
+         PCI_FLIT_EI_CTL2_MAG(flit_ei_ctl2));
+
+  u32 flit_ei_sts = get_conf_long(d, where + PCI_FLIT_EI_STS);
+  printf("\t\tFlitEiSts:    Tx: %s, Rx: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_STS_TX(flit_ei_sts)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_STS_RX(flit_ei_sts)));
+
+  u32 flit_ei_os_ctl1 = get_conf_long(d, where + PCI_FLIT_EI_OS_CTL1);
+  printf("\t\tFlitEiOsCtl1: En%c Tx%c Rx%c TS0%c TS1%c TS2%c SKP%c EIEOS%c EIOS%c\n"
+        "\t\t\t      SDS%c Poll%c Conf%c L0%c NoEq%c Eq01%c Eq2%c Eq3%c\n",
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EN),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_TX),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_RX),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_TS0),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_TS1),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_TS2),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_SKP),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EIEOS),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EIOS),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_SDS),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_POLL),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_CONF),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_L0),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_NOEQ),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EQ01),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EQ2),
+        FLAG(flit_ei_os_ctl1, PCI_FLIT_EI_OS_CTL1_EQ3));
+
+  u32 flit_ei_os_ctl2 = get_conf_long(d, where + PCI_FLIT_EI_OS_CTL2);
+  printf("\t\tFlitEiOsCtl2: Bytes: %04x, Lanes: %04x\n",
+         PCI_FLIT_EI_OS_CTL2_BYTES(flit_ei_os_ctl2),
+         PCI_FLIT_EI_OS_CTL2_LANES(flit_ei_os_ctl2));
+
+  u32 flit_ei_os_tx = get_conf_long(d, where + PCI_FLIT_EI_OS_TX);
+  printf("\t\tFlitEiOsTx:   TS0: %s, TS1: %s, TS2: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_TX_TS0(flit_ei_os_tx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_TX_TS1(flit_ei_os_tx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_TX_TS2(flit_ei_os_tx)));
+  printf("\t\t\t      SKP: %s, EIEOS: %s, EIOS: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_TX_SKP(flit_ei_os_tx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_TX_EIEOS(flit_ei_os_tx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_TX_EIOS(flit_ei_os_tx)));
+  printf("\t\t\t      SDS: %s, Polling: %s, Configuration: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_TX_SDS(flit_ei_os_tx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_TX_POLL(flit_ei_os_tx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_TX_CONF(flit_ei_os_tx)));
+  printf("\t\t\t      L0: %s, non-EQ recovery: %s, Eq01: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_TX_L0(flit_ei_os_tx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_TX_NOEQ(flit_ei_os_tx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_TX_EQ01(flit_ei_os_tx)));
+  printf("\t\t\t      Eq2: %s, Eq3: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_TX_EQ2(flit_ei_os_tx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_TX_EQ3(flit_ei_os_tx)));
+
+  u32 flit_ei_os_rx = get_conf_long(d, where + PCI_FLIT_EI_OS_RX);
+  printf("\t\tFlitEiOsRx:   TS0: %s, TS1: %s, TS2: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_RX_TS0(flit_ei_os_rx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_TS1(flit_ei_os_rx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_RX_TS2(flit_ei_os_rx)));
+  printf("\t\t\t      SKP: %s, EIEOS: %s, EIOS: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_RX_SKP(flit_ei_os_rx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_EIEOS(flit_ei_os_rx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_RX_EIOS(flit_ei_os_rx)));
+  printf("\t\t\t      SDS: %s, Polling: %s, Configuration: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_RX_SDS(flit_ei_os_rx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_POLL(flit_ei_os_rx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_RX_CONF(flit_ei_os_rx)));
+  printf("\t\t\t      L0: %s, non-EQ recovery: %s, Eq01: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_RX_L0(flit_ei_os_rx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_NOEQ(flit_ei_os_rx)),
+         flit_ei_sts_str(buf2, sizeof(buf2), PCI_FLIT_EI_OS_RX_EQ01(flit_ei_os_rx)));
+  printf("\t\t\t      Eq2: %s, Eq3: %s\n",
+         flit_ei_sts_str(buf0, sizeof(buf0), PCI_FLIT_EI_OS_RX_EQ2(flit_ei_os_rx)),
+         flit_ei_sts_str(buf1, sizeof(buf1), PCI_FLIT_EI_OS_RX_EQ3(flit_ei_os_rx)));
+}
+
 void
 show_ext_caps(struct device *d, int type)
 {
@@ -2139,6 +2331,9 @@ show_ext_caps(struct device *d, int type)
 	    break;
 	  case PCI_EXT_CAP_ID_MMIO_RBL:
 	    cap_mmio_rbl(d, where);
+	    break;
+	  case PCI_EXT_CAP_ID_FLIT_EI:
+	    cap_flit_ei(d, where);
 	    break;
 	  default:
 	    printf("Extended Capability ID %#02x\n", id);
