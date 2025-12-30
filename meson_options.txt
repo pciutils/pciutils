@@ -1,0 +1,5 @@
+option('build-date', type: 'string', description: 'build date. Defaults to today if not set')
+option('with-dns', type: 'feature', value: 'auto', description: 'Support for resolving IDs by DNS')
+option('with-hwdb', type: 'feature', value: 'auto', description: 'Use libudev to resolve device names using hwdb on Linux')
+option('with-libkmod', type: 'feature', value: 'auto', description: 'use libkmod to resolve kernel modules on Linux')
+option('with-zlib', type: 'feature', value: 'auto', description: 'Support for compressed pci.ids')
