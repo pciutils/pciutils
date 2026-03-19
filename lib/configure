@@ -112,6 +112,7 @@ case $sys in
 		if [ "$sys" != "kfreebsd" ] ; then
 			LIBRESOLV=
 		fi
+		echo >>$c '#define PCI_HAVE_64BIT_ADDRESS'
 		;;
         openbsd)
 	        echo_n " obsd-device mem-ports ecam"
