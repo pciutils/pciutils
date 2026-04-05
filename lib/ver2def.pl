@@ -35,7 +35,7 @@ foreach (@syms) {
 		print $buildfh "\"$sym\@$ver\" \@$ord\n";
 	} else {
 		$ords{$sym} = $ord;
-		print $buildfh "\"$sym\@$ver\" = " . (($cnt{$sym} > 1) ? "\"$sym\@\@$ver\"" : $sym) . " \@$ord\n"
+		print $buildfh "\"$sym\@$ver\" = " . (($cnt{$sym} > 1) ? "\"$sym\@\@\@$ver\"" : $sym) . " \@$ord\n"
 	}
 	$ord++;
 }
