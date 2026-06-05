@@ -251,7 +251,7 @@ win32_is_vista_system(void)
   version.dwOSVersionInfoSize = sizeof(version);
   if (!GetVersionEx(&version) ||
       version.dwPlatformId != VER_PLATFORM_WIN32_NT ||
-      version.dwMajorVersion >= 6)
+      version.dwMajorVersion < 6)
     return FALSE;
   else
     return TRUE;
