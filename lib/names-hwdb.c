@@ -71,7 +71,16 @@ pci_id_hwdb_lookup(struct pci_access *a, int cat, int id1, int id2, int id3, int
 	{
 	  a->debug("Initializing UDEV HWDB\n");
 	  a->id_udev = udev_new();
-	  a->id_udev_hwdb = udev_hwdb_new(a->id_udev);
+	  if (a->id_udev)
+	    a->id_udev_hwdb = udev_hwdb_new(a->id_udev);
+	  if (!a->id_udev_hwdb)
+	    {
+	      a->debug("UDEV HWDB not available\n");
+	      if (a->id_udev)
+		udev_unref(a->id_udev);
+	      a->id_udev = NULL;
+	      return NULL;
+	    }
 	}
 
       struct udev_list_entry *entry;
