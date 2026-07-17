@@ -17,6 +17,8 @@
 #define PCIUTILS_SETPCI
 #include "pciutils.h"
 
+#define MAX_SPLIT_WIDTH 4 /* Has to be 1, 2, or 4 (valid singular pci read or write size) */
+
 static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
 static int demo_mode;			/* Only show */
@@ -39,6 +41,7 @@ struct op {
   unsigned int hdr_type_mask;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
+  unsigned int span;            /* Width of variable-sized window in bytes (0 unless .V) */
   unsigned int num_values;		/* Number of values to write; 0=read */
   unsigned int number;                 /* The n-th capability of that id */
   struct value values[0];
@@ -108,6 +111,37 @@ trace(const char *fmt, ...)
   va_end(args);
 }
 
+static unsigned int
+pci_read(struct pci_dev *dev, int addr, int w)
+{
+  switch (w)
+  {
+    case 1:  return pci_read_byte(dev, addr);
+    case 2:  return pci_read_word(dev, addr);
+    default: return pci_read_long(dev, addr);
+  }
+}
+
+static unsigned int
+determine_width_alignment(unsigned int addr, int remaining)
+{
+  if ((addr & 3) == 0 && remaining >= 4)
+    return 4;
+  if ((addr & 1) == 0 && remaining >= 2)
+    return 2;
+
+  return 1;
+}
+
+static void
+print_le_bytes(u32 x, int width)
+{
+  for (int b = 0; b < width; b++)
+  {
+    printf("%02x", (x >> (8 * b)) & 0xff);
+  }
+}
+
 static void
 exec_op(struct op *op, struct pci_dev *dev)
 {
@@ -116,6 +150,7 @@ exec_op(struct op *op, struct pci_dev *dev)
   unsigned int i, x, y;
   int addr = 0;
   int width = op->width;
+  int span = op->span;
   char slot[16];
 
   snprintf(slot, sizeof(slot), "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
@@ -147,6 +182,8 @@ exec_op(struct op *op, struct pci_dev *dev)
     die("%s: Unaligned access of width %d to register %04x", slot, width, addr);
   if (addr + width > 0x1000)
     die("%s: Access of width %d to register %04x out of range", slot, width, addr);
+  if (span && addr + span > 0x1000)
+    die("%s: Access of range %u to register %04x is out of range", slot, span, addr);
 
   if (op->hdr_type_mask)
     {
@@ -203,20 +240,37 @@ exec_op(struct op *op, struct pci_dev *dev)
   else
     {
       trace(" = ");
-      switch (width)
-	{
-	case 1:
-	  x = pci_read_byte(dev, addr);
-	  break;
-	case 2:
-	  x = pci_read_word(dev, addr);
-	  break;
-	default:
-	  x = pci_read_long(dev, addr);
-	  break;
-	}
+      if (!span)
+      {
+        switch (width)
+	      {
+	        case 1:
+	          x = pci_read_byte(dev, addr);
+	          break;
+	        case 2:
+	          x = pci_read_word(dev, addr);
+	          break;
+	        default:
+	          x = pci_read_long(dev, addr);
+	          break;
+        }
       printf(formats[width]+1, x);
       putchar('\n');
+      }
+      else
+      {
+        int remaining = span;
+        while (remaining)
+        {
+          width = determine_width_alignment(addr, remaining);
+          x = pci_read(dev, addr, width);
+          print_le_bytes(x, width);
+          addr += width;
+          remaining -= width;
+        }
+
+        putchar('\n');
+      }
     }
 }
 
@@ -440,13 +494,14 @@ GENERIC_HELP
 "Setting commands:\n"
 "<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t\t-d [<vendor>]:[<device>]\n"
-"<reg>:\t\t<base>[+<offset>][.(B|W|L)][@<number>]\n"
+"<reg>:\t\t<base>[+<offset>][.(B|W|L|V[<length>])][@<number>]\n"
 "<base>:\t\t<address>\n"
 "\t\t<named-register>\n"
 "\t\t[E]CAP_<capability-name>\n"
 "\t\t[E]CAP<capability-number>\n"
 "<values>:\t<value>[,<value>...]\n"
 "<value>:\t<hex>\n"
+"<length>:\thex (number of bytes; multiple of split width)\n"
 "\t\t<hex>:<mask>\n");
   exit(0);
 }
@@ -668,7 +723,9 @@ static void parse_op(char *c, struct group *group)
 {
   char *base, *offset, *width, *value, *number;
   char *e, *f;
+  char *span = NULL;
   int n, j;
+  unsigned int span_val = 0;
   struct op *op;
 
   /* Split the argument */
@@ -679,6 +736,16 @@ static void parse_op(char *c, struct group *group)
     *number++ = 0;
   if (width = strchr(base, '.'))
     *width++ = 0;
+  if (width && (span = strchr(width, '[')))
+    {
+      char *stop;
+      *span++ = 0;
+      if (parse_x32(span, &stop, &span_val) < 0 || !stop || *stop != ']' || stop[1])
+        parse_err("Invalid span \"%s\"", span);
+      if (span_val == 0) {
+        parse_err("Span must be a non-zero value. Span is: \"%d\"", span_val);
+      }
+    }
   if (offset = strchr(base, '+'))
     *offset++ = 0;
 
@@ -694,6 +761,11 @@ static void parse_op(char *c, struct group *group)
 	  n++;
     }
 
+  if (span && n)
+  {
+    parse_err("Variable length (.V[N]) operations are a read only feature");
+  }
+
   /* Allocate the operation */
   op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
   memset(op, 0, sizeof(struct op));
@@ -702,7 +774,7 @@ static void parse_op(char *c, struct group *group)
   op->num_values = n;
 
   /* What is the width suffix? */
-  if (width)
+  if (width && !span)
     {
       if (width[1])
 	parse_err("Invalid width \"%s\"", width);
@@ -716,7 +788,15 @@ static void parse_op(char *c, struct group *group)
 	  op->width = 4; break;
 	default:
 	  parse_err("Invalid width \"%c\"", *width);
-	}
+	  }
+    }
+  else if (span)
+    {
+     if (!width || (*width & 0xdf) != 'V' || width[1])
+      parse_err("Invalid variable-width suffix; expected .V[N]");
+
+    op->width = MAX_SPLIT_WIDTH;
+    op->span = span_val;
     }
   else
     op->width = 0;
@@ -748,7 +828,8 @@ static void parse_op(char *c, struct group *group)
     }
 
   /* Check range */
-  if (op->addr >= 0x1000 || op->addr + op->width*(n ? n : 1) > 0x1000)
+  unsigned int range_span = op->span ? op->span : op->width * (n ? n : 1);
+  if (op->addr >= 0x1000 || op->addr + range_span > 0x1000)
     parse_err("Register number %02x out of range", op->addr);
   if (op->addr & (op->width - 1))
     parse_err("Unaligned register address %02x", op->addr);

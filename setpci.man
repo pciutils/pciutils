@@ -157,6 +157,16 @@ To choose how many bytes (1, 2, or 4) should be transferred, you should append a
 specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP. The width can be omitted if you are
 referring to a register by its name and the width of the register is well known.
 .IP \(bu
+To transfer a variable-length window larger than a single access, apend \fB.V[len]\fP,
+where \fBlen\fP is a hexademical byte count set statically within setpci (4). The window is read
+as a sequence of aligned longword accesses, low address first. Each chunk is assembled in
+little-endian, but the final result is in big-endian. This is the opposite of other operations.
+If there is a misalignment, that is fixed in the, first couple reads: we will do a two byte and
+a one byte read or one or the other to reach four-byte alignment, and then continue to read four
+bytes. Because PCI configuraiton space has no atomic access wider than a longword, a
+\fB.V[len]\fP operation is \fInot\fP atomic: if the underlying field changes between the
+individual accesses, the value may be read torn.
+.IP \(bu
 Finally, if a capability exists multiple times you can choose which one to target using
 \fB@number\fP. Indexing starts at 0.
 
@@ -179,6 +189,9 @@ specifies the upper byte of the vendor ID register (remember, PCI is little-endi
 corresponds to the second word of the power management capability.
 .IP ECAP108.l
 asks for the first 32-bit word of the extended capability with ID 0x108.
+.IP ECAP_DSN+4.V[8]
+reads the 8-byte Device Serial Number as a single little-endian value,
+equivalent to reading the longwords at \fB+4\fP and \fB+8\fP and combining them.
 
 .SH SEE ALSO
 .BR lspci (8),
