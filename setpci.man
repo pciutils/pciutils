@@ -157,15 +157,23 @@ To choose how many bytes (1, 2, or 4) should be transferred, you should append a
 specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP. The width can be omitted if you are
 referring to a register by its name and the width of the register is well known.
 .IP \(bu
-To transfer a variable-length window larger than a single access, apend \fB.V[len]\fP,
+To operate on a variable-length window larger than a single access, append \fB.V[len]\fP,
 where \fBlen\fP is a hexademical byte count set statically within setpci (4). The window is read
-as a sequence of aligned longword accesses, low address first. Each chunk is assembled in
+as a sequence of aligned long accesses, low address first. Each chunk is assembled in
 little-endian, but the final result is in big-endian. This is the opposite of other operations.
-If there is a misalignment, that is fixed in the, first couple reads: we will do a two byte and
+If there is a misalignment, that is fixed in the first couple reads: we will do a two byte and
 a one byte read or one or the other to reach four-byte alignment, and then continue to read four
-bytes. Because PCI configuraiton space has no atomic access wider than a longword, a
+bytes. Because PCI configuration space has no atomic access wider than a long, a
 \fB.V[len]\fP operation is \fInot\fP atomic: if the underlying field changes between the
 individual accesses, the value may be read torn.
+.IP \(bu
+To use a variable-length window larger than a single access specifically for reads on vendor-defined
+registers / values, you can use .V. In this mode, setpci will, at runtime, dynamically
+determine the length defined within the vendor header. Note that this only works for
+vendor-defined registers like ECAP_DVSEC or ECAP_VNDR. Note that the way in which reading is done and
+the output is produced is the same as the non-automatic variable-length window. That means the
+result is returned in big-endian, which is the \fIopposite\fP of all other operation sizes.
+
 .IP \(bu
 Finally, if a capability exists multiple times you can choose which one to target using
 \fB@number\fP. Indexing starts at 0.
@@ -192,6 +200,15 @@ asks for the first 32-bit word of the extended capability with ID 0x108.
 .IP ECAP_DSN+4.V[8]
 reads the 8-byte Device Serial Number as a single little-endian value,
 equivalent to reading the longwords at \fB+4\fP and \fB+8\fP and combining them.
+reads starting from the offset provided.
+.IP ECAP_DVSEC.V
+resolves the DVSEC capability on the device, reads DVSEC header 1 at base+4,
+extracts the length and reads as many bytes.
+.IP ECAP_VNDR+4.V
+resolves the Vendor specific capbaility on the device, reads the VSEC header,
+extracst the length and reads as many bytes within the span found.
+reads from the provided offset, automatically adjusting the total span to read with respect
+to the adjusted starting position
 
 .SH SEE ALSO
 .BR lspci (8),
