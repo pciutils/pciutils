@@ -158,22 +158,14 @@ specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP. The width can be omitted if you are
 referring to a register by its name and the width of the register is well known.
 .IP \(bu
 To operate on a variable-length window larger than a single access, append \fB.V[len]\fP,
-where \fBlen\fP is a hexademical byte count set statically within setpci (4). The window is read
-as a sequence of aligned long accesses, low address first. Each chunk is assembled in
-little-endian, but the final result is in big-endian. This is the opposite of other operations.
-If there is a misalignment, that is fixed in the first couple reads: we will do a two byte and
-a one byte read or one or the other to reach four-byte alignment, and then continue to read four
-bytes. Because PCI configuration space has no atomic access wider than a long, a
-\fB.V[len]\fP operation is \fInot\fP atomic: if the underlying field changes between the
-individual accesses, the value may be read torn.
+where \fBlen\fP is a hexademical byte count set statically within setpci (4). The requested
+number of bytes is printed out in a bite wise fashion with read width and alignment
+being handled internally. Note that this is a non-atomic operation and the result is printed
+in big-endian--opposite of all other operations.
 .IP \(bu
 To use a variable-length window larger than a single access specifically for reads on vendor-defined
-registers / values, you can use .V. In this mode, setpci will, at runtime, dynamically
-determine the length defined within the vendor header. Note that this only works for
-vendor-defined registers like ECAP_DVSEC or ECAP_VNDR. Note that the way in which reading is done and
-the output is produced is the same as the non-automatic variable-length window. That means the
-result is returned in big-endian, which is the \fIopposite\fP of all other operation sizes.
-
+registers / values, you can use .V. Setpci will determine the length at runtime, adjust for any
+offsets provided, and then perform a read with the same semantics as .V[len].
 .IP \(bu
 Finally, if a capability exists multiple times you can choose which one to target using
 \fB@number\fP. Indexing starts at 0.
