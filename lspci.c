@@ -571,10 +571,9 @@ show_htype1(struct device *d)
 
   if ((p->known_fields & PCI_FILL_BRIDGE_BASES) && !io_disabled)
     {
-      io_base = p->bridge_base_addr[0] & PCI_IO_RANGE_MASK;
+      io_base = p->bridge_base_addr[0];
       io_limit = io_base + p->bridge_size[0] - 1;
-      io_type = p->bridge_base_addr[0] & PCI_IO_RANGE_TYPE_MASK;
-      io_bits = (io_type == PCI_IO_RANGE_TYPE_32) ? 32 : 16;
+      io_bits = (p->bridge_flags[0] & PCI_IORESOURCE_IO_16BIT_ADDR) ? 16 : 32;
       show_range("\tI/O behind bridge", io_base, io_limit, io_bits, io_disabled);
     }
   else if (io_type != (io_limit & PCI_IO_RANGE_TYPE_MASK) ||
@@ -600,7 +599,7 @@ show_htype1(struct device *d)
 
   if ((p->known_fields & PCI_FILL_BRIDGE_BASES) && !mem_disabled)
     {
-      mem_base = p->bridge_base_addr[1] & PCI_MEMORY_RANGE_MASK;
+      mem_base = p->bridge_base_addr[1];
       mem_limit = mem_base + p->bridge_size[1] - 1;
       show_range("\tMemory behind bridge", mem_base, mem_limit, 32, mem_disabled);
     }
@@ -616,10 +615,9 @@ show_htype1(struct device *d)
 
   if ((p->known_fields & PCI_FILL_BRIDGE_BASES) && !pref_disabled)
     {
-      u64 pref_base_64 = p->bridge_base_addr[2] & PCI_MEMORY_RANGE_MASK;
+      u64 pref_base_64 = p->bridge_base_addr[2];
       u64 pref_limit_64 = pref_base_64 + p->bridge_size[2] - 1;
-      pref_type = p->bridge_base_addr[2] & PCI_MEMORY_RANGE_TYPE_MASK;
-      pref_bits = (pref_type == PCI_PREF_RANGE_TYPE_64) ? 64 : 32;
+      pref_bits = (p->bridge_flags[2] & PCI_IORESOURCE_MEM_64) ? 64 : 32;
       show_range("\tPrefetchable memory behind bridge", pref_base_64, pref_limit_64, pref_bits, pref_disabled);
     }
   else if (pref_type != (pref_limit & PCI_PREF_RANGE_TYPE_MASK) ||
