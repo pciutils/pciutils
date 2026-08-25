@@ -157,6 +157,16 @@ To choose how many bytes (1, 2, or 4) should be transferred, you should append a
 specifier \fB.B\fP, \fB.W\fP, or \fB.L\fP. The width can be omitted if you are
 referring to a register by its name and the width of the register is well known.
 .IP \(bu
+To operate on a variable-length window larger than a single access, append \fB.V[len]\fP,
+where \fBlen\fP is a hexademical byte count set statically within setpci (4). The requested
+number of bytes is printed out in a bite wise fashion with read width and alignment
+being handled internally. Note that this is a non-atomic operation and the result is printed
+in big-endian--opposite of all other operations.
+.IP \(bu
+To use a variable-length window larger than a single access specifically for reads on vendor-defined
+registers / values, you can use .V. Setpci will determine the length at runtime, adjust for any
+offsets provided, and then perform a read with the same semantics as .V[len].
+.IP \(bu
 Finally, if a capability exists multiple times you can choose which one to target using
 \fB@number\fP. Indexing starts at 0.
 
@@ -179,6 +189,18 @@ specifies the upper byte of the vendor ID register (remember, PCI is little-endi
 corresponds to the second word of the power management capability.
 .IP ECAP108.l
 asks for the first 32-bit word of the extended capability with ID 0x108.
+.IP ECAP_DSN+4.V[8]
+reads the 8-byte Device Serial Number as a single little-endian value,
+equivalent to reading the longwords at \fB+4\fP and \fB+8\fP and combining them.
+reads starting from the offset provided.
+.IP ECAP_DVSEC.V
+resolves the DVSEC capability on the device, reads DVSEC header 1 at base+4,
+extracts the length and reads as many bytes.
+.IP ECAP_VNDR+4.V
+resolves the Vendor specific capbaility on the device, reads the VSEC header,
+extracst the length and reads as many bytes within the span found.
+reads from the provided offset, automatically adjusting the total span to read with respect
+to the adjusted starting position
 
 .SH SEE ALSO
 .BR lspci (8),
