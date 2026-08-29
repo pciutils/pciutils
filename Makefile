@@ -41,6 +41,7 @@ MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; 
 INCDIR=$(PREFIX)/include
 LIBDIR=$(PREFIX)/lib
 PKGCFDIR=$(LIBDIR)/pkgconfig
+COMPDIR=$(shell pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo $(PREFIX)/etc/bash_completion.d)
 
 # Commands
 INSTALL=install
@@ -164,7 +165,7 @@ distclean: clean
 
 install: all
 # -c is ignored on Linux, but required on FreeBSD
-	$(DIRINSTALL) -m 755 $(DESTDIR)$(BINDIR) $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7 $(DESTDIR)$(MANDIR)/man5
+	$(DIRINSTALL) -m 755 $(DESTDIR)$(BINDIR) $(DESTDIR)$(SBINDIR) $(DESTDIR)$(IDSDIR) $(DESTDIR)$(MANDIR)/man8 $(DESTDIR)$(MANDIR)/man7 $(DESTDIR)$(MANDIR)/man5 $(DESTDIR)$(COMPDIR)
 	$(INSTALL) -c -m 755 $(STRIP) lspci$(EXEEXT) $(DESTDIR)$(LSPCIDIR)
 	$(INSTALL) -c -m 755 $(STRIP) setpci$(EXEEXT) $(DESTDIR)$(SBINDIR)
 	$(INSTALL) -c -m 755 $(STRIP) pcilmr$(EXEEXT) $(DESTDIR)$(SBINDIR)
@@ -184,6 +185,7 @@ else ifeq ($(LIBEXT),so)
 	ln -sf $(PCILIB) $(DESTDIR)$(LIBDIR)/$(LIBNAME).$(LIBEXT).$(ABI_VERSION)
 endif
 endif
+	for f in lspci setpci update-pciids; do $(INSTALL) -c -m 644 $$f.bash $(DESTDIR)$(COMPDIR)/$$f; done
 
 ifeq ($(SHARED),yes)
 install: install-pcilib
@@ -252,6 +254,7 @@ else
 endif
 endif
 endif
+	for f in lspci setpci update-pciids; do rm -f $(DESTDIR)$(COMPDIR)/$$f; done
 
 pci.ids.gz: pci.ids
 	gzip -9n <$< >$@
