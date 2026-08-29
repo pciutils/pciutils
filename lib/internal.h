@@ -91,6 +91,7 @@ struct pci_access *pci_clone_access(struct pci_access *a);
 int pci_init_internal(struct pci_access *a, int skip_method);
 
 void pci_init_v30(struct pci_access *a) VERSIONED_ABI;
+void pci_init_v32(struct pci_access *a) VERSIONED_ABI;
 void pci_init_v35(struct pci_access *a) VERSIONED_ABI;
 
 /* access.c */

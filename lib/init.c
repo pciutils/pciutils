@@ -533,7 +533,9 @@ pci_init_v35(struct pci_access *a)
 
 STATIC_ALIAS(void pci_init(struct pci_access *a), pci_init_v35(a));
 DEFINE_ALIAS(void pci_init_v30(struct pci_access *a), pci_init_v35);
+DEFINE_ALIAS(void pci_init_v32(struct pci_access *a), pci_init_v35);
 SYMBOL_VERSION(pci_init_v30, pci_init@LIBPCI_3.0);
+SYMBOL_VERSION(pci_init_v32, pci_init@LIBPCI_3.2);
 SYMBOL_VERSION(pci_init_v35, pci_init@@LIBPCI_3.5);
 
 struct pci_access *
