@@ -65,7 +65,13 @@ do_map_bus(int bus)
   for (dev = 0; dev < 32; dev++)
     if (filter.slot < 0 || filter.slot == dev)
       {
+	struct pci_dev *p0 = pci_get_dev(pacc, domain, bus, dev, 0);
+	u16 vendor0 = pci_read_word(p0, PCI_VENDOR_ID);
 	int func_limit = 1;
+	if (vendor0 && vendor0 != 0xffff && (pci_read_byte(p0, PCI_HEADER_TYPE) & 0x80))
+	  func_limit = 8;
+	pci_free_dev(p0);
+
 	for (func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
@@ -73,8 +79,6 @@ do_map_bus(int bus)
 	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
 	      if (vendor && vendor != 0xffff)
 		{
-		  if (!func && (pci_read_byte(p, PCI_HEADER_TYPE) & 0x80))
-		    func_limit = 8;
 		  if (verbose)
 		    printf("Discovered device %04x:%02x:%02x.%d\n", domain, bus, dev, func);
 		  bi->exists = 1;
