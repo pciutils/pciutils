@@ -146,6 +146,6 @@ extern struct pci_methods pm_intel_conf1, pm_intel_conf2, pm_linux_proc,
 	pm_dump, pm_linux_sysfs, pm_darwin, pm_sylixos_device, pm_hurd,
 	pm_mmio_conf1, pm_mmio_conf1_ext, pm_ecam,
 	pm_win32_cfgmgr32, pm_win32_kldbg, pm_win32_sysdbg, pm_aos_expansion,
-	pm_rt_thread_smart_dm;
+	pm_rt_thread_smart_dm, pm_minios;
 
 #endif

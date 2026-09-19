@@ -101,6 +101,10 @@ typedef u16 word;
   #include <machine/endian.h>
 #endif
 
+#ifdef PCI_OS_MINIOS
+  #include <machine/endian.h>
+#endif
+
 #if !defined(BYTE_ORDER)
 #error "BYTE_ORDER not defined for your platform"
 #endif

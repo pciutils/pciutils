@@ -81,6 +81,10 @@ ifdef PCI_OS_WINDOWS
 OBJS += win32-helpers
 endif
 
+ifdef PCI_OS_MINIOS
+OBJS += minios
+endif
+
 ifdef PCI_USE_PHYSMEM
 ifdef PCI_OS_WINDOWS
 OBJS += physmem-windows
@@ -172,6 +176,7 @@ win32-cfgmgr32.o: win32-cfgmgr32.c $(INCL) win32-helpers.h
 win32-kldbg.o: win32-kldbg.c $(INCL) win32-helpers.h
 win32-sysdbg.o: win32-sysdbg.c $(INCL) win32-helpers.h
 i386-io-windows.h: win32-helpers.h
+minios.o: minios.c $(INCL)
 
 # MinGW32 toolchain has some required Win32 header files in /ddk subdirectory.
 # But these header files include another header files from /ddk subdirectory

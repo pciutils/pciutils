@@ -1,0 +1,15 @@
+Since MiniOS is cross-built with the host compiler with just different
+header/library paths, lib/configure can not really detect it by itself. pciutils
+thus needs to be built with an explicit libpci.config.mak reading:
+
+PCI_OS_MINIOS=1
+PCI_HAVE_STDINT_H=1
+PCI_PATH_IDS_DIR=.
+PCI_IDS=pci.ids
+
+and libpci.config.h reading:
+
+#define PCI_OS_MINIOS in
+#define PCI_HAVE_STDINT_H
+#define PCI_PATH_IDS_DIR "."
+#define PCI_IDS "pci.ids"

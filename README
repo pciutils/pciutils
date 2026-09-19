@@ -34,6 +34,7 @@ In runs on the following systems:
 	SylixOS		(via /proc/pci)
 	AmigaOS on PPC	(via Expansion library)
 	RT-Thread Smart	(via /proc/pci)
+	Xen MiniOS      (via pcifront, see README.MiniOS)
 
 It should be very easy to add support for other systems as well (volunteers
 wanted; if you want to try that, I'll be very glad to see the patches and
