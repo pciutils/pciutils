@@ -92,6 +92,61 @@ get_hdr_type(struct pci_dev *d)
   return d->hdrtype;
 }
 
+static u32
+pci32_size(u32 base, u32 maxbase, u32 mask)
+{
+  u32 size = mask & maxbase;
+  if (!size)
+    return 0;
+  size = (size & ~(size-1)) - 1;
+
+  if (base == maxbase && ((base | size) & mask) != mask)
+    return 0;
+
+  return size + 1;
+}
+
+static u64
+pci64_size(u64 base, u64 maxbase, u64 mask)
+{
+  u64 size = mask & maxbase;
+  if (!size)
+    return 0;
+  size = (size & ~(size-1)) - 1;
+
+  if (base == maxbase && ((base | size) & mask) != mask)
+    return 0;
+
+  return size + 1;
+}
+
+static void
+fill_pci32_size(struct pci_dev *d, unsigned int flags, u32 base, u32 mask, int i)
+{
+  if (!want_fill(d, flags, PCI_FILL_SIZES))
+    return;
+
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + i*4, ~0);
+  d->size[i] = pci32_size(base, pci_read_long(d, PCI_BASE_ADDRESS_0 + i*4), mask);
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + i*4, base);
+}
+
+static void
+fill_pci64_size(struct pci_dev *d, unsigned int flags, u64 base, u64 mask, int i)
+{
+  if (!want_fill(d, flags, PCI_FILL_SIZES))
+    return;
+
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + i*4, ~0);
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + (i+1)*4, ~0);
+  d->size[i] = pci64_size(base,
+      pci_read_long(d, PCI_BASE_ADDRESS_0 + i*4)
+    | (((u64) pci_read_long(d, PCI_BASE_ADDRESS_0 + (i+1)*4)) << 32),
+      mask);
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + i*4, base);
+  pci_write_long(d, PCI_BASE_ADDRESS_0 + (i+1)*4, base >> 32);
+}
+
 void
 pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 {
@@ -165,11 +220,17 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 	      if (!x || x == (u32) ~0)
 		continue;
 	      if ((x & PCI_BASE_ADDRESS_SPACE) == PCI_BASE_ADDRESS_SPACE_IO)
-		d->base_addr[i] = x;
+		{
+		  d->base_addr[i] = x;
+		  fill_pci32_size(d, flags, x, (u32) PCI_BASE_ADDRESS_IO_MASK, i);
+		}
 	      else
 		{
 		  if ((x & PCI_BASE_ADDRESS_MEM_TYPE_MASK) != PCI_BASE_ADDRESS_MEM_TYPE_64)
-		    d->base_addr[i] = x;
+		    {
+		      d->base_addr[i] = x;
+		      fill_pci32_size(d, flags, x, (u32) PCI_BASE_ADDRESS_MEM_MASK, i);
+		    }
 		  else if (i >= cnt-1)
 		    a->warning("%04x:%02x:%02x.%d: Invalid 64-bit address seen for BAR %d.", d->domain, d->bus, d->dev, d->func, i);
 		  else
@@ -177,11 +238,15 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 		      u32 y = pci_read_long(d, PCI_BASE_ADDRESS_0 + (++i)*4);
 #ifdef PCI_HAVE_64BIT_ADDRESS
 		      d->base_addr[i-1] = x | (((pciaddr_t) y) << 32);
+		      fill_pci64_size(d, flags, d->base_addr[i-1], PCI_BASE_ADDRESS_MEM_MASK, i-1);
 #else
 		      if (y)
 			a->warning("%04x:%02x:%02x.%d 64-bit device address ignored.", d->domain, d->bus, d->dev, d->func);
 		      else
-			d->base_addr[i-1] = x;
+			{
+			  d->base_addr[i-1] = x;
+			  fill_pci32_size(d, flags, x, (u32) PCI_BASE_ADDRESS_MEM_MASK, i-1);
+			}
 #endif
 		    }
 		}
@@ -206,7 +271,15 @@ pci_generic_fill_info(struct pci_dev *d, unsigned int flags)
 	{
 	  u32 u = pci_read_long(d, reg);
 	  if (u != 0xffffffff)
-	    d->rom_base_addr = u;
+	    {
+	      d->rom_base_addr = u;
+	      if (want_fill(d, flags, PCI_FILL_SIZES))
+		{
+		  pci_write_long(d, reg, ~0);
+		  d->rom_size = pci_read_long(d, reg);
+		  pci_write_long(d, reg, u);
+		}
+	    }
 	}
     }
 
