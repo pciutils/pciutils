@@ -168,6 +168,11 @@ static struct pci_methods *pci_methods[PCI_ACCESS_MAX] = {
 #else
   NULL,
 #endif
+#ifdef PCI_OS_MINIOS
+  &pm_minios,
+#else
+  NULL,
+#endif
 };
 
 // If PCI_ACCESS_AUTO is selected, we probe the access methods in this order
@@ -187,6 +192,7 @@ static int probe_sequence[] = {
   PCI_ACCESS_WIN32_SYSDBG,
   PCI_ACCESS_AOS_EXPANSION,
   PCI_ACCESS_RT_THREAD_SMART_DM,
+  PCI_ACCESS_MINIOS,
   // Low-level methods poking the hardware directly
   PCI_ACCESS_ECAM,
   PCI_ACCESS_I386_TYPE1,

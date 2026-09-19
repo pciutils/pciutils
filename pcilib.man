@@ -172,6 +172,9 @@ filesystem provided by RT-Thread Smart OS. This method requires PCI support
 and the DFS v2-based procfs must be mounted in a rootfs-enabled environment.
 It provides access to the standard PCI configuration space, with limited
 information available.
+.TP
+.B minios
+Access method used on Xen MiniOS, through the para-virtualized PCI frontend.
 
 .SH PARAMETERS
 
