@@ -8,14 +8,18 @@
  *	SPDX-License-Identifier: GPL-2.0-or-later
  */
 
+#include "lib/pci.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <strings.h>
 
 #define PCIUTILS_SETPCI
 #include "pciutils.h"
+
+#define MAX_OP_WIDTH 4        /* Has to be 1, 2, or 4 (valid singular pci read size) */
 
 static int force;			/* Don't complain if no devices match */
 static int verbose;			/* Verbosity level */
@@ -39,6 +43,8 @@ struct op {
   unsigned int hdr_type_mask;
   unsigned int addr;
   unsigned int width;			/* Byte width of the access */
+  int32_t span;                 /* Width of variable-sized window in bytes (0 unless .V) */
+  unsigned int auto_discov;     /* Dynamically determine the span at runtime? */
   unsigned int num_values;		/* Number of values to write; 0=read */
   unsigned int number;                 /* The n-th capability of that id */
   struct value values[0];
@@ -108,6 +114,60 @@ trace(const char *fmt, ...)
   va_end(args);
 }
 
+static u32
+auto_discov_len(struct pci_dev *dev, int addr, int shift)
+{
+  u32 header = pci_read_long(dev, addr);
+  return (header >> shift) & 0xfff;
+}
+
+static u32
+det_ext_cap_defined_length(struct pci_dev *dev, int cap_base, int cap_id, int cap_type)
+{
+  if (cap_type != PCI_CAP_EXTENDED)
+    die("Auto length only supports extended vendor-defined capabilities");
+
+  switch (cap_id)
+    {
+      case PCI_EXT_CAP_ID_DVSEC:
+      case PCI_EXT_CAP_ID_VNDR:
+        return auto_discov_len(dev, cap_base + 4, 20);
+      default:
+        die("Auto length not supported for this capability");
+    }
+}
+
+static unsigned int
+pci_read(struct pci_dev *dev, int addr, int w)
+{
+  switch (w)
+    {
+      case 1:  return pci_read_byte(dev, addr);
+      case 2:  return pci_read_word(dev, addr);
+      default: return pci_read_long(dev, addr);
+    }
+}
+
+static unsigned int
+determine_width_alignment(unsigned int addr, int remaining)
+{
+  if ((addr & 3) == 0 && remaining >= 4)
+    return 4;
+  if ((addr & 1) == 0 && remaining >= 2)
+    return 2;
+
+  return 1;
+}
+
+static void
+print_le_bytes(u32 x, int width)
+{
+  for (int b = 0; b < width; b++)
+    {
+      printf("%02x", (x >> (8 * b)) & 0xff);
+    }
+}
+
 static void
 exec_op(struct op *op, struct pci_dev *dev)
 {
@@ -116,6 +176,7 @@ exec_op(struct op *op, struct pci_dev *dev)
   unsigned int i, x, y;
   int addr = 0;
   int width = op->width;
+  int32_t span;
   char slot[16];
 
   snprintf(slot, sizeof(slot), "%04x:%02x:%02x.%x", dev->domain, dev->bus, dev->dev, dev->func);
@@ -142,11 +203,23 @@ exec_op(struct op *op, struct pci_dev *dev)
   addr += op->addr;
   trace("@%02x", addr);
 
+  if (op->auto_discov && !op->cap_type)
+    die("%s: Auto length requires a capability", slot);
+
+  span = op->auto_discov
+    ? op->span + (int32_t)det_ext_cap_defined_length(dev, addr - op->addr, op->cap_id, op->cap_type)
+    : op->span;
+
+  if (span < 0)
+    die("Span cannot be negative: \"%d\"", span);
+
   /* We have already checked it when parsing, but addressing relative to capabilities can change the address. */
   if (addr & (width-1))
     die("%s: Unaligned access of width %d to register %04x", slot, width, addr);
   if (addr + width > 0x1000)
     die("%s: Access of width %d to register %04x out of range", slot, width, addr);
+  if (span && addr + span > 0x1000)
+    die("%s: Access of range %d to register %04x is out of range", slot, span, addr);
 
   if (op->hdr_type_mask)
     {
@@ -203,20 +276,26 @@ exec_op(struct op *op, struct pci_dev *dev)
   else
     {
       trace(" = ");
-      switch (width)
-	{
-	case 1:
-	  x = pci_read_byte(dev, addr);
-	  break;
-	case 2:
-	  x = pci_read_word(dev, addr);
-	  break;
-	default:
-	  x = pci_read_long(dev, addr);
-	  break;
-	}
-      printf(formats[width]+1, x);
-      putchar('\n');
+      if (!span)
+        {
+          x = pci_read(dev, addr, width);
+          printf(formats[width]+1, x);
+          putchar('\n');
+        }
+      else
+        {
+          int32_t remaining = span;
+          while (remaining)
+            {
+              width = determine_width_alignment(addr, remaining);
+              x = pci_read(dev, addr, width);
+              print_le_bytes(x, width);
+              addr += width;
+              remaining -= width;
+            }
+
+          putchar('\n');
+        }
     }
 }
 
@@ -440,13 +519,15 @@ GENERIC_HELP
 "Setting commands:\n"
 "<device>:\t-s [[[<domain>]:][<bus>]:][<slot>][.[<func>]]\n"
 "\t\t-d [<vendor>]:[<device>]\n"
-"<reg>:\t\t<base>[+<offset>][.(B|W|L)][@<number>]\n"
+"<reg>:\t\t<base>[+<offset>][.(B|W|L|V[<length>]|V)][@<number>]\n"
 "<base>:\t\t<address>\n"
 "\t\t<named-register>\n"
 "\t\t[E]CAP_<capability-name>\n"
 "\t\t[E]CAP<capability-number>\n"
 "<values>:\t<value>[,<value>...]\n"
 "<value>:\t<hex>\n"
+"<length>:\t<hex> (number of bytes)\n"
+"V:\tdynamic, runtime discovery of header length\n"
 "\t\t<hex>:<mask>\n");
   exit(0);
 }
@@ -668,7 +749,10 @@ static void parse_op(char *c, struct group *group)
 {
   char *base, *offset, *width, *value, *number;
   char *e, *f;
+  char *span = NULL;
   int n, j;
+  unsigned int span_val = 0;
+  unsigned int auto_discov = 0;
   struct op *op;
 
   /* Split the argument */
@@ -679,6 +763,35 @@ static void parse_op(char *c, struct group *group)
     *number++ = 0;
   if (width = strchr(base, '.'))
     *width++ = 0;
+  if (width)
+    {
+      if (span = strchr(width, '['))
+        {
+          char *close;
+          *span++ = 0;
+
+          if (strcasecmp(width, "V"))
+            parse_err("Span is only allowed on the variable length operator \".V\"");
+
+          close = strchr(span, ']');
+          if (!close)
+            parse_err("Invalid span provided : \"%s\"", span);
+
+          if (close[1])
+            parse_err("Invalid characters placed after \"]\". Please use \".V\" or \".V[len]\"");
+
+          *close = 0;
+          if (parse_x32(span, NULL, &span_val) != 1)
+            parse_err("Invalid span provided: \"%s\"", span);
+          if (span_val == 0)
+            parse_err("Span must be a non-zero value. Span is: \"%d\"", span_val);
+        }
+      else if(!strcasecmp(width, "V"))
+        {
+          auto_discov = 1;
+          span = "V";
+        }
+    }
   if (offset = strchr(base, '+'))
     *offset++ = 0;
 
@@ -694,6 +807,9 @@ static void parse_op(char *c, struct group *group)
 	  n++;
     }
 
+  if (span && n)
+    parse_err("Variable length (.V or .V[...]) is a read only feature");
+
   /* Allocate the operation */
   op = xmalloc(sizeof(struct op) + n*sizeof(struct value));
   memset(op, 0, sizeof(struct op));
@@ -702,7 +818,7 @@ static void parse_op(char *c, struct group *group)
   op->num_values = n;
 
   /* What is the width suffix? */
-  if (width)
+  if (width && strcasecmp(width, "V"))
     {
       if (width[1])
 	parse_err("Invalid width \"%s\"", width);
@@ -716,7 +832,22 @@ static void parse_op(char *c, struct group *group)
 	  op->width = 4; break;
 	default:
 	  parse_err("Invalid width \"%c\"", *width);
-	}
+	  }
+    }
+  else if (span)
+    {
+      if (!width || strncasecmp(width, "V", 1) || width[1])
+        parse_err("Invalid variable-width suffix; expected .V[N]");
+
+      if (auto_discov)
+        {
+          op->span = 0;
+          op->auto_discov = auto_discov;
+        }
+      else
+        op->span = span_val;
+
+      op->width = MAX_OP_WIDTH;
     }
   else
     op->width = 0;
@@ -745,10 +876,15 @@ static void parse_op(char *c, struct group *group)
       if (parse_x32(offset, NULL, &off) <= 0 || off >= 0x1000)
 	parse_err("Invalid offset \"%s\"", offset);
       op->addr += off;
+
+      /* Adjust for the provided offset in preparation for the auto-discovered, raw span */
+      if (auto_discov)
+        op->span -= off;
     }
 
   /* Check range */
-  if (op->addr >= 0x1000 || op->addr + op->width*(n ? n : 1) > 0x1000)
+  unsigned int range_span = op->span ? (u32)op->span : op->width * (n ? n : 1);
+  if (op->addr >= 0x1000 || op->addr + range_span > 0x1000)
     parse_err("Register number %02x out of range", op->addr);
   if (op->addr & (op->width - 1))
     parse_err("Unaligned register address %02x", op->addr);
