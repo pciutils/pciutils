@@ -397,7 +397,8 @@ cap_ats(struct device *d, int where)
     return;
 
   w = get_conf_word(d, where + PCI_ATS_CAP);
-  printf("\t\tATSCap:\tInvalidate Queue Depth: %02x\n", PCI_ATS_CAP_IQD(w));
+  printf("\t\tATSCap:\tInvalidate Queue Depth: %02x, Page Aligned Request%c\n",
+      PCI_ATS_CAP_IQD(w), FLAG(w, PCI_ATS_CAP_PAGE_ALIGNED));
   w = get_conf_word(d, where + PCI_ATS_CTRL);
   printf("\t\tATSCtl:\tEnable%c, Smallest Translation Unit: %02x\n",
 	FLAG(w, PCI_ATS_CTRL_ENABLE), PCI_ATS_CTRL_STU(w));
