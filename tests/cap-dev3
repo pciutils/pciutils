@@ -63,6 +63,15 @@
 		L1SubCtl1: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2- ASPM_L1.1-
 			   T_CommonMode=0us LTR1.2_Threshold=32768ns
 		L1SubCtl2: T_PwrOn=10us
+	Capabilities: [300 v1] Device 3
+		DevCap3: DMWr Request Routing+, 14-Bit Tag Completer+, 14-Bit Tag Requester+
+			 L0p+, Port L0p Exit Latency: Less than 1us, Retimer L0p Exit Latency: Less than 1us
+			 UIO Mem RdWr Completer+, UIO Mem RdWr Requester+
+			 OHC-E Support: Not indicated
+		DevCtl3: DMWr Requester+, DMWr Egress Blocking+, 14-Bit Tag Requester-
+			 L0p-, Target Link Width: x2
+			 UIO Mem RdWr Requester+, UIO Request 256B Boundary-
+		DevSta3: Initial Link Width: x1, Segment Captured+, Remote L0p+
 	Kernel driver in use: nvme
 	Kernel modules: nvme
 00: c3 16 da ed 06 04 10 00 03 02 08 01 10 00 00 00

@@ -1534,6 +1534,7 @@
 #define  PCI_DEV3_DEVCAP3_RETIMER_L0P_EXIT(x)	(((x) >> 7) & 0x7) /* Retimer L0p Exit Latency */
 #define  PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_COMP	0x0400	/* UIO Mem RdWr Completer Supported */
 #define  PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ	0x0800	/* UIO Mem RdWr Requester Supported */
+#define  PCI_DEV3_DEVCAP3_OHC_E_SUPP(x)	(((x) >> 12) & 0x7) /* OHC-E Support */
 
 #define PCI_DEV3_DEVCTL3		0x08	/* Device Control 3 */
 #define  PCI_DEV3_DEVCTL3_DMWR_REQ_EN	0x0001	/* DMWr Requester Enable */
