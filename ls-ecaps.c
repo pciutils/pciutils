@@ -1932,8 +1932,32 @@ static const char *link_width_str(char *buf, size_t buflen, int width)
     }
 }
 
+static const char *ohc_e_support_str(u32 val, int type)
+{
+  /* For switches, the field covers the USP and all its Downstream Ports. */
+  int is_switch = (type == PCI_EXP_TYPE_UPSTREAM);
+
+  switch (val)
+    {
+      case 0:
+        return "Not indicated";
+      case 1:
+        return "OHC-E1";
+      case 2:
+        return "OHC-E1, OHC-E2";
+      case 3:
+        return "OHC-E1, OHC-E2, OHC-E4";
+      case 4:
+        return is_switch ? "Not supported, All forwarded" : "Reserved";
+      case 7:
+        return is_switch ? "Not supported, Not forwarded" : "Not supported";
+      default:
+        return "Reserved";
+    }
+}
+
 static void
-cap_dev3(struct device *d, int where)
+cap_dev3(struct device *d, int where, int type)
 {
   u32 devcap3;
   u16 devctl3, devsta3;
@@ -1960,9 +1984,11 @@ cap_dev3(struct device *d, int where)
            l0p_exit_latency(PCI_DEV3_DEVCAP3_PORT_L0P_EXIT(devcap3)),
            l0p_exit_latency(PCI_DEV3_DEVCAP3_RETIMER_L0P_EXIT(devcap3)));
 
-  printf("\n\t\t\t UIO Mem RdWr Completer%c, UIO Mem RdWr Requester%c\n",
+  printf("\n\t\t\t UIO Mem RdWr Completer%c, UIO Mem RdWr Requester%c\n"
+         "\t\t\t OHC-E Support: %s\n",
          FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_COMP),
-         FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ));
+         FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ),
+         ohc_e_support_str(PCI_DEV3_DEVCAP3_OHC_E_SUPP(devcap3), type));
 
   if (!config_fetch(d, where + PCI_DEV3_DEVCTL3, 2))
     return;
@@ -2516,7 +2542,7 @@ show_ext_caps(struct device *d, int type)
 	    cap_phy_64gt(d, where);
 	    break;
 	  case PCI_EXT_CAP_ID_DEV3:
-	    cap_dev3(d, where);
+	    cap_dev3(d, where, type);
 	    break;
 	  case PCI_EXT_CAP_ID_MMIO_RBL:
 	    cap_mmio_rbl(d, where);
