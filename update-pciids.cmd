@@ -1,6 +1,6 @@
 @set @rem=1 /*
 @echo off
-cscript %0 //E:JScript //Nologo
+cscript //E:JScript //Nologo "%~f0" %*
 goto end
 */;
 
