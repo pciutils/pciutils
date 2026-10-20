@@ -60,16 +60,17 @@ dev_for_filter(struct pci_access *pacc, char *filter)
 }
 
 static u8
-parse_csv_arg(char *arg, u8 *vals)
+parse_csv_arg(char *arg, u8 *vals, u8 max_vals)
 {
   u8 cnt = 0;
   char *token = strtok(arg, ",");
-  while (token)
-    {
-      vals[cnt] = atoi(token);
-      cnt++;
-      token = strtok(NULL, ",");
-    }
+  while (token && cnt < max_vals) {
+    vals[cnt] = atoi(token);
+    cnt++;
+    token = strtok(NULL, ",");
+  }
+  if (token)
+    die("Too many values in CSV argument. Maximum is %u.\n", max_vals);
   return cnt;
 }
 
@@ -132,10 +133,10 @@ parse_dev_args(int argc, char **argv, struct margin_link_args *args, u8 link_spe
             args->parallel_lanes = atoi(optarg);
             break;
           case 'l':
-            args->lanes_n = parse_csv_arg(optarg, args->lanes);
+            args->lanes_n = parse_csv_arg(optarg, args->lanes, sizeof(args->lanes) / sizeof(*args->lanes));
             break;
           case 'r':
-            args->recvs_n = parse_csv_arg(optarg, args->recvs);
+            args->recvs_n = parse_csv_arg(optarg, args->recvs, sizeof(args->recvs) / sizeof(*args->recvs));
             break;
             case 'g': {
               char recv[2] = { 0 };
