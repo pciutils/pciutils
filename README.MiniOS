@@ -1,3 +1,5 @@
+# Bulding pciutils on Xen MiniOS
+
 Since MiniOS is cross-built with the host compiler with just different
 header/library paths, lib/configure can not really detect it by itself. pciutils
 thus needs to be built with an explicit libpci.config.mak reading:
