@@ -1,7 +1,7 @@
 /*
  *	The PCI Utilities -- Bus Mapping Mode
  *
- *	Copyright (c) 1997--2008 Martin Mares <mj@ucw.cz>
+ *	Copyright (c) 1997--2026 Martin Mares <mj@ucw.cz>
  *
  *	Can be freely distributed and used under the terms of the GNU GPL v2+.
  *
@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "lspci.h"
 
@@ -51,6 +52,13 @@ map_bridge(struct bus_info *bi, struct device *d, int np, int ns, int nl)
     }
 }
 
+static bool
+looks_like_real_device(struct pci_dev *p)
+{
+  u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
+  return vendor && vendor != 0xffff;
+}
+
 static void
 do_map_bus(int bus)
 {
@@ -65,16 +73,19 @@ do_map_bus(int bus)
   for (dev = 0; dev < 32; dev++)
     if (filter.slot < 0 || filter.slot == dev)
       {
-	int func_limit = 1;
+	struct pci_dev *p0 = pci_get_dev(pacc, domain, bus, dev, 0);
+	int func_limit;
+	if (looks_like_real_device(p0) && (pci_read_byte(p0, PCI_HEADER_TYPE) & 0x80))
+	  func_limit = 8;
+	else
+	  func_limit = 1;
+
 	for (func = 0; func < func_limit; func++)
 	  if (filter.func < 0 || filter.func == func)
 	    {
 	      struct pci_dev *p = pci_get_dev(pacc, domain, bus, dev, func);
-	      u16 vendor = pci_read_word(p, PCI_VENDOR_ID);
-	      if (vendor && vendor != 0xffff)
+	      if (looks_like_real_device(p))
 		{
-		  if (!func && (pci_read_byte(p, PCI_HEADER_TYPE) & 0x80))
-		    func_limit = 8;
 		  if (verbose)
 		    printf("Discovered device %04x:%02x:%02x.%d\n", domain, bus, dev, func);
 		  bi->exists = 1;
