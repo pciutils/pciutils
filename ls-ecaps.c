@@ -397,7 +397,7 @@ cap_ats(struct device *d, int where)
     return;
 
   w = get_conf_word(d, where + PCI_ATS_CAP);
-  printf("\t\tATSCap:\tInvalidate Queue Depth: %02x, Page Aligned Request%c\n",
+  printf("\t\tATSCap:\tInvalidate Queue Depth: %02x, Page Aligned Request %c\n",
       PCI_ATS_CAP_IQD(w), FLAG(w, PCI_ATS_CAP_PAGE_ALIGNED));
   w = get_conf_word(d, where + PCI_ATS_CTRL);
   printf("\t\tATSCtl:\tEnable%c, Smallest Translation Unit: %02x\n",
@@ -802,7 +802,7 @@ cap_lmr(struct device *d, int where)
   u16 port_caps = get_conf_word(d, where + PCI_LMR_CAPS);
   u16 port_status = get_conf_word(d, where + PCI_LMR_PORT_STS);
 
-  printf("\t\tPortCap: Uses Driver%c\n", FLAG(port_caps, PCI_LMR_CAPS_DRVR));
+  printf("\t\tPortCap: UsesDriver%c\n", FLAG(port_caps, PCI_LMR_CAPS_DRVR));
   printf("\t\tPortSta: MargReady%c MargSoftReady%c\n",
          FLAG(port_status, PCI_LMR_PORT_STS_READY),
          FLAG(port_status, PCI_LMR_PORT_STS_SOFT_READY));
@@ -1973,7 +1973,7 @@ cap_dev3(struct device *d, int where, int type)
     return;
   devcap3 = get_conf_long(d, where + PCI_DEV3_DEVCAP3);
 
-  printf("\t\tDevCap3: DMWr Request Routing%c, 14-Bit Tag Completer%c, 14-Bit Tag Requester%c\n"
+  printf("\t\tDevCap3: DMWr Request Routing %c, 14-Bit Tag Completer %c, 14-Bit Tag Requester %c\n"
          "\t\t\t L0p%c",
          FLAG(devcap3, PCI_DEV3_DEVCAP3_DMWR_REQ),
          FLAG(devcap3, PCI_DEV3_DEVCAP3_14BIT_TAG_COMP),
@@ -1985,7 +1985,7 @@ cap_dev3(struct device *d, int where, int type)
            l0p_exit_latency(PCI_DEV3_DEVCAP3_PORT_L0P_EXIT(devcap3)),
            l0p_exit_latency(PCI_DEV3_DEVCAP3_RETIMER_L0P_EXIT(devcap3)));
 
-  printf("\n\t\t\t UIO Mem RdWr Completer%c, UIO Mem RdWr Requester%c\n"
+  printf("\n\t\t\t UIO Mem RdWr Completer %c, UIO Mem RdWr Requester %c\n"
          "\t\t\t OHC-E Support: %s\n",
          FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_COMP),
          FLAG(devcap3, PCI_DEV3_DEVCAP3_UIO_MEM_RDWR_REQ),
@@ -1995,9 +1995,9 @@ cap_dev3(struct device *d, int where, int type)
     return;
   devctl3 = get_conf_word(d, where + PCI_DEV3_DEVCTL3);
 
-  printf("\t\tDevCtl3: DMWr Requester%c, DMWr Egress Blocking%c, 14-Bit Tag Requester%c\n"
+  printf("\t\tDevCtl3: DMWr Requester %c, DMWr Egress Blocking %c, 14-Bit Tag Requester %c\n"
          "\t\t\t L0p%c, Target Link Width: %s\n"
-         "\t\t\t UIO Mem RdWr Requester%c, UIO Request 256B Boundary%c\n",
+         "\t\t\t UIO Mem RdWr Requester %c, UIO Request 256B Boundary %c\n",
          FLAG(devctl3, PCI_DEV3_DEVCTL3_DMWR_REQ_EN),
          FLAG(devctl3, PCI_DEV3_DEVCTL3_DMWR_EGRESS_BLK),
          FLAG(devctl3, PCI_DEV3_DEVCTL3_14BIT_TAG_REQ_EN),
@@ -2010,7 +2010,7 @@ cap_dev3(struct device *d, int where, int type)
     return;
   devsta3 = get_conf_word(d, where + PCI_DEV3_DEVSTA3);
 
-  printf("\t\tDevSta3: Initial Link Width: %s, Segment Captured%c, Remote L0p%c\n",
+  printf("\t\tDevSta3: Initial Link Width: %s, Segment Captured %c, Remote L0p%c\n",
          link_width_str(buf, sizeof(buf), PCI_DEV3_DEVSTA3_INIT_LINK_WIDTH(devsta3)),
          FLAG(devsta3, PCI_DEV3_DEVSTA3_SEGMENT_CAPTURED),
          FLAG(devsta3, PCI_DEV3_DEVSTA3_REMOTE_L0P_SUPP));
@@ -2306,7 +2306,7 @@ cap_flit_log(struct device *d, int where)
 
   u32 err_log_1 = get_conf_long(d, where + PCI_FLIT_LOG_ERR1);
   printf("\t\tLog1:      Valid%c, Link Width: %s\n"
-         "\t\t\t   More entries%c Unrecognized flit%c FEC uncorrectable%c\n"
+         "\t\t\t   MoreEntries%c UnrecognizedFlit%c FECUncorrectable%c\n"
          "\t\t\t   SyndParityGrp0: %02x, SyndCheckGrp0: %02x\n",
          FLAG(err_log_1, PCI_FLIT_LOG_ERR1_VLD),
          link_width_str(buf, sizeof(buf), PCI_FLIT_LOG_ERR1_WIDTH(err_log_1)),
@@ -2334,7 +2334,7 @@ cap_flit_log(struct device *d, int where)
 
   u16 err_cnt_sts = get_conf_word(d, where + PCI_FLIT_LOG_CNT_STS);
   printf("\t\tCntSts:    Link Width when Error Counter Started %s\n"
-         "\t\t\t   Interrupt Generated based on Trigger Event Count%c, FlitErr: %u\n",
+         "\t\t\t   Interrupt Generated based on Trigger Event Count %c, FlitErr: %u\n",
          link_width_str(buf, sizeof(buf), PCI_FLIT_LOG_CNT_STS_WIDTH(err_cnt_sts)),
          FLAG(err_cnt_sts, PCI_FLIT_LOG_CNT_STS_INT),
          PCI_FLIT_LOG_CNT_STS_CNT(err_cnt_sts));
