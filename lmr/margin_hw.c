@@ -178,7 +178,7 @@ margin_restore_dev(struct margin_dev *dev)
     return;
 
   u16 lnk_ctl = pci_read_word(dev->dev, pcie->addr + PCI_EXP_LNKCTL);
-  lnk_ctl = SET_REG_MASK(lnk_ctl, PCI_EXP_LNKCAP_ASPM, dev->aspm);
+  lnk_ctl = SET_REG_MASK(lnk_ctl, PCI_EXP_LNKCTL_ASPM, dev->aspm);
   lnk_ctl = SET_REG_MASK(lnk_ctl, PCI_EXP_LNKCTL_HWAUTWD, dev->hawd);
   pci_write_word(dev->dev, pcie->addr + PCI_EXP_LNKCTL, lnk_ctl);
 
