@@ -788,6 +788,160 @@ cap_rcec(struct device *d, int where)
     printf("\t\tAssociatedBusNumbers: %02x-%02x\n", nextbusn, lastbusn );
 }
 
+/* Both Margining Lane Control and Lane Status registers use the same
+   field layout (spec Tables 7-82/7-83): RecvNum[2:0], Type[5:3]
+   (1=Report, 2=Set, 3=Timing Step, 4=Voltage Step, 7=No Command),
+   UsageModel[6], Payload[15:8]. Field masks live in lib/header.h. */
+
+/* Margining payload sub-field encodings (spec 4.2.13 Lane Margining at Receiver,
+   Table 4-26 Margin Commands and Corresponding Responses;
+   cf. the matching LMR_PLD_* definitions in lmr/margin.c) */
+#define LMR_T_GO_LEFT		BIT(14)
+#define LMR_T_STEPS		MASK(13, 8)
+
+#define LMR_V_GO_DOWN		BIT(15)
+#define LMR_V_STEPS		MASK(14, 8)
+#define LMR_ERR_CNT		MASK(13, 8)
+#define LMR_MARGIN_STS	MASK(15, 14)
+
+/* Number of Margining Lane Control/Status register pairs.
+   They are implemented per lane of the link, so their count equals
+   the Max Link Width advertised in the Express LNKCAP register.
+   Returns 0 on failure, 1 on success with *lanes filled in. */
+static int
+cap_lmr_lane_count(struct device *d, unsigned int *lanes)
+{
+  struct pci_cap *exp = pci_find_cap(d->dev, PCI_CAP_ID_EXP, PCI_CAP_NORMAL);
+  if (!exp || !config_fetch(d, exp->addr + PCI_EXP_LNKCAP, 4))
+    return 0;
+
+  unsigned int width = GET_REG_MASK(get_conf_long(d, exp->addr + PCI_EXP_LNKCAP), PCI_EXP_LNKCAP_WIDTH);
+  if (width < 1 || width > 32)
+    return 0;
+
+  *lanes = width;
+  return 1;
+}
+
+/* Print one Margining Lane Control Register (spec 7.7.7.4) */
+static void
+cap_lmr_print_lane_ctl(unsigned int lane, u16 margin_ctl)
+{
+  unsigned int recv_num = GET_REG_MASK(margin_ctl, PCI_LMR_LANE_RECVN);
+  unsigned int margin_type = GET_REG_MASK(margin_ctl, PCI_LMR_LANE_TYPE);
+  unsigned int margin_pld = GET_REG_MASK(margin_ctl, PCI_LMR_LANE_PLD);
+  unsigned int usage_model = GET_REG_MASK(margin_ctl, PCI_LMR_LANE_USAGE);
+
+  printf("\t\tLaneCtl%u: RecvNum=%u", lane, recv_num);
+  if (usage_model)
+    printf(" UsageModel=%u", usage_model);
+  putchar(' ');
+  /* Command encoding is fixed by the PCIe spec (4.2.13, Table 4-26):
+     Type 1=Report, 2=Set, 3=Timing Step, 4=Voltage Step, 7=No Command */
+  switch (margin_type)
+    {
+    case 7:
+      /* No Command - the fixed idle encoding: Type=7, Payload=0x9c */
+      printf("No Command");
+      if (margin_pld != 0x9c)
+	printf(" Pld=%02x", margin_pld);
+      break;
+    case 3:
+      /* Timing Step - payload format fixed by spec (4.2.13.1.2):
+	 GoLeft (bit 14; meaningful only if the receiver supports
+	 independent left/right timing, else reserved) + NumSteps (bits 13:8) */
+      printf("Timing Step %s %u steps",
+		 (margin_ctl & LMR_T_GO_LEFT) ? "Left" : "Right",
+		 (unsigned int) GET_REG_MASK(margin_ctl, LMR_T_STEPS));
+      break;
+    case 4:
+      /* Voltage Step - payload format fixed by spec (4.2.13.1.2):
+		 GoDown (bit 15; meaningful only if the receiver supports
+		 independent up/down voltage, else reserved) + NumSteps (bits 14:8) */
+      printf("Voltage Step %s %u steps",
+		 (margin_ctl & LMR_V_GO_DOWN) ? "Down" : "Up",
+		 (unsigned int) GET_REG_MASK(margin_ctl, LMR_V_STEPS));
+      break;
+    case 1:
+      /* Report - payload holds the fixed selector code (0x88..0x90)
+	 of the value to report */
+      printf("Report Sel=%02x", margin_pld);
+      break;
+    case 2:
+      /* Set - payload holds the value to set; fixed codes:
+		 0xC0|n error limit, 0x55 clear error log, 0x0F normal settings */
+      printf("Set Val=%02x", margin_pld);
+      break;
+    default:
+      /* Reserved type - dump raw fields */
+      printf("Type=%u Pld=%02x", margin_type, margin_pld);
+      break;
+    }
+  putchar('\n');
+}
+
+/* Print one Margining Lane Status Register (spec 7.7.7.5).
+   When idle, it echoes the No Command encoding; after a step command
+   it holds the response: error count + execution status. */
+static void
+cap_lmr_print_lane_sta(unsigned int lane, u16 margin_sta)
+{
+  /* Step Margin Execution Status (spec 4.2.13.1.1) */
+  static const char *margin_sts[] = {
+    "Too many errors", "Set up in progress", "Margining in progress", "NAK"
+  };
+  char stsbuf[16]= {0};
+  unsigned int recv_num = GET_REG_MASK(margin_sta, PCI_LMR_LANE_RECVN);
+  unsigned int margin_type = GET_REG_MASK(margin_sta, PCI_LMR_LANE_TYPE);
+  unsigned int margin_pld = GET_REG_MASK(margin_sta, PCI_LMR_LANE_PLD);
+  unsigned int usage_model = GET_REG_MASK(margin_sta, PCI_LMR_LANE_USAGE);
+
+  printf("\t\tLaneSta%u: RecvNum=%u", lane, recv_num);
+  if (usage_model)
+    printf(" UsageModel=%u", usage_model);
+  putchar(' ');
+  /* Status echoes the last command using the same fixed encoding as
+     Lane Control (spec 4.2.13); the payload holds the command response
+     as defined by Table 4-26 (Margin Commands and Corresponding Responses) */
+  switch (margin_type)
+    {
+    case 7:
+      /* No Command echo - idle, no command in progress */
+      printf("No Command");
+      if (margin_pld != 0x9c)
+	printf(" Pld=%02x", margin_pld);
+      break;
+    case 3:
+    case 4:
+      {
+	/* Step response - payload format fixed by spec (4.2.13.1.1):
+		   ErrCnt (bits 13:8) + MargSts (bits 15:14):
+		   00=Too many errors, 01=Set up in progress,
+		   10=Margining in progress, 11=NAK */
+	unsigned int err_cnt = GET_REG_MASK(margin_sta, LMR_ERR_CNT);
+	unsigned int marg_sts = GET_REG_MASK(margin_sta, LMR_MARGIN_STS);
+
+	printf("%s Response ErrCnt=%u MargSts=%u (%s)",
+			       (margin_type == 3) ? "Timing Step" : "Voltage Step",
+			       err_cnt, marg_sts, TABLE(margin_sts, marg_sts, stsbuf));
+      }
+      break;
+    case 1:
+      /* Report response - payload = the reported value */
+      printf("Report Data=%02x", margin_pld);
+      break;
+    case 2:
+      /* Set echo - payload = the value that was set */
+      printf("Set Val=%02x", margin_pld);
+      break;
+    default:
+      /* Reserved type - dump raw fields */
+      printf("Type=%u Pld=%02x", margin_type, margin_pld);
+      break;
+    }
+  putchar('\n');
+}
+
 static void
 cap_lmr(struct device *d, int where)
 {
@@ -806,6 +960,18 @@ cap_lmr(struct device *d, int where)
   printf("\t\tPortSta: MargReady%c MargSoftReady%c\n",
          FLAG(port_status, PCI_LMR_PORT_STS_READY),
          FLAG(port_status, PCI_LMR_PORT_STS_SOFT_READY));
+
+  unsigned int lanes = 0;
+  if (!cap_lmr_lane_count(d, &lanes))
+    return;
+  if (!config_fetch(d, where + PCI_LMR_LANECTL, 4 * lanes))
+    return;
+
+  for (unsigned int lane = 0; lane < lanes; lane++)
+    {
+      cap_lmr_print_lane_ctl(lane, get_conf_word(d, where + PCI_LMR_LANECTL + 4 * lane));
+      cap_lmr_print_lane_sta(lane, get_conf_word(d, where + PCI_LMR_LANESTA + 4 * lane));
+    }
 }
 
 static void
