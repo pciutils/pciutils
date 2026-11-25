@@ -1524,6 +1524,12 @@
 #define PCI_LMR_PORT_STS		0x6 /* Margining Port Status Register */
 #define PCI_LMR_PORT_STS_READY		0x1 /* Margining Ready */
 #define PCI_LMR_PORT_STS_SOFT_READY	0x2 /* Margining Software Ready */
+#define PCI_LMR_LANECTL			0x8 /* Margining Lane Control Register (one per lane, stride 4) */
+#define PCI_LMR_LANESTA			0xa /* Margining Lane Status Register (one per lane, stride 4) */
+#define  PCI_LMR_LANE_RECVN		0x0007 /* Receiver Number [2:0]; same layout in Lane Control and Lane Status */
+#define  PCI_LMR_LANE_TYPE		0x0038 /* Margin Type [5:3]: 1=Report 2=Set 3=TimStep 4=VoltStep 7=No Command */
+#define  PCI_LMR_LANE_USAGE		0x0040 /* Usage Model [6] */
+#define  PCI_LMR_LANE_PLD		0xff00 /* Margin Payload [15:8] */
 
 /* Device 3 Extended Capability */
 #define PCI_DEV3_DEVCAP3		0x04	/* Device Capabilities 3 */
